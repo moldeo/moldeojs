@@ -1,0 +1,64 @@
+/* Limpiadores */
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea, p, blockquote, th, td, span {margin:0;padding:0;resize:none;}table {border-collapse:collapse;border-spacing:0;}fieldset, img {border:0;}address, caption, cite, code, strong, dfn, em, th, var {font-style:normal;font-weight:normal;}ol, ul {list-style:none;}caption, th {text-align:left;}h1, h2, h3, h4, h5, h6 {font-size:100%;font-weight:normal;}q:before, q:after {content:'';}abbr, acronym {border:0;}input:focus, textarea:focus{outline:0px;}html {overflow-x:hidden;}
+/*Doc*/
+html, body{
+	background:rgba(32, 64, 96, 0.1);
+	width:100%;
+	height:100%;
+	padding:0;
+	margin:0;
+	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: hidden;
+	-webkit-touch-callout: none; 
+    -webkit-user-select: none;   
+    -khtml-user-select: none;    
+    -moz-user-select: none;      
+    -ms-user-select: none;
+    user-select: none;
+}
+html{
+	-webkit-box-shadow: inset 0px 0px 19px 5px rgba(0,0,0,1);
+	-moz-box-shadow: inset 0px 0px 19px 5px rgba(0,0,0,1);
+	box-shadow: inset 0px 0px 19px 5px rgba(0,0,0,1);
+}
+body{
+
+}
+h1{
+	opacity:0.8;
+	font-weight: bold;
+	font-size:14px;
+	text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.35);
+	padding:5px 5px 0 5px;
+	margin-bottom:10px;
+}
+p{
+	opacity:0.9;
+	font-size:10px;
+	text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.35);
+	padding:0 5px;
+}
+
+#datax {
+  display: block;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  margin-top: -100px;
+  width: 30%;
+  height: auto;
+  overflow: hidden;
+  background-color: rgba(255,255,255,0.25);  
+  box-shadow: 4px 4px 0px rgba( 0, 0, 0, 0.35);
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-bottom: 8px;
+  opacity: 0.0;
+  transition: all 0.5s;
+}
+
+#datax.mostrar {
+  opacity: 1.0;
+}
