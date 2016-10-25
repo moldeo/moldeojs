@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<title>three.js canvas - interactive - cubes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link href='estilo.css' rel='stylesheet' type='text/css'>
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+			iframe{
+				border:0 solid #000000;
+				width:150px;
+				height:170px;
+				margin:-100px 0 0 75px;
+			}
+		</style>
+		<script src="build/three.js"></script>
+
+		<script src="build/js/renderers/Projector.js"></script>
+		<script src="build/js/renderers/CanvasRenderer.js"></script>
+		<script src="build/js/controls/TrackballControls.js"></script>
+		<script src="build/js/libs/stats.min.js"></script>	
+
+		<script type='text/javascript' src='build/tween.js'></script>
+		
+	</head>
+	<body>
+
+		<script>
+			var container, stats;
+			var camera, controls, scene, renderer;
+			var particleMaterial;
+			var plane = new THREE.Plane();
+			var raycaster = new THREE.Raycaster();
+			var mouse = new THREE.Vector2(),
+			offset = new THREE.Vector3(),
+			intersection = new THREE.Vector3(),
+			INTERSECTED, SELECTED;
+
+			var objects = [];				//Imagenes
+			var txt_lupa, map_lupa, lupa;	//Lupa
+			var txt_zoom, map_zoom, zoom;	//Zoom de la lupa
+
+			var texturas = new Array();	//Cargar Textura
+
+      var lupasize = 1.0;
+			var id_actual;
+			var data = document.createElement( 'div' );
+      data.setAttribute("id","datax");
+      data.setAttribute("class","");
+			var data_titulo;
+      var data_descripcion;
+			init();
+			animate();
+
+			function init() {
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				var info = document.createElement( 'div' );
+				container.appendChild( info );
+
+				data.style.position = 'absolute';
+				data.style.display = 'none';
+				//data.style.top = '50%';
+				//data.style.left = '50%';
+				//data.style.marginTop = ""+map_range(window.innerHeight, 768, 900, -110, -150)+"px";
+				//data.style.marginLeft = ""+map_range(window.innerHeight, 768, 900, 80, 100)+"px";
+				//data.innerHTML = '<iframe src="historia-coor/data.html"></iframe>';
+        data.innerHTML = '<h1 id="titulo_data">Titulo</h1><p id="descripcion_data">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam rhoncus sem eu blandit ultrices. Maecenas et ex id purus euismod varius vitae vel nisl. Duis commodo sed justo non ornare.</p>';
+				container.appendChild( data );
+        data_titulo = document.getElementById("titulo_data");
+        data_descripcion = document.getElementById("descripcion_data");
+
+				//Declaraciones THREE
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 0, 0, 500 );
+
+				controls = new THREE.TrackballControls( camera );
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+				controls.noZoom = true;
+				controls.noPan = true;
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				scene = new THREE.Scene();
+				loader = new THREE.TextureLoader();
+
+				//Otras variables
+				particulas = 3;	//Cantidad de particulas
+
+				//Variables de Imagen
+				var c = 0;
+
+				for ( var y = 2; y >= 1; y-- ) {
+					for ( var x = 1; x <= 2; x++ ) {
+						texturas[c] = loader.load("img/historia2/"+(c+1)+".jpg");
+						texturas[c].minFilter = THREE.LinearFilter;
+						var img = new THREE.MeshBasicMaterial({ map:texturas[c] });
+						var object = new THREE.Mesh(new THREE.PlaneBufferGeometry( 950 , 421), img);
+						object.position.x = x * 300 - 450;
+						object.position.y = y * 180 - 280;
+						object.position.z = 1;
+						object.scale.x = 0.3;
+						object.scale.y = 0.3;
+						object.idi = c;
+						scene.add( object );
+						objects.push( object );
+						c++;
+					}
+				}
+				//LUPA//
+				txt_lupa = loader.load("img/lupa.png");
+				txt_lupa.minFilter = THREE.LinearFilter;
+				map_lupa = new THREE.MeshBasicMaterial({ map:txt_lupa, transparent: true });
+				lupa = new THREE.Mesh(new THREE.PlaneBufferGeometry( 292*lupasize , 200*lupasize ), map_lupa);
+				lupa.position.x = 0;
+				lupa.position.y = 0;
+				lupa.position.z = 4;
+				lupa.name = "lupa";
+				scene.add( lupa );
+				objects.push( lupa );
+
+				//Zoom de la LUPA//
+				txt_zoom = loader.load("img/historia2/1.jpg");
+				map_zoom = new THREE.MeshBasicMaterial({ map:txt_zoom });
+				map_zoom.map.repeat.x = 0.1*0.1;
+				map_zoom.map.repeat.y = 0.18*0.1;
+				zoom = new THREE.Mesh(new THREE.CircleBufferGeometry( 62*lupasize , 62*lupasize ), map_zoom);
+				zoom.material.map.needsUpdate = true;
+				zoom.position.x = 0;
+				zoom.position.y = 0;
+				zoom.position.z = 3;
+				scene.add( zoom );
+
+				var PI2 = Math.PI * 2;
+
+				raycaster = new THREE.Raycaster();
+				mouse = new THREE.Vector2();
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				//renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 000000 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+				stats = new Stats();
+				container.appendChild( stats.dom );
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				//
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+			function onDocumentMouseMove( event ) {
+				event.preventDefault();
+
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				
+				raycaster.setFromCamera( mouse, camera );
+
+				if ( SELECTED ) {
+					if ( raycaster.ray.intersectPlane( plane, intersection ) ) {
+						SELECTED.position.copy( intersection.sub( offset ) );
+					}
+					return;
+				}
+				var intersects = raycaster.intersectObjects( objects );
+				if ( intersects.length > 0 ) {
+					if ( INTERSECTED != intersects[ 0 ].object ) {
+						if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
+						INTERSECTED = intersects[ 0 ].object;
+						INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
+						plane.setFromNormalAndCoplanarPoint(
+							camera.getWorldDirection( plane.normal ),
+							INTERSECTED.position );
+					}
+				} else {
+					if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
+					INTERSECTED = null;
+				}
+
+			}
+			function onDocumentTouchStart( event ) {
+				event.preventDefault();
+				event.clientX = event.touches[0].clientX;
+				event.clientY = event.touches[0].clientY;
+				onDocumentMouseDown( event );
+			}
+			function onDocumentMouseDown( event ) {
+				event.preventDefault();
+				mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
+				raycaster.setFromCamera( mouse, camera );
+
+
+				var intersects = raycaster.intersectObjects( objects );
+				if ( intersects.length > 0 ) {
+
+					/////////////////////LUPA////////////////////////
+					if(intersects[ 0 ].object.name === "lupa"){
+						controls.enabled = false;
+						SELECTED = intersects[ 0 ].object;
+						if ( raycaster.ray.intersectPlane( plane, intersection ) ) {
+							offset.copy( intersection ).sub( SELECTED.position );
+						}
+					}else{					
+					////////////////////////////////////////////////
+						data.style.display = 'none';
+						id_actual = intersects[ 0 ].object.idi;
+
+						//Animación Lupa
+						var lupaCoords = { x: lupa.position.x, y: lupa.position.y };
+						var sTween = new TWEEN.Tween(lupaCoords)
+						    .to({ x: 0, y: 0 }, 200)
+						    .onUpdate(function() {
+						    	lupa.position.x = this.x;
+						        lupa.position.y = this.y;
+						    })
+						    .easing(TWEEN.Easing.Quintic.In)
+						    .start();
+
+						//Animacion Escala de objecto seleccionado
+						var sCoords = { x: intersects[ 0 ].object.scale.x, y: intersects[ 0 ].object.scale.y };
+						var sTween = new TWEEN.Tween(sCoords)
+						    .to({ x: 0.8, y: 0.8 }, 300)
+						    .onUpdate(function() {
+						    	intersects[ 0 ].object.scale.x = this.x;
+						        intersects[ 0 ].object.scale.y = this.y;
+						    })
+						    .easing(TWEEN.Easing.Quintic.In)
+						    .start();
+						//Animación Posición de objeto seleccionado
+						var pCoords = { x: intersects[ 0 ].object.position.x, y: intersects[ 0 ].object.position.y };
+						var pTween = new TWEEN.Tween(pCoords)
+						    .to({ x: 0, y: 0 }, 550)
+						    .onUpdate(function() {
+						    	intersects[ 0 ].object.position.x = this.x;
+						        intersects[ 0 ].object.position.y = this.y;
+						    })
+						    .easing(TWEEN.Easing.Quintic.Out)
+						    .start();
+
+						intersects[ 0 ].object.position.z = 2;
+
+						zoom.material.map = intersects[ 0 ].object.material.map.clone();
+						zoom.material.map.needsUpdate = true;
+						map_zoom.map.repeat.x = 0.1*0.88;
+						map_zoom.map.repeat.y = 0.18*0.88;
+
+						for (var i = 0; i <= particulas; i++) {
+							if(objects[i].id !== intersects[ 0 ].object.id){
+								objects[i].scale.x = 0.3;
+								objects[i].scale.y = 0.3;
+								objects[i].position.z = 1;
+							}
+						}
+
+						var c2 = 0;
+						for ( var y = 2; y >= 1; y-- ) {
+							for ( var x = 1; x <= 2; x++ ) {
+								if(objects[c2].id !== intersects[ 0 ].object.id){
+									if( c2 > parseInt(particulas/2) ){
+										objects[c2].position.x = x * 300 - 450;
+										objects[c2].position.y = y * 180 - 460;
+									}else{
+										objects[c2].position.x = x * 300 - 450;
+										objects[c2].position.y = y * 180 - 70;
+									}
+								}
+								c2++;
+							}
+						}
+					}
+				}
+			}
+			function onDocumentMouseUp( event ) {
+				event.preventDefault();
+				controls.enabled = true;
+				if ( INTERSECTED ) {
+					SELECTED = null;
+				}
+			}
+
+			/////////////////////////////////////////////////////////////////
+
+			function animate( ) {
+				requestAnimationFrame( animate );
+				TWEEN.update();
+				render();
+				stats.update();
+			}
+
+			var radius = 800;
+			var theta = 0;
+
+			function render() {
+				//console.log(lupa.position.x, lupa.position.y);
+				zoom.position.x = lupa.position.x + 74*lupasize;
+				zoom.position.y = lupa.position.y + 29*lupasize;
+				//zoom.material.map.offset.x = map_range(lupa.position.x, -392, 267, 0, 0.9);
+				//zoom.material.map.offset.y = map_range(lupa.position.y, 100, -150, 0.9, 0);
+        zoom.material.map.offset.x = (zoom.position.x/0.8-62*lupasize/2+950.0/2)/(950.0);
+        zoom.material.map.offset.y = (zoom.position.y/0.8-62*lupasize/2+421.0/2)/(421.0); 
+
+				coords(id_actual, zoom.position.x, zoom.position.y);
+				//theta += 0.1;
+				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+				camera.lookAt( scene.position );
+				renderer.render( scene, camera );
+			}
+
+			/////////////FUNCIONES//////////////
+
+			function map_range(value, low1, high1, low2, high2) {
+			    return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+			}
+			function distan(x1, y1, x2, y2){
+				return Math.sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
+			}
+
+			function coords(ida, px, py){	//X: de derecha a izquierda, Y: de abajo hacia arriba
+				if(ida === 0){
+
+					if ( distan(px, py, 0, 0) <= 170 ) {
+						data.style.display = 'block';
+					}else{
+						data.style.display = 'none';
+					}
+
+				}else if(ida === 1){
+          
+          mapc = [{ 
+            "coords": "30,677",
+            "radius": "70",
+            "title": "Botas",
+            "description": "Soldado calzandose sus botas tras haber cruzado el arroyo"
+          },
+          { 
+            "coords": "16,676",
+            "radius": "70",
+            "title": "Pantalones",
+            "description": "En distintas escenas del cuadro se puede ver como los soldados vuelven a ponerse los pantalones secos, los que han procurado resguardar de las aguas al cruzar el arroyo"
+          },
+          { 
+            "coords": "164,642",
+            "radius": "70",
+            "title": "Calzones largos",
+            "description": "El contexto de la escena retratada por el pintor, nos permite apreciar quer los soldados usaban dos prendas en sus priernas. Bajo los pantalones marron llevaban calzones largos color blanco"
+          },
+          { 
+            "coords": "200,691",
+            "radius": "70",
+            "title": "Sombreros",
+            "description": "En esta parte del cuadro se pueden apreciar los sombreros marron que llevan algunos soldados"
+          },          
+          { 
+            "coords": "250,746",
+            "radius": "70",
+            "title": "Gorros",
+            "description": "También encontramos dentro de las vestimentas gorros color azul, parte del uniforme de los soldados"
+          },          
+          { 
+            "coords": "709,797",
+            "radius": "70",
+            "title": "Cañon",
+            "description": "Dentro de las armas que portaban los soldos destacan los cañones "
+          },          
+          { 
+            "coords": "628,473",
+            "radius": "70",
+            "title": "Carretas",
+            "description": "Las carretas eran una medio de transporte vital en el traslado de las provisiones y el armamento pesado"
+          },          
+          { 
+            "coords": "645,791",
+            "radius": "70",
+            "title": "Fusta",
+            "description": "Herramienta para golpear a los caballos y hacerlos obedecer"
+          },
+          { 
+            "coords": "743,762",
+            "radius": "70",
+            "title": "Pala",
+            "description": "Dentro de las herramientas que portaban los soldados destacan las palas"
+          },
+          { 
+            "coords": "169,766",
+            "radius": "70",
+            "title": "Provisiones",
+            "description": "Destacan en la composición, las provisiones llevadas por los soldados para el largo viaje"
+          },
+          { 
+            "coords": "259,864",
+            "radius": "70",
+            "title": "Caballos",
+            "description": "Destacan en la distintas escenas la presencia de caballos, animales usados historicamente como medio de transporte y las antiguas campañas belicas"
+          },
+          { 
+            "coords": "259,694",
+            "radius": "70",
+            "title": "Razas caballos",
+            "description": "Se pueden apreciar al menos dos colores de caballos, Blancos y marrones"
+          },
+          { 
+            "coords": "377,637",
+            "radius": "70",
+            "title": "Monturas",
+            "description": "Aqui se parecia la montura del caballo, indispensable para la comodidad y seguridad del jinete"
+          },
+          { 
+            "coords": "191,820",
+            "radius": "70",
+            "title": "Etnias soldados",
+            "description": "Al presentarse algunos de los soldados sin pantalosnes podemos ver que algunos de ellos tienen pieles oscuras y otros claramente tiene piel blanca"
+          },
+          { 
+            "coords": "505,503",
+            "radius": "70",
+            "title": "Arboles",
+            "description": "Dentro de la vegetancion destacan estos arboles altos pertenecientes a la especie ..."
+          },
+          { 
+            "coords": "465,624",
+            "radius": "70",
+            "title": "Juncos",
+            "description": "En el arroyo se aprecian estas plantas acuaticas"
+          },
+          { 
+            "coords": "435,288",
+            "radius": "70",
+            "title": "Clima, estación del año",
+            "description": "Se ven las nubes y un timido sol entre ellas que nos hablan de la epoca del año en la que se enmarca este hecho historico"
+          },
+          { 
+            "coords": "653,710",
+            "radius": "70",
+            "title": "Arroyo",
+            "description": "El arroyo, centro articulador de la escena que vemos en el cuadro, obligando a los soldados a quitarse la ropa para cruzar sin mojar sus uniformes"
+          },
+          { 
+            "coords": "550,807",
+            "radius": "70",
+            "title": "Lanza",
+            "description": "Destacan entre los armamentos las lanzas que portan algunos soldados"
+          },
+          { 
+            "coords": "301,795",
+            "radius": "70",
+            "title": "Armas",
+            "description": "Aquí se precian claramente a los soldados cargando sus armas apoyadas en el hombro para evitar que se mojen"
+          } ,
+          { 
+            "coords": "0,0",
+            "radius": "70",
+            "title": "Cero",
+            "description": "Coord 0,0"
+          },         
+          { 
+            "coords": "1000,1000",
+            "radius": "70",
+            "title": "Mil",
+            "description": "Coord 1000,1000"
+          }         
+          ];
+          cfound = false;
+          console.log("px,py",px,py);
+          for( var i=0; i<mapc.length; i++ ) {
+            var cobj = mapc[i];
+            var coordsxy = cobj.coords.split(",");
+            var cx = Number(coordsxy[0])/1000.0;
+            var cy = Number(coordsxy[1])/1000.0;            
+            cx = (cx * 950 - 950/2)*0.8;
+            cy = (- cy * 421 + 421/2)*0.8;
+            if (cobj.title=="Mil") console.log("cx,cy",cx,cy);
+            if ( distan(px, py, cx, cy) <= 40 ) {              
+              console.log("cx,cy",cx,cy);
+              data.style.display = 'block';
+              data_titulo.innerHTML = cobj.title;
+              data_descripcion.innerHTML = cobj.description; 
+              data.setAttribute("class","mostrar");    
+              cfound = true;
+            }
+          }	
+          if (cfound===false) {
+              //data.style.display = 'none';
+              //data_titulo.innerHTML = '';
+              //data_descripcion.innerHTML = '';     
+              data.setAttribute("class","");
+          }				
+
+				}else if(ida === 2){
+
+					
+
+				}else if(ida === 3){
+
+					
+					
+				}
+			}
+
+		</script>
+
+	</body>
+</html>
