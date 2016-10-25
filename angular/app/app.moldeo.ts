@@ -723,6 +723,7 @@ export class moConsoleState {
 
 export class moConsole extends moObject {
   m_ConsoleState: string;
+  m_Config: moConfig;
   constructor() { 
     super();
     this.name = "__console__";

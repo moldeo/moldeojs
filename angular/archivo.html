@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js canvas - interactive - cubes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+		<script src="build/three.js"></script>
+
+		<script src="build/js/renderers/Projector.js"></script>
+		<script src="build/js/renderers/CanvasRenderer.js"></script>
+		<script src="build/js/controls/TrackballControls.js"></script>
+		<script src="build/js/libs/stats.min.js"></script>	
+
+		<script type='text/javascript' src='build/tween.js'></script>
+		
+	</head>
+	<body>
+
+		<script>
+			var container, stats;
+			var camera, controls, scene, renderer;
+			var particleMaterial;
+			var plane = new THREE.Plane();
+			var raycaster = new THREE.Raycaster();
+			var mouse = new THREE.Vector2(),
+			offset = new THREE.Vector3(),
+			intersection = new THREE.Vector3(),
+			INTERSECTED, SELECTED;
+
+			var objects = [];				//Imagenes
+			var txt_lupa, map_lupa, lupa;	//Lupa
+			
+			init();
+			animate();
+
+			function init() {
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				var info = document.createElement( 'div' );
+				container.appendChild( info );
+
+				//Declaraciones THREE
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 0, 0, 500 );
+
+				controls = new THREE.TrackballControls( camera );
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+				controls.noZoom = true;
+				controls.noPan = true;
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				scene = new THREE.Scene();
+				loader = new THREE.TextureLoader();
+
+				//Otras variables
+				particulas = 23;	//Cantidad de particulas
+
+				//Variables de Imagen
+				var texturas = new Array();	//Cargar Textura
+				var c = 0;
+
+				for ( var y = 6; y >= 1; y-- ) {
+					for ( var x = 1; x <= 4; x++ ) {
+						texturas[c] = loader.load("img/archivo/"+(c+1)+".jpg");
+						texturas[c].minFilter = THREE.LinearFilter;
+						var img = new THREE.MeshBasicMaterial({ map:texturas[c] });
+						var object = new THREE.Mesh(new THREE.PlaneBufferGeometry( 566 , 850), img);
+						object.position.x = x * 140 - 350;
+						object.position.y = y * 180 - 630;
+						object.position.z = 1;
+						object.scale.x = 0.18;
+						object.scale.y = 0.18;
+						scene.add( object );
+						objects.push( object );
+						c++;
+					}
+				}
+				txt_lupa = loader.load("img/lupa.png");;
+				txt_lupa.minFilter = THREE.LinearFilter;
+				map_lupa = new THREE.MeshBasicMaterial({ map:txt_lupa, transparent: true });
+				lupa = new THREE.Mesh(new THREE.PlaneBufferGeometry( 266 , 200), map_lupa);
+				lupa.position.x = 0;
+				lupa.position.y = 0;
+				lupa.position.z = 3;
+				lupa.name = "lupa";
+				scene.add( lupa );
+				objects.push( lupa );
+
+				var PI2 = Math.PI * 2;
+
+				raycaster = new THREE.Raycaster();
+				mouse = new THREE.Vector2();
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				//renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor( 000000 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+				stats = new Stats();
+				container.appendChild( stats.dom );
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				//
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+			function onDocumentMouseMove( event ) {
+				event.preventDefault();
+
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				
+				raycaster.setFromCamera( mouse, camera );
+
+				if ( SELECTED ) {
+					if ( raycaster.ray.intersectPlane( plane, intersection ) ) {
+						SELECTED.position.copy( intersection.sub( offset ) );
+					}
+					return;
+				}
+				var intersects = raycaster.intersectObjects( objects );
+				if ( intersects.length > 0 ) {
+					if ( INTERSECTED != intersects[ 0 ].object ) {
+						if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
+						INTERSECTED = intersects[ 0 ].object;
+						INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
+						plane.setFromNormalAndCoplanarPoint(
+							camera.getWorldDirection( plane.normal ),
+							INTERSECTED.position );
+					}
+				} else {
+					if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
+					INTERSECTED = null;
+				}
+
+			}
+			function onDocumentTouchStart( event ) {
+				event.preventDefault();
+				event.clientX = event.touches[0].clientX;
+				event.clientY = event.touches[0].clientY;
+				onDocumentMouseDown( event );
+			}
+			function onDocumentMouseDown( event ) {
+				event.preventDefault();
+				mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
+				raycaster.setFromCamera( mouse, camera );
+
+
+				var intersects = raycaster.intersectObjects( objects );
+				if ( intersects.length > 0 ) {
+
+					/////////////////////LUPA////////////////////////
+					if(intersects[ 0 ].object.name === "lupa"){
+						controls.enabled = false;
+						SELECTED = intersects[ 0 ].object;
+						if ( raycaster.ray.intersectPlane( plane, intersection ) ) {
+							offset.copy( intersection ).sub( SELECTED.position );
+						}
+					}else{					
+					////////////////////////////////////////////////
+						var sCoords = { x: intersects[ 0 ].object.scale.x, y: intersects[ 0 ].object.scale.y };
+						var sTween = new TWEEN.Tween(sCoords)
+						    .to({ x: 0.8, y: 0.8 }, 250)
+						    .onUpdate(function() {
+						    	intersects[ 0 ].object.scale.x = this.x;
+						        intersects[ 0 ].object.scale.y = this.y;
+						    })
+						    .easing(TWEEN.Easing.Quintic.In)
+						    .start();
+
+						var pCoords = { x: intersects[ 0 ].object.position.x, y: intersects[ 0 ].object.position.y };
+						var pTween = new TWEEN.Tween(pCoords)
+						    .to({ x: 0, y: 0 }, 500)
+						    .onUpdate(function() {
+						    	intersects[ 0 ].object.position.x = this.x;
+						        intersects[ 0 ].object.position.y = this.y;
+						    })
+						    .easing(TWEEN.Easing.Quintic.Out)
+						    .start();
+
+						intersects[ 0 ].object.position.z = 2;
+
+						for (var i = 0; i <= particulas; i++) {
+							if(objects[i].id !== intersects[ 0 ].object.id){
+								objects[i].scale.x = 0.18;
+								objects[i].scale.y = 0.18;
+								objects[i].position.z = 1;
+							}
+						}
+
+						var c2 = 0;
+						for ( var y = 6; y >= 1; y-- ) {
+							for ( var x = 1; x <= 4; x++ ) {
+								if(objects[c2].id !== intersects[ 0 ].object.id){
+									if( c2 > parseInt(particulas/2) ){
+										objects[c2].position.x = x * 140 - 350;
+										objects[c2].position.y = y * 120 - 700;
+									}else{
+										objects[c2].position.x = x * 140 - 350;
+										objects[c2].position.y = y * 120 - 140;
+									}
+								}
+								c2++;
+							}
+						}
+					}
+
+				}
+			}
+			function onDocumentMouseUp( event ) {
+				event.preventDefault();
+				controls.enabled = true;
+				if ( INTERSECTED ) {
+					SELECTED = null;
+				}
+			}
+
+			/////////////////////////////////////////////////////////////////
+
+			function animate( ) {
+				requestAnimationFrame( animate );
+				TWEEN.update();
+				render();
+				stats.update();
+			}
+
+			var radius = 800;
+			var theta = 0;
+
+			function render() {
+				//theta += 0.1;
+				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+				camera.lookAt( scene.position );
+				renderer.render( scene, camera );
+			}
+
+		</script>
+
+	</body>
+</html>
