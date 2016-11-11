@@ -76,7 +76,7 @@ export class moTextHeap {
 type moTextArray = moText[];
 
 export class moDebug {
-  moTextHeap; 
+  moTextHeap;
 }
 
 export class moAbstract {
@@ -95,9 +95,9 @@ export class moTextFilterParam {
 
 /**
  * moValue
- *  
+ *
  * All basic data and value definitions
- * 
+ *
  */
 
 export class moData {
@@ -125,9 +125,9 @@ type moDataMessages = moDataMessage[];
 
 /**
  * moResourceManager
- * 
+ *
  * All basic resource classes and definitions
- * 
+ *
  */
 
 enum moResourceType {
@@ -181,9 +181,9 @@ type moAttributeArray = moAttribute[];
 
 /**
  * moGUIManager
- * 
+ *
  * All geometry and graphics primitives class
- * 
+ *
  */
 
 enum moGeometryType {
@@ -225,7 +225,7 @@ export class moGeometry extends moResourceElement {
         moTCoordArray m_FaceVertexUvs;//array of texture coordinates for each vertex, corresponding to each face from m_Faces
         moAttributeArray m_Attributes;
         */
-} 
+}
 
 
 export class moPath extends moResourceElement {
@@ -239,7 +239,7 @@ export class moMaterial extends moMaterialBase {
 
 /**
  * mo3dModelManager
- * 
+ *
  * Managing all 3d scene nodes
  */
 
@@ -355,7 +355,7 @@ export class moMoldeoActionType {
 
 export class moAction {
   m_ActionType: moMoldeoActionType;
-  m_Arguments: moDataMessages; 
+  m_Arguments: moDataMessages;
 
 }
 
@@ -441,13 +441,13 @@ export class moTimerAbsolute {
 
   state: moTimerState;
   Start() {
-    
+
   }
   Pause() {
-    
+
   }
   Stop() {
-    
+
   }
   State() : moTimerState  {
     return this.state;
@@ -458,7 +458,7 @@ export class moTimerAbsolute {
 }
 
 export class moTimer extends moTimerAbsolute {
-  
+
 }
 
 
@@ -478,7 +478,7 @@ enum moParamInterpolationFunction {
     MO_INTERPOLATION_EASEINOUTCUBIC
 };
 
-export class moParamInterpolation { 
+export class moParamInterpolation {
   m_bIsOn : boolean;
   m_Timer : moTimer;
   m_Duration : MOlong; //in milliseconds
@@ -509,7 +509,7 @@ type moParamDefinitions = moParamDefinition[];
 
 export class moParamIndex {
   index: MOint;
-  constructor(index: MOint) {    
+  constructor(index: MOint) {
     this.index = index;
   }
 }
@@ -558,11 +558,11 @@ export class moConfig extends moAbstract {
     */
 }
 
-export class moMobState { 
+export class moMobState {
 
   m_Activated : MOswitch;
   m_Selected: MOswitch;
-  
+
 };
 
 export class moMobIndex {
@@ -614,7 +614,7 @@ enum moMoldeoObjectType {
 	MO_OBJECT_TYPES = 7 /// referencia para la cantidad de tipos de objetos
 };
 
-export class moMobDefinition { 
+export class moMobDefinition {
 
   m_MoldeoFatherId : MOint;
   m_MoldeoFatherLabelName : moText;
@@ -631,7 +631,7 @@ export class moMobDefinition {
 
   m_KeyName : moText;/// nombre de la tecla que activa el objeto
   m_Activate: boolean;/// activo al iniciar el proyecto
-  
+
 };
 
 export class moObject extends moAbstract {
@@ -644,9 +644,12 @@ export class moObject extends moAbstract {
     super();
   }
   Update() {}
-  
+
 }
 
+export class moTempo extends moAbstract {
+
+};
 
 export class moEffectState extends moMobState {
   /** moTempo, registro del beat del efecto */
@@ -685,7 +688,7 @@ export class moEffectState extends moMobState {
   fulldebug: MOswitch;
 
   /** 3d stereo capable: capacitado para diferenciar visión entre ojo izquierdo y derecho, profundidad, descativado: -1, activado: 1*/
-  stereo: MOswitch;
+  /*stereo: MOswitch;*/
 
   Init() {
     this.on = MO_DEACTIVATED;
@@ -702,9 +705,10 @@ export class moEffectState extends moMobState {
 		this.tint = 1.0;
 		this.tintc = 0.0;
 		this.tints = 0.0;
-
+/*
 		this.stereo = MO_DEACTIVATED;
 		this.stereoside = MO_STEREO_NONE;
+		*/
 		this.fulldebug = MO_DEACTIVATED;
 
 		this.tempo.Init();
@@ -734,7 +738,7 @@ export class moResource extends moObject {
 
 /**
  * Managers ALL
- * 
+ *
  */
 
 type moResources = moResource[];
@@ -808,7 +812,7 @@ export class moConsoleState {
 export class moConsole extends moObject {
   m_ConsoleState: string;
   m_Config: moConfig;
-  constructor() { 
+  constructor() {
     super();
     this.name = "__console__";
   }
