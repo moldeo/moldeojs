@@ -143,14 +143,14 @@
 
 				raycaster = new THREE.Raycaster();
 				mouse = new THREE.Vector2();
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				//renderer = new THREE.CanvasRenderer();
+				//renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.CanvasRenderer();
 				renderer.setClearColor( 000000 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				//stats = new Stats();
+				//container.appendChild( stats.dom );
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -298,10 +298,11 @@
 			/////////////////////////////////////////////////////////////////
 
 			function animate( ) {
-				requestAnimationFrame( animate );
+				//requestAnimationFrame( animate );
 				TWEEN.update();
 				render();
-				stats.update();
+				//stats.update();
+                setTimeout( animate, 20 );
 			}
 
 			var radius = 800;

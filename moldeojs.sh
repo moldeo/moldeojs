@@ -1,5 +1,5 @@
 #!/bin/sh
-cd angular
+cd a2cli
 npm start &
 alm
 

@@ -165,7 +165,7 @@ enum moResourceType {
 	MO_RESOURCETYPE_RESERVED2,
 	MO_RESOURCETYPE_RESERVED3,
 	MO_RESOURCETYPE_RESERVED4
-};///< enum tipos de recursos
+};
 
 export class moResourceElement extends moAbstract {
 }
