@@ -10,13 +10,15 @@ import { AppComponent } from './app.component';
 import { ThreeviewerComponent } from './threeviewer/threeviewer.component';
 import { MoldeojsViewComponent } from './moldeojs-view/moldeojs-view.component';
 import { MoldeoControlComponent } from './moldeo-control/moldeo-control.component';
+import { ControlProjectContent } from './moldeo-control/control-project-content/control-project-content.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ThreeviewerComponent,
     MoldeojsViewComponent,
-    MoldeoControlComponent
+    MoldeoControlComponent,
+    ControlProjectContent
   ],
   imports: [
     BrowserModule,

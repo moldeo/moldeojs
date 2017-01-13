@@ -13,7 +13,7 @@
 			<div id="control_project_led" class="con_indicator_led_big"></div>
 			<div id="control_project_header" class="header">
         <button id="buttonED_OpenProject" key="O" class="button_OpenProject key_button" title="Abrir un nuevo proyecto Moldeo" (click)="OpenProject();"></button>
-        <label title="Abrir un proyecto" id="control_project_header_label"> &lt;&lt;&lt; AQUí!!</label>
+        <label title="Abrir un proyecto" id="control_project_header_label"> {{message}}</label>
         <div class="buttons">
           <button id="buttonED_SaveProject" class="button_SaveProject control_button glyphicon glyphicon-save" title="Guardar" (click)="SaveProject();"></button>
           <button id="buttonED_SaveProjectAs" class="button_SaveProjectAs control_button glyphicon glyphicon-export"  title="Guardar Como / Clonar" (click)="SaveAsProject();"></button>
@@ -29,8 +29,10 @@
           </ul>
         </div>
 			</div>
-			<div id="control_project_content" class="content">
-			</div>
+
+      <control-project-content [project_name]='message' (notify)='onNotifyProjectContent($event)'></control-project-content>
+			<!--<div id="control_project_content" class="content">
+			</div>-->
 		</div>
   </div>
 </div>

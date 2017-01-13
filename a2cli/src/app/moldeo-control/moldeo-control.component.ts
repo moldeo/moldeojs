@@ -1,5 +1,6 @@
 import { Component, ContentChild, ViewChild, ViewChildren, ElementRef, OnInit } from '@angular/core';
 import * as ConsoleInterface from './MoldeoObjects';
+import { ControlProjectContent } from './control-project-content/control-project-content.component';
 
 @Component({
   selector: 'moldeocontrol',
@@ -14,6 +15,10 @@ export class MoldeoControlComponent implements OnInit {
 
   constructor(el: ElementRef) {
     this.hostElement = el;
+  }
+
+  onNotifyProjectContent(event) {
+    this.message = "MoldeoControl (Notified!)";
   }
 
   @ViewChild('openproject') openproject: ElementRef;
