@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="834"
+   height="164"
+   id="svg4031"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="moldeocontrol_back2a.svg"
+   inkscape:export-filename="/home/fabricio/moldeo/moldeoinstaller/moldeonet/MoldeoControl/art/moldeocontrol_back2b.png"
+   inkscape:export-xdpi="89"
+   inkscape:export-ydpi="89">
+  <defs
+     id="defs4033">
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3936"
+       id="linearGradient3942"
+       x1="367.2692"
+       y1="144.55675"
+       x2="16.866552"
+       y2="0.34772086"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.000376,0,0,0.94404422,-0.07133508,8.186324)" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3936">
+      <stop
+         style="stop-color:#d06414;stop-opacity:1;"
+         offset="0"
+         id="stop3938" />
+      <stop
+         style="stop-color:#d06414;stop-opacity:0;"
+         offset="1"
+         id="stop3940" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3936"
+       id="linearGradient4253"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.000376,0,0,0.94404422,-0.07133508,8.186324)"
+       x1="367.2692"
+       y1="144.55675"
+       x2="16.866552"
+       y2="0.34772086" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3936"
+       id="linearGradient4258"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.000376,0,0,0.94404422,286.29687,258.61573)"
+       x1="367.2692"
+       y1="144.55675"
+       x2="16.866552"
+       y2="0.34772086" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3936"
+       id="linearGradient4269"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.000376,0,0,0.94404422,286.29687,258.61573)"
+       x1="367.2692"
+       y1="144.55675"
+       x2="16.866552"
+       y2="0.34772086" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3936"
+       id="linearGradient4274"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.000376,0,0,0.94404422,286.29687,258.61573)"
+       x1="705.61688"
+       y1="137.10275"
+       x2="16.866552"
+       y2="0.34772086" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="5.0925085"
+     inkscape:cx="155.44609"
+     inkscape:cy="139.50441"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1024"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       orientation="0,1"
+       position="4.5519354,151.70631"
+       id="guide4278" />
+    <sodipodi:guide
+       orientation="1,0"
+       position="3.0346236,153.0495"
+       id="guide4280" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="0.57210117,148.57219"
+       id="guide4282" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata4036">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-284.5825,-238.5116)">
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       d="m 1090.7186,239.58519 -0.1678,19.88757 c -0.051,6.01817 -4.8452,10.86352 -10.8636,10.86352 l -773.20746,0 c -6.01839,0 -10.86352,-4.84513 -10.86352,-10.86352 l 0,-9.05623 c 0,-6.01839 4.84513,-10.86352 10.86352,-10.86352 261.41287,0.0109 522.8259,0.0215 784.23886,0.0321 z"
+       id="rect3999"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cssssscc"
+       inkscape:export-filename="/home/fabricio/moldeo/moldeoinstaller/moldeonet/MoldeoControl/art/moldeocontrol_back2.png"
+       inkscape:export-xdpi="89"
+       inkscape:export-ydpi="89" />
+    <path
+       style="fill:#b3b3b3;fill-opacity:1;fill-rule:evenodd;stroke:none;display:inline"
+       d="m 969.2417,260.91642 c 9.45061,-0.051 22.65987,-22.34918 31.8803,-22.39141 9.2205,-0.0422 110.4466,-0.0117 110.4466,-0.0117 3.878,-0.009 7,3.122 7,7 l 0,149.99829 c 0,3.878 -3.122,7 -7,7 l -819.9861,0 c -3.878,0 -7,-3.122 -7,-7 l 0,-127.66487 c 0,-3.878 3.04452,-6.99166 7,-7 237.00444,-0.76117 466.40638,0.0619 677.6592,0.0697 z"
+       id="rect2998-44-9-4"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="czssssssscc"
+       inkscape:export-filename="/home/fabricio/moldeo/moldeoinstaller/moldeonet/MoldeoControl/art/moldeocontrol_back2.png"
+       inkscape:export-xdpi="89"
+       inkscape:export-ydpi="89" />
+    <rect
+       style="fill:url(#linearGradient4274);fill-opacity:1;stroke:#646464;stroke-width:4.76183033;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="rect2998-31-0-98-1-4"
+       y="268.61838"
+       x="292.43619"
+       height="125.52213"
+       width="818.02393"
+       inkscape:export-filename="/home/fabricio/moldeo/moldeoinstaller/moldeonet/MoldeoControl/art/moldeocontrol_back2.png"
+       inkscape:export-xdpi="89"
+       inkscape:export-ydpi="89" />
+    <rect
+       style="fill:#333333;fill-opacity:1;fill-rule:evenodd;stroke:#7d7d7d;stroke-width:1.45547473;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="rect2998-31-0-98-1"
+       y="268.08847"
+       x="291.87766"
+       height="126.20181"
+       width="818.7309"
+       inkscape:export-filename="/home/fabricio/moldeo/moldeoinstaller/moldeonet/MoldeoControl/art/moldeocontrol_back2.png"
+       inkscape:export-xdpi="89"
+       inkscape:export-ydpi="89" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#800000;fill-opacity:1;stroke:none"
+       id="path3946"
+       sodipodi:cx="8.0403748"
+       sodipodi:cy="6.6351857"
+       sodipodi:rx="3.6830101"
+       sodipodi:ry="3.6830101"
+       d="m 11.723385,6.6351857 a 3.6830101,3.6830101 0 1 1 -7.3660203,0 3.6830101,3.6830101 0 1 1 7.3660203,0 z"
+       transform="matrix(0.97465188,0,0,0.97465188,298.73178,243.9816)"
+       inkscape:export-filename="/home/fabricio/moldeo/moldeoinstaller/moldeonet/MoldeoControl/art/moldeocontrol_back2.png"
+       inkscape:export-xdpi="89"
+       inkscape:export-ydpi="89" />
+  </g>
+</svg>

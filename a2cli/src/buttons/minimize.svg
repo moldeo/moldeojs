@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="16.073257"
+   height="16.073257"
+   id="svg42330"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="Documento nuevo 153">
+  <defs
+     id="defs42332">
+    <filter
+       id="filter7824"
+       inkscape:label="Invert hue"
+       inkscape:menu="Color"
+       inkscape:menu-tooltip="Invert hue, or rotate it"
+       y="0"
+       x="0"
+       height="1"
+       width="1"
+       color-interpolation-filters="sRGB">
+      <feColorMatrix
+         id="feColorMatrix7826"
+         type="hueRotate"
+         values="180"
+         result="result1" />
+    </filter>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient7564"
+       id="linearGradient7570"
+       x1="1020.8592"
+       y1="149.9407"
+       x2="1020.7889"
+       y2="167.23343"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient7564">
+      <stop
+         style="stop-color:#dc0000;stop-opacity:1;"
+         offset="0"
+         id="stop7566" />
+      <stop
+         style="stop-color:#dc0000;stop-opacity:0;"
+         offset="1"
+         id="stop7568" />
+    </linearGradient>
+    <filter
+       id="filter7820"
+       inkscape:label="Invert hue"
+       inkscape:menu="Color"
+       inkscape:menu-tooltip="Invert hue, or rotate it"
+       y="0"
+       x="0"
+       height="1"
+       width="1"
+       color-interpolation-filters="sRGB">
+      <feColorMatrix
+         id="feColorMatrix7822"
+         type="hueRotate"
+         values="180"
+         result="result1" />
+    </filter>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient7580"
+       id="radialGradient7588"
+       cx="1029.375"
+       cy="158.30357"
+       fx="1029.375"
+       fy="158.30357"
+       r="8.6607141"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(-0.0063316,1.6765898,-1.1792843,-0.00932742,1222.5776,-1566.0595)" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient7580">
+      <stop
+         style="stop-color:#ff4141;stop-opacity:1;"
+         offset="0"
+         id="stop7582" />
+      <stop
+         style="stop-color:#ff4141;stop-opacity:0;"
+         offset="1"
+         id="stop7584" />
+    </linearGradient>
+    <filter
+       id="filter7816"
+       inkscape:label="Invert hue"
+       inkscape:menu="Color"
+       inkscape:menu-tooltip="Invert hue, or rotate it"
+       y="0"
+       x="0"
+       height="1"
+       width="1"
+       color-interpolation-filters="sRGB">
+      <feColorMatrix
+         id="feColorMatrix7818"
+         type="hueRotate"
+         values="180"
+         result="result1" />
+    </filter>
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect6908-6-9-5"
+       is_visible="true" />
+    <filter
+       id="filter7808"
+       inkscape:label="Invert hue"
+       inkscape:menu="Color"
+       inkscape:menu-tooltip="Invert hue, or rotate it"
+       y="0"
+       x="0"
+       height="1"
+       width="1"
+       color-interpolation-filters="sRGB">
+      <feColorMatrix
+         id="feColorMatrix7810"
+         type="hueRotate"
+         values="180"
+         result="result1" />
+    </filter>
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect6908-6-2"
+       is_visible="true" />
+    <filter
+       id="filter7800"
+       inkscape:label="Invert hue"
+       inkscape:menu="Color"
+       inkscape:menu-tooltip="Invert hue, or rotate it"
+       y="0"
+       x="0"
+       height="1"
+       width="1"
+       color-interpolation-filters="sRGB">
+      <feColorMatrix
+         id="feColorMatrix7802"
+         type="hueRotate"
+         values="180"
+         result="result1" />
+    </filter>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient7564"
+       id="linearGradient42732"
+       gradientUnits="userSpaceOnUse"
+       x1="1020.8592"
+       y1="149.9407"
+       x2="1020.7889"
+       y2="167.23343" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient7580"
+       id="radialGradient42734"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(-0.0063316,1.6765898,-1.1792843,-0.00932742,1222.5776,-1566.0595)"
+       cx="1029.375"
+       cy="158.30357"
+       fx="1029.375"
+       fy="158.30357"
+       r="8.6607141" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.8"
+     inkscape:cx="26.610279"
+     inkscape:cy="-1.077904"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1366"
+     inkscape:window-height="716"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata42335">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-203.39194,-492.89699)">
+    <g
+       transform="translate(363.09824,599.55149)"
+       id="g41631">
+      <path
+         transform="matrix(0.92794067,0,0,0.92794067,-1106.8686,-245.5142)"
+         d="m 1038.0357,158.30357 c 0,4.78318 -3.8775,8.66072 -8.6607,8.66072 -4.7832,0 -8.6607,-3.87754 -8.6607,-8.66072 0,-4.78318 3.8775,-8.66071 8.6607,-8.66071 4.7832,0 8.6607,3.87753 8.6607,8.66071 z"
+         sodipodi:ry="8.6607141"
+         sodipodi:rx="8.6607141"
+         sodipodi:cy="158.30357"
+         sodipodi:cx="1029.375"
+         id="path6048-6"
+         style="color:#000000;fill:#2d2d2d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.10776551;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter7824);enable-background:accumulate"
+         sodipodi:type="arc" />
+      <path
+         transform="matrix(0.87123963,0,0,0.89082683,-1048.502,-239.87206)"
+         d="m 1038.0357,158.30357 c 0,4.78318 -3.8775,8.66072 -8.6607,8.66072 -4.7832,0 -8.6607,-3.87754 -8.6607,-8.66072 0,-4.78318 3.8775,-8.66071 8.6607,-8.66071 4.7832,0 8.6607,3.87753 8.6607,8.66071 z"
+         sodipodi:ry="8.6607141"
+         sodipodi:rx="8.6607141"
+         sodipodi:cy="158.30357"
+         sodipodi:cx="1029.375"
+         id="path6048-7-7"
+         style="color:#000000;fill:url(#linearGradient42732);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.11220998;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter7820);enable-background:accumulate"
+         sodipodi:type="arc" />
+      <path
+         transform="matrix(0.64185817,0,0,0.44351665,-812.49406,-172.57814)"
+         d="m 1038.0357,158.30357 c 0,4.78318 -3.8775,8.66072 -8.6607,8.66072 -4.7832,0 -8.6607,-3.87754 -8.6607,-8.66072 0,-4.78318 3.8775,-8.66071 8.6607,-8.66071 4.7832,0 8.6607,3.87753 8.6607,8.66071 z"
+         sodipodi:ry="8.6607141"
+         sodipodi:rx="8.6607141"
+         sodipodi:cy="158.30357"
+         sodipodi:cx="1029.375"
+         id="path6048-7-0-8"
+         style="opacity:0.53363229;color:#000000;fill:url(#radialGradient42734);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.11220998;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter7816);enable-background:accumulate"
+         sodipodi:type="arc" />
+      <path
+         transform="matrix(-1102.0609,3148.6465,-1206.3131,3443.091,423351.31,-1209538.5)"
+         inkscape:connector-curvature="0"
+         inkscape:original-d="m 218.57202,151.38548 -9.0282,8.25615"
+         inkscape:path-effect="#path-effect6908-6-9-5"
+         id="path6906-8-6-8"
+         d="m 218.57202,151.38548 -9.0282,8.25615"
+         style="fill:#2d2d2d;stroke:#000000;stroke-width:0.02120764;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-mid:none;filter:url(#filter7808)" />
+      <path
+         transform="matrix(-1102.0609,3148.6465,-1206.3131,3443.091,423351.31,-1209538.5)"
+         inkscape:connector-curvature="0"
+         inkscape:original-d="m 218.57202,151.38548 -9.0282,8.25615"
+         inkscape:path-effect="#path-effect6908-6-2"
+         id="path6906-8-60"
+         d="m 218.57202,151.38548 -9.0282,8.25615"
+         style="fill:#2d2d2d;stroke:#2d2d2d;stroke-width:0.01631358px;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;marker-mid:none;filter:url(#filter7800)" />
+    </g>
+  </g>
+</svg>

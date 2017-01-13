@@ -1,0 +1,2298 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="399.9986"
+   height="160.08701"
+   id="svg6215"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="moldeocontrol_full.svg">
+  <defs
+     id="defs6217">
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-16-3-1-1-0-0">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-8-4-7-1-1-7" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-5-1-40-5-5-2" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-7-1-9-2-1-6" />
+      <feFlood
+         flood-color="rgb(172,172,172)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-6-3-4-7-7-6" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-1-8-8-6-6-8" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-89-7-82-1-0-5" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-9-0-2-7-4-5">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-86-6-4-8-3-4" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-50-81-8-3-9-8" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-2-9-6-5-8-9" />
+      <feFlood
+         flood-color="rgb(198,198,198)"
+         flood-opacity="1"
+         result="result10"
+         id="feFlood4036-8-8-5-1-8-9" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-6-9-09-2-0-8" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-0-7-00-0-8-1" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-9-0-2-7-2">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-86-6-4-8-7" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-50-81-8-3-7" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-2-9-6-5-9" />
+      <feFlood
+         flood-color="rgb(198,198,198)"
+         flood-opacity="1"
+         result="result10"
+         id="feFlood4036-8-8-5-1-2" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-6-9-09-2-1" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-0-7-00-0-82" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-9-7-8-9">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-86-61-2-7" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-50-4-4-9" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-2-2-5-9" />
+      <feFlood
+         flood-color="rgb(184,184,184)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-8-3-5-0" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-6-22-1-0" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-0-1-7-6" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-1-2-68-4-4">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-7-4-57-2-2" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-4-8-6-3-5" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-0-6-18-2-3" />
+      <feFlood
+         flood-color="rgb(172,172,172)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-9-5-92-2-5" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-4-0-7-1-1" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-8-9-9-6-9" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-16-3-1-1-7">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-8-4-7-1-8" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-5-1-40-5-4" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-7-1-9-2-9" />
+      <feFlood
+         flood-color="rgb(172,172,172)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-6-3-4-7-1" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-1-8-8-6-9" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-89-7-82-1-8" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-9-5-9-2-46-7">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-86-9-7-95-0-9" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-50-8-3-2-6-6" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-2-4-7-0-6-9" />
+      <feFlood
+         flood-color="rgb(0,0,0)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-8-0-2-03-1-5" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-6-7-6-9-8-6" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-0-6-0-18-4-4" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-9-2-1-7">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-86-0-2-4" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-50-3-0-4" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-2-5-0-8" />
+      <feFlood
+         flood-color="rgb(84,254,245)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-8-6-1-6" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-6-6-4-5" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-0-67-6-1" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-1-2-6-0-4">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-7-4-7-7-9" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-4-8-7-1-8" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-0-6-1-7-8" />
+      <feFlood
+         flood-color="rgb(84,254,245)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-9-5-9-7-7" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-4-0-1-7-3" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-8-9-6-7-4" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-9-5-9-5-0-6-5">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-86-9-7-4-0-3-7" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-50-8-3-1-4-7-7" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-2-4-7-2-8-8-5" />
+      <feFlood
+         flood-color="rgb(84,254,245)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-8-0-2-0-3-8-1" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-6-7-6-0-0-2-3" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-0-6-0-1-1-9-3" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-16-3-7-0-7">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-8-4-8-9-9" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-5-1-3-7-6" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-7-1-71-3-5" />
+      <feFlood
+         flood-color="rgb(84,254,245)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-6-3-0-7-3" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-1-8-0-2-4" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-89-7-8-6-0" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-5-4-3-0-2">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-1-2-4-1-4" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-7-7-5-6-9" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-1-7-0-5-8" />
+      <feFlood
+         flood-color="rgb(84,254,245)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-1-9-1-7-0" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-5-3-45-5-4" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-2-1-6-4-2" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-9-5-0-76-6">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-86-9-8-3-1" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-50-8-9-6-5" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-2-4-3-1-6" />
+      <feFlood
+         flood-color="rgb(84,254,245)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-8-0-0-5-1" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-6-7-7-4-0" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-0-6-4-2-5" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-9-5-9-29-1-0">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-86-9-7-0-3-4" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-50-8-3-3-5-8" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-2-4-7-8-9-7" />
+      <feFlood
+         flood-color="rgb(84,254,245)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-8-0-2-85-8-0" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-6-7-6-7-4-8" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-0-6-0-7-0-1" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-9-5-9-1-7">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-86-9-7-3-2" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-50-8-3-87-8" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-2-4-7-4-0" />
+      <feFlood
+         flood-color="rgb(255,246,0)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-8-0-2-2-1" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-6-7-6-77-1" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-0-6-0-9-9" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-9-5-9-5-3-1">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-86-9-7-4-1-0" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-50-8-3-1-9-3" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-2-4-7-2-86-2" />
+      <feFlood
+         flood-color="rgb(255,0,3)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-8-0-2-0-5-3" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-6-7-6-0-02-2" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-0-6-0-1-8-2" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-9-5-5-8">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-86-9-4-18" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-50-8-31-7" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-2-4-2-5" />
+      <feFlood
+         flood-color="rgb(171,171,171)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-8-0-3-62" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-6-7-3-64" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-0-6-41-7" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-9-7-4">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-86-61-3" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-50-4-7" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-2-2-0" />
+      <feFlood
+         flood-color="rgb(184,184,184)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-8-3-54" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-6-22-3" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-0-1-73" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-16-3-1-8">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-8-4-7-0" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-5-1-40-56" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-7-1-9-8" />
+      <feFlood
+         flood-color="rgb(172,172,172)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-6-3-4-2" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-1-8-8-68" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-89-7-82-12" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-5-4-4-6">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-1-2-5-6" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-7-7-51-2" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-1-7-7-4" />
+      <feFlood
+         flood-color="rgb(0,255,252)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-1-9-11-3" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-5-3-5-0" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-2-1-2-2" />
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Adds a colorizable glow inside"
+       inkscape:menu="Shadows and Glows"
+       inkscape:label="Inner Glow"
+       id="filter4028-9-5-5-6-0">
+      <feGaussianBlur
+         result="result8"
+         stdDeviation="1.1726744186046512"
+         id="feGaussianBlur4030-86-9-4-3-5" />
+      <feComposite
+         operator="in"
+         in="SourceGraphic"
+         result="result6"
+         in2="result8"
+         id="feComposite4032-50-8-31-8-1" />
+      <feComposite
+         result="result11"
+         operator="in"
+         in2="result6"
+         id="feComposite4034-2-4-2-0-0" />
+      <feFlood
+         flood-color="rgb(171,171,171)"
+         flood-opacity="1"
+         in="result11"
+         result="result10"
+         id="feFlood4036-8-0-3-3-5" />
+      <feBlend
+         result="result12"
+         in="result11"
+         mode="normal"
+         in2="result10"
+         id="feBlend4038-6-7-3-6-8" />
+      <feComposite
+         in="result12"
+         operator="in"
+         result="result2"
+         in2="SourceGraphic"
+         id="feComposite4040-0-6-41-94-0" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.412844"
+     inkscape:cx="110.60327"
+     inkscape:cy="80.426346"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1172"
+     inkscape:window-height="627"
+     inkscape:window-x="78"
+     inkscape:window-y="78"
+     inkscape:window-maximized="0"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata6220">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-156.01108,-150.99484)">
+    <g
+       style="display:inline"
+       id="g4410-2"
+       transform="matrix(0.44608179,0,0,0.50170519,96.344828,200.72926)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         id="g5816-0"
+         transform="translate(74.817179,-67.335461)">
+        <rect
+           ry="63.091599"
+           rx="70.902336"
+           y="95.609741"
+           x="111.81523"
+           height="60"
+           width="60"
+           id="rect2998-44-5-4"
+           style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+        <rect
+           ry="58.885494"
+           rx="66.175514"
+           y="98.109741"
+           x="114.31523"
+           height="55"
+           width="55"
+           id="rect2998-31-0-2-4"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:3.94410634;stroke-opacity:1" />
+        <rect
+           transform="matrix(1.4914506,0,0,2.0984505,-1059.5245,-1139.0661)"
+           ry="30.065802"
+           rx="47.539181"
+           y="590.04291"
+           x="787.71619"
+           height="25.256731"
+           width="35.535873"
+           id="rect2998-31-3-6-0-3"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-9-5-5-6-0)" />
+        <text
+           transform="scale(1.1957556,0.8362913)"
+           sodipodi:linespacing="125%"
+           id="text6072-3-8-4-69"
+           y="166.7121"
+           x="122.48985"
+           style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           xml:space="preserve"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#999999;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League"
+             y="166.7121"
+             x="122.48985"
+             id="tspan6074-0-9-7-1"
+             sodipodi:role="line">1</tspan></text>
+      </g>
+    </g>
+    <rect
+       ry="2.1102254"
+       rx="2.1085494"
+       y="150.99484"
+       x="156.01108"
+       height="160.08701"
+       width="399.9986"
+       id="rect2998-44-9-4"
+       style="fill:#b3b3b3;fill-opacity:1;fill-rule:evenodd;stroke:none;display:inline"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997" />
+    <rect
+       y="163.9949"
+       x="162.31956"
+       height="134.08691"
+       width="387.38162"
+       id="rect2998-31-0-98-1-4"
+       style="fill:none;stroke:#646464;stroke-width:6.32816219;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997" />
+    <rect
+       y="163.9949"
+       x="162.31956"
+       height="134.08691"
+       width="387.38162"
+       id="rect2998-31-0-98-1"
+       style="fill:#333333;fill-opacity:1;fill-rule:evenodd;stroke:#7d7d7d;stroke-width:3.1640811;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997" />
+    <g
+       style="display:inline"
+       id="g4512"
+       transform="matrix(0.48162872,0,0,0.54168461,89.163226,195.66753)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         id="g3084-6-1"
+         transform="matrix(0.70803107,0,0,0.66171234,-275.64666,-317.3379)">
+        <g
+           id="g3079-1-8">
+          <rect
+             style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none"
+             id="rect2998-4-4"
+             width="117.96266"
+             height="85.156624"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1832824"
+             ry="5.8872585" />
+          <rect
+             style="fill:none;stroke:none"
+             id="rect2998-3-23-9"
+             width="117.8148"
+             height="90.775742"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1832824"
+             ry="5.8872585" />
+          <rect
+             style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:5.04921389;stroke-opacity:1"
+             id="rect2998-31-2-6"
+             width="113.74971"
+             height="79.479515"
+             x="757.34131"
+             y="563.08649"
+             rx="6.1832824"
+             ry="5.8872585" />
+        </g>
+      </g>
+      <rect
+         style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-5-4-4-6)"
+         id="rect2998-31-3-2-3"
+         width="53"
+         height="27"
+         x="787.71619"
+         y="590.04291"
+         rx="2.9353678"
+         ry="2.0740342"
+         transform="matrix(1.4914506,0,0,1.8783062,-913.51949,-1052.0787)" />
+      <text
+         xml:space="preserve"
+         style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         x="268.64822"
+         y="122.22565"
+         id="text6072"
+         sodipodi:linespacing="125%"
+         transform="scale(1.1957556,0.8362913)"><tspan
+           sodipodi:role="line"
+           id="tspan6074"
+           x="268.64822"
+           y="122.22565"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#94fbff;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League">w</tspan></text>
+    </g>
+    <g
+       style="display:inline"
+       id="g4491"
+       transform="matrix(0.48162872,0,0,0.54168461,89.163226,195.66753)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         id="g3084-7-8"
+         transform="matrix(0.70803107,0,0,0.66171234,-275.64666,-259.51867)">
+        <g
+           id="g3079-9-8">
+          <rect
+             style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none"
+             id="rect2998-5-2"
+             width="117.96266"
+             height="85.156624"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1832824"
+             ry="5.8872585" />
+          <rect
+             style="fill:none;stroke:none"
+             id="rect2998-3-4-9"
+             width="117.8148"
+             height="90.775742"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1832824"
+             ry="5.8872585" />
+          <rect
+             style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:5.04921389;stroke-opacity:1"
+             id="rect2998-31-31-1"
+             width="113.74971"
+             height="79.479515"
+             x="757.34131"
+             y="563.08649"
+             rx="6.1832824"
+             ry="5.8872585" />
+        </g>
+      </g>
+      <rect
+         style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-16-3-1-8)"
+         id="rect2998-31-3-23-3"
+         width="53"
+         height="27"
+         x="787.71619"
+         y="590.04291"
+         rx="2.9353678"
+         ry="2.0740342"
+         transform="matrix(1.4914506,0,0,1.8783062,-913.51949,-994.2595)" />
+      <text
+         xml:space="preserve"
+         style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         x="272.87976"
+         y="192.16937"
+         id="text6072-3"
+         sodipodi:linespacing="125%"
+         transform="scale(1.1957556,0.8362913)"><tspan
+           sodipodi:role="line"
+           id="tspan6074-0"
+           x="272.87976"
+           y="192.16937"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#999999;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League">s</tspan></text>
+    </g>
+    <rect
+       y="246.658"
+       x="172.42166"
+       height="34.349949"
+       width="41.457668"
+       id="rect2998-8-0"
+       style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none;display:inline" />
+    <rect
+       ry="2.1102254"
+       rx="2.1085494"
+       y="246.658"
+       x="173.12532"
+       height="36.351128"
+       width="40.175797"
+       id="rect2998-3-2-6-9"
+       style="fill:none;stroke:none;display:inline" />
+    <rect
+       y="247.91919"
+       x="173.75568"
+       height="31.827555"
+       width="38.789577"
+       id="rect2998-31-4-1-0"
+       style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#646464;stroke-width:2.10938716;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+    <rect
+       y="247.91919"
+       x="173.75568"
+       height="31.827555"
+       width="38.789577"
+       id="rect2998-31-4-1"
+       style="fill:none;stroke:#3d3d3d;stroke-width:1.05469358;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+    <text
+       transform="scale(1.1275229,0.88689994)"
+       sodipodi:linespacing="125%"
+       id="text6072-3-8"
+       y="311.26624"
+       x="181.95609"
+       style="font-size:13.13309574px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#b3b3b3;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League"
+         y="311.26624"
+         x="181.95609"
+         id="tspan6074-0-9"
+         sodipodi:role="line">a</tspan></text>
+    <g
+       style="display:inline"
+       id="g4501"
+       transform="matrix(0.48162872,0,0,0.54168461,89.163226,195.66753)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <rect
+         style="fill:none;stroke:none"
+         id="rect3395"
+         width="1.0101526"
+         height="1.0101526"
+         x="400.35553"
+         y="109.71167" />
+      <g
+         id="g3084-9"
+         transform="matrix(0.70803107,0,0,0.73926744,-190.86962,-320.28078)">
+        <g
+           id="g3079-3">
+          <rect
+             style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none"
+             id="rect2998-44"
+             width="117.96266"
+             height="85.156624"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1832824"
+             ry="5.2696371" />
+          <rect
+             style="fill:none;stroke:none"
+             id="rect2998-3-6"
+             width="117.8148"
+             height="90.775742"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1832824"
+             ry="5.2696371" />
+          <rect
+             style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:5.04921389;stroke-opacity:1"
+             id="rect2998-31-0"
+             width="113.74971"
+             height="79.479515"
+             x="757.34131"
+             y="563.08649"
+             rx="6.1832824"
+             ry="5.2696371" />
+        </g>
+      </g>
+      <rect
+         style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-9-7-4)"
+         id="rect2998-31-3-6"
+         width="53"
+         height="27"
+         x="787.71619"
+         y="590.04291"
+         rx="2.9353678"
+         ry="1.8564515"
+         transform="matrix(1.4914506,0,0,2.0984505,-828.74245,-1141.1359)" />
+      <text
+         xml:space="preserve"
+         style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         x="342.26938"
+         y="177.45624"
+         id="text6072-3-8-1"
+         sodipodi:linespacing="125%"
+         transform="scale(1.1957556,0.8362913)"><tspan
+           sodipodi:role="line"
+           id="tspan6074-0-9-3"
+           x="342.26938"
+           y="177.45624"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#999999;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League">d</tspan></text>
+    </g>
+    <g
+       style="display:inline"
+       id="g4410"
+       transform="matrix(0.44608179,0,0,0.50170519,96.344828,200.72926)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         id="g5816"
+         transform="translate(74.817179,-67.335461)">
+        <rect
+           ry="63.091599"
+           rx="70.902336"
+           y="95.609741"
+           x="111.81523"
+           height="60"
+           width="60"
+           id="rect2998-44-5"
+           style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+        <rect
+           ry="58.885494"
+           rx="66.175514"
+           y="98.109741"
+           x="114.31523"
+           height="55"
+           width="55"
+           id="rect2998-31-0-2"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:3.94410634;stroke-opacity:1" />
+        <rect
+           transform="matrix(1.4914506,0,0,2.0984505,-1059.5245,-1139.0661)"
+           ry="30.065802"
+           rx="47.539181"
+           y="590.04291"
+           x="787.71619"
+           height="25.256731"
+           width="35.535873"
+           id="rect2998-31-3-6-0"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-9-5-5-8)" />
+        <text
+           transform="scale(1.1957556,0.8362913)"
+           sodipodi:linespacing="125%"
+           id="text6072-3-8-4"
+           y="166.7121"
+           x="122.48985"
+           style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           xml:space="preserve"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#999999;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League"
+             y="166.7121"
+             x="122.48985"
+             id="tspan6074-0-9-7"
+             sodipodi:role="line">1</tspan></text>
+      </g>
+    </g>
+    <g
+       style="display:inline"
+       id="g4522"
+       transform="matrix(0.44608179,0,0,0.50170519,137.92368,196.78062)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         transform="translate(0,-37.375644)"
+         id="g4417">
+        <rect
+           ry="63.091599"
+           rx="70.902336"
+           y="31.800722"
+           x="186.09024"
+           height="60"
+           width="60"
+           id="rect2998-44-5-6-6"
+           style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+        <rect
+           ry="58.885494"
+           rx="66.175514"
+           y="34.300724"
+           x="188.59024"
+           height="55"
+           width="55"
+           id="rect2998-31-0-2-5-0"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:3.94410634;stroke-opacity:1" />
+        <rect
+           transform="matrix(1.4914506,0,0,2.0984505,-985.24955,-1202.8751)"
+           ry="30.065802"
+           rx="47.539181"
+           y="590.04291"
+           x="787.71619"
+           height="25.256731"
+           width="35.535873"
+           id="rect2998-31-3-6-0-7-7"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-9-5-9-5-3-1)" />
+        <text
+           transform="scale(1.1957556,0.8362913)"
+           sodipodi:linespacing="125%"
+           id="text6072-3-8-4-4"
+           y="94.64106"
+           x="182.58846"
+           style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           xml:space="preserve"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League"
+             y="94.64106"
+             x="182.58846"
+             id="tspan6074-0-9-7-6"
+             sodipodi:role="line">2</tspan></text>
+      </g>
+    </g>
+    <g
+       style="display:inline"
+       id="g4436"
+       transform="matrix(0.44608179,0,0,0.50170519,141.13193,218.02922)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <rect
+         style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none"
+         id="rect2998-44-5-6"
+         width="60"
+         height="60"
+         x="272.05328"
+         y="-8.7672405"
+         rx="70.902336"
+         ry="63.091599" />
+      <rect
+         style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:3.94410634;stroke-opacity:1"
+         id="rect2998-31-0-2-5"
+         width="55"
+         height="55"
+         x="274.55328"
+         y="-6.26724"
+         rx="66.175514"
+         ry="58.885494" />
+      <rect
+         style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-9-5-9-1-7)"
+         id="rect2998-31-3-6-0-7"
+         width="35.535873"
+         height="25.256731"
+         x="787.71619"
+         y="590.04291"
+         rx="47.539181"
+         ry="30.065802"
+         transform="matrix(1.4914506,0,0,2.0984505,-899.28647,-1243.4431)" />
+      <text
+         xml:space="preserve"
+         style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         x="256.25775"
+         y="44.052738"
+         id="text6072-3-8-4-4-3"
+         sodipodi:linespacing="125%"
+         transform="scale(1.1957556,0.8362913)"><tspan
+           sodipodi:role="line"
+           id="tspan6074-0-9-7-6-6"
+           x="256.25775"
+           y="44.052738"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#f6ff00;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League">3</tspan></text>
+    </g>
+    <g
+       style="display:inline"
+       id="g5457"
+       transform="matrix(0.45753654,0,0,0.51458829,128.00541,217.55288)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         id="g3469-1-11"
+         transform="matrix(-1,0,0,1,1176.2499,-589.62632)">
+        <rect
+           ry="61.512054"
+           rx="69.127251"
+           y="580.85907"
+           x="471.94507"
+           height="60"
+           width="60"
+           id="rect2998-44-5-6-5"
+           style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+        <rect
+           ry="57.411251"
+           rx="64.518768"
+           y="583.35907"
+           x="474.44507"
+           height="55"
+           width="55"
+           id="rect2998-31-0-2-5-9"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:3.8453629;stroke-opacity:1" />
+        <rect
+           transform="matrix(1.4914506,0,0,2.0984505,-699.39471,-653.81676)"
+           ry="29.313082"
+           rx="46.348999"
+           y="590.04291"
+           x="787.71619"
+           height="25.256731"
+           width="35.535873"
+           id="rect2998-31-3-6-0-7-5"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-9-5-9-29-1-0)" />
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         x="559.06854"
+         y="44.099979"
+         id="text6072-3-8-4-4-3-5"
+         sodipodi:linespacing="125%"
+         transform="scale(1.1957556,0.8362913)"><tspan
+           sodipodi:role="line"
+           id="tspan6074-0-9-7-6-6-2"
+           x="559.06854"
+           y="44.099979"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#94fbff;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League">f1</tspan></text>
+    </g>
+    <g
+       style="display:inline"
+       id="g5440"
+       transform="matrix(0.45753654,0,0,0.51458829,137.3503,162.75006)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <rect
+         style="fill:none;stroke:none"
+         id="rect3395-7"
+         width="1.0101526"
+         height="1.0101526"
+         x="864.82391"
+         y="124.77979" />
+      <g
+         id="g3469-8"
+         transform="matrix(-1,0,0,1,1336.488,-485.24934)">
+        <rect
+           ry="61.512054"
+           rx="69.127251"
+           y="580.85907"
+           x="471.94507"
+           height="60"
+           width="60"
+           id="rect2998-44-5-58"
+           style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+        <rect
+           ry="57.411251"
+           rx="64.518768"
+           y="583.35907"
+           x="474.44507"
+           height="55"
+           width="55"
+           id="rect2998-31-0-2-32"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:3.8453629;stroke-opacity:1" />
+        <rect
+           transform="matrix(1.4914506,0,0,2.0984505,-699.39471,-653.81676)"
+           ry="29.313082"
+           rx="46.348999"
+           y="590.04291"
+           x="787.71619"
+           height="25.256731"
+           width="35.535873"
+           id="rect2998-31-3-6-0-4"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-9-5-0-76-6)" />
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         x="692.36108"
+         y="171.55048"
+         id="text6072-3-8-4-4-3-5-1-5"
+         sodipodi:linespacing="125%"
+         transform="scale(1.1957556,0.8362913)"><tspan
+           sodipodi:role="line"
+           id="tspan6074-0-9-7-6-6-2-5-2"
+           x="692.36108"
+           y="171.55048"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#94fbff;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League">f3</tspan></text>
+    </g>
+    <g
+       style="display:inline"
+       id="g5405"
+       transform="matrix(0.48721671,0,0,0.54796936,149.00098,194.93493)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         id="g3084-6-1-2"
+         transform="matrix(-0.70803107,0,0,0.66171234,1252.0049,-317.33791)">
+        <g
+           id="g3079-1-8-4">
+          <rect
+             style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none"
+             id="rect2998-4-4-4"
+             width="117.96266"
+             height="85.156624"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1123657"
+             ry="5.8197365" />
+          <rect
+             style="fill:none;stroke:none"
+             id="rect2998-3-23-9-4"
+             width="117.8148"
+             height="90.775742"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1123657"
+             ry="5.8197365" />
+          <rect
+             style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:4.99130344;stroke-opacity:1"
+             id="rect2998-31-2-6-2"
+             width="113.74971"
+             height="79.479515"
+             x="757.34131"
+             y="563.08649"
+             rx="6.1123657"
+             ry="5.8197365" />
+        </g>
+      </g>
+      <rect
+         style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-5-4-3-0-2)"
+         id="rect2998-31-3-2-3-7"
+         width="53"
+         height="27"
+         x="787.71619"
+         y="590.04291"
+         rx="2.9017017"
+         ry="2.050247"
+         transform="matrix(-1.4914506,0,0,1.8783062,1889.8777,-1052.0787)" />
+      <path
+         sodipodi:type="star"
+         style="fill:#94fbff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         id="path6352"
+         sodipodi:sides="3"
+         sodipodi:cx="748.7688"
+         sodipodi:cy="558.64093"
+         sodipodi:r1="11.590848"
+         sodipodi:r2="5.795424"
+         sodipodi:arg1="-1.5707963"
+         sodipodi:arg2="-0.52359878"
+         inkscape:flatsided="true"
+         inkscape:rounded="0"
+         inkscape:randomized="0"
+         d="m 748.7688,547.05008 10.03797,17.38627 -20.07594,0 z"
+         inkscape:transform-center-y="-2.897712"
+         transform="translate(-49.149384,-463.80627)" />
+    </g>
+    <g
+       style="display:inline"
+       id="g5387"
+       transform="matrix(0.48721671,0,0,0.54796936,149.00098,194.93493)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         id="g3090-2-7-9"
+         transform="matrix(-0.70803107,0,0,0.66171234,1304.9311,-361.78852)">
+        <g
+           transform="translate(74.751288,154.55334)"
+           id="g3084-7-8-2">
+          <g
+             id="g3079-9-8-3">
+            <rect
+               ry="5.8197365"
+               rx="6.1123657"
+               y="560.24792"
+               x="755.23486"
+               height="85.156624"
+               width="117.96266"
+               id="rect2998-5-2-7"
+               style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+            <rect
+               ry="5.8197365"
+               rx="6.1123657"
+               y="560.24792"
+               x="755.23486"
+               height="90.775742"
+               width="117.8148"
+               id="rect2998-3-4-9-3"
+               style="fill:none;stroke:none" />
+            <rect
+               ry="5.8197365"
+               rx="6.1123657"
+               y="563.08649"
+               x="757.34131"
+               height="79.479515"
+               width="113.74971"
+               id="rect2998-31-31-1-1"
+               style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:4.99130344;stroke-opacity:1" />
+          </g>
+        </g>
+        <rect
+           transform="matrix(2.1064762,0,0,2.838554,-826.15951,-955.80956)"
+           ry="2.050247"
+           rx="2.9017017"
+           y="590.04291"
+           x="787.71619"
+           height="27"
+           width="53"
+           id="rect2998-31-3-23-3-5"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-16-3-7-0-7)" />
+      </g>
+      <path
+         sodipodi:type="star"
+         style="fill:#94fbff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         id="path6352-7"
+         sodipodi:sides="3"
+         sodipodi:cx="748.7688"
+         sodipodi:cy="558.64093"
+         sodipodi:r1="11.590848"
+         sodipodi:r2="5.795424"
+         sodipodi:arg1="-1.5707963"
+         sodipodi:arg2="-0.52359878"
+         inkscape:flatsided="true"
+         inkscape:rounded="0"
+         inkscape:randomized="0"
+         d="m 748.7688,547.05008 10.03797,17.38627 -20.07594,0 z"
+         inkscape:transform-center-y="2.8977124"
+         transform="matrix(1,0,0,-1,-49.149384,707.37296)" />
+    </g>
+    <g
+       style="display:inline"
+       id="g5449"
+       transform="matrix(0.45753654,0,0,0.51458829,130.00794,175.51236)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         id="g3469-1-4-1"
+         transform="matrix(-1,0,0,1,1262.213,-549.05835)">
+        <rect
+           ry="61.512054"
+           rx="69.127251"
+           y="580.85907"
+           x="471.94507"
+           height="60"
+           width="60"
+           id="rect2998-44-5-6-6-06"
+           style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+        <rect
+           ry="57.411251"
+           rx="64.518768"
+           y="583.35907"
+           x="474.44507"
+           height="55"
+           width="55"
+           id="rect2998-31-0-2-5-0-4"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:3.8453629;stroke-opacity:1" />
+        <rect
+           transform="matrix(1.4914506,0,0,2.0984505,-699.39471,-653.81676)"
+           ry="29.313082"
+           rx="46.348999"
+           y="590.04291"
+           x="787.71619"
+           height="25.256731"
+           width="35.535873"
+           id="rect2998-31-3-6-0-7-7-5"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-9-5-9-5-0-6-5)" />
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         x="630.80853"
+         y="93.2425"
+         id="text6072-3-8-4-4-3-5-1"
+         sodipodi:linespacing="125%"
+         transform="scale(1.1957556,0.8362913)"><tspan
+           sodipodi:role="line"
+           id="tspan6074-0-9-7-6-6-2-5"
+           x="630.80853"
+           y="93.2425"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#94fbff;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League">f2</tspan></text>
+    </g>
+    <g
+       style="display:inline"
+       transform="matrix(-0.34496458,0,0,0.40509591,845.75533,-105.2532)"
+       id="g3073-0-2">
+      <rect
+         style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none"
+         id="rect2998-8-0-7"
+         width="117.96266"
+         height="85.156624"
+         x="887.02649"
+         y="868.36249"
+         rx="6.1123657"
+         ry="5.2091994" />
+      <rect
+         style="fill:none;stroke:none"
+         id="rect2998-3-2-6-2"
+         width="117.8148"
+         height="90.775742"
+         x="887.02649"
+         y="868.36249"
+         rx="6.1123657"
+         ry="5.2091994" />
+      <rect
+         style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:4.99130344;stroke-opacity:1"
+         id="rect2998-31-4-1-7"
+         width="113.74971"
+         height="79.479515"
+         x="889.13293"
+         y="871.20105"
+         rx="6.1123657"
+         ry="5.2091994" />
+      <rect
+         style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-1-2-6-0-4)"
+         id="rect2998-31-3-5-3-6"
+         width="53"
+         height="27"
+         x="787.71619"
+         y="590.04291"
+         rx="2.9017017"
+         ry="1.8351594"
+         transform="matrix(2.1064762,0,0,2.838554,-769.11916,-802.24831)" />
+    </g>
+    <path
+       inkscape:transform-center-x="-2.7175432"
+       transform="matrix(0.41507758,0.28694171,0.25512886,-0.46683496,77.487248,317.61206)"
+       inkscape:transform-center-y="-0.15728002"
+       d="m 748.7688,547.05008 10.03797,17.38627 -20.07594,0 z"
+       inkscape:randomized="0"
+       inkscape:rounded="0"
+       inkscape:flatsided="true"
+       sodipodi:arg2="-0.52359878"
+       sodipodi:arg1="-1.5707963"
+       sodipodi:r2="5.795424"
+       sodipodi:r1="11.590848"
+       sodipodi:cy="558.64093"
+       sodipodi:cx="748.7688"
+       sodipodi:sides="3"
+       id="path6352-7-4"
+       style="fill:#94fbff;fill-opacity:1;fill-rule:nonzero;stroke:none;display:inline"
+       sodipodi:type="star" />
+    <g
+       style="display:inline"
+       id="g5340"
+       transform="matrix(0.48721671,0,0,0.54796936,149.00098,194.93493)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         id="g3090-8-5"
+         transform="matrix(-0.70803107,0,0,0.73926744,1220.154,-434.53704)">
+        <g
+           transform="translate(74.751288,154.55334)"
+           id="g3084-9-13">
+          <g
+             id="g3079-3-9">
+            <rect
+               ry="5.2091994"
+               rx="6.1123657"
+               y="560.24792"
+               x="755.23486"
+               height="85.156624"
+               width="117.96266"
+               id="rect2998-44-95"
+               style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+            <rect
+               ry="5.2091994"
+               rx="6.1123657"
+               y="560.24792"
+               x="755.23486"
+               height="90.775742"
+               width="117.8148"
+               id="rect2998-3-6-9"
+               style="fill:none;stroke:none" />
+            <rect
+               ry="5.2091994"
+               rx="6.1123657"
+               y="563.08649"
+               x="757.34131"
+               height="79.479515"
+               width="113.74971"
+               id="rect2998-31-0-26"
+               style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:4.99130344;stroke-opacity:1" />
+          </g>
+        </g>
+        <rect
+           transform="matrix(2.1064762,0,0,2.838554,-826.15951,-955.80956)"
+           ry="1.8351594"
+           rx="2.9017017"
+           y="590.04291"
+           x="787.71619"
+           height="27"
+           width="53"
+           id="rect2998-31-3-6-5"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-9-2-1-7)" />
+      </g>
+      <path
+         sodipodi:type="star"
+         style="fill:#94fbff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         id="path6352-7-4-8"
+         sodipodi:sides="3"
+         sodipodi:cx="748.7688"
+         sodipodi:cy="558.64093"
+         sodipodi:r1="11.590848"
+         sodipodi:r2="5.795424"
+         sodipodi:arg1="-1.5707963"
+         sodipodi:arg2="-0.52359878"
+         inkscape:flatsided="true"
+         inkscape:rounded="0"
+         inkscape:randomized="0"
+         d="m 748.7688,547.05008 10.03797,17.38627 -20.07594,0 z"
+         inkscape:transform-center-y="-0.15951107"
+         transform="matrix(-0.85193624,0.52364553,-0.52364553,-0.85193624,1549.2176,223.29637)"
+         inkscape:transform-center-x="2.7584936" />
+    </g>
+    <g
+       style="display:inline"
+       id="g5465"
+       transform="matrix(0.43288679,0,0,0.54091915,142.12025,170.68195)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <rect
+         style="fill:none;stroke:none"
+         id="rect2998-3-6-4"
+         width="83.416534"
+         height="67.107552"
+         x="404.36597"
+         y="30.124849"
+         rx="4.8709025"
+         ry="3.9011843" />
+      <rect
+         style="fill:none;stroke:none"
+         id="rect3467"
+         width="9.497776"
+         height="30.083845"
+         x="441.32535"
+         y="48.636723"
+         rx="73.063545"
+         ry="58.517769" />
+      <g
+         id="g5809"
+         transform="translate(5.6946118,138.29771)">
+        <rect
+           ry="58.517769"
+           rx="73.063545"
+           y="29.748964"
+           x="351.10532"
+           height="60.482986"
+           width="274.67935"
+           id="rect2998-44-5-6-9"
+           style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+        <rect
+           ry="54.616581"
+           rx="68.192635"
+           y="35.308414"
+           x="357.7908"
+           height="50.183659"
+           width="261.82971"
+           id="rect2998-31-0-2-5-5"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:8.036273;stroke-opacity:1" />
+        <rect
+           transform="matrix(7.1001105,0,0,1.9146895,-5230.3206,-1093.5282)"
+           ry="30.562532"
+           rx="10.290478"
+           y="590.04291"
+           x="787.71619"
+           height="25.256731"
+           width="35.535873"
+           id="rect2998-31-3-6-0-7-32"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-9-5-9-2-46-7)" />
+        <text
+           transform="scale(1.1957556,0.8362913)"
+           sodipodi:linespacing="125%"
+           id="text6072-36"
+           y="90.495674"
+           x="437.16013"
+           style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+           xml:space="preserve"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#94fbff;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League"
+             y="90.495674"
+             x="437.16013"
+             id="tspan6074-3"
+             sodipodi:role="line">space</tspan></text>
+      </g>
+    </g>
+    <g
+       style="display:inline"
+       id="g4491-3"
+       transform="matrix(0.48178584,0,0,0.54186132,210.8122,160.30287)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         id="g3084-7-8-1"
+         transform="matrix(0.70803107,0,0,0.66171234,-275.64666,-259.51867)">
+        <g
+           id="g3079-9-8-2">
+          <rect
+             style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none"
+             id="rect2998-5-2-3"
+             width="117.96266"
+             height="85.156624"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1812663"
+             ry="5.8853383" />
+          <rect
+             style="fill:none;stroke:none"
+             id="rect2998-3-4-9-34"
+             width="117.8148"
+             height="90.775742"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1812663"
+             ry="5.8853383" />
+          <rect
+             style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:5.04756737;stroke-opacity:1"
+             id="rect2998-31-31-1-11"
+             width="113.74971"
+             height="79.479515"
+             x="757.34131"
+             y="563.08649"
+             rx="6.1812663"
+             ry="5.8853383" />
+        </g>
+      </g>
+      <rect
+         style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-16-3-1-1-7)"
+         id="rect2998-31-3-23-3-3"
+         width="53"
+         height="27"
+         x="787.71619"
+         y="590.04291"
+         rx="2.9344106"
+         ry="2.0733578"
+         transform="matrix(1.4914506,0,0,1.8783062,-913.51949,-994.2595)" />
+      <text
+         xml:space="preserve"
+         style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         x="272.87976"
+         y="192.16937"
+         id="text6072-3-87"
+         sodipodi:linespacing="125%"
+         transform="scale(1.1957556,0.8362913)"><tspan
+           sodipodi:role="line"
+           id="tspan6074-0-4"
+           x="272.87976"
+           y="192.16937"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#999999;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League">n</tspan></text>
+    </g>
+    <g
+       style="display:inline"
+       id="g4443-2"
+       transform="matrix(0.48178584,0,0,0.54186132,210.8122,160.30287)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <rect
+         style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none"
+         id="rect2998-8-0-77"
+         width="83.521233"
+         height="62.953518"
+         x="174.32959"
+         y="94.132965"
+         rx="4.3765283"
+         ry="3.8944013" />
+      <rect
+         style="fill:none;stroke:none"
+         id="rect2998-3-2-6-9-9"
+         width="83.416534"
+         height="67.107552"
+         x="174.32959"
+         y="94.132965"
+         rx="4.3765283"
+         ry="3.8944013" />
+      <rect
+         style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:3.65181732;stroke-opacity:1"
+         id="rect2998-31-4-1-3"
+         width="80.53833"
+         height="58.756618"
+         x="175.82101"
+         y="96.231384"
+         rx="4.3765283"
+         ry="3.8944013" />
+      <rect
+         style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-1-2-68-4-4)"
+         id="rect2998-31-3-5-3-1"
+         width="53"
+         height="27"
+         x="787.71619"
+         y="590.04291"
+         rx="2.9344106"
+         ry="1.855846"
+         transform="matrix(1.4914506,0,0,2.0984505,-998.27299,-1140.8952)" />
+      <text
+         xml:space="preserve"
+         style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         x="201.41405"
+         y="177.46875"
+         id="text6072-3-8-9"
+         sodipodi:linespacing="125%"
+         transform="scale(1.1957556,0.8362913)"><tspan
+           sodipodi:role="line"
+           id="tspan6074-0-9-8"
+           x="201.41405"
+           y="177.46875"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#b3b3b3;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League">b</tspan></text>
+    </g>
+    <g
+       style="display:inline"
+       id="g4501-6"
+       transform="matrix(0.48178584,0,0,0.54186132,210.8122,160.30287)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <rect
+         style="fill:none;stroke:none"
+         id="rect3395-5"
+         width="1.0101526"
+         height="1.0101526"
+         x="400.35553"
+         y="109.71167" />
+      <g
+         id="g3084-9-0"
+         transform="matrix(0.70803107,0,0,0.73926744,-190.86962,-320.28078)">
+        <g
+           id="g3079-3-2">
+          <rect
+             style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none"
+             id="rect2998-44-8"
+             width="117.96266"
+             height="85.156624"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1812663"
+             ry="5.2679186" />
+          <rect
+             style="fill:none;stroke:none"
+             id="rect2998-3-6-60"
+             width="117.8148"
+             height="90.775742"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1812663"
+             ry="5.2679186" />
+          <rect
+             style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:5.04756737;stroke-opacity:1"
+             id="rect2998-31-0-24"
+             width="113.74971"
+             height="79.479515"
+             x="757.34131"
+             y="563.08649"
+             rx="6.1812663"
+             ry="5.2679186" />
+        </g>
+      </g>
+      <rect
+         style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-9-7-8-9)"
+         id="rect2998-31-3-6-8"
+         width="53"
+         height="27"
+         x="787.71619"
+         y="590.04291"
+         rx="2.9344106"
+         ry="1.855846"
+         transform="matrix(1.4914506,0,0,2.0984505,-828.74245,-1141.1359)" />
+      <text
+         xml:space="preserve"
+         style="font-size:22.66075516px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         x="388.34769"
+         y="156.39684"
+         id="text6072-3-8-1-6"
+         sodipodi:linespacing="125%"
+         transform="scale(1.0538507,0.948901)"><tspan
+           sodipodi:role="line"
+           id="tspan6074-0-9-3-5"
+           x="388.34769"
+           y="156.39684"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#999999;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League">m</tspan></text>
+    </g>
+    <g
+       style="display:inline"
+       transform="matrix(0.23719308,0,0,0.20194064,200.03162,68.911527)"
+       id="g3084-9-2-4"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         id="g3079-3-8-0">
+        <rect
+           ry="10.449731"
+           rx="8.8895903"
+           y="560.24792"
+           x="755.23486"
+           height="85.156624"
+           width="117.96266"
+           id="rect2998-44-2-61"
+           style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+        <rect
+           ry="10.449731"
+           rx="8.8895903"
+           y="560.24792"
+           x="755.23486"
+           height="90.775742"
+           width="117.8148"
+           id="rect2998-3-6-8-8"
+           style="fill:none;stroke:none" />
+        <rect
+           ry="10.449731"
+           rx="8.8895903"
+           y="563.08649"
+           x="757.34131"
+           height="79.479515"
+           width="113.74971"
+           id="rect2998-31-0-9-9"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:6.18643856;stroke-opacity:1" />
+      </g>
+    </g>
+    <rect
+       transform="matrix(0.49964159,0,0,0.57321939,-13.658198,-155.31586)"
+       ry="3.6813576"
+       rx="4.2201247"
+       y="590.04291"
+       x="787.71619"
+       height="27"
+       width="53"
+       id="rect2998-31-3-6-07-8"
+       style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;display:inline;filter:url(#filter4028-9-0-2-7-2)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997" />
+    <text
+       transform="scale(1.1917579,0.83909662)"
+       sodipodi:linespacing="125%"
+       id="text6072-36-1-4-4"
+       y="234.4864"
+       x="319.9263"
+       style="font-size:9.84800625px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997"><tspan
+         style="font-size:9.19225216px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#999999;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League"
+         y="234.4864"
+         x="319.9263"
+         id="tspan6074-3-7-0-1"
+         sodipodi:role="line">enter</tspan></text>
+    <g
+       style="display:inline"
+       transform="matrix(0.23719308,0,0,0.20194064,124.98561,68.911548)"
+       id="g3084-9-2-4-7"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         id="g3079-3-8-0-7">
+        <rect
+           ry="10.449731"
+           rx="8.8895903"
+           y="560.24792"
+           x="755.23486"
+           height="85.156624"
+           width="117.96266"
+           id="rect2998-44-2-61-8"
+           style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+        <rect
+           ry="10.449731"
+           rx="8.8895903"
+           y="560.24792"
+           x="755.23486"
+           height="90.775742"
+           width="117.8148"
+           id="rect2998-3-6-8-8-3"
+           style="fill:none;stroke:none" />
+        <rect
+           ry="10.449731"
+           rx="8.8895903"
+           y="563.08649"
+           x="757.34131"
+           height="79.479515"
+           width="113.74971"
+           id="rect2998-31-0-9-9-8"
+           style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:6.18643856;stroke-opacity:1" />
+      </g>
+    </g>
+    <rect
+       transform="matrix(0.49964159,0,0,0.57321939,-88.704203,-155.31585)"
+       ry="3.6813576"
+       rx="4.2201247"
+       y="590.04291"
+       x="787.71619"
+       height="27"
+       width="53"
+       id="rect2998-31-3-6-07-8-3"
+       style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;display:inline;filter:url(#filter4028-9-0-2-7-4-5)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997" />
+    <text
+       transform="scale(1.1917579,0.83909662)"
+       sodipodi:linespacing="125%"
+       id="text6072-36-1-4-4-7"
+       y="234.48647"
+       x="264.87625"
+       style="font-size:9.84800625px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997"><tspan
+         style="font-size:9.19225216px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#999999;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League"
+         y="234.48647"
+         x="264.87625"
+         id="tspan6074-3-7-0-1-1"
+         sodipodi:role="line">tab</tspan></text>
+    <g
+       style="display:inline"
+       id="g4491-3-0"
+       transform="matrix(0.48178584,0,0,0.54186132,210.8122,128.71778)"
+       inkscape:export-filename="C:\Users\Usuario\Desktop\intfz\medio.png"
+       inkscape:export-xdpi="77.269997"
+       inkscape:export-ydpi="77.269997">
+      <g
+         id="g3084-7-8-1-2"
+         transform="matrix(0.70803107,0,0,0.66171234,-275.64666,-259.51867)">
+        <g
+           id="g3079-9-8-2-4">
+          <rect
+             style="fill:#ababab;fill-opacity:1;fill-rule:evenodd;stroke:none"
+             id="rect2998-5-2-3-3"
+             width="117.96266"
+             height="85.156624"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1812663"
+             ry="5.8853383" />
+          <rect
+             style="fill:none;stroke:none"
+             id="rect2998-3-4-9-34-3"
+             width="117.8148"
+             height="90.775742"
+             x="755.23486"
+             y="560.24792"
+             rx="6.1812663"
+             ry="5.8853383" />
+          <rect
+             style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:#3d3d3d;stroke-width:5.04756737;stroke-opacity:1"
+             id="rect2998-31-31-1-11-6"
+             width="113.74971"
+             height="79.479515"
+             x="757.34131"
+             y="563.08649"
+             rx="6.1812663"
+             ry="5.8853383" />
+        </g>
+      </g>
+      <rect
+         style="fill:#606060;fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter4028-16-3-1-1-0-0)"
+         id="rect2998-31-3-23-3-3-2"
+         width="53"
+         height="27"
+         x="787.71619"
+         y="590.04291"
+         rx="2.9344106"
+         ry="2.0733578"
+         transform="matrix(1.4914506,0,0,1.8783062,-913.51949,-994.2595)" />
+      <text
+         xml:space="preserve"
+         style="font-size:25.71210861px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         x="272.87976"
+         y="192.16937"
+         id="text6072-3-87-8"
+         sodipodi:linespacing="125%"
+         transform="scale(1.1957556,0.8362913)"><tspan
+           sodipodi:role="line"
+           id="tspan6074-0-4-2"
+           x="272.87976"
+           y="192.16937"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#999999;fill-opacity:1;font-family:Alien League;-inkscape-font-specification:Alien League">v</tspan></text>
+    </g>
+    <rect
+       y="248.27126"
+       x="174.19548"
+       height="30.947218"
+       width="37.82201"
+       id="rect2998-31-4-1-9"
+       style="fill:none;stroke:none;display:inline" />
+  </g>
+</svg>

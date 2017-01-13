@@ -1,0 +1,38 @@
+<div id="container">
+	<div id="control_panel" class="control_panel">
+		<div style="display: none;">
+			<input #openproject id="openproject" type="file" accept=".mol"  (change)="openprojectChanged($event)"/>
+			<input #importfile id="importfile" type="file" accept=".jpg,.png" (change)="importfileChanged($event)"/>
+			<input #saveasfile id="saveasfile" type="file" nwsaveas (change)="saveasfileChanged($event)"/>
+			<input #saveasproject id="saveasproject" type="file" nwdirectory (change)="saveasChanged($event)"/>
+			<input #saveasscreenshot id="saveasscreenshot" type="file" nwsaveas accept=".png,.jpg" (change)="saveasscreenshotChanged($event)"/>
+			<input #saveasvideo id="saveasvideo" type="file"  nwsaveas accept=".avi,.mp4,.ogg,.mov" (change)="saveasvideoChanged($event)"/>
+		</div>
+
+    <div id="control_project_panel" class="project_panel  collapsed">
+			<div id="control_project_led" class="con_indicator_led_big"></div>
+			<div id="control_project_header" class="header">
+        <button id="buttonED_OpenProject" key="O" class="button_OpenProject key_button" title="Abrir un nuevo proyecto Moldeo" (click)="OpenProject();"></button>
+        <label title="Abrir un proyecto" id="control_project_header_label"> &lt;&lt;&lt; AQUí!!</label>
+        <div class="buttons">
+          <button id="buttonED_SaveProject" class="button_SaveProject control_button glyphicon glyphicon-save" title="Guardar" (click)="SaveProject();"></button>
+          <button id="buttonED_SaveProjectAs" class="button_SaveProjectAs control_button glyphicon glyphicon-export"  title="Guardar Como / Clonar" (click)="SaveAsProject();"></button>
+          <button #presentation id="buttonED_Presentation"  class="button_Presentation control_button" title="Cambiar Modo de Presentación" (click)="Presentation();"></button>
+          <div id="dropdown_moreactions" class="dropdown">
+            <button class="btn btn-default dropdown-toggle control_button" type="button" id="moreactions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            ++
+            <span class="caret"></span>
+          </button>
+          <ul id="buttonED_moreactions" class="dropdown-menu" aria-labelledby="moreactions">
+            <li><div class="morebutton"><button #screenshot  id="buttonED_Screenshot"  class="button_Screenshot control_button" title="Capturar Pantalla"  (click)="Screenshot();"></button></div></li>
+            <li><div class="morebutton"><button #previewshot id="buttonED_PreviewShot"  class="button_PreviewShot control_button" title="Generar viñetas" (click)="PreviewShot();"></button></div></li>
+          </ul>
+        </div>
+			</div>
+			<div id="control_project_content" class="content">
+			</div>
+		</div>
+  </div>
+</div>
+
+
