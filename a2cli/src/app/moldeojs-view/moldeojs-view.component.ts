@@ -13,13 +13,13 @@ export class MoldeojsViewComponent implements OnInit {
   m_IODeviceManager: moIODeviceManager;
 
   constructor() {
-    console.log("<moldeojs-view/> MoldeojsViewComponent");
-    this.message = "moldeojs initializing...";
+    console.log("MoldeojsViewComponent");
+    this.message = "no project";
     this.m_ResourceManager = new moResourceManager();
     this.m_IODeviceManager = new moIODeviceManager();
     this.m_Console = new moConsole();
     console.log(this.m_Console.name);
-    this.message = this.m_Console.name;
+    //this.message = this.m_Console.name;
     this.m_Console.Init();
   }
 

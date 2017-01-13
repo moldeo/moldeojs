@@ -9,12 +9,14 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { ThreeviewerComponent } from './threeviewer/threeviewer.component';
 import { MoldeojsViewComponent } from './moldeojs-view/moldeojs-view.component';
+import { MoldeoControlComponent } from './moldeo-control/moldeo-control.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ThreeviewerComponent,
-    MoldeojsViewComponent
+    MoldeojsViewComponent,
+    MoldeoControlComponent
   ],
   imports: [
     BrowserModule,

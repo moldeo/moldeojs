@@ -14,8 +14,6 @@ export enum moConsoleMode {
 
 export class moConsoleState {
 
-
-
 }
 
 export class moConsole extends moMoldeoObject {
