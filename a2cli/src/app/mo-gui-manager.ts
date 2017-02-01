@@ -1,6 +1,6 @@
 
 import { moAbstract } from "./mo-abstract";
-import { moResource, moResourceElement } from "./mo-resource-manager";
+import { moResource, moResourceElement } from "./mo-resource";
 
 export class moGeometry extends moResourceElement {
   /*

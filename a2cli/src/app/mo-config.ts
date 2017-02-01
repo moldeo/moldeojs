@@ -2,8 +2,10 @@
 import { MOint, MOuint, MOboolean, MOfloat, MOdouble, MOlong, MOulong, moNumber, moTextFilterParam } from "./mo-types";
 import { moText } from "./mo-text";
 import { moAbstract } from "./mo-abstract";
-import { moParam, moParams, moParamIndexes, moParamDefinitions } from "./mo-param";
+import { moValue, moValues, moValueBase, moValueBases, moValueDefinition } from "./mo-value";
+import { moParam, moParams, moParamIndexes, moParamDefinition, moParamDefinitions } from "./mo-param";
 import { moPreconfig, moPreConfigs } from "./mo-pre-config";
+import * as xml2js from 'xml2js';
 
 
 export class moConfigDefinition extends moAbstract {
@@ -47,4 +49,72 @@ export class moConfig extends moAbstract {
 		static moSound*                m_pSound;
 		static moTexture*              m_pTexture;
     */
+    constructor() {
+      super();
+    }
+
+    LoadConfig( configname : moText ) : boolean {
+      if (configname.length > 1000) {
+          console.log("moConfig::LoadConfig > Full text", configname);
+          //parse XML:
+          xml2js.parseString(configname, (err, result) => {
+            console.log(result);
+            console.log('Done');
+            if ("MOCONFIG" in result) {
+              if ("CONFIGPARAMS" in result["MOCONFIG"]) {
+                var CFGPARAMS = result["MOCONFIG"]["CONFIGPARAMS"][0]["PARAM"];
+                this.m_Params = [];
+                for (var PARAM_I in CFGPARAMS) {
+                  var PARAM = CFGPARAMS[PARAM_I];
+                  console.log("Adding Param:", PARAM);
+                  var p_param_def = new moParamDefinition(
+                    PARAM["$"]["name"],
+                    PARAM["$"]["type"],
+                    PARAM["$"]["property"],
+                    PARAM["$"]["group"],
+                    PARAM["$"]["interpolation"],
+                    PARAM["$"]["duration"],
+                    PARAM["$"]["options"]
+                  );
+                  var p_param = new moParam( p_param_def );
+                  this.m_Params.push(p_param);
+
+                  var PARAMVALS = PARAM["VAL"];
+                  for (var PARAMVAL_I in PARAMVALS) {
+                    var VAL = PARAMVALS[PARAMVAL_I];
+                    var newValue: moValue = new moValue();
+                    var VALSUBS = VAL["D"];
+                    for (var SUBVAL_I in VALSUBS) {
+                      var SUBVAL = VALSUBS[SUBVAL_I];
+                      console.log(" <D> Subvalue:", SUBVAL);
+                      var vbd: moValueDefinition = new moValueDefinition();
+
+                      var subvalue: moText = SUBVAL["_"];
+                      var subvaluetype: moText = SUBVAL["$"]["type"];
+
+                      newValue.AddSubValue( subvalue, subvaluetype );
+                      console.log("newValue:", newValue);
+                      //var subvaluedata: moText = SUBVAL[0];
+                      if (newValue.m_List.length) {
+                        if (SUBVAL["$"]["code"]) newValue.m_List[newValue.m_List.length - 1].SetCodeName(SUBVAL["$"]["code"]);
+                        if (SUBVAL["$"]["attribute"]) newValue.m_List[newValue.m_List.length - 1].SetAttribute(SUBVAL["$"]["attribute"]);
+                        if (SUBVAL["$"]["min"]) newValue.m_List[newValue.m_List.length - 1].SetRange(
+                          SUBVAL["$"]["min"],
+                          SUBVAL["$"]["max"]);
+                      }
+                    }
+                    p_param.AddValue(newValue);
+                  }
+                }
+                console.log("Added params:", this.m_Params);
+
+              }
+            }
+
+
+          });
+
+      }
+      return false;
+    }
 }

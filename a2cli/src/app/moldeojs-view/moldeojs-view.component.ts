@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { moConsole, moResourceManager, moIODeviceManager } from '../moldeojs'
+import { moConsole } from '../mo-console';
+import { moConsoleState } from '../mo-console-state';
+import { ConsoleService } from "../console.service";
 
 @Component({
   selector: 'moldeojs-view',
@@ -7,23 +9,14 @@ import { moConsole, moResourceManager, moIODeviceManager } from '../moldeojs'
   styleUrls: ['./moldeojs-view.component.css']
 })
 export class MoldeojsViewComponent implements OnInit {
-  message: string;
-  m_Console: moConsole;
-  m_ResourceManager: moResourceManager;
-  m_IODeviceManager: moIODeviceManager;
 
-  constructor() {
-    console.log("MoldeojsViewComponent");
-    this.message = "no project";
-    this.m_ResourceManager = new moResourceManager();
-    this.m_IODeviceManager = new moIODeviceManager();
-    this.m_Console = new moConsole();
-    console.log(this.m_Console.name);
-    //this.message = this.m_Console.name;
-    this.m_Console.Init();
+  message: string = "- no project -";
+
+  constructor( private MoldeoCS : ConsoleService ) {
   }
 
   ngOnInit() {
+    console.log("MoldeojsViewComponent::ngOnInit >  this.MoldeoCS.m_Console:", this.MoldeoCS.m_Console);
   }
 
 }

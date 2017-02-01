@@ -34,3 +34,39 @@ export enum moParamType {
 	MO_PARAM_OUTLET,			///value type: TXT or LNK
 	MO_PARAM_UNDEFINED = -1
 };
+
+export const moParamTypeStrs = {
+  "ALPHA": moParamType.MO_PARAM_ALPHA,
+  "COLOR": moParamType.MO_PARAM_COLOR,
+  "BLENDING": moParamType.MO_PARAM_BLENDING,
+  "POLYGONMODE": moParamType.MO_PARAM_POLYGONMODE,
+  "SYNC": moParamType.MO_PARAM_SYNC,
+  "PHASE": moParamType.MO_PARAM_PHASE,
+  "TEXT": moParamType.MO_PARAM_TEXT,
+  "TEXTURE": moParamType.MO_PARAM_TEXTURE,
+  "TEXTUREFOLDER": moParamType.MO_PARAM_TEXTUREFOLDER,
+  "FONT": moParamType.MO_PARAM_FONT,
+  "3DMODEL": moParamType.MO_PARAM_3DMODEL,
+  "MOLDEOOBJECT": moParamType.MO_PARAM_MOLDEO_OBJECT,
+  "OBJECT": moParamType.MO_PARAM_OBJECT,
+  "VIDEO": moParamType.MO_PARAM_VIDEO,
+  "FILTER": moParamType.MO_PARAM_FILTER,
+  "SOUND": moParamType.MO_PARAM_SOUND,
+  "NUM": moParamType.MO_PARAM_NUMERIC,
+  "FUNCTION": moParamType.MO_PARAM_FUNCTION,
+  "TRANSLATEX": moParamType.MO_PARAM_TRANSLATEX,
+  "TRANSLATEY": moParamType.MO_PARAM_TRANSLATEY,
+  "TRANSLATEZ": moParamType.MO_PARAM_TRANSLATEZ,
+  "SCALEX": moParamType.MO_PARAM_SCALEX,
+  "SCALEY": moParamType.MO_PARAM_SCALEY,
+  "SCALEZ": moParamType.MO_PARAM_SCALEZ,
+  "ROTATEX": moParamType.MO_PARAM_ROTATEX,
+  "ROTATEY": moParamType.MO_PARAM_ROTATEY,
+  "ROTATEZ": moParamType.MO_PARAM_ROTATEZ,
+  "SCRIPT": moParamType.MO_PARAM_SCRIPT,
+  "COMPOSE": moParamType.MO_PARAM_COMPOSE,
+  "VECTOR": moParamType.MO_PARAM_VECTOR,
+  "INLET": moParamType.MO_PARAM_INLET,
+  "OUTLET": moParamType.MO_PARAM_OUTLET,
+  "UNDEFINED": moParamType.MO_PARAM_UNDEFINED
+};

@@ -2,6 +2,7 @@
 import { MOlong } from "./mo-types";
 import { moAbstract } from "./mo-abstract";
 import { moMoldeoObject } from "./mo-moldeo-object";
+import { moResource, moResources } from "./mo-resource";
 
 //import { moFileManager } from "./mo-file-manager";
 //import { moVideoManager } from "./mo-video-manager";
@@ -43,25 +44,6 @@ import { moDebugManager } from "./mo-debug-manager";
 import { moScriptManager } from "./mo-script-manager";
 
 
-
-export class moResourceElement extends moAbstract {
-}
-
-export class moAttribute extends moResourceElement {
-  buffer : void;
-  itemsize : MOlong;
-  length : MOlong;
-}
-
-type moAttributeArray = moAttribute[];
-
-
-
-export class moResource extends moMoldeoObject {
-}
-
-export type moResources = moResource[];
-
 export class moResourceManager extends moAbstract {
     //MOFileMan : moFileManager;
 		//MOVideoMan : moVideoManager;
@@ -82,5 +64,26 @@ export class moResourceManager extends moAbstract {
 		MOModelMan : mo3dModelManager;
 		MODebugMan : moDebugManager;
 		//MODecoderMan : moDecoderManager;
-		m_Resources : moResources;
- }
+    m_Resources: moResources;
+
+    constructor() {
+      super();
+    }
+
+    Init(options?: any): boolean {
+
+      if (this.MORenderMan) { }
+      else this.MORenderMan = new moRenderManager();
+      console.log("moResourceManager::Init > MORenderMan:", this.MORenderMan);
+
+      if (this.MODataMan) { }
+      else this.MODataMan = new moDataManager();
+      console.log("moResourceManager::Init > MODataMan:", this.MODataMan);
+
+      if (this.MOGuiMan) { }
+      else this.MOGuiMan = new moGUIManager();
+      console.log("moResourceManager::Init > MOGuiMan:", this.MOGuiMan);
+
+      return super.Init();
+    }
+};

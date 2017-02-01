@@ -12,6 +12,15 @@ import { ThreeviewerComponent } from './threeviewer/threeviewer.component';
 import { MoldeojsViewComponent } from './moldeojs-view/moldeojs-view.component';
 import { MoldeoControlComponent } from './moldeo-control/moldeo-control.component';
 import { ControlProjectContent } from './moldeo-control/control-project-content/control-project-content.component';
+import { UploadComponent } from './upload/upload.component';
+import { RouterModule, Routes } from '@angular/router';
+
+import { ConsoleService } from "./console.service";
+
+const appRoutes: Routes = [
+  { path: 'upload', component: UploadComponent },
+  //{ path: 'about', component: AboutComponent },
+];
 
 @NgModule({
   declarations: [
@@ -19,14 +28,16 @@ import { ControlProjectContent } from './moldeo-control/control-project-content/
     ThreeviewerComponent,
     MoldeojsViewComponent,
     MoldeoControlComponent,
-    ControlProjectContent
+    ControlProjectContent,
+    UploadComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule
+    HttpModule,
+    RouterModule.forRoot(appRoutes)
   ],
-  providers: [Uploader],
+  providers: [Uploader, ConsoleService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

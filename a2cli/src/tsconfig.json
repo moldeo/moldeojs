@@ -1,4 +1,5 @@
 {
+  "compileOnSave": true,
   "compilerOptions": {
     "baseUrl": "",
     "declaration": false,
@@ -14,6 +15,7 @@
     "allowJs": true,
     "typeRoots": [
       "../node_modules/@types"
-    ]
+    ],
+    "types": []
   }
 }

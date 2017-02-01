@@ -1,2 +1,5 @@
-export class moSoundManager {
+import { moResource } from "./mo-resource";
+
+export class moSoundManager extends moResource {
+
 }

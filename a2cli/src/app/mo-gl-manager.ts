@@ -1,2 +1,4 @@
-export class moGLManager {
+import { moResource } from "./mo-resource";
+
+export class moGLManager extends moResource {
 }

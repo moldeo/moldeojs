@@ -12,7 +12,8 @@ export class moEffectState extends moMobState {
 
   /** synchronized, efecto sincronizado con el estado y beat de la consola, en sincro: 1, sin sincro: -1 */
   synchronized: MOswitch;
-  /** enabled (OBSOLETO: moEffectState desciende de moMobState que tiene el miembro m_Activated ), si está activo o no, activado: 1 , desactivado: -1*/
+  /** enabled (OBSOLETO: moEffectState desciende de moMobState que tiene el miembro m_Activated ),
+   * si está activo o no, activado: 1 , desactivado: -1*/
   enabled: MOswitch;
   magnitude: MOfloat;
 	amplitude : MOfloat;

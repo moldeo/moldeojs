@@ -31,6 +31,10 @@ export type MOuchar = number;
 export type MOswitch = number;
 export type moNumber = number;
 
+export type MO_DISPLAY = any;
+export type MO_HANDLE = any;
+export const NULL = 0;
+
 export class moTextFilterParam {
 
 

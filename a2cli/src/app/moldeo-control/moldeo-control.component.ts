@@ -3,12 +3,14 @@ import * as ConsoleInterface from './MoldeoObjects';
 import { ControlProjectContent } from './control-project-content/control-project-content.component';
 import { Http, Headers, RequestOptions } from '@angular/http';
 import { Uploader }      from 'angular2-http-file-upload';
-import { MyUploadItem }  from '../mo-file-manager';
+//import { MyUploadItem }  from '../mo-file-manager';
 //import {Observable} from 'rxjs/Rx';
 
 // Import RxJs required methods
 //import 'rxjs/add/operator/map';
 //import 'rxjs/add/operator/catch';
+
+import { ConsoleService } from "../console.service";
 
 @Component({
   selector: 'moldeocontrol',
@@ -21,16 +23,19 @@ export class MoldeoControlComponent implements OnInit {
   message: string = 'MoldeoControl';
   hostElement: ElementRef;
   projectfilecontent: string;
+  file: any;
   //http: Http;
 
   //constructor(el: ElementRef) {
-  constructor( public el: ElementRef, public uploaderService: Uploader ) {
+  constructor(
+    public el: ElementRef,
+    private MoldeoCS: ConsoleService    ) {
     //this.http = new Http();
     this.hostElement = el;
   }
 
   submit() {
-        console.log("submitting file!");
+/*        console.log("submitting file!");
         let uploadFile = (<HTMLInputElement>window.document.getElementById('openproject')).files[0];
 
         let myUploadItem = new MyUploadItem(uploadFile);
@@ -48,7 +53,7 @@ export class MoldeoControlComponent implements OnInit {
              // complete callback, called regardless of success or failure
              console.log("uploaderService.onCompleteUpload");
         };
-        this.uploaderService.upload(myUploadItem);
+        this.uploaderService.upload(myUploadItem);*/
     }
 
   onNotifyProjectContent(event) {
@@ -58,7 +63,9 @@ export class MoldeoControlComponent implements OnInit {
   @ViewChild('openproject') openproject: ElementRef;
   OpenProject() {
     var elx = this.openproject.nativeElement;
-    console.log("OpenProject:", elx);
+    var fl: FileList;
+    this.openproject.nativeElement.value = "";//for re importing
+    console.log("OpenProject:", elx, this.openproject);
     elx.click();
   }
 
@@ -67,9 +74,19 @@ export class MoldeoControlComponent implements OnInit {
   }
 
   openprojectChanged(event) {
-    var file = event.target.files[0];
-    console.log("OpenProject changed! file:", file);
-    this.submit();
+    this.file = event.target.files[0];
+    console.log("OpenProject changed! file:", typeof this.file, this.file);
+
+    var fileReader = new FileReader();
+    fileReader.onload = e => {
+      var contents: any = e.target;
+      console.log("onloading", e, contents, contents.result);
+      this.projectfilecontent = contents.result;
+      this.MoldeoCS.Init( { "consoleconfig": this.projectfilecontent } );
+    }
+    //fileReader.readAsDataURL(this.file);
+    fileReader.readAsText(this.file);
+    //this.submit();
 /*
     var reader = new FileReader();
     reader.onload = file => {

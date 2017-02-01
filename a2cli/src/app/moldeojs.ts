@@ -1,4 +1,4 @@
-export * from "./mo-types";
+/*export * from "./mo-types";
 export * from "./mo-text";
 export * from "./mo-abstract";
 export * from "./mo-actions";
@@ -25,6 +25,6 @@ export * from "./mo-render-manager";
 export * from "./mo-resource-manager";
 export * from "./mo-iodevice-manager";
 export * from "./mo-console";
-
+*/
 export class Moldeojs {
 }
