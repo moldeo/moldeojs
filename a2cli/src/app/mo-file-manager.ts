@@ -1,5 +1,6 @@
+import { moAbstract } from "./mo-abstract";
 import { moResource } from "./mo-resource";
-import { UploadItem }    from 'angular2-http-file-upload';
+import { UploadItem } from 'angular2-http-file-upload';
 
 export class MyUploadItem extends UploadItem {
     constructor(file: any) {
@@ -11,6 +12,11 @@ export class MyUploadItem extends UploadItem {
     }
 };
 
+export class moFile extends moAbstract {
+
+  constructor() { super();}
+  Init(): boolean { return super.Init(); }
+};
 
 
 export class moFileManager extends moResource {

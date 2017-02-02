@@ -1,6 +1,64 @@
 
 import { moAbstract } from "./mo-abstract";
 import { moResource, moResourceElement } from "./mo-resource";
+import {
+  moVector, moVector2f, moVector3f, moVector4f,
+  moVector2i, moVector3i, moVector4i,
+  moMatrix, moMatrix3f, moMatrix4f,
+  moMathManager
+} from "./mo-math-manager";
+import { moGLMatrixf } from "./mo-gl-manager";
+import * as THREE from 'three';
+import MaterialBase = THREE.Material;
+import MeshStandardMaterial = THREE.MeshStandardMaterial;
+//export type moCamera3DBase = THREE.Camera;
+
+export type moPointf = moVector3f;
+export type moPointd = moVector3f;
+export type moPoint = moPointf;
+export type moVertex3f = moVector3f;
+export type moVertex = moVector3f;
+export type moTCoord = moVector2f;
+
+export type moPosition = moVertex;
+export type moFace = moVector3i;
+export type moFace3 = moMatrix3f;
+
+export type moColorRGB = moVertex3f;
+export type moColorRGBA = moVector4f;
+//export type moColorx = THREE.Color;
+export class moColor extends THREE.Color { };
+
+export type moCameraMatrix = moGLMatrixf;
+export type moCamera3DBase = moGLMatrixf;
+
+export class moCamera3D  {
+
+    m_Position : moPosition;
+    m_Center: moPosition;
+
+
+};
+
+export enum moGeometryType {
+  MO_GEOMETRY_UNDEFINED=-1,
+  MO_GEOMETRY_POINT=0,
+  MO_GEOMETRY_BOX=1,
+  MO_GEOMETRY_CIRCLE=2,
+  MO_GEOMETRY_CYLINDER=3,
+  MO_GEOMETRY_SHAPE=4,
+  MO_GEOMETRY_PLANE=5,
+  MO_GEOMETRY_EXTRUDE=6,
+  MO_GEOMETRY_RING=7,
+  MO_GEOMETRY_SPHERE=8,
+  MO_GEOMETRY_POLYHEDRON=9,
+  MO_GEOMETRY_ICOSAHEDRON=10,
+  MO_GEOMETRY_DODECAHEDRON=11,
+  MO_GEOMETRY_TETRAHEDRON=13,
+  MO_GEOMETRY_TEXT=14,
+  MO_GEOMETRY_TUBE=15,
+  MO_GEOMETRY_MAX=16
+};
 
 export class moGeometry extends moResourceElement {
   /*
@@ -28,9 +86,19 @@ export class moPath extends moResourceElement {
 }
 
 export class moMaterialBase extends moResourceElement {
+  base: MaterialBase;
+  constructor() { super(); this.base = new MaterialBase(); }
+  Init(): boolean {
+    return super.Init();
+  }
 }
 
 export class moMaterial extends moMaterialBase {
+  base: MeshStandardMaterial;
+  constructor() { super(); this.base = new MeshStandardMaterial(); }
+  Init(): boolean {
+    return super.Init();
+  }
 }
 
 /**

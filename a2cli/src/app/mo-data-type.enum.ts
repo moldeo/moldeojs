@@ -26,3 +26,4 @@ export enum moDataType {
 	MO_DATA_MESSAGE,
 	MO_DATA_MESSAGES
 };
+

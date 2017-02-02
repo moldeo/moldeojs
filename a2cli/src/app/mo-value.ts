@@ -70,7 +70,7 @@ export type moDataMessage = moDatas;
 export type moDataMessages = moDataMessage[];
 
 export enum moValueType {
-	MO_VALUE_NUM,//cualquier número
+	MO_VALUE_NUM=0,//cualquier número
 	MO_VALUE_NUM_CHAR,//un byte
 	MO_VALUE_NUM_INT,//entero 32b
 	MO_VALUE_NUM_LONG,//entero largo 64b
@@ -83,6 +83,23 @@ export enum moValueType {
 	MO_VALUE_XML,//text, xml formatted...
 	MO_VALUE_UNDEFINED
 };
+
+export const moValueTypeStr = {
+  "NUM": moValueType.MO_VALUE_NUM,//cualquier número
+	"CHAR": moValueType.MO_VALUE_NUM_CHAR,//un byte
+	"INT": moValueType.MO_VALUE_NUM_INT,//entero 32b
+	"LONG": moValueType.MO_VALUE_NUM_LONG,//entero largo 64b
+	"FLOAT": moValueType.MO_VALUE_NUM_FLOAT,//coma flotante 32b
+	"DOUBLE": moValueType.MO_VALUE_NUM_DOUBLE,//coma flotante precision doble
+	"MATRIX": moValueType.MO_VALUE_MATRIX,//any type of VECTOR
+	"TXT": moValueType.MO_VALUE_TXT,//any type of text, single or multiline
+	"LNK": moValueType.MO_VALUE_LNK,//link to a file, text is interpreted as relative, absolute link to a file
+	"FUNCTION": moValueType.MO_VALUE_FUNCTION,//function parameter value, with lots of attributes....
+	"XML": moValueType.MO_VALUE_XML,//text, xml formatted...
+	"UNDEFINED": moValueType.MO_VALUE_UNDEFINED
+};
+export const moValueTypeArr = [ "NUM", "CHAR", "INT", "LONG", "FLOAT", "DOUBLE",
+  "MATRIX", "TXT", "LNK", "FUNCTION", "XML", "UNDEFINED"];
 
 export class moValueDefinition {
 
@@ -265,10 +282,13 @@ export class moValue {
   AddSubValue( p_valuebase: moValueBase);
   AddSubValue( strvalue: moText, type: moText);
   AddSubValue( valuebase : any, type?: moText ) {
-    console.log("moValue::AddSubValue > ", valuebase, type);
+    //console.log("moValue::AddSubValue > ", valuebase, type);
     var vd: moValueDefinition = new moValueDefinition();
-    //vd.SetType(vd.GetTypeStr());
-    //
+
+    if (valuebase == undefined) {
+      valuebase = "";
+    }
+
     if (typeof valuebase == "string") {
       var vb: moValueBase = new moValueBase();
       if (type == "TEXT") {
@@ -310,7 +330,7 @@ export class moValue {
     } else {
       vb = valuebase;
       this.m_List.push(vb);
-      console.log("moValue::AddSubValue(moValueBase) > ", vb, this.m_List);
+      //console.log("moValue::AddSubValue(moValueBase) > ", vb, this.m_List);
     }
   }
 

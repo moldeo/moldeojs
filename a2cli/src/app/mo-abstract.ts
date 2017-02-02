@@ -7,7 +7,7 @@ export class moAbstract {
   }
 
   Init(): boolean {
-    console.log("moAbstract::Init");
+    //console.log("moAbstract::Init");
     this.m_bInitialized = true; return true;
   }
 
@@ -18,5 +18,9 @@ export class moAbstract {
 
   Initialized(): boolean {
     return this.m_bInitialized;
+  }
+
+  ToJSON(): any {
+    return {};
   }
 }

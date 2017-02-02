@@ -34,6 +34,17 @@ export class MoldeoControlComponent implements OnInit {
     this.hostElement = el;
   }
 
+  ngOnInit() {
+    //var el = this.hostElement.nativeElement;
+    //console.log(el);
+  }
+
+  ngAfterContentInit() {
+    //var el = this.openprojectEl.nativeElement;
+    //console.log("openproject>el",this.openproject);
+  }
+
+
   submit() {
 /*        console.log("submitting file!");
         let uploadFile = (<HTMLInputElement>window.document.getElementById('openproject')).files[0];
@@ -65,7 +76,7 @@ export class MoldeoControlComponent implements OnInit {
     var elx = this.openproject.nativeElement;
     var fl: FileList;
     this.openproject.nativeElement.value = "";//for re importing
-    console.log("OpenProject:", elx, this.openproject);
+    //console.log("OpenProject:", elx, this.openproject);
     elx.click();
   }
 
@@ -75,14 +86,14 @@ export class MoldeoControlComponent implements OnInit {
 
   openprojectChanged(event) {
     this.file = event.target.files[0];
-    console.log("OpenProject changed! file:", typeof this.file, this.file);
+    //console.log("OpenProject changed! file:", typeof this.file, this.file);
 
     var fileReader = new FileReader();
     fileReader.onload = e => {
       var contents: any = e.target;
-      console.log("onloading", e, contents, contents.result);
+      //console.log("onloading", e, contents, contents.result);
       this.projectfilecontent = contents.result;
-      this.MoldeoCS.Init( { "consoleconfig": this.projectfilecontent } );
+      this.MoldeoCS.Init( { "consoleconfig": this.file, "consoleconfig_fulltext": this.projectfilecontent } );
     }
     //fileReader.readAsDataURL(this.file);
     fileReader.readAsText(this.file);
@@ -165,15 +176,6 @@ export class MoldeoControlComponent implements OnInit {
     console.log(event.target.files[0]);
   }
 
-  ngOnInit() {
-    //var el = this.hostElement.nativeElement;
-    //console.log(el);
-  }
-
-  ngAfterContentInit() {
-    //var el = this.openprojectEl.nativeElement;
-    console.log("openproject>el",this.openproject);
-  }
 
   @ViewChild("presentation") presentation: ElementRef;
   Presentation() : void {

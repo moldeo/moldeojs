@@ -1,9 +1,11 @@
 
 import { moAbstract } from "./mo-abstract";
+import { moScript } from "./mo-script";
 import { moMoldeoObjectType } from "./mo-moldeo-object-type.enum";
+export { moMoldeoObjectType } from "./mo-moldeo-object-type.enum";
 import { MOswitch, MOint } from "./mo-types";
 import { moText } from "./mo-text";
-import { moConfig } from "./mo-config";
+import { moConfig, moConfigDefinition } from "./mo-config";
 import { moResourceManager } from "./mo-resource-manager";
 
 export class moMobState {
@@ -36,6 +38,13 @@ export class moMobDefinition {
   m_KeyName : moText;/// nombre de la tecla que activa el objeto
   m_Activate: boolean;/// activo al iniciar el proyecto
 
+  SetName( p_name : moText ) {
+    this.m_Name = p_name;
+  }
+
+  GetName(): moText {
+    return this.m_Name;
+  }
 
   GetType() : moMoldeoObjectType {
     return this.m_Type;
@@ -124,7 +133,7 @@ export class moMobDefinition {
 
 }
 
-export class moMoldeoObject extends moAbstract {
+export class moMoldeoObject extends moScript {
   moid: number;
   name: string;
   label: string;
@@ -165,10 +174,12 @@ export class moMoldeoObject extends moAbstract {
     this.m_pResourceManager = null;
     //this.m_Script = "";
     this.m_Config = new moConfig();
+    this.m_MobDefinition = new moMobDefinition();
+    this.m_MobState = new moMobState();
   }
 
   Init(): boolean {
-    console.log("moMoldeoObject::Init");
+    console.log("moMoldeoObject::Init > ", this.m_MobDefinition);
     return super.Init();
   }
 
@@ -176,7 +187,13 @@ export class moMoldeoObject extends moAbstract {
 
   }
 
+  SetName( p_name : moText ) {
+    this.m_MobDefinition.SetName(p_name);
+  }
 
+  GetName(): moText {
+    return this.m_MobDefinition.GetName();
+  }
 
   GetType() : moMoldeoObjectType {
     return this.m_MobDefinition.GetType();
@@ -202,6 +219,14 @@ export class moMoldeoObject extends moAbstract {
     this.m_MobDefinition.GetConfigName();
   }
 
+  SetLabelName( p_labelname: moText) : void {
+    this.m_MobDefinition.SetLabelName( p_labelname );
+  }
+
+  GetLabelName() : void {
+    this.m_MobDefinition.GetLabelName();
+  }
+
   SetResourceManager( p_resourcemanager : moResourceManager ) : void {
     this.m_pResourceManager = p_resourcemanager;
   }
@@ -214,5 +239,13 @@ export class moMoldeoObject extends moAbstract {
     return -1;
   }
 
+  GetDefinition( p_configdefinition?: moConfigDefinition) : moConfigDefinition {
+    return this.m_Config.GetConfigDefinition();
+  }
+
+  ToJSON(): any {
+    //super.ToJSON();
+    return {};
+  }
 
 }

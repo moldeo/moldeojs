@@ -4,7 +4,7 @@ import { moAbstract } from "./mo-abstract";
 import { moMoldeoObject } from "./mo-moldeo-object";
 import { moResource, moResources } from "./mo-resource";
 
-//import { moFileManager } from "./mo-file-manager";
+import { moFileManager } from "./mo-file-manager";
 //import { moVideoManager } from "./mo-video-manager";
 
 //import { moFilterManager } from "./mo-filter-manager";
@@ -45,7 +45,7 @@ import { moScriptManager } from "./mo-script-manager";
 
 
 export class moResourceManager extends moAbstract {
-    //MOFileMan : moFileManager;
+    MOFileMan : moFileManager;
 		//MOVideoMan : moVideoManager;
 		//MOFilterMan : moFilterManager;
 		//MONetMan : moNetManager;
@@ -72,18 +72,26 @@ export class moResourceManager extends moAbstract {
 
     Init(options?: any): boolean {
 
+      if (this.MOFileMan) { }
+      else this.MOFileMan = new moFileManager();
+      this.MOFileMan.SetResourceManager(this);
+      //console.log("moResourceManager::Init > MOFileMan:", this.MOFileMan);
+
       if (this.MORenderMan) { }
       else this.MORenderMan = new moRenderManager();
-      console.log("moResourceManager::Init > MORenderMan:", this.MORenderMan);
+      this.MORenderMan.SetResourceManager(this);
+      //console.log("moResourceManager::Init > MORenderMan:", this.MORenderMan);
 
       if (this.MODataMan) { }
       else this.MODataMan = new moDataManager();
-      console.log("moResourceManager::Init > MODataMan:", this.MODataMan);
+      this.MODataMan.SetResourceManager(this);
+      //console.log("moResourceManager::Init > MODataMan:", this.MODataMan);
 
       if (this.MOGuiMan) { }
       else this.MOGuiMan = new moGUIManager();
-      console.log("moResourceManager::Init > MOGuiMan:", this.MOGuiMan);
-
+      this.MOGuiMan.SetResourceManager(this);
+      //console.log("moResourceManager::Init > MOGuiMan:", this.MOGuiMan);
+      this.m_bInitialized = true;
       return super.Init();
     }
 };
