@@ -1,0 +1,61 @@
+import { Injectable } from '@angular/core';
+import { Subject }    from 'rxjs/Subject';
+import {  BehaviorSubject }    from 'rxjs/BehaviorSubject';
+import { Http } from "@angular/http";
+
+import { moConsole } from './mo-console';
+import { moResourceManager } from './mo-resource-manager';
+import { moIODeviceManager } from './mo-iodevice-manager';
+
+
+
+@Injectable()
+export class ConsoleService {
+
+  //m_ResourceManager: moResourceManager;
+  m_pIODeviceManager: moIODeviceManager;
+  m_Console: moConsole;
+
+  private updated = new BehaviorSubject(false);
+  updated$ = this.updated.asObservable();
+
+  constructor( private http: Http ) {
+    this.m_Console = new moConsole( http  );
+    this.m_pIODeviceManager = new moIODeviceManager();
+   }
+
+  Init(options?: any) : boolean {
+    if (options["start_loading"] == undefined)
+      options["start_loading"] = (result) => {
+        this.m_Console.ConsolePlay();
+        this.updated.next(true);
+      };
+
+    if (options["config_open"] == undefined)
+      options["config_open"] = (result) => {
+        console.log("Config opened ok.");
+      };
+
+    if (options["config_loaded"] == undefined)
+      options["config_loaded"] = (result) => {
+        console.log("Config Loaded! Start Playing!");
+      };
+
+    if (options["effects_loaded"] == undefined)
+      options["effects_loaded"] = (result) => {
+        console.log("Effects Loaded!");
+      };
+
+    var consoled: boolean = this.m_Console.Init(options);
+    if (consoled) {
+      console.log("Loading...");
+    } else {
+      console.error("Something happened");
+    }
+
+    return consoled;
+  }
+
+
+
+}
