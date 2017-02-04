@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<MOCONFIG majorversion="0" minorversion="0">
+    <DEFINITION name="__console__" class="moConsole" />
+    <UPDATE />
+    <CONFIGPARAMS>
+        <PARAM name="inlet" type="INLET">
+            <VAL>
+                <D type="TXT">VARIABLE1</D>
+                <D type="TXT">NUMERIC</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="outlet" type="OUTLET" />
+        <PARAM name="script" type="SCRIPT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="devices" type="MOLDEOOBJECT" />
+        <PARAM name="preeffect" type="MOLDEOOBJECT">
+            <VAL>
+                <D type="TXT">erase</D>
+                <D type="TXT">erase</D>
+                <D type="TXT">erase</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">L</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="effect" type="MOLDEOOBJECT">
+            <VAL>
+                <D type="TXT">icon</D>
+                <D type="TXT">icon</D>
+                <D type="TXT">icon</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">W</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="posteffect" type="MOLDEOOBJECT" />
+        <PARAM name="mastereffect" type="MOLDEOOBJECT" />
+        <PARAM name="resources" type="MOLDEOOBJECT" />
+        <PARAM name="mastereffects_on" type="NUM" options="off,on">
+            <VAL>
+                <D type="NUM">0</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="fulldebug" type="NUM">
+            <VAL>
+                <D type="NUM">0</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="outputmode" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="outputresolution" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="rendermode" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="renderresolution" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="clip1" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="clip2" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="clip3" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="screenshots" type="NUM">
+            <VAL>
+                <D type="NUM">0</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="videoshots" type="NUM">
+            <VAL>
+                <D type="NUM">0</D>
+            </VAL>
+        </PARAM>
+    </CONFIGPARAMS>
+    <PRECONFIGS />
+</MOCONFIG>
