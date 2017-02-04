@@ -1,6 +1,9 @@
+import { moAbstract } from "./mo-abstract";
 
+export class moIODeviceManager extends moAbstract {
 
-export class moIODeviceManager {
-
-
+  constructor() {
+    super();
+    //this.SetName("_iodevicemanager_");
+  }
 }

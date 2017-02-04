@@ -28,6 +28,8 @@ export type MOint = number;
 export type MOuint = number;
 export type MOchar = number;
 export type MOuchar = number;
+export type MOubyte = number;
+export type MObyte = number;
 export type MOswitch = number;
 export type moNumber = number;
 

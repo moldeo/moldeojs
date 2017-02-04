@@ -1,8 +1,14 @@
-
+import { moText } from "./mo-text";
 import { moAbstract } from "./mo-abstract";
-import { moResource, moResourceElement } from "./mo-resource";
+import {
+  MOfloat, MOdouble,
+  MOint, MOuint, MOlong, MOulong
+} from "./mo-types";
+import { moResource, moResourceElement, moAttribute, moAttributeArray } from "./mo-resource";
 import {
   moVector, moVector2f, moVector3f, moVector4f,
+  moVector2fArray, moVector3fArray, moVector4fArray,
+  moVector3iArray, moMatrix3fArray,
   moVector2i, moVector3i, moVector4i,
   moMatrix, moMatrix3f, moMatrix4f,
   moMathManager
@@ -12,6 +18,7 @@ import * as THREE from 'three';
 import MaterialBase = THREE.Material;
 import MeshStandardMaterial = THREE.MeshStandardMaterial;
 //export type moCamera3DBase = THREE.Camera;
+import { moSceneNode, moSceneNodeArray  } from "./mo-3d-model-manager";
 
 export type moPointf = moVector3f;
 export type moPointd = moVector3f;
@@ -32,12 +39,30 @@ export class moColor extends THREE.Color { };
 export type moCameraMatrix = moGLMatrixf;
 export type moCamera3DBase = moGLMatrixf;
 
-export class moCamera3D  {
+export type moPointArray = moVector3fArray;
+export type moColorArray = moVector3fArray;
+export type moColor4fArray = moVector3fArray;
+export type moColorRGBAArray = moVector3fArray;
+export type moTCoordArray = moVector2fArray;
+export type moVertexArray = moVector3fArray;
+export type moFaceArray = moVector3iArray;
+export type moFace3Array = moMatrix3fArray;
+/*
+typedef moVector3fArray moColorArray;
+typedef moVector3fArray moColorRGBArray;
+typedef moVector4fArray moColor4fArray;
+typedef moVector4fArray moColorRGBAArray;
+typedef moVector2fArray moTCoordArray;
+typedef moVector3fArray moVertexArray;
+typedef moVector3iArray moFaceArray;
+typedef moMatrix3fArray moFace3Array;
+*/
 
+export class moCamera3D extends THREE.Camera {
+/*
     m_Position : moPosition;
     m_Center: moPosition;
-
-
+*/
 };
 
 export enum moGeometryType {
@@ -60,25 +85,33 @@ export enum moGeometryType {
   MO_GEOMETRY_MAX=16
 };
 
-export class moGeometry extends moResourceElement {
-  /*
-      moText        m_Name;
-        moGeometryType m_Type;
+//export class moGeometry extends moResourceElement {
+export class moGeometry extends THREE.Geometry {
+/*
+  geometry: THREE.Geometry;
 
-        moPointArray m_Vertices;
-        moTCoordArray m_VerticesUvs;
-        moVertexArray m_Normals;
-        moColorArray    m_Colors;
+  n_Name : moText;
+  m_Type : moGeometryType;
 
-        MOfloat*       m_VerticesBuffer;
-        MOfloat*       m_NormalsBuffer;
-        MOfloat*       m_VerticesUVBuffer;
-        MOfloat*       m_ColorBuffer;
+  m_Vertices : moPointArray;
+  m_VerticesUvs : moTCoordArray;
+  m_Normals : moVertexArray;
+  m_Colors : moColorArray;
 
-        moFaceArray m_Faces;//array of triangles, 3 points referencing each an index of m_Vertices.
-        moTCoordArray m_FaceVertexUvs;//array of texture coordinates for each vertex, corresponding to each face from m_Faces
-        moAttributeArray m_Attributes;
-        */
+  m_VerticesBuffer : MOfloat[];
+  m_NormalsBuffer : MOfloat[];
+  m_VerticesUVBuffer : MOfloat[];
+  m_ColorBuffer : MOfloat[];
+
+  m_Faces : moFaceArray;//array of triangles, 3 points referencing each an index of m_Vertices.
+  m_FaceVertexUvs : moTCoordArray;//array of texture coordinates for each vertex, corresponding to each face from m_Faces
+  m_Attributes : moAttributeArray;
+
+  constructor() {
+    super();
+    this.geometry = new THREE.Geometry();
+  }
+  */
 }
 
 
@@ -86,19 +119,32 @@ export class moPath extends moResourceElement {
 }
 
 export class moMaterialBase extends moResourceElement {
-  base: MaterialBase;
-  constructor() { super(); this.base = new MaterialBase(); }
+  //material_basic: MaterialBase;
+  constructor() {
+    super();
+    //this.material = new MaterialBase();
+  }
   Init(): boolean {
     return super.Init();
   }
 }
-
+/*
 export class moMaterial extends moMaterialBase {
-  base: MeshStandardMaterial;
-  constructor() { super(); this.base = new MeshStandardMaterial(); }
+  material: MeshStandardMaterial;
+  constructor() {
+    super();
+    this.material = new MeshStandardMaterial();
+  }
   Init(): boolean {
     return super.Init();
   }
+}
+*/
+
+export class moMaterial extends THREE.MeshStandardMaterial {
+}
+
+export class moMaterialBasic extends THREE.MeshBasicMaterial {
 }
 
 /**
@@ -107,56 +153,58 @@ export class moMaterial extends moMaterialBase {
  * Managing all 3d scene nodes
  */
 
-export class moSceneNode extends moAbstract {
-  /*
-      void*   SceneNodeImplementation;
 
-        moGLMatrixf  m_ProjectionMatrix;
-        moGLMatrixf  m_ModelMatrix;
+//export class moObject3D extends moSceneNode {
+export class moObject3D extends THREE.Object3D {
+/*
+  m_Geometry : moGeometry;
+  m_Material : moMaterial;
+  m_Position : moPosition;
+  m_Scale : moVector3f;
+  m_Rotation : moVector3f;
 
-        moSceneNodePointerArray m_Childrens;
-        moSceneNode* m_Parent;
-        MOulong     m_Id;
-        moText   m_Name;
-  */
+  constructor(p_geometry: moGeometry, p_material: moMaterial ) {
+    super();
+    this.m_Geometry = p_geometry;
+    this.m_Material = p_material;
+  }
+*/
 }
 
-type moSceneNodeArray = moSceneNode[];
-
-export class moObject3D extends moSceneNode {
+export class moBone extends THREE.Bone {
 }
 
-export class moBone extends moObject3D {
+export class moSprite extends THREE.Sprite {
 }
 
-export class moSprite extends moObject3D {
+export class moLine extends THREE.Line {
 }
 
-export class moLine extends moObject3D {
+export class moLineSegments extends THREE.LineSegments {
 }
 
-export class moLineSegments extends moObject3D {
+export class moPoints extends THREE.Points {
 }
 
-export class moPoints extends moObject3D {
+export class moLOD extends THREE.LOD {
 }
 
-export class moLOD extends moObject3D {
+export class moSkinnedMesh extends THREE.SkinnedMesh {
 }
 
-export class moSkinnedMesh extends moObject3D {
+export class moSkeleton extends THREE.Skeleton {
 }
 
-export class moSkeleton extends moObject3D {
+export class moMesh extends THREE.Mesh {
+  SetModelMatrix(matrix: moGLMatrixf) {
+    this.applyMatrix( matrix );
+  }
 }
 
-export class moMesh extends moObject3D {
+export class moShape extends THREE.Shape {
 }
 
-export class moShape extends moObject3D {
-}
-
-export class moBoxGeometry extends moGeometry {
+export class moBoxGeometry extends THREE.BoxGeometry {
 }
 
 export class moCircleGeometry extends moGeometry {
@@ -182,13 +230,18 @@ export class moTetrahedronGeometry extends moGeometry {
 export class moShapeGeometry extends moGeometry {
 }
 
-export class moPlaneGeometry extends moGeometry {
+export class moPlaneGeometry extends THREE.PlaneGeometry {
 }
 export class moExtrudeGeometry extends moGeometry {
 }
 export class moRingGeometry extends moGeometry {
 }
-export class moSphereGeometry extends moGeometry {
+export class moSphereGeometry extends THREE.SphereGeometry {
+  //m_SphereGeometry: THREE.SphereGeometry;
+  /*constructor( radius : MOfloat, width: MOint, height: MOint) {
+    super();
+    this.m_SphereGeometry = new THREE.SphereGeometry(radius,width,height);
+  }*/
 }
 export class moTextGeometry extends moGeometry {
 }
@@ -210,4 +263,8 @@ export class mo3dWidget extends moWidget {
 
 
 export class moGUIManager extends moResource {
+  constructor() {
+    super();
+    this.SetName("_guimanager_");
+  }
 }

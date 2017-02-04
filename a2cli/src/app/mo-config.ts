@@ -1,3 +1,5 @@
+import * as xml2js from "xml2js";
+
 
 import { MOint, MOuint, MOboolean, MOfloat, MOdouble, MOlong, MOulong, moNumber, moTextFilterParam } from "./mo-types";
 import { moText } from "./mo-text";
@@ -6,8 +8,12 @@ import { moValue, moValues, moValueBase, moValueBases, moValueDefinition } from 
 import { moParam, moParams, moParamIndexes, moParamDefinition, moParamDefinitions } from "./mo-param";
 import { moPreconfig, moPreConfigs } from "./mo-pre-config";
 import { moFile } from "./mo-file-manager";
-import * as xml2js from "xml2js";
 
+export const MO_PARAM_NOT_SEL = -1;
+export const MO_PARAM_NOT_FOUND = -1;
+export const MO_CONFIGFILE_NOT_FOUND = -1;
+export const MO_CONFIG_OK = 0;
+export const MO_SELECTED = -1;
 
 export class moConfigDefinition extends moAbstract {
 
@@ -29,23 +35,32 @@ export class moConfigDefinition extends moAbstract {
     return this.m_ObjectClass;
   }
 
+  constructor() {
+    super();
+  }
+
+  Init(): boolean {
+    return super.Init();
+  }
+
 }
 //type moPreConfigs = moPreconfig[];
 
 export class moConfig extends moAbstract {
 
-    m_ConfigLoaded : MOboolean;
-		m_Params : moParams;//los parametros del config
-		m_PreConfigs : moPreConfigs;
+    m_ConfigLoaded : MOboolean = false;
+    m_Params: moParams = [];//los parametros del config
+    m_ParamsByName: any = {};
+    m_PreConfigs : moPreConfigs = [];
 		m_ConfigDefinition : moConfigDefinition;
 
-		m_MajorVersion : MOint;
-		m_MinorVersion : MOint;
+		m_MajorVersion : MOint = 0;
+		m_MinorVersion : MOint = 0;
 		m_FileName : moText;
 
-		m_CurrentParam : MOint;// el indice que indica cual es el parametro actual.
-		m_PreconfParamNum : MOint;
-		m_PreconfActual: MOint;
+		m_CurrentParam : MOint = 0;// el indice que indica cual es el parametro actual.
+		m_PreconfParamNum : MOint = 0;
+		m_PreconfActual: MOint = 0;
 
     ///solo para poder devolver una referencia
     /*
@@ -71,6 +86,10 @@ export class moConfig extends moAbstract {
 
     Set( p_objectname : moText, p_objectclass : moText ) : void {
       this.m_ConfigDefinition.Set( p_objectname, p_objectclass);
+    }
+
+    GetName(): moText {
+      return this.m_FileName;
     }
 
     /// Devuelve el nombre del objeto asociado a este config
@@ -109,13 +128,17 @@ export class moConfig extends moAbstract {
     }
 
     //LoadConfig( config: moFile ): boolean;
-    LoadConfig( configname : moText ) : boolean {
-      if (configname.length > 1000) {
+    LoadConfig( configtext: any, callback?: any ): MOint {
+      console.log("configname:", typeof configtext, configtext);
+      //return MO_CONFIGFILE_NOT_FOUND;
+      if ( configtext && typeof configtext == "string" ) {
           //console.log("moConfig::LoadConfig > Full text", configname);
           //parse XML:
-          xml2js.parseString(configname, (err, result) => {
+          xml2js.parseString( configtext, (err, result) => {
             //console.log(result);
             //console.log('Parsing done');
+            this.m_ParamsByName = {};
+
             if ("MOCONFIG" in result) {
               if ("CONFIGPARAMS" in result["MOCONFIG"]) {
                 var CFGPARAMS = result["MOCONFIG"]["CONFIGPARAMS"][0]["PARAM"];
@@ -134,7 +157,7 @@ export class moConfig extends moAbstract {
                   );
                   var p_param = new moParam( p_param_def );
                   this.m_Params.push(p_param);
-
+                  this.m_ParamsByName[""+p_param.m_ParamDefinition.m_Name] = p_param;
                   var PARAMVALS = PARAM["VAL"];
                   for (var PARAMVAL_I in PARAMVALS) {
                     var VAL = PARAMVALS[PARAMVAL_I];
@@ -163,6 +186,7 @@ export class moConfig extends moAbstract {
                       }
                     }
                     p_param.AddValue(newValue);
+                    p_param.m_ParamDefinition.m_Index = this.m_Params.length - 1;
                   }
                 }
                 console.log("Added params:", this.m_Params);
@@ -173,11 +197,159 @@ export class moConfig extends moAbstract {
             if ("PRECONFIGS" in result["MOCONFIG"]) {
 
             }//fin "PRECONFIGS"
-
-
+            this.m_ConfigLoaded = true;
+            if (callback) callback(MO_CONFIG_OK);
+            return MO_CONFIG_OK;
           });
-
+        return MO_CONFIG_OK;//MUST BE MO_CONFIG_LOADING
       }
-      return false;
+      this.m_ConfigLoaded = false;
+      return MO_CONFIGFILE_NOT_FOUND;
     }
+
+
+    Text(param_id: any) : moText {
+      var param: moParam;
+      param = this.GetParam(param_id);
+      if (param && param.m_Values.length>0)
+        return param.m_Values[0].m_List[0].m_Text;
+      return "";
+    }
+
+  GetParams() : moParams {
+    return this.m_Params;
+  }
+
+  GetParam(p_paramindex?: any): moParam {
+    var param: moParam = new moParam();
+
+    if (p_paramindex) {
+      if (typeof p_paramindex == "string") {
+        param = this.m_ParamsByName["" + p_paramindex];
+      } else
+        if (typeof p_paramindex == "number") {
+          if (p_paramindex == -1)
+            param = this.m_Params[this.m_CurrentParam];
+          else
+            param = this.m_Params[p_paramindex];
+        }
+    } else {
+      if (this.m_CurrentParam>-1)
+        param = this.m_Params[this.m_CurrentParam];
+    }
+
+    return param;
+  }
+
+
+
+  GetParamsCount() : MOint {
+    return this.m_Params.length;
+  }
+
+  GetParamIndex( p_paramname : moText ) : MOint {
+    var param: moParam = this.GetParam(p_paramname);
+    if (param)
+      return param.m_ParamDefinition.m_Index;
+    return -1;
+  }
+
+
+  GetValuesCount( p_paramindex : MOint ) : MOuint {
+    return this.m_Params[ p_paramindex].GetValuesCount();
+  }
+
+  GetValue( p_paramindex : any, indexvalue : MOint ) : moValue {
+      var param : moParam = this.GetParam(p_paramindex);
+      return param.GetValue( indexvalue );
+  }
+
+  GetCurrentValueIndex(p_paramindex: MOint) {
+    return this.m_Params[p_paramindex].GetIndexValue();
+  }
+
+  GetCurrentValue() : moValue {
+    return this.m_Params[this.m_CurrentParam].GetValue();
+  }
+
+  GetCurrentParam() : moParam {
+    return this.m_Params[this.m_CurrentParam];
+  }
+
+  GetCurrentParamIndex() : MOint {
+    return this.m_CurrentParam;
+  }
+
+  SetCurrentParamIndex( p_currentparam : MOint ) : boolean {
+    if (  0<=p_currentparam
+          && p_currentparam< this.m_Params.length ) {
+      this.m_CurrentParam = p_currentparam;
+      return true;
+    }
+    return false;
+  }
+
+  FirstParam() : void {
+    if ( this.m_Params.length>0 ) {
+      this.m_CurrentParam = 0;
+    } else this.m_CurrentParam = -1;
+  }
+
+  NextParam() : void {
+    if ( this.m_Params.length>0 ) {
+      if ( this.m_CurrentParam < ( this.m_Params.length-1 ) ) {
+        this.m_CurrentParam++;
+      }
+    } else this.m_CurrentParam = -1;
+  }
+
+  PrevParam() : void {
+    if ( this.m_Params.length > 0 ) {
+      if ( this.m_CurrentParam > 0 ) {
+        this.m_CurrentParam--;
+      }
+    } else this.m_CurrentParam = -1;
+  }
+
+  FirstValue() : boolean {
+    if ( this.m_CurrentParam>=0 ) {
+      var pParam : moParam = this.m_Params[this.m_CurrentParam];
+      if ( pParam.GetValuesCount() == 0 ) {
+        return false;
+      }
+      pParam.FirstValue();
+      return true;
+    }
+    return false;
+  }
+
+  NextValue() : boolean {
+    if ( this.m_CurrentParam>=0 ) {
+      var pParam : moParam = this.m_Params[this.m_CurrentParam];
+      if ( pParam.GetIndexValue() == pParam.GetValuesCount()-1) {
+        return false;
+      }
+      pParam.NextValue();
+      return true;
+    }
+    return false;
+  }
+
+  PreviousValue() : boolean {
+    if ( this.m_CurrentParam>=0 ) {
+      var pParam : moParam = this.m_Params[this.m_CurrentParam];
+      if ( pParam.GetIndexValue() == 0 ) {
+        return false;
+      }
+      pParam.PrevValue();
+      return true;
+    }
+    return false;
+  }
+
 }
+
+
+
+
+

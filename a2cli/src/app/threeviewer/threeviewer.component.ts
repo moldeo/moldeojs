@@ -42,6 +42,7 @@ export class ThreeviewerComponent implements OnInit {
         this.camera.position.z = 10;
 
         // Lights
+
         const ambientLight = new THREE.AmbientLight(0xcccccc);
         this.scene.add(ambientLight);
 
@@ -55,8 +56,8 @@ export class ThreeviewerComponent implements OnInit {
         //this.controls = new THREE.TrackballControls(this.camera, this.hostElement.nativeElement );
 
         // Sphere
-
         const textureLoader = new THREE.TextureLoader();
+/*
         textureLoader.load('assets/earth.jpg', t => {
             this.sphere = new THREE.SphereGeometry(5, 50, 50);
             this.material = new THREE.MeshLambertMaterial({map: t});
@@ -65,6 +66,15 @@ export class ThreeviewerComponent implements OnInit {
             this.scene.add(this.mesh);
             this.animate();
         });
+*/
+        //var t = textureLoader.load('assets/earth.jpg');
+        this.sphere = new THREE.SphereGeometry(5, 50, 50);
+        //this.material = new THREE.MeshLambertMaterial({map: t});
+        this.material = new THREE.MeshStandardMaterial();
+        this.mesh = new THREE.Mesh( this.sphere, this.material);
+
+        this.scene.add(this.mesh);
+        this.animate();
 
         //this.mesh = new THREE.Mesh( this.geometry, this.material );
         //this.scene.add(this.mesh);

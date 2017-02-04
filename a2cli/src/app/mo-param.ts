@@ -2,7 +2,11 @@ import { moAbstract } from "./mo-abstract";
 import { MOint, MOuint, MOboolean, MOfloat, MOdouble, MOlong, MOulong, moNumber, moTextFilterParam } from "./mo-types";
 import { moText, moTextArray } from "./mo-text";
 import { moDataType } from "./mo-data-type.enum";
-import { moData, moValue, moValues } from "./mo-value";
+import {
+  moData, moValue, moValues, moValueBase,
+  moValueType, moValueTypeStr, moValueTypeArr,
+  moValueDefinition
+} from "./mo-value";
 import { moParamType } from "./mo-param-type.enum";
 import { moTimer } from "./mo-timer";
 export * from "./mo-param-type.enum";
@@ -40,6 +44,7 @@ export class moParamInterpolation {
 
   constructor(  ) {
   }
+
 
 
 }
@@ -91,6 +96,13 @@ export class moParamDefinition extends moAbstract {
     return p_Type;
   }
 
+   GetType(): moParamType {
+     return this.m_Type;
+   }
+
+   GetName(): moText {
+     return this.m_Name;
+  }
 }
 export type moParamDefinitions = moParamDefinition[];
 
@@ -117,9 +129,197 @@ export class moParam extends moAbstract {
     this.m_Values = [];
   }
 
-  AddValue(p_value: moValue) {
-    this.m_Values.push( p_value );
+  GetParamDefinition(): moParamDefinition {
+    return this.m_ParamDefinition;
+}
+
+
+GetValues() : moValues {
+	return this.m_Values;
+}
+
+
+GetValuesCount() : MOuint {
+	return this.m_Values.length;
+}
+
+
+AddValue( value : moValue ) : void {
+	this.m_Values.push( value );
+}
+
+
+DeleteValue( i : MOint ) {
+  this.m_Values.splice(i,1);
+}
+
+SetDefaultValue() : void {
+
+    //atencion: siempre setear el tipo despues de pasar el valor del texto...
+    if (this.GetValuesCount()==0) {
+        var xvalue : moValue;
+        var valuebase : moValueBase;
+
+        switch( this.m_ParamDefinition.GetType() ) {
+            case moParamType.MO_PARAM_COLOR:
+                valuebase.SetText( "1.0" );
+                valuebase.SetType( moValueType.MO_VALUE_FUNCTION );
+                xvalue.AddSubValue( valuebase );
+                xvalue.AddSubValue( valuebase );
+                xvalue.AddSubValue( valuebase );
+                xvalue.AddSubValue( valuebase );
+                break;
+            case moParamType.MO_PARAM_BLENDING:
+            case moParamType.MO_PARAM_POLYGONMODE:
+                valuebase.SetText( "0" );
+                valuebase.SetInt(0);
+                valuebase.SetType( moValueType.MO_VALUE_NUM );
+                xvalue.AddSubValue( valuebase );
+                break;
+            case moParamType.MO_PARAM_ALPHA:
+            case moParamType.MO_PARAM_SYNC:
+            case moParamType.MO_PARAM_SCALEX:
+            case moParamType.MO_PARAM_SCALEY:
+            case moParamType.MO_PARAM_SCALEZ:
+                valuebase.SetText( "1.0" );
+                valuebase.SetType( moValueType.MO_VALUE_FUNCTION );
+                xvalue.AddSubValue( valuebase );
+                break;
+
+            case moParamType.MO_PARAM_FUNCTION:
+            case moParamType.MO_PARAM_PHASE:
+            case moParamType.MO_PARAM_TRANSLATEX:
+            case moParamType.MO_PARAM_TRANSLATEY:
+            case moParamType.MO_PARAM_TRANSLATEZ:
+            case moParamType.MO_PARAM_ROTATEX:
+            case moParamType.MO_PARAM_ROTATEY:
+            case moParamType.MO_PARAM_ROTATEZ:
+                valuebase.SetText( "0.0" );
+                valuebase.SetType( moValueType.MO_VALUE_FUNCTION );
+                xvalue.AddSubValue( valuebase );
+                break;
+
+            case moParamType.MO_PARAM_TEXTURE:
+                valuebase.SetText( "default" );
+                valuebase.SetType( moValueType.MO_VALUE_TXT );
+                xvalue.AddSubValue( valuebase );
+                break;
+            case moParamType.MO_PARAM_3DMODEL:
+            case moParamType.MO_PARAM_OBJECT:
+            case moParamType.MO_PARAM_VIDEO:
+            case moParamType.MO_PARAM_TEXTUREFOLDER:
+            case moParamType.MO_PARAM_SOUND:
+            case moParamType.MO_PARAM_SCRIPT:
+            case moParamType.MO_PARAM_TEXT:
+                if ( this.GetParamDefinition().GetName()=="effect"
+                    ||
+                    this.GetParamDefinition().GetName()=="preeffect"
+                    ||
+                    this.GetParamDefinition().GetName()=="posteffect"
+                    ||
+                    this.GetParamDefinition().GetName()=="mastereffect"
+                    ||
+                    this.GetParamDefinition().GetName()=="devices"
+                    ||
+                    this.GetParamDefinition().GetName()=="resources" ) {
+                      return;
+                    }
+                valuebase.SetText( "" );
+                valuebase.SetType( moValueType.MO_VALUE_TXT );
+                xvalue.AddSubValue( valuebase );
+                break;
+            case moParamType.MO_PARAM_MOLDEO_OBJECT:
+              return;
+            case moParamType.MO_PARAM_FONT:
+                valuebase.SetText( "fonts/Tuffy.ttf" );
+                valuebase.SetType( moValueType.MO_VALUE_TXT );
+                xvalue.AddSubValue( valuebase );
+                break;
+            case moParamType.MO_PARAM_FILTER:
+                valuebase.SetText( "" );
+                valuebase.SetType( moValueType.MO_VALUE_TXT );
+                xvalue.AddSubValue( valuebase );
+                xvalue.AddSubValue( valuebase );
+                xvalue.AddSubValue( valuebase );
+                xvalue.AddSubValue( valuebase );
+                break;
+            case moParamType.MO_PARAM_INLET:
+            case moParamType.MO_PARAM_OUTLET:
+                //valuebase.SetText( "" );
+                //valuebase.SetType( MO_VALUE_TXT );
+                //xvalue.AddSubValue( valuebase );
+                break;
+            case moParamType.MO_PARAM_NUMERIC:
+                valuebase.SetText( "" );
+                valuebase.SetType( moValueType.MO_VALUE_NUM );
+                valuebase.SetInt(0);
+                break;
+            case moParamType.MO_PARAM_COMPOSE:
+                valuebase.SetText( "" );
+                valuebase.SetType( moValueType.MO_VALUE_TXT );
+                xvalue.AddSubValue( valuebase );
+                xvalue.AddSubValue( valuebase );
+                xvalue.AddSubValue( valuebase );
+                break;
+            case moParamType.MO_PARAM_VECTOR:
+                valuebase.SetText( "0.0" );
+                valuebase.SetType( moValueType.MO_VALUE_NUM_FLOAT );
+                xvalue.AddSubValue( valuebase );
+                xvalue.AddSubValue( valuebase );
+                break;
+
+        }
+
+        this.AddValue(xvalue);
+    }
+}
+
+GetValue(p_valueindex?: MOint) {
+    if (p_valueindex == undefined || p_valueindex == -1)
+      p_valueindex = this.m_CurrentIndexValue;
+    return this.m_Values[p_valueindex];
   }
+
+SetIndexValue( indexvalue : MOint ) : void {
+
+	if (0<=indexvalue && indexvalue< this.m_Values.length ) {
+		this.m_CurrentIndexValue = indexvalue;
+		this.m_bExternDataUpdated = false;
+	}
+
+}
+
+GetIndexValue() : MOint {
+
+	return this.m_CurrentIndexValue;
+
+}
+
+NextValue() : void {
+	if ( this.m_Values.length > 0 ) {
+	    this.m_bExternDataUpdated = false;
+		if ( this.m_CurrentIndexValue < this.m_Values.length-1) {
+			this.m_CurrentIndexValue++;
+		}
+	} else this.m_CurrentIndexValue = -1;
+}
+
+PrevValue() : void {
+	if ( this.m_Values.length > 0 ) {
+	    this.m_bExternDataUpdated = false;
+		if ( this.m_CurrentIndexValue > 0 ) {
+			this.m_CurrentIndexValue--;
+		}
+	} else this.m_CurrentIndexValue = -1;
+}
+
+FirstValue() : void {
+	if (this.m_Values.length > 0) {
+	    this.m_bExternDataUpdated = false;
+		this.m_CurrentIndexValue = 0;
+	} else this.m_CurrentIndexValue = -1;
+}
+
 
 }
 

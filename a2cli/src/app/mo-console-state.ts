@@ -10,6 +10,8 @@ import { moMoldeoObject } from "./mo-moldeo-object";
 import { moIODeviceManager } from "./mo-iodevice-manager";
 import { moResourceManager } from "./mo-resource-manager";
 import { moRenderManagerMode } from "./mo-render-manager";
+import { moEffectState } from "./mo-effect-state";
+
 
 export const MO_DEF_SCREEN_WIDTH = 640;
 export const MO_DEF_SCREEN_HEIGHT = 300;
@@ -25,7 +27,7 @@ export enum moConsoleMode {
 
 };
 
-export class moConsoleState {
+export class moConsoleState extends moEffectState {
     m_Mode : moConsoleMode;
 
     m_RenderFrameQuality : moText;
@@ -46,7 +48,11 @@ export class moConsoleState {
     savescreen : MOswitch;
     frame : MOuint;
 
-    step_interval : MOlong;
+    step_interval: MOlong;
+
+    constructor() {
+      super();
+    }
 };
 
 

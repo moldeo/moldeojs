@@ -4,7 +4,7 @@
  * All basic data and value definitions
  *
  */
-import { MOfloat, MOdouble, MOulong, MOint, moNumber, moTextFilterParam } from "./mo-types"
+import { MOfloat, MOdouble, MOlong, MOulong, MOint, MOuint, moNumber, moTextFilterParam } from "./mo-types"
 import { moText } from "./mo-text"
 import { moDataType } from "./mo-data-type.enum"
 export * from "./mo-data-type.enum";
@@ -61,6 +61,26 @@ export class moData {
   SetFun(p_function: moText) {
     this.m_DataType = moDataType.MO_DATA_FUNCTION;
     this.m_Text = p_function;
+  }
+
+  Text() : moText {
+    return this.m_Text;
+  }
+
+  Int() : MOint {
+    return this.m_Number;
+  }
+
+  Long() : MOlong {
+    return this.m_Number;
+  }
+
+  Float() : MOfloat {
+    return this.m_Number;
+  }
+
+  Double() : MOdouble {
+    return this.m_Number;
   }
 
 }
@@ -269,7 +289,10 @@ export class moValueBase extends moData {
   SetRange( min: any, max: any) { this.m_ValueDefinition.SetRange(min, max); }
   GetRange() : any { return this.m_ValueDefinition.GetRange(); }
   SetIndex( p_index: MOint) { this.m_ValueDefinition.SetIndex(p_index);}
-  GetIndex(): MOint { return this.m_ValueDefinition.m_Index;}
+  GetIndex(): MOint { return this.m_ValueDefinition.m_Index; }
+  SetType(p_type: moValueType) : void {
+    this.m_ValueDefinition.m_Type = p_type;
+  }
 }
 export type moValueBases = moValueBase[];
 
@@ -334,6 +357,15 @@ export class moValue {
     }
   }
 
+GetSubValue(  p_indexsubvalue : MOint = 0 ) : moValueBase {
+			return this.m_List[p_indexsubvalue];
+		}
+		 GetLastSubValue() : moValueBase {
+			return this.m_List[this.GetSubValueCount() - 1];
+		}
+		GetSubValueCount() : MOuint {
+			return this.m_List.length;
+		}
 
 }
 export type moValues = moValue[];

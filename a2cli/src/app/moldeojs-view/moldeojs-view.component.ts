@@ -14,6 +14,8 @@ export class MoldeojsViewComponent implements OnInit {
 
   message: string = "- no project -";
   hostElement: ElementRef;
+  test: number = 0;
+  testmax: number = 120;
 
   constructor(el: ElementRef, private MoldeoCS: ConsoleService) {
     this.hostElement = el;
@@ -26,20 +28,31 @@ export class MoldeojsViewComponent implements OnInit {
         var RMan = this.MoldeoCS.m_Console.m_pResourceManager.MORenderMan;
         this.hostElement.nativeElement.appendChild( RMan.m_Renderer.domElement );
         RMan.m_Renderer.clear();
+        this.test = 0;
         this.animate();
       }
     });
+
+    this.MoldeoCS.Init({
+      "consoleconfig": "/molrepos/basic/00_Image/00_Image.mol"
+    } );
   }
 
   public animate() {
+    //console.log("animate");
     window.requestAnimationFrame(_=>this.animate() );
+    //console.log("animate: ",this.test);
+    if (this.test < this.testmax) {
+      //console.log("Running TestScreen!");
+      this.MoldeoCS.m_Console.TestScreen();
+      this.test = Number(this.test) + Number(1);
+    } else
     if (this.MoldeoCS.m_Console.Initialized()) {
+      //console.log("Running Console animation!");
       if (this.MoldeoCS.m_Console.Interaction()) {
         this.MoldeoCS.m_Console.Draw();
         this.MoldeoCS.m_Console.Update();
       }
-    } else {
-      this.MoldeoCS.m_Console.TestScreen();
     }
   }
 

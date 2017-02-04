@@ -1,7 +1,11 @@
+import { Http } from "@angular/http";
+
 
 import { MOlong } from "./mo-types";
+import { moText } from "./mo-text";
 import { moAbstract } from "./mo-abstract";
 import { moMoldeoObject } from "./mo-moldeo-object";
+import { moConfig } from "./mo-config";
 import { moResource, moResources } from "./mo-resource";
 
 import { moFileManager } from "./mo-file-manager";
@@ -52,7 +56,7 @@ export class moResourceManager extends moAbstract {
 		MOTimeMan : moTimeManager;
 		MODataMan : moDataManager;
 		//MOFBMan : moFBManager;
-		//MOGLMan : moGLManager;
+		MOGLMan : moGLManager;
 		MORenderMan : moRenderManager;
 		//MOShaderMan : moShaderManager;
 		//MOMathMan : moMathManager;
@@ -66,14 +70,14 @@ export class moResourceManager extends moAbstract {
 		//MODecoderMan : moDecoderManager;
     m_Resources: moResources;
 
-    constructor() {
+    constructor(private http: Http) {
       super();
     }
 
     Init(options?: any): boolean {
 
       if (this.MOFileMan) { }
-      else this.MOFileMan = new moFileManager();
+      else this.MOFileMan = new moFileManager(this.http);
       this.MOFileMan.SetResourceManager(this);
       //console.log("moResourceManager::Init > MOFileMan:", this.MOFileMan);
 
@@ -91,7 +95,80 @@ export class moResourceManager extends moAbstract {
       else this.MOGuiMan = new moGUIManager();
       this.MOGuiMan.SetResourceManager(this);
       //console.log("moResourceManager::Init > MOGuiMan:", this.MOGuiMan);
-      this.m_bInitialized = true;
-      return super.Init();
+      //
+      if (this.MOTextureMan) { }
+      else this.MOTextureMan = new moTextureManager();
+      this.MOTextureMan.SetResourceManager(this);
+
+      if (this.MOTimeMan) { }
+      else this.MOTimeMan = new moTimeManager();
+      this.MOTimeMan.SetResourceManager(this);
+
+      if (this.MOGLMan) { }
+      else this.MOGLMan = new moGLManager();
+      this.MOGLMan.SetResourceManager(this);
+
+      var ConsoleConfig: moConfig = options["consoleconfig"];
+      var consoleconfigname: moText = ConsoleConfig.GetName();
+
+/*
+///Asigna configname, y labelname a los recursos PREDETERMINADOS en caso de encontrarse en el config
+	moText resname;
+	moText cfname;
+	moText lblname;
+
+  ///TODO: chequear errores...
+	moParam& presources( p_consoleconfig.GetParam(moText("resources")) );
+
+	presources.FirstValue();
+
+	for(MOuint r=0; r<presources.GetValuesCount(); r++) {
+
+		moResource* pResource = NULL;
+
+		resname = presources[MO_SELECTED][MO_CFG_RESOURCE].Text();
+		cfname = presources[MO_SELECTED][MO_CFG_RESOURCE_CONFIG].Text();
+		lblname = presources[MO_SELECTED][MO_CFG_RESOURCE_LABEL].Text();
+
+		MOint rid = GetResourceIndex( lblname );
+
+		if(rid>-1) pResource = GetResource(rid);
+
+		if (pResource) {
+			pResource->SetConfigName(cfname);
+			pResource->SetLabelName(lblname);
+            pResource->SetConsoleParamIndex( presources.GetParamDefinition().GetIndex() );
+            pResource->SetConsoleValueIndex( r );
+		}
+		presources.NextValue();
+    }*/
+
+      this.MOTextureMan.Init();
+      this.MOGLMan.Init();
+      this.MOTimeMan.Init();
+      this.MOGuiMan.Init();
+      this.MODataMan.Init( options["apppath"], options["datapath"], consoleconfigname );
+      this.MORenderMan.Init();
+      this.MOFileMan.Init();
+
+      super.Init();
+      if (options["callback"]) options["callback"]("ResourceManager Initialized.");
+      return this.Initialized();
+    }
+
+    GetDataMan(): moDataManager {
+      return this.MODataMan;
+    }
+
+    GetRenderMan(): moRenderManager {
+      return this.MORenderMan;
+    }
+
+    GetGLMan(): moGLManager {
+      return this.MOGLMan;
+    }
+
+    GetFileMan(): moFileManager {
+      return this.MOFileMan;
     }
 };

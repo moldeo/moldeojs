@@ -2,14 +2,14 @@
 import { moEffectState } from "./mo-effect-state";
 export { moEffectState } from "./mo-effect-state";
 import { moMoldeoObject } from "./mo-moldeo-object";
+import { moEffectManager } from "./mo-effect-manager";
+import { moConsoleState } from "./mo-console-state";
 
 export class moEffect extends moMoldeoObject {
 	m_EffectState: moEffectState;
 	Draw() {}
 }
 export type moEffectsArray = moEffect[];
-
-
 
 export class moPreEffect extends moEffect {
 	Draw() {}
@@ -28,7 +28,13 @@ export type moPostEffectsArray = moPostEffect[];
 
 
 export class moMasterEffect extends moEffect {
-	Draw() {}
+  m_pEffectManager: moEffectManager;
+  Draw() { }
+  Set(p_EffectManager: moEffectManager, cstate?: moConsoleState) {
+    this.m_pEffectManager = p_EffectManager;
+  }
 }
 export type moMasterEffectsArray = moMasterEffect[];
 
+export class moSceneEffect extends moMasterEffect {
+};
