@@ -13,8 +13,12 @@ import {
   moPlugin, moPluginsArray,
   moPrePlugin, moPrePluginsArray,
   moPostPlugin, moPostPluginsArray,
-  moMasterPlugin, moMasterPluginsArray
+  moMasterPlugin, moMasterPluginsArray,
+  moNewEffect, moNewPostEffect, moNewMasterEffect, moNewPreEffect, moPluginDefinition,
+  moPluginDefinitions, moPluginExtension
 } from "./mo-plugin";
+import { moDataManager } from "./mo-data-manager";
+import { moFileManager } from "./mo-file-manager";
 import { moResourceManager } from "./mo-resource-manager";
 
 export class moEffectManager extends moAbstract {
@@ -67,7 +71,7 @@ export class moEffectManager extends moAbstract {
         if ( ""+p_resname=="scene" ) {
           peffect = new moSceneEffect();
         } else {
-          peffect = this.moNewEffect( p_resname, this.m_Plugins);
+          peffect = moNewEffect( p_resname, this.m_Plugins);
         }
         p_valueindex = this.m_Effects.length;
         this.m_Effects.push( peffect );
@@ -75,19 +79,19 @@ export class moEffectManager extends moAbstract {
         break;
 
       case moMoldeoObjectType.MO_OBJECT_PREEFFECT:
-        peffect = this.moNewPreEffect( p_resname, this.m_PrePlugins );
+        peffect = moNewPreEffect( p_resname, this.m_PrePlugins );
         p_valueindex = this.m_PreEffects.length;
         this.m_PreEffects.push( peffect );
         break;
 
       case moMoldeoObjectType.MO_OBJECT_POSTEFFECT:
-        peffect = this.moNewPostEffect( p_resname, this.m_PostPlugins );
+        peffect = moNewPostEffect( p_resname, this.m_PostPlugins );
         p_valueindex = this.m_PostEffects.length;
         this.m_PostEffects.push( peffect );
         break;
 
       case moMoldeoObjectType.MO_OBJECT_MASTEREFFECT:
-        var pmastereffect : any = this.moNewMasterEffect( p_resname, this.m_MasterPlugins );
+        var pmastereffect : any = moNewMasterEffect( p_resname, this.m_MasterPlugins );
         p_valueindex = this.m_MasterEffects.length;
         this.m_MasterEffects.push( pmastereffect );
         peffect = pmastereffect;
@@ -97,6 +101,7 @@ export class moEffectManager extends moAbstract {
       }
 
       if (peffect) {
+      console.log("moEffectManager.NewEffect", peffect);
       var MDef : moMobDefinition = peffect.GetMobDefinition();
       MDef.SetConfigName( p_configname );
       MDef.SetLabelName( p_labelname );
@@ -115,29 +120,14 @@ export class moEffectManager extends moAbstract {
         peffect.Set( this.m_pEffectManager);
       }
 
-      this.m_AllEffects.push( peffect );
+      this.m_AllEffects.push(peffect);
+      console.log("moEffectManager.NewEffect(ok?)", peffect);
       }
 
       return (peffect);
 
   }
 
-
-  moNewEffect( p_resname : moText, plugins : any ) : moEffect {
-    return new moEffect();
-  }
-
-  moNewPreEffect( p_resname : moText, plugins : any ) : moEffect {
-    return new moPreEffect();
-  }
-
-  moNewPostEffect( p_resname : moText, plugins : any ) : moEffect {
-    return new moPostEffect();
-  }
-
-  moNewMasterEffect( p_resname : moText, plugins : any ) : moEffect {
-    return new moMasterEffect();
-  }
 
 
 }

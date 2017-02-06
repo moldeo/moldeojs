@@ -41,3 +41,18 @@ export class moTextFilterParam {
 
 
 }
+
+export function IntToStr( num : number, nzeros?: number ) : string
+{
+/*
+    char buffer[100];
+    moText pat = moText("%0") + IntToStr(nzeros) + moText("d");
+    snprintf(buffer, 100, pat, a); // Memory-safe version of sprintf.
+
+    moText str = buffer;
+    return str;
+*/
+  var zero = nzeros - num.toString().length + 1;
+  return Array(+(zero > 0 && zero)).join("0") + num;
+}
+

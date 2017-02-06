@@ -1,14 +1,15 @@
 import { MOlong } from "./mo-types";
 import { moAbstract } from "./mo-abstract";
 import { moText } from "./mo-text";
-import { moMoldeoObject } from './mo-moldeo-object';
+import { moMoldeoObject, moMoldeoObjectType } from './mo-moldeo-object';
 import { moResourceType } from './mo-resource-type.enum';
 export { moResourceType } from './mo-resource-type.enum';
 
 
-/// Recurso ( objeto para cargar y manipular objetos físicos de datos de imágenes, audio, video, 3d, 2d, fuentes, shaders y de cualquier otro tipo extendible por un plugin )
+/// Recurso
 /**
- *
+ * ( objeto para cargar y manipular objetos físicos de datos de imágenes,
+ * audio, video, 3d, 2d, fuentes, shaders y de cualquier otro tipo extendible por un plugin )
  *  Los recursos son aquellos objetos que implementan funciones de tratamiento de datos, generalmente
  *  localizados en dispositivos físicos, locales o remotos,o que tienen por destino algún tipo de representación.
  *
@@ -22,8 +23,10 @@ export { moResourceType } from './mo-resource-type.enum';
  *
  *  Un ejemplo sería el moTextureManager, que administrar la carga de imágenes en texturas de opengl.
  *
- *  Otro ejemplo sería el mo3dModelManager, que administrar la carga de objeto 3d, en este caso del formato .3ds. El mo3dModelManager a su vez
- *  depende del moTextureManager para cargar las texturas especificadas por los materiales de los modelos tridimensionales. Mantener esta coherencia
+ *  Otro ejemplo sería el mo3dModelManager, que administrar la carga de objeto 3d,
+ * en este caso del formato .3ds. El mo3dModelManager a su vez
+ *  depende del moTextureManager para cargar las texturas especificadas
+ * por los materiales de los modelos tridimensionales. Mantener esta coherencia
  *  de los datos en Moldeo es una de las características importantes de su arquitectura.
  * @see moResourceType
  * @see moMoldeoObject
@@ -35,6 +38,16 @@ export class moResource extends moMoldeoObject {
   m_ResourceType : moResourceType = moResourceType.MO_RESOURCETYPE_UNDEFINED;
   m_ResourceName : moText = "";
 
+  constructor() {
+    super();
+    //console.log("moResource::Constructor");
+    this.SetType(moMoldeoObjectType.MO_OBJECT_RESOURCE);
+  }
+
+  Init(): boolean {
+    return super.Init();
+  }
+
   GetResourceType(): moResourceType {
     return this.m_ResourceType;
   }
@@ -43,15 +56,6 @@ export class moResource extends moMoldeoObject {
     this.m_ResourceType = p_restype;
   }
 
-
-  constructor() {
-    super();
-    //console.log("moResource::Constructor");
-  }
-
-  Init(): boolean {
-    return super.Init();
-  }
 };
 
 export type moResources = moResource[];

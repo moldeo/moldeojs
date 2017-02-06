@@ -118,7 +118,7 @@ export class moParam extends moAbstract {
 
   m_ParamDefinition : moParamDefinition;
 	m_Values : moValues;
-	m_CurrentIndexValue : MOint = -1;
+	m_CurrentIndexValue : MOint = 0;
 
 	m_pExternData : moData;//Definido cuando el valor del parámetro es intervenido por un Inlet o un Outlet
   m_bExternDataUpdated : MOboolean = false;//Marcado cuando un Inlet actualiza este parámetro

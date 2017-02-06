@@ -33,17 +33,22 @@ export class ConsoleService {
 
     if (options["config_open"] == undefined)
       options["config_open"] = (result) => {
-        console.log("Config opened ok.");
+        console.log("Config opened ok.", result);
       };
 
     if (options["config_loaded"] == undefined)
       options["config_loaded"] = (result) => {
-        console.log("Config Loaded! Start Playing!");
+        console.log("Config Loaded! Start Playing!", result);
       };
 
     if (options["effects_loaded"] == undefined)
       options["effects_loaded"] = (result) => {
-        console.log("Effects Loaded!");
+        console.log("ALL Effects Loaded!", result);
+      };
+
+    if (options["effects_started"] == undefined)
+      options["effects_started"] = (result) => {
+        console.log("ALL Effects Started!", result);
       };
 
     var consoled: boolean = this.m_Console.Init(options);

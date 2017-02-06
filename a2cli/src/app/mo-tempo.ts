@@ -38,4 +38,8 @@ export class moTempo extends moTimer {
     return true;
   }
 
+  getTempo() {
+
+  }
+
 };

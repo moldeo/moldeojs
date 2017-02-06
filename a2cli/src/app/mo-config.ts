@@ -8,12 +8,14 @@ import { moValue, moValues, moValueBase, moValueBases, moValueDefinition } from 
 import { moParam, moParams, moParamIndexes, moParamDefinition, moParamDefinitions } from "./mo-param";
 import { moPreconfig, moPreConfigs } from "./mo-pre-config";
 import { moFile } from "./mo-file-manager";
+import { moColor, moColor4fArray, moColorRGBA, moColorRGB, moColorArray } from "./mo-gui-manager";
 
 export const MO_PARAM_NOT_SEL = -1;
 export const MO_PARAM_NOT_FOUND = -1;
 export const MO_CONFIGFILE_NOT_FOUND = -1;
 export const MO_CONFIG_OK = 0;
 export const MO_SELECTED = -1;
+
 
 export class moConfigDefinition extends moAbstract {
 
@@ -256,12 +258,17 @@ export class moConfig extends moAbstract {
 
 
   GetValuesCount( p_paramindex : MOint ) : MOuint {
-    return this.m_Params[ p_paramindex].GetValuesCount();
+    var Param: moParam = this.m_Params[p_paramindex];
+    if (Param)
+      return Param.GetValuesCount();
+    return 0;
   }
 
   GetValue( p_paramindex : any, indexvalue : MOint ) : moValue {
-      var param : moParam = this.GetParam(p_paramindex);
-      return param.GetValue( indexvalue );
+    var Param: moParam = this.GetParam(p_paramindex);
+    if (Param)
+      return Param.GetValue( indexvalue );
+    return new moValue();
   }
 
   GetCurrentValueIndex(p_paramindex: MOint) {
@@ -347,6 +354,42 @@ export class moConfig extends moAbstract {
     return false;
   }
 
+  Eval(refid: any): any {
+    var Param: moParam = this.GetParam(refid);
+    var f: any;
+    if (Param) {
+      //console.log("EvalColor:", Param);
+      var vb: moValue = Param.GetValue();
+      if (vb) {
+        f = vb.GetSubValue(0).Eval()
+      }
+    }
+    return f;
+  }
+
+//moVector4d color4D = m_Config.EvalColor( moR(ERASE_COLOR) );
+  //mr_Color: moColor = new moColor(0.0,0.0,0.0);
+  EvalColor( refid: any ) : any {
+    var r: any;
+    var g: any;
+    var b: any;
+    var Param: moParam = this.GetParam(refid);
+    if (Param) {
+      //console.log("EvalColor:", Param);
+      var vb: moValue = Param.GetValue();
+      if (vb) {
+        //console.log("EvalColor: vb:", vb);
+        r = vb.GetSubValue(0).Eval();
+        g = vb.GetSubValue(1).Eval();
+        b = vb.GetSubValue(2).Eval();
+        //this.mr_Color.setRGB(r,g,b);
+      }
+    }
+    //console.log(` EvalColor is ${r},${g},${b}`);
+    //return new moColor(r, g, b);
+    //return this.mr_Color;
+    return { "r": r, "g": g, "b": g };
+  }
 }
 
 

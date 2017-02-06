@@ -92,8 +92,24 @@ export class moRenderManager extends moResource {
     //console.log("moRenderManager::constructor",  this.renderer);
   }
 
+  BeginDraw() : void {
+
+  }
+
+  BeginDrawEffect(): void {
+
+  }
+
   Render( p_pObj : moSceneNode, p_pCamera : moCamera3D  ) : void {
     this.m_Renderer.render( p_pObj, p_pCamera );
+  }
+
+  EndDraw() : void {
+
+  }
+
+  EndDrawEffect(): void {
+
   }
 
 }

@@ -222,7 +222,7 @@ export class moMoldeoObject extends moScript {
   InletTimeabs : moInlet;
   InletPreconfig : moInlet;
 */
-  m_bConnectorsLoaded : boolean;
+  m_bConnectorsLoaded : boolean = false;
 
   __iscript : MOint;
 
@@ -279,7 +279,17 @@ export class moMoldeoObject extends moScript {
     if ( this.GetType() == moMoldeoObjectType.MO_OBJECT_CONSOLE ) {
       confignamecompleto = this.GetConfigName();
       console.log("confignamecompleto:", confignamecompleto);
-    }/* else {
+    } else if (
+      this.GetType() == moMoldeoObjectType.MO_OBJECT_PREEFFECT
+      || this.GetType() == moMoldeoObjectType.MO_OBJECT_EFFECT) {
+
+      var datap: moText = this.m_pResourceManager.GetDataMan().GetDataPath();
+      //confignamecompleto = "" + this.m_pResourceManager.GetDataMan().GetDataPath();
+      confignamecompleto = `${datap}${this.GetConfigName()}.cfg`;
+
+    }
+
+    /*else {
 
       if (this.m_pResourceManager) {
         if (this.m_pResourceManager.GetDataMan()) {
@@ -298,15 +308,12 @@ export class moMoldeoObject extends moScript {
           + " label:" + this.GetLabelName());
           return false;
       }
-    }
-*/
+    }*/
 
-
-
-    this.MODebug2.Message("*****Initializing " + this.GetName() + " *****");
+  this.MODebug2.Message(`***** Initializing ${this.GetName()} ***** ${confignamecompleto}`);
     if (confignamecompleto != undefined && confignamecompleto + "" != "") {
       this.m_pFileManager.Load(confignamecompleto, true, (res) => {
-        console.log("loaded..OK", res);
+        console.log("loaded file .. OK", res);
         if (this.m_Config.LoadConfig(res._body, (config_res) => {
           console.log("CONFIG LOADED!", config_res);
 
@@ -317,7 +324,8 @@ export class moMoldeoObject extends moScript {
           /*
           __iscript = m_Config.GetParamIndex("script");
           if(__iscript==MO_PARAM_NOT_FOUND)
-          MODebug2->Error(moText("moMoldeoObject::Init > config: "+GetConfigName()+ " config: " + GetConfigName() + " label: "+GetLabelName()+" script parameter missing"));
+          MODebug2->Error(moText("moMoldeoObject::Init > config: "+GetConfigName()
+          + " config: " + GetConfigName() + " label: "+GetLabelName()+" script parameter missing"));
 
 
           InitScript();
@@ -325,7 +333,8 @@ export class moMoldeoObject extends moScript {
           if (callback) callback(config_res);
 
         } ) != MO_CONFIG_OK ) {
-          this.MODebug2.Error("moMoldeoObject::Init > Config file invalid or not found > object: " + this.GetName() + " config:" + confignamecompleto + " label: " + this.GetLabelName());
+          this.MODebug2.Error("moMoldeoObject::Init > Config file invalid or not found > object: " + this.GetName()
+            + " config:" + confignamecompleto + " label: " + this.GetLabelName());
           return false;//bad
         }
       });
@@ -333,6 +342,123 @@ export class moMoldeoObject extends moScript {
 
 
     return super.Init();
+  }
+
+  CreateConnectors() : boolean {
+    console.log( `moMoldeoObject.CreateConnectors > ${this.GetConfigName()}`);
+/*
+    if (m_pResourceManager == NULL) {
+    MODebug2->Error("moMoldeoObject::CreateConnectors > ResourceManager is NULL!!! Can't continue. Sorry for object: "+GetName()+ " config: " + GetConfigName() + " label:"+GetLabelName() );
+    return false;
+  }
+
+  if (m_bConnectorsLoaded) {
+    MODebug2->Error("moMoldeoObject::CreateConnectors > Calling twice. Can't continue. Sorry for object: "+GetName()+ " config: " + GetConfigName() + " label:"+GetLabelName() );
+    return false;
+  }
+
+  MODebug2->Message("moMoldeoObject::CreateConnectors > Calling once. object: "+GetName()+ " config: " + GetConfigName() + " label:" + GetLabelName() );
+
+
+	///crea los Inlets adicionales a los parámetros: definidos en el parámetro "inlet"
+
+	moParam& pinlets = m_Config[moText("inlet")];
+
+	for( MOuint i=0; i<pinlets.GetValuesCount(); i++ ) {
+    if ( GetInletIndex(pinlets[i][MO_INLET_NAME].Text())==-1 ) {
+      moInlet* Inlet = new moInlet();
+      if (Inlet) {
+        Inlet->SetMoldeoLabelName( GetLabelName() );
+        moText InletName = pinlets[i][MO_INLET_NAME].Text();
+        ///lo creamos si y solo si no existe como parámetro....
+        if ( m_Config.GetParamIndex(InletName)==-1 ) {
+          ((moConnector*)Inlet)->Init( InletName, m_Inlets.Count(), pinlets[i][MO_INLET_TYPE].Text() );
+          m_Inlets.Add( Inlet );
+        }
+      }
+    }
+	}
+
+	///Inicializa las funciones matemáticas del config
+	///así como los inlets y outlets por cada parámetro
+	///así como las texturas
+	for( MOint p=0;p<m_Config.GetParamsCount();p++) {
+
+		moParam	&param( m_Config[p] );
+
+		MODebug2->Log( moText("moMoldeoObject::CreateConnectors > Init param type ") + param.GetParamDefinition().GetTypeStr() + moText(" name: ") + param.GetParamDefinition().GetName() );
+
+
+    ///CREAMOS UN INLET POR CADA PARAMETRO
+    int inletidx = GetInletIndex(param.GetParamDefinition().GetName());
+    if (inletidx==-1) {
+      moInlet* Inlet = new moInlet();
+      if (Inlet) {
+        Inlet->Init( param.GetParamDefinition().GetName(), m_Inlets.Count(), param.GetPtr() );
+        m_Inlets.Add(Inlet);
+      }
+    }
+
+		for( MOuint v=0;v<param.GetValuesCount();v++) {
+      ResolveValue( param, v );
+
+		}
+	}
+
+  MODebug2->Message("moMoldeoObject::CreateConnectors > loaded params & values for Object: " + GetName() + " config:" + GetConfigName() + " label:" + GetLabelName() );
+*/
+    /** VERIFICAR ESTO!!!!*/
+    /**
+    Solo se crean los outlets declarados en el xml.
+    */
+/*
+    /// Crea aquellos Outlets definidos dentro del parámetro "outlet"
+    /// y conecta aquellos nombrados que ya existen como parámetros de este config
+	moParam& poutlets = m_Config[moText("outlet")];
+
+	for( MOuint i=0; i<poutlets.GetValuesCount(); i++ ) {
+    if ( GetOutletIndex(poutlets[i][MO_OUTLET_NAME].Text())==-1 ) {
+      moOutlet* Outlet = new moOutlet();
+      if (Outlet) {
+        Outlet->SetMoldeoLabelName( GetLabelName() );
+        ///Buscamos el parametro asociado al outlet
+        ///para asociar un parametro a un outlet debe simplemente tener el mismo nombre...
+        moText OutletName = poutlets[i][MO_OUTLET_NAME].Text();
+
+        if ( m_Config.GetParamIndex(OutletName) > -1 ) {
+          ///CREAMOS UN OUTLET nuevo para este parametro....
+          MODebug2->Log( moText("moMoldeoObject::CreateConnectors > ") + this->GetLabelName() + moText(" creating Outlet as parameter \"") + OutletName + "\""  );
+          Outlet->Init( OutletName, i, m_Config.GetParam(OutletName).GetPtr());
+        } else {
+          ///CREAMOS UN OUTLET desde el .cfg, teniendo en cuenta los tipos...
+          MODebug2->Log( moText("moMoldeoObject::CreateConnectors > ") + this->GetLabelName() + moText(" Init > creating outlet not as param.") + OutletName  );
+          Outlet->Init( OutletName, i, poutlets[i][MO_OUTLET_TYPE].Text() );
+        }
+        m_Outlets.Add( Outlet );
+
+        /// Creamos sus conecciones
+        /// las conecciones viene de a pares: object label name + object inlet name
+        for( MOuint j=MO_OUTLET_INLETS_OFFSET; j<poutlets[i].GetSubValueCount(); j+=2 ) {
+          moText objectname = poutlets[i][j].Text();
+          moText inletname = poutlets[i][j+1].Text();
+          moConnection* Connection = new moConnection( objectname, inletname );
+          if (Connection)
+            Outlet->GetConnections()->Add(Connection);
+        }
+      }
+    }
+	}
+
+  m_bConnectorsLoaded = true;
+
+  ///Una vez establecidos los conectores, podemos inicializar el script a su vez....
+	//moMoldeoObject::ScriptExeInit();
+	ScriptExeInit();
+
+  MODebug2->Message("moMoldeoObject::CreateConnectors > OK! Object: " + GetName() + " config:" + GetConfigName() + " label: " + GetLabelName() );
+
+  */
+  	return this.m_bConnectorsLoaded;
   }
 
   Update(): void {
@@ -414,6 +540,10 @@ export class moMoldeoObject extends moScript {
     p_configdefinition.Add(moText("script"), MO_PARAM_SCRIPT);
 */
     return p_configdefinition;
+  }
+
+  ScriptExeRun(): void {
+    //console.log("moMoldeoObject.ScriptExeRun()");
   }
 
   ToJSON(): any {

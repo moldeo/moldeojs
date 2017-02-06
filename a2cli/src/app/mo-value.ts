@@ -8,6 +8,22 @@ import { MOfloat, MOdouble, MOlong, MOulong, MOint, MOuint, moNumber, moTextFilt
 import { moText } from "./mo-text"
 import { moDataType } from "./mo-data-type.enum"
 export * from "./mo-data-type.enum";
+import {
+  moGetTicks, moGetTicksAbsolute, moGetTicksAbsoluteStep,
+  moGetDuration, moGetTimerState, moGetTimerStateStr
+} from "./mo-timer";
+
+function sin( val : number ) : number {
+  return Math.sin(val);
+}
+
+function cos( val : number ) : number {
+  return Math.cos(val);
+}
+
+function abs(val: number): number {
+  return Math.abs(val);
+}
 
 export class moData {
 
@@ -75,12 +91,22 @@ export class moData {
     return this.m_Number;
   }
 
-  Float() : MOfloat {
+  Float(): MOfloat {
     return this.m_Number;
   }
 
   Double() : MOdouble {
     return this.m_Number;
+  }
+
+  Eval(): MOfloat {
+    if (this.m_DataType == moDataType.MO_DATA_FUNCTION) {
+      var t: string = "this.m_LastEval = " + this.m_Text;
+      var time = moGetTicks()/1000.0;
+      //console.log("Eval:", t);
+      eval(t);
+    }
+    return this.m_LastEval;
   }
 
 }

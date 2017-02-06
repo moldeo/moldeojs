@@ -2,6 +2,7 @@ import {
   MOfloat, MOdouble, MOulong,
   MOlong, MOint, MOuint, moNumber,
   moTextFilterParam, MOswitch,
+  MO_DEACTIVATED, MO_ACTIVATED, MO_OFF, MO_ON, MO_FALSE, MO_TRUE,
   MO_DISPLAY, MO_HANDLE, NULL
 } from "./mo-types";
 import { moText } from "./mo-text";
@@ -28,30 +29,51 @@ export enum moConsoleMode {
 };
 
 export class moConsoleState extends moEffectState {
-    m_Mode : moConsoleMode;
 
-    m_RenderFrameQuality : moText;
+    m_Mode: moConsoleMode = moConsoleMode.MO_CONSOLE_MODE_LIVE;
+    m_RenderFrameQuality : moText = "JPGGOOD";
 
-    pause : MOswitch;
-    automatic : MOswitch;
-    reinit : MOswitch;
-    finish : MOswitch;
+    pause : MOswitch = MO_DEACTIVATED;
+    automatic : MOswitch = MO_DEACTIVATED;
+    reinit : MOswitch = MO_FALSE;
+    finish : MOswitch = MO_FALSE;
 
-    setfps : MOswitch;
-    fps: MOuint;
-    fps0: MOuint;
-    fps1: MOuint;
+    setfps : MOswitch = MO_DEACTIVATED;
+    fps: MOuint = 30;
+    fps0: MOuint = 0;
+    fps1: MOuint = 1;
 
     //especiales
     stereooutput : MOswitch;
 
-    savescreen : MOswitch;
-    frame : MOuint;
+    savescreen : MOswitch = MO_DEACTIVATED;
+    frame : MOuint = 0;
 
-    step_interval: MOlong;
+    step_interval: MOlong = 0;
 
     constructor() {
       super();
+    }
+
+    Init(): boolean {
+      this.automatic = MO_DEACTIVATED;
+      this.pause = MO_DEACTIVATED;
+      this.finish = MO_FALSE;
+      this.reinit = MO_FALSE;
+      this.setfps = MO_DEACTIVATED;
+
+      this.fps = 30;
+      this.fps0 = 0;
+      this.fps1 = 1;
+
+      this.m_Mode = moConsoleMode.MO_CONSOLE_MODE_LIVE;
+      this.stereooutput = MO_DEACTIVATED;
+	    this.savescreen = MO_DEACTIVATED;
+	    this.frame = 0;
+
+      this.m_RenderFrameQuality = "JPGGOOD";
+
+      return true;
     }
 };
 

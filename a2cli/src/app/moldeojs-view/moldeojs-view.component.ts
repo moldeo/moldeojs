@@ -46,11 +46,13 @@ export class MoldeojsViewComponent implements OnInit {
       //console.log("Running TestScreen!");
       this.MoldeoCS.m_Console.TestScreen();
       this.test = Number(this.test) + Number(1);
+      this.message = ""+this.test;
     } else
     if (this.MoldeoCS.m_Console.Initialized()) {
       //console.log("Running Console animation!");
+      this.message = "Running "+this.MoldeoCS.m_Console.GetConfigName();
       if (this.MoldeoCS.m_Console.Interaction()) {
-        this.MoldeoCS.m_Console.Draw();
+        this.MoldeoCS.m_Console.Draw(undefined);
         this.MoldeoCS.m_Console.Update();
       }
     }

@@ -47,7 +47,9 @@ export class moGLMatrixf extends THREE.Matrix4 {
     return this;
   }
 
-  MakeOrthographic(left: MOfloat = -1.0, right: MOfloat = 1.0, bottom: MOfloat = -1.0, top: MOfloat = 1.0, near: MOfloat = 0.0001, far: MOfloat = 1000.0): moGLMatrixf {
+  MakeOrthographic(left: MOfloat = -1.0, right: MOfloat = 1.0,
+    bottom: MOfloat = -1.0, top: MOfloat = 1.0,
+    near: MOfloat = 0.0001, far: MOfloat = 1000.0): moGLMatrixf {
     this.makeOrthographic( left, right, top, bottom, near, far);
     return this;
   }
@@ -170,7 +172,10 @@ export class moGLManager extends moResource {
                       );
    }
 
-  SetOrthographicView(p_width: MOint = 0, p_height: MOint = 0, left: MOfloat = 0, right: MOfloat = 1, bottom: MOfloat = 0, top: MOfloat = 1, znear: MOfloat = -1.0, zfar: MOfloat = 1.0) {
+  SetOrthographicView(p_width: MOint = 0, p_height: MOint = 0,
+    left: MOfloat = 0, right: MOfloat = 1,
+    bottom: MOfloat = 0, top: MOfloat = 1,
+    znear: MOfloat = -1.0, zfar: MOfloat = 1.0) {
     this.m_ProjectionMatrix.MakeIdentity();
     this.m_ProjectionMatrix.MakeOrthographic( left, right, bottom, top, znear, zfar );
   }

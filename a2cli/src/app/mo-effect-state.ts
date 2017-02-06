@@ -85,4 +85,6 @@ export class moEffectState extends moMobState {
   CSV2RGB() : void {
 
   }
+
+
 }
