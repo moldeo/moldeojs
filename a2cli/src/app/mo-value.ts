@@ -6,24 +6,13 @@
  */
 import { MOfloat, MOdouble, MOlong, MOulong, MOint, MOuint, moNumber, moTextFilterParam } from "./mo-types"
 import { moText } from "./mo-text"
-import { moDataType } from "./mo-data-type.enum"
+import { moDataType, moDataTypeStr } from "./mo-data-type.enum"
 export * from "./mo-data-type.enum";
 import {
   moGetTicks, moGetTicksAbsolute, moGetTicksAbsoluteStep,
   moGetDuration, moGetTimerState, moGetTimerStateStr
 } from "./mo-timer";
-
-function sin( val : number ) : number {
-  return Math.sin(val);
-}
-
-function cos( val : number ) : number {
-  return Math.cos(val);
-}
-
-function abs(val: number): number {
-  return Math.abs(val);
-}
+import { moMathFunction, moParserFunction } from "./mo-math-manager";
 
 export class moData {
 
@@ -40,6 +29,21 @@ export class moData {
   m_pAlphaFilter : moData;/**pointer or reference*/
 
   m_LastEval : MOdouble;
+
+  constructor(type?: any) {
+    if (typeof type == "string") {
+      if (type in moDataTypeStr)
+        this.SetType( moDataTypeStr[type] );
+    }
+  }
+
+  SetType( p_type: moDataType ) {
+    this.m_DataType = p_type;
+  }
+
+  GetData() : moData {
+    return this;
+  }
 
   SetText(p_text: moText) {
     this.m_DataType = moDataType.MO_DATA_TEXT;
@@ -74,9 +78,23 @@ export class moData {
     this.m_DataType = moDataType.MO_DATA_IMAGESAMPLE_FILTERED;
   }
 
-  SetFun(p_function: moText) {
+  m_pFun: moMathFunction;
+  SetFun(p_function: any) {
     this.m_DataType = moDataType.MO_DATA_FUNCTION;
-    this.m_Text = p_function;
+    if (typeof p_function == "string")
+      this.m_Text = p_function;
+    if (typeof p_function == "object") {
+      if (p_function.constructor)
+        if ("name" in p_function.constructor) {
+          if (p_function.constructor.name == "moMathFunction"
+            || p_function.constructor.name == "moParserFunction") {
+            this.m_pFun = p_function;
+            if (p_function) {
+              this.m_Text = p_function.GetExpression();
+            }
+          }
+        }
+    }
   }
 
   Text() : moText {
@@ -101,10 +119,13 @@ export class moData {
 
   Eval(): MOfloat {
     if (this.m_DataType == moDataType.MO_DATA_FUNCTION) {
-      var t: string = "this.m_LastEval = " + this.m_Text;
-      var time = moGetTicks()/1000.0;
-      //console.log("Eval:", t);
-      eval(t);
+      //var t: string = "this.m_LastEval = " + this.m_Text+";";
+      //var time = moGetTicks()/1000.0;
+      //console.log("Eval:", t, this);
+      //eval(t);
+      if (this.m_pFun) {
+        this.m_LastEval = this.m_pFun.Eval();
+      }
     }
     return this.m_LastEval;
   }
@@ -316,9 +337,11 @@ export class moValueBase extends moData {
   GetRange() : any { return this.m_ValueDefinition.GetRange(); }
   SetIndex( p_index: MOint) { this.m_ValueDefinition.SetIndex(p_index);}
   GetIndex(): MOint { return this.m_ValueDefinition.m_Index; }
-  SetType(p_type: moValueType) : void {
+  SetType(p_type: any) : void {
     this.m_ValueDefinition.m_Type = p_type;
   }
+  GetType(): moValueType { return this.m_ValueDefinition.GetType(); }
+  GetTypeStr(): moText { return this.m_ValueDefinition.GetTypeStr(); }
 }
 export type moValueBases = moValueBase[];
 

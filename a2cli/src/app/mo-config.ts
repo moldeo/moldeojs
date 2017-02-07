@@ -131,7 +131,7 @@ export class moConfig extends moAbstract {
 
     //LoadConfig( config: moFile ): boolean;
     LoadConfig( configtext: any, callback?: any ): MOint {
-      console.log("configname:", typeof configtext, configtext);
+      //console.log("configname:", { "fullconfig": configtext });
       //return MO_CONFIGFILE_NOT_FOUND;
       if ( configtext && typeof configtext == "string" ) {
           //console.log("moConfig::LoadConfig > Full text", configname);
@@ -191,7 +191,7 @@ export class moConfig extends moAbstract {
                     p_param.m_ParamDefinition.m_Index = this.m_Params.length - 1;
                   }
                 }
-                console.log("Added params:", this.m_Params);
+                //console.log("Added params:", this.m_Params);
 
               }
             }//fin "CONFIGPARAMS"

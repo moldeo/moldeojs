@@ -127,6 +127,9 @@ export class moTextureManager extends moResource {
     }
   }
 
+  GetTextureBuffer(): moTextureBuffer {
+    return null;
+  }
 
 
 

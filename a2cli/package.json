@@ -30,6 +30,7 @@
     "angular2-http-file-upload": "^1.0.5",
     "bootstrap": "^3.3.7",
     "core-js": "^2.4.1",
+    "mathjs": "^3.9.1",
     "ng2-bootstrap": "^1.2.0",
     "node-osc": "^2.0.4",
     "rxjs": "5.0.3",
@@ -41,6 +42,7 @@
   "devDependencies": {
     "@angular/compiler-cli": "2.4.2",
     "@types/jasmine": "^2.5.41",
+    "@types/mathjs": "0.0.33",
     "@types/node": "^7.0.0",
     "@types/three": "^0.81.0",
     "angular-cli": "1.0.0-beta.24",

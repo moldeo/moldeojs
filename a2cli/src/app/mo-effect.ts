@@ -5,6 +5,8 @@ import { moMoldeoObject, moMobState, moMoldeoObjectType } from "./mo-moldeo-obje
 import { moEffectManager } from "./mo-effect-manager";
 import { moConsoleState } from "./mo-console-state";
 import { moTempo } from "./mo-tempo";
+import {moDataType,moData,moValue, moDataTypeStr} from "./mo-value";
+import { moInlet, moOutlet, moConnector, moConnections } from "./mo-connectors";
 
 export class moEffect extends moMoldeoObject {
 
@@ -19,6 +21,52 @@ export class moEffect extends moMoldeoObject {
   PreInit(callback?:any): boolean {
     this.m_EffectState.Init();
     if (this.m_pResourceManager==undefined) return false;
+
+    var InletTimems : moInlet = new moInlet();
+    if (InletTimems) {
+      InletTimems.Init( "timems", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(InletTimems);
+    }
+
+    var InletTimes : moInlet = new moInlet();
+    if (InletTimes) {
+      InletTimes.Init( "times", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(InletTimes);
+    }
+
+    /** Crea INLETS INTERNOS, es decir que no tienen un parametro asociado... (especificamente para su uso generico*/
+    var InletTime : moInlet = new moInlet();
+    if (InletTime) {
+      InletTime.Init( "time", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(InletTime);
+    }
+
+    var InletTempo : moInlet = new moInlet();
+    if (InletTempo) {
+      //Inlet->Init( "tempo", m_Inlets.Count(), param.GetPtr() );
+      //param.SetExternData( Inlet->GetData() );
+      InletTempo.Init( "tempo", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(InletTempo);
+    }
+
+    var InletT : moInlet = new moInlet();
+    if (InletT) {
+      InletT.Init( "t", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(InletT);
+    }
+
+
+    var InletMilliseconds : moInlet = new moInlet();
+    if (InletMilliseconds) {
+      InletMilliseconds.Init( "milliseconds", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(InletMilliseconds);
+    }
+
+    var InletSeconds : moInlet = new moInlet();
+    if (InletSeconds) {
+      InletSeconds.Init( "seconds", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(InletSeconds);
+    }
 
     if (super.Init((res) => {
       console.log("moEffect.PreInit OK!", this);

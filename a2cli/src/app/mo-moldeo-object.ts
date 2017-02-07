@@ -9,10 +9,61 @@ import {
   MO_FALSE, MO_TRUE
 } from "./mo-types";
 import { moText } from "./mo-text";
+import {
+  moValueType, moValueTypeArr, moValueTypeStr,
+  moValue, moValueBase, moValueDefinition,
+  moValues, moValueBases, moDataType, moDataTypeStr
+} from "./mo-value";
+import {
+  moParam, moParamType, moParams,
+  moParamDefinition, moParamTypeStrs,
+  moParamIndex, moParamIndexes, moParamDefinitions
+} from "./mo-param";
 import { moConfig, moConfigDefinition, MO_CONFIG_OK } from "./mo-config";
 import { moSlash } from "./mo-file-manager";
 import { moFileManager } from "./mo-file-manager";
 import { moResourceManager } from "./mo-resource-manager";
+import { moTextureManager, moTextureBuffer, moTextureBuffers } from "./mo-texture-manager";
+import { moTexture, moTextureType, moTextureArray } from "./mo-texture";
+import { moMathManager, moMathFunction, moParserFunction } from "./mo-math-manager";
+import {
+  moOutlets, moOutlet,
+  moInlets, moInlet,
+  moConnection, moConnections
+} from "./mo-connectors";
+
+export const MO_INLET_NAME = 0;
+export const MO_INLET_TYPE = 1;
+
+export const MO_OUTLET_NAME = 0;
+export const MO_OUTLET_TYPE = 1;
+export const MO_OUTLET_INLETS_OFFSET = 2;
+
+export const MO_IODEVICE_KEYBOARD = 0;
+export const MO_IODEVICE_MOUSE = 1;
+export const MO_IODEVICE_MIDI = 2;
+export const MO_IODEVICE_MIXER = 3;
+export const MO_IODEVICE_JOYSTICK = 4;
+export const MO_IODEVICE_NET_TCP_IN = 5;
+export const MO_IODEVICE_NET_UDP_IN = 6;
+export const MO_IODEVICE_NET_TCP_OUT = 7;
+export const MO_IODEVICE_NET_UDP_OUT = 8;
+export const MO_IODEVICE_LIVE = 9;
+export const MO_IODEVICE_TRACKER = 10;
+
+export const MO_IODEVICE_TABLET = 11;
+export const MO_IODEVICE_TOUCH = 12;
+export const MO_IODEVICE_CONSOLE = 20;
+export const MO_IODEVICE_ANY = -1;
+
+///Manteniendo compatibilidad con los id de dispositivos de versiones de 0.6.x
+///los moldeo ID's empiezan en 100...
+export const MO_MOLDEOOBJECTS_OFFSET_ID = 100;
+///scene objects are recursive sub-scene-fx's
+export const MO_MOLDEOSCENEOBJECTS_OFFSET_ID = 10000;
+
+export const MO_MOLDEOOBJECT_UNDEFINED_ID = -1;
+
 
 export class moMobState extends moAbstract {
 
@@ -190,6 +241,13 @@ export class moMobDefinition {
 
 }
 
+
+
+
+
+
+
+
 export class moMoldeoObject extends moScript {
   moid: number;
   name: string;
@@ -210,18 +268,20 @@ export class moMoldeoObject extends moScript {
   /// Puntero al administrador de recursos
   m_pResourceManager : moResourceManager;
   m_pFileManager: moFileManager;//para leer archivos de configuracion locales y remotos
-/*
+
   /// Conectores de salida, Arreglo de moOutlet's
-  m_Outlets : moOutlets;
+  m_Outlets : moOutlets = [];
+  m_OutletsStr: any = {};
 
   /// Conectores de entrada, Arreglo de moInlet's
-  m_Inlets : moInlets;
+  m_Inlets : moInlets = [];
+  m_InletsStr: any = {};
 
   InletScreenWidth : moInlet;
   InletScreenHeight : moInlet;
   InletTimeabs : moInlet;
   InletPreconfig : moInlet;
-*/
+
   m_bConnectorsLoaded : boolean = false;
 
   __iscript : MOint;
@@ -260,19 +320,19 @@ export class moMoldeoObject extends moScript {
       ((moConnector*)InletScreenHeight)->Init( moText("screen_height"), m_Inlets.Count(), MO_DATA_NUMBER_DOUBLE );
       m_Inlets.Add(InletScreenHeight);
     }
-
-    InletTimeabs = new moInlet();
-    if (InletTimeabs) {
-      ((moConnector*)InletTimeabs)->Init( moText("timeabs"), m_Inlets.Count(), MO_DATA_NUMBER_DOUBLE );
-      m_Inlets.Add(InletTimeabs);
-    }
-
-    InletPreconfig = new moInlet();
-    if (InletPreconfig) {
-      ((moConnector*)InletPreconfig)->Init( moText("preconfig"), m_Inlets.Count(), MO_DATA_NUMBER_INT );
-      m_Inlets.Add(InletPreconfig);
-    }
 */
+    var InletTimeabs : moInlet = new moInlet();
+    if (InletTimeabs) {
+      InletTimeabs.Init( "timeabs", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(InletTimeabs);
+    }
+
+    var InletPreconfig : moInlet = new moInlet();
+    if (InletPreconfig) {
+      InletPreconfig.Init( "preconfig", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_INT );
+      this.m_Inlets.push(InletPreconfig);
+    }
+
     var confignamecompleto : moText;
     this.GetDefinition();
 
@@ -313,7 +373,7 @@ export class moMoldeoObject extends moScript {
   this.MODebug2.Message(`***** Initializing ${this.GetName()} ***** ${confignamecompleto}`);
     if (confignamecompleto != undefined && confignamecompleto + "" != "") {
       this.m_pFileManager.Load(confignamecompleto, true, (res) => {
-        console.log("loaded file .. OK", res);
+        console.log("loaded file .. OK");
         if (this.m_Config.LoadConfig(res._body, (config_res) => {
           console.log("CONFIG LOADED!", config_res);
 
@@ -345,35 +405,39 @@ export class moMoldeoObject extends moScript {
   }
 
   CreateConnectors() : boolean {
-    console.log( `moMoldeoObject.CreateConnectors > ${this.GetConfigName()}`);
+    //console.log( `moMoldeoObject.CreateConnectors > ${this.GetConfigName()}`);
 /*
     if (m_pResourceManager == NULL) {
-    MODebug2->Error("moMoldeoObject::CreateConnectors > ResourceManager is NULL!!! Can't continue. Sorry for object: "+GetName()+ " config: " + GetConfigName() + " label:"+GetLabelName() );
+    MODebug2->Error("moMoldeoObject::CreateConnectors > ResourceManager is NULL!!! Can't continue. Sorry for object: "
+    +GetName()+ " config: " + GetConfigName() + " label:"+GetLabelName() );
     return false;
   }
-
-  if (m_bConnectorsLoaded) {
-    MODebug2->Error("moMoldeoObject::CreateConnectors > Calling twice. Can't continue. Sorry for object: "+GetName()+ " config: " + GetConfigName() + " label:"+GetLabelName() );
+*/
+  if (this.m_bConnectorsLoaded) {
+    this.MODebug2.Error("moMoldeoObject::CreateConnectors > Calling twice. Can't continue. Sorry for object: "
+    +this.GetName()+ " config: " + this.GetConfigName() + " label:"+this.GetLabelName() );
     return false;
   }
-
-  MODebug2->Message("moMoldeoObject::CreateConnectors > Calling once. object: "+GetName()+ " config: " + GetConfigName() + " label:" + GetLabelName() );
-
+/*
+  MODebug2->Message("moMoldeoObject::CreateConnectors > Calling once. object: "
+  +GetName()+ " config: " + GetConfigName() + " label:" + GetLabelName() );
+*/
 
 	///crea los Inlets adicionales a los parámetros: definidos en el parámetro "inlet"
 
-	moParam& pinlets = m_Config[moText("inlet")];
+  var pinlets : moParam = this.m_Config.GetParam("inlet");
 
-	for( MOuint i=0; i<pinlets.GetValuesCount(); i++ ) {
-    if ( GetInletIndex(pinlets[i][MO_INLET_NAME].Text())==-1 ) {
-      moInlet* Inlet = new moInlet();
+  for (let i = 0; i < pinlets.GetValuesCount(); i++) {
+    let InletName = pinlets.GetValue(i).GetSubValue(MO_INLET_NAME).Text();
+    let InletType = pinlets.GetValue(i).GetSubValue(MO_INLET_TYPE).Text();
+    if ( this.GetInletIndex( InletName )==-1 ) {
+      var Inlet : moInlet = new moInlet();
       if (Inlet) {
-        Inlet->SetMoldeoLabelName( GetLabelName() );
-        moText InletName = pinlets[i][MO_INLET_NAME].Text();
+        Inlet.SetMoldeoLabelName( this.GetLabelName() );
         ///lo creamos si y solo si no existe como parámetro....
-        if ( m_Config.GetParamIndex(InletName)==-1 ) {
-          ((moConnector*)Inlet)->Init( InletName, m_Inlets.Count(), pinlets[i][MO_INLET_TYPE].Text() );
-          m_Inlets.Add( Inlet );
+        if (this.m_Config.GetParamIndex(InletName) == -1) {
+          Inlet.Init( InletName, this.m_Inlets.length, ""+InletType );
+          this.m_Inlets.push( Inlet );
         }
       }
     }
@@ -382,30 +446,35 @@ export class moMoldeoObject extends moScript {
 	///Inicializa las funciones matemáticas del config
 	///así como los inlets y outlets por cada parámetro
 	///así como las texturas
-	for( MOint p=0;p<m_Config.GetParamsCount();p++) {
+	for( var p=0;p<this.m_Config.GetParamsCount();p++) {
 
-		moParam	&param( m_Config[p] );
-
-		MODebug2->Log( moText("moMoldeoObject::CreateConnectors > Init param type ") + param.GetParamDefinition().GetTypeStr() + moText(" name: ") + param.GetParamDefinition().GetName() );
-
+    var param: moParam = this.m_Config.GetParam(p);
+/*
+		this.MODebug2.Log( moText("moMoldeoObject::CreateConnectors > Init param type ")
+    + param.GetParamDefinition().GetTypeStr() + moText(" name: ")
+    + param.GetParamDefinition().GetName() );
+*/
 
     ///CREAMOS UN INLET POR CADA PARAMETRO
-    int inletidx = GetInletIndex(param.GetParamDefinition().GetName());
+    var inletidx : MOint = this.GetInletIndex(param.GetParamDefinition().GetName());
     if (inletidx==-1) {
-      moInlet* Inlet = new moInlet();
+      var Inlet : moInlet = new moInlet();
       if (Inlet) {
-        Inlet->Init( param.GetParamDefinition().GetName(), m_Inlets.Count(), param.GetPtr() );
-        m_Inlets.Add(Inlet);
+        var iname = param.GetParamDefinition().GetName();
+        Inlet.Init( iname, this.m_Inlets.length, param );
+        this.m_Inlets.push(Inlet);
+        this.m_InletsStr[""+iname] = Inlet;
       }
     }
 
-		for( MOuint v=0;v<param.GetValuesCount();v++) {
-      ResolveValue( param, v );
+		for( var v=0;v<param.GetValuesCount();v++) {
+      this.ResolveValue( param, v );
 
 		}
 	}
-
-  MODebug2->Message("moMoldeoObject::CreateConnectors > loaded params & values for Object: " + GetName() + " config:" + GetConfigName() + " label:" + GetLabelName() );
+/*
+  MODebug2->Message("moMoldeoObject::CreateConnectors > loaded params & values for Object: "
+  + GetName() + " config:" + GetConfigName() + " label:" + GetLabelName() );
 */
     /** VERIFICAR ESTO!!!!*/
     /**
@@ -427,11 +496,13 @@ export class moMoldeoObject extends moScript {
 
         if ( m_Config.GetParamIndex(OutletName) > -1 ) {
           ///CREAMOS UN OUTLET nuevo para este parametro....
-          MODebug2->Log( moText("moMoldeoObject::CreateConnectors > ") + this->GetLabelName() + moText(" creating Outlet as parameter \"") + OutletName + "\""  );
+          MODebug2->Log( moText("moMoldeoObject::CreateConnectors > ")
+          + this->GetLabelName() + moText(" creating Outlet as parameter \"") + OutletName + "\""  );
           Outlet->Init( OutletName, i, m_Config.GetParam(OutletName).GetPtr());
         } else {
           ///CREAMOS UN OUTLET desde el .cfg, teniendo en cuenta los tipos...
-          MODebug2->Log( moText("moMoldeoObject::CreateConnectors > ") + this->GetLabelName() + moText(" Init > creating outlet not as param.") + OutletName  );
+          MODebug2->Log( moText("moMoldeoObject::CreateConnectors > ")
+          + this->GetLabelName() + moText(" Init > creating outlet not as param.") + OutletName  );
           Outlet->Init( OutletName, i, poutlets[i][MO_OUTLET_TYPE].Text() );
         }
         m_Outlets.Add( Outlet );
@@ -448,14 +519,15 @@ export class moMoldeoObject extends moScript {
       }
     }
 	}
-
-  m_bConnectorsLoaded = true;
+*/
+  this.m_bConnectorsLoaded = true;
 
   ///Una vez establecidos los conectores, podemos inicializar el script a su vez....
 	//moMoldeoObject::ScriptExeInit();
-	ScriptExeInit();
-
-  MODebug2->Message("moMoldeoObject::CreateConnectors > OK! Object: " + GetName() + " config:" + GetConfigName() + " label: " + GetLabelName() );
+	this.ScriptExeInit();
+/*
+  MODebug2->Message("moMoldeoObject::CreateConnectors > OK! Object: "
+  + GetName() + " config:" + GetConfigName() + " label: " + GetLabelName() );
 
   */
   	return this.m_bConnectorsLoaded;
@@ -542,8 +614,253 @@ export class moMoldeoObject extends moScript {
     return p_configdefinition;
   }
 
+  ResolveValue( param : moParam, value_index : MOint, p_refresh: boolean = false ) : boolean {
+
+    var idx : MOint = -1;
+    var value : moValue = param.GetValue(value_index);
+    var param_type : moParamType = param.GetParamDefinition().GetType();
+    //MODebug2->Message( moText("+Init value #") + IntToStr(v) );
+
+    ///RESUELVE LAS FUNCIONES!!!!
+    ///esto debe hacerse antes de aplicar filtros y otros...
+
+    for( var ivb=0; ivb<value.GetSubValueCount(); ivb++) {
+        var VB : moValueBase  = value.GetSubValue( ivb );
+        if (VB.GetType() == moValueType.MO_VALUE_FUNCTION ) {
+            idx = -1;
+            if (p_refresh)
+              if (this.m_pResourceManager.GetMathMan())
+                idx = this.m_pResourceManager.GetMathMan().AddFunction( VB.Text(), true, this );
+
+            if (this.m_pResourceManager.GetMathMan())
+              idx = this.m_pResourceManager.GetMathMan().AddFunction( VB.Text(), true, this );
+            if (idx>-1) {
+              var Fun : moMathFunction = this.m_pResourceManager.GetMathMan().GetFunction(idx);
+                VB.SetFun( Fun );
+                if (Fun.m_isNumber == false) {
+                  this.MODebug2.Message("function defined: " + VB.Text());
+                  console.log( "function defined: " + VB.Text(), Fun );
+                }
+            } else {
+              this.MODebug2.Error("moMoldeoObject::CreateConnectors > function couldn't be defined: "
+                                + VB.Text()
+                                + " object: "+this.GetName()
+                                + " config: " + this.GetConfigName()
+                                + " label:" + this.GetLabelName());
+            }
+        }
+    }
+
+
+    //
+
+    if (value.GetSubValueCount()<=0) return false;
+
+    var valuebase0 : moValueBase = value.GetSubValue(0);
+    var idx: MOint;
+    var TexMan: moTextureManager = this.m_pResourceManager.GetTextureMan();
+
+    switch( param_type ) {
+
+        case moParamType.MO_PARAM_TEXTUREFOLDER:
+            ///es una carpeta pero puede tener otros parametros
+            ///
+            /*
+            if ( ! (valuebase0.Text().trim() == "") ) {
+
+                ///si tenemos un segundo parametro deberia ser el formato del buffer (JPG o PNG)
+                if (p_refresh) {
+
+                }
+                idx = this.m_pResourceManager.GetTextureMan().GetTextureBuffer( valuebase0.Text(), true, "PNG" );
+                if (idx>-1) {
+
+                    var pTextureBuffer : moTextureBuffer = this.m_pResourceManager.GetTextureMan().GetTextureBuffer(idx);
+                    valuebase0.SetTextureBuffer( pTextureBuffer );
+                    return true;
+                }
+                return false;
+
+            }*/
+
+
+            break;
+
+        case moParamType.MO_PARAM_VIDEO:
+            ///ojo aquí el video es tratado por el VideoManager si quiere ser tratado realamente
+            /// como video y no como texturaanimada....
+
+            break;
+
+        case moParamType.MO_PARAM_TEXTURE:
+        case moParamType.MO_PARAM_FILTER:
+            var s: String = new String(valuebase0.Text());
+            if ( ! (s.trim() == "") ) {
+
+                if (p_refresh) {
+                  idx = TexMan.GetTextureMOId( valuebase0.Text(), true, true );
+                }
+
+                idx = TexMan.GetTextureMOId( valuebase0.Text(), true );
+                if (idx>-1) {
+                    var pTexture : moTexture = TexMan.GetTexture(idx);
+                    valuebase0.SetTexture( pTexture );
+
+                    if (pTexture.GetType()!=moTextureType.MO_TYPE_TEXTURE_MULTIPLE && value.GetSubValueCount()>1) {
+                      /*
+                        idx = m_pResourceManager->GetShaderMan()->GetTextureFilterIndex()->LoadFilter( &value );
+                        moTextureFilter*  pTextureFilter = m_pResourceManager->GetShaderMan()->GetTextureFilterIndex()->Get(idx-1);
+                        valuebase0.SetTextureFilter( pTextureFilter );
+                        */
+                    }
+  /*
+                    if (value.GetSubValueCount()==4) {
+                        valuebase0.SetTextureFilterAlpha( value.GetSubValue(3).GetData() );
+                    }
+  */
+  /*
+                    if (value.GetSubValueCount()>=5) {
+                        //valuebase.SetTextureFilterParam( value.GetSubValue(4).GetData() );
+                    }
+  */
+                    //MODebug2->Message( moText("moMoldeoObject::CreateConnectors > ") + valuebase0.Text());
+
+                }
+            } else {
+              this.MODebug2.Error("moMoldeoObject::UpdateValue > VALUE BASE EMPTY: "
+                                  + valuebase0.Text()
+                                /*+ moText(" Param name:") +param.GetParamDefinition().GetName()*/ );
+                return false;
+            }
+            break;
+
+        case moParamType.MO_PARAM_FONT:
+  /*
+            moFont* pFont;
+            moFontType fonttype;
+            moFontSize  fontsize;
+
+            if ( value.GetSubValueCount()==3 ) {
+                if ( valuebase0.Text().Trim() == moText("Default") ) {
+                  pFont = m_pResourceManager->GetFontMan()->GetFont(0);
+                } else if ( ! (valuebase0.Text().Trim() == moText("")) ) {
+
+                    if ( value.GetSubValue(1).GetType()==MO_VALUE_TXT) {
+                        moText fonttypeT = value.GetSubValue(1).Text();
+                        fonttype = m_pResourceManager->GetFontMan()->GetFontType(fonttypeT);
+                    } else {
+                        fonttype = (moFontType)value.GetSubValue(1).Int();
+                    }
+
+                    if ( value.GetSubValue(2).GetType()==MO_VALUE_NUM ) {
+                        fontsize = value.GetSubValue(2).Int();
+                    } else if ( value.GetSubValue(2).GetType()==MO_VALUE_FUNCTION ) {
+                        fontsize = 12;
+                    }
+
+                    pFont = m_pResourceManager->GetFontMan()->AddFont( valuebase0.Text(), fonttype, fontsize);
+                    if (pFont==NULL) {
+                      MODebug2->Error( moText("moMoldeoObject::CreateConnectors > FONT NOT FOUND: Using Default")
+                      + valuebase0.Text() + moText(" Param name:") +param.GetParamDefinition().GetName() );
+                      pFont = m_pResourceManager->GetFontMan()->GetFont(0);
+                    }
+                } else {
+                    MODebug2->Error( moText("moMoldeoObject::CreateConnectors > VALUE BASE EMPTY: Using Default")+ valuebase0.Text()
+                    + moText(" Param name:") +param.GetParamDefinition().GetName() );
+                    pFont = m_pResourceManager->GetFontMan()->GetFont(0);
+                }
+
+                if (pFont) {
+                    valuebase0.SetFont( pFont );
+                    return true;
+                }
+                return false;
+            } else {
+                MODebug2->Error( moText("moMoldeoObject::UpdateValue > MISSING VALUES: ")
+                + valuebase0.Text() + moText(" Param name:")
+                +param.GetParamDefinition().GetName() );
+                return false;
+            }
+            */
+            break;
+
+        case moParamType.MO_PARAM_3DMODEL:
+        case moParamType.MO_PARAM_OBJECT:
+        /*
+            if (value.GetSubValueCount()>0) {
+                ///TODO: PROBAR!!!!!
+                moSceneNode* pModel = m_pResourceManager->GetModelMan()->Get3dModel( valuebase0.Text(),
+                true //force load !!
+                  );
+                valuebase0.SetModel( pModel );
+                return false;
+            }
+            */
+            break;
+
+        case moParamType.MO_PARAM_SOUND:
+        /*
+            if (value.GetSubValueCount()>0) {
+              if (valuebase0.Text()!="") {
+                moSound* pSound = m_pResourceManager->GetSoundMan()->GetSound( valuebase0.Text() );
+                if (pSound) {
+                    valuebase0.SetSound( pSound );
+                    return true;
+                }
+                return false;
+              }
+            }*/
+            break;
+        default:
+          break;
+
+    }//fin siwtch
+
+    return false;
+  }
+
+
+  GetInletIndex( p_connector_name : moText ): MOint {
+
+    return -1;
+  }
+
+  GetInlets(): moInlets {
+    return this.m_Inlets;
+  }
+
+  GetOutlets(): moOutlets {
+    return this.m_Outlets;
+  }
+
+  GetConfig(): moConfig {
+    return this.m_Config;
+  }
+
+  /// \if spanish Carga las definiciones de parámetros del archivo de configuración \endif
+  // \if english Loads parameter's config definitions \endif
+  LoadDefinition(): void {
+
+  }
+
+  /// Corre la funcion de script Run o Compila el nuevo script
+  ScriptExeInit() : void {
+
+  }
   ScriptExeRun(): void {
-    //console.log("moMoldeoObject.ScriptExeRun()");
+
+  }
+
+  ScriptExeUpdate(): void {
+
+  }
+
+  ScriptExeFinish() : void {
+
+  }
+
+  SetScript( p_script : moText ) : void {
+    this.m_Script = p_script;
   }
 
   ToJSON(): any {

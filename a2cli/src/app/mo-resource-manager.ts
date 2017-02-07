@@ -27,7 +27,7 @@ import { moRenderManager } from "./mo-render-manager";
 
 //import { moShaderManager } from "./mo-shader-manager";
 
-//import { moMathManager } from "./mo-math-manager";
+import { moMathManager } from "./mo-math-manager";
 
 //import { moFontManager } from "./mo-font-manager";
 
@@ -59,7 +59,7 @@ export class moResourceManager extends moAbstract {
 		MOGLMan : moGLManager;
 		MORenderMan : moRenderManager;
 		//MOShaderMan : moShaderManager;
-		//MOMathMan : moMathManager;
+		MOMathMan : moMathManager;
 		//MOFontMan : moFontManager;
 		MOGuiMan : moGUIManager;
 		//MOScriptMan : moScriptManager;
@@ -75,6 +75,10 @@ export class moResourceManager extends moAbstract {
     }
 
     Init(options?: any): boolean {
+
+      if (this.MOMathMan) { }
+      else this.MOMathMan = new moMathManager();
+      this.MOMathMan.SetResourceManager(this);
 
       if (this.MOFileMan) { }
       else this.MOFileMan = new moFileManager(this.http);
@@ -143,6 +147,7 @@ export class moResourceManager extends moAbstract {
 		presources.NextValue();
     }*/
 
+      this.MOMathMan.Init();
       this.MOTextureMan.Init();
       this.MOGLMan.Init();
       this.MOTimeMan.Init();
@@ -170,5 +175,13 @@ export class moResourceManager extends moAbstract {
 
     GetFileMan(): moFileManager {
       return this.MOFileMan;
+    }
+
+    GetMathMan(): moMathManager {
+      return this.MOMathMan;
+    }
+
+    GetTextureMan(): moTextureManager {
+      return this.MOTextureMan;
     }
 };

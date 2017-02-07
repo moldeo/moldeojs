@@ -75,6 +75,9 @@ export class moTexture extends moAbstract {
     return this.m_moid;
   }
 
+  GetType(): moTextureType {
+    return this.m_type;
+  }
 
 }
 
