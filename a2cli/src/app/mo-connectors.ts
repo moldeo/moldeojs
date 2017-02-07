@@ -60,11 +60,12 @@ export class moConnector extends moAbstract {
   * @param p_datatype tipo de dato manejado por este conector
   *                   [ moDataType | moText | moParam | ]
   */
-  Init( p_ConnectorLabelName?: moText , ConnectorId?: MOint, t_datatype?: any ): boolean {
+  Init(p_ConnectorLabelName ?: moText, ConnectorId ?: MOint, t_datatype ?: any): boolean {
     this.m_ConnectorLabelName = p_ConnectorLabelName;
     this.m_ConnectorId = ConnectorId;
 
     var ttype: moDataType;
+    console.log("t_datatype:", p_ConnectorLabelName, typeof t_datatype, t_datatype);
     if (typeof t_datatype == "string") {
       ttype = moDataTypeStr["" + t_datatype];
       this.m_pData = new moData( ttype );

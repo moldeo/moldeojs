@@ -208,6 +208,8 @@ export class moConsole extends moMoldeoObject {
         this.m_EffectManager.m_pResourceManager = this.GetResourceManager();
         this.m_EffectManager.Init();
 
+        this.m_ConsoleState.Init();
+
         this.LoadObjects(moMoldeoObjectType.MO_OBJECT_PREEFFECT, (pre) => {
           this.LoadObjects(moMoldeoObjectType.MO_OBJECT_EFFECT, (efe) => {
             this.LoadObjects(moMoldeoObjectType.MO_OBJECT_POSTEFFECT, (pos) => {
@@ -573,6 +575,7 @@ export class moConsole extends moMoldeoObject {
         //normal mode: do nothing
           this.m_ConsoleState.tempo.Duration();
           this.m_ConsoleState.tempo.getTempo();
+          //console.log("console tempo", this.m_ConsoleState.tempo.ang, this.m_ConsoleState.tempo);
         }
         break;
 

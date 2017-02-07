@@ -60,3 +60,4 @@ export const moDataTypeStr = {
   "MESSAGE": moDataType.MO_DATA_MESSAGE,
   "MESSAGES": moDataType.MO_DATA_MESSAGES
 };
+

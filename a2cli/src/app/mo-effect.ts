@@ -5,12 +5,26 @@ import { moMoldeoObject, moMobState, moMoldeoObjectType } from "./mo-moldeo-obje
 import { moEffectManager } from "./mo-effect-manager";
 import { moConsoleState } from "./mo-console-state";
 import { moTempo } from "./mo-tempo";
-import {moDataType,moData,moValue, moDataTypeStr} from "./mo-value";
+import { moDataType, moData, moValue, moDataTypeStr } from "./mo-value";
+import {
+  MO_DEACTIVATED, MO_ACTIVATED,
+  MO_ON, MO_OFF, MO_ERROR, MO_TRUE, MO_FALSE
+} from "./mo-types";
 import { moInlet, moOutlet, moConnector, moConnections } from "./mo-connectors";
+import * as moMath from "./mo-math";
+import { moTimerState, moTimer } from "./mo-timer";
 
 export class moEffect extends moMoldeoObject {
 
   m_EffectState: moEffectState;
+
+  InletTime: moInlet;
+  InletTimems: moInlet;
+  InletTimes: moInlet;
+  InletTempo: moInlet;
+  InletT: moInlet;
+  InletMilliseconds: moInlet;
+  InletSeconds : moInlet;
 
   constructor() {
     super();
@@ -22,50 +36,51 @@ export class moEffect extends moMoldeoObject {
     this.m_EffectState.Init();
     if (this.m_pResourceManager==undefined) return false;
 
-    var InletTimems : moInlet = new moInlet();
-    if (InletTimems) {
-      InletTimems.Init( "timems", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
-      this.m_Inlets.push(InletTimems);
+    this.InletTimems = new moInlet();
+    if (this.InletTimems) {
+      this.InletTimems.Init( "timems", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(this.InletTimems);
     }
 
-    var InletTimes : moInlet = new moInlet();
-    if (InletTimes) {
-      InletTimes.Init( "times", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
-      this.m_Inlets.push(InletTimes);
+    this.InletTimes = new moInlet();
+    if (this.InletTimes) {
+      this.InletTimes.Init( "times", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(this.InletTimes);
     }
 
     /** Crea INLETS INTERNOS, es decir que no tienen un parametro asociado... (especificamente para su uso generico*/
-    var InletTime : moInlet = new moInlet();
-    if (InletTime) {
-      InletTime.Init( "time", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
-      this.m_Inlets.push(InletTime);
+    this.InletTime = new moInlet();
+    if (this.InletTime) {
+      //moDataType.MO_DATA_NUMBER_DOUBLE
+      this.InletTime.Init( "time", this.m_Inlets.length, "DOUBLE"  );
+      this.m_Inlets.push(this.InletTime);
     }
 
-    var InletTempo : moInlet = new moInlet();
-    if (InletTempo) {
+    this.InletTempo = new moInlet();
+    if (this.InletTempo) {
       //Inlet->Init( "tempo", m_Inlets.Count(), param.GetPtr() );
       //param.SetExternData( Inlet->GetData() );
-      InletTempo.Init( "tempo", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
-      this.m_Inlets.push(InletTempo);
+      this.InletTempo.Init( "tempo", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(this.InletTempo);
     }
 
-    var InletT : moInlet = new moInlet();
-    if (InletT) {
-      InletT.Init( "t", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
-      this.m_Inlets.push(InletT);
+    this.InletT = new moInlet();
+    if (this.InletT) {
+      this.InletT.Init( "t", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(this.InletT);
     }
 
 
-    var InletMilliseconds : moInlet = new moInlet();
-    if (InletMilliseconds) {
-      InletMilliseconds.Init( "milliseconds", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
-      this.m_Inlets.push(InletMilliseconds);
+    this.InletMilliseconds = new moInlet();
+    if (this.InletMilliseconds) {
+      this.InletMilliseconds.Init( "milliseconds", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(this.InletMilliseconds);
     }
 
-    var InletSeconds : moInlet = new moInlet();
-    if (InletSeconds) {
-      InletSeconds.Init( "seconds", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
-      this.m_Inlets.push(InletSeconds);
+    this.InletSeconds = new moInlet();
+    if (this.InletSeconds) {
+      this.InletSeconds.Init( "seconds", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.m_Inlets.push(this.InletSeconds);
     }
 
     if (super.Init((res) => {
@@ -80,8 +95,102 @@ export class moEffect extends moMoldeoObject {
     return true;
   }
 
+  BeginDraw(p_tempo: moTempo, parentstate : moEffectState = null ): void {
+/*
+    MOdouble syncrotmp;
+
+    if(isyncro != MO_PARAM_NOT_FOUND) {
+      moData *sync = m_Config.GetParam(isyncro).GetData();
+      if (sync) {
+        moMathFunction* pFun = sync->Fun();
+        if (sync->Type()==MO_DATA_FUNCTION && pFun) {
+          //m_EffectState.tempo.syncro = pFun->Eval(m_EffectState.tempo.ang);
+          m_EffectState.tempo.syncro = pFun->Eval();
+        }
+        else m_EffectState.tempo.syncro = sync->Double();
+      }
+
+      //código alternativo
+      //m_EffectState.tempo.syncro = m_Config.Fun(isyncro).Eval( m_EffectState.tempo.ang );
+    }
+*/
+      if(this.m_EffectState.synchronized==MO_DEACTIVATED)
+      {
+          //m_EffectState.tempo.ticks = moGetTicks();
+          ///Clock independiente
+          this.m_EffectState.tempo.Duration();
+          this.m_EffectState.tempo.getTempo();
+      }
+      else
+      {
+          var syncrotmp = this.m_EffectState.tempo.syncro;
+          Object.assign( this.m_EffectState.tempo, p_tempo );
+          this.m_EffectState.tempo.syncro = syncrotmp;
+          this.m_EffectState.tempo.getTempo();
+          //if(m_EffectState.fulldebug==MO_ACTIVATED) MODebug2->Push("SYNCRO: " + FloatToStr(m_EffectState.tempo.syncro,3));
+      }
+/*
+    if(iphase != MO_PARAM_NOT_FOUND) {
+      moData *phase = m_Config.GetParam(iphase).GetData();
+      if (phase) {
+        moMathFunction* pFun = phase->Fun();
+            if (phase->Type()==MO_DATA_FUNCTION && pFun) {
+              //m_EffectState.tempo.ang+= pFun->Eval(m_EffectState.tempo.ang);
+              m_EffectState.tempo.ang+= pFun->Eval();
+            }
+            else m_EffectState.tempo.ang+= phase->Double();
+          }
+    }
+*/
+    if(parentstate!=null) {
+      //asginar parametros del state del padre al state del hijo
+      Object.assign(this.m_EffectState, parentstate);
+    }
+
+    if (this.InletTime) {
+      if (this.InletTime.GetData())
+        this.InletTime.GetData().SetDouble(this.m_EffectState.tempo.ang);
+      //console.log("tempo.ang", this.m_EffectState.tempo.ang);
+    }
+
+    if (this.InletTimems) {
+      if (this.InletTimems.GetData())
+        this.InletTimems.GetData().SetDouble(this.m_EffectState.tempo.Duration());
+    }
+    if (this.InletMilliseconds) {
+      if (this.InletMilliseconds.GetData())
+        this.InletMilliseconds.GetData().SetDouble( this.m_EffectState.tempo.Duration());
+    }
+    if (this.InletTimes) {
+      if (this.InletTimes.GetData())
+        this.InletTimes.GetData().SetDouble(this.m_EffectState.tempo.Duration() / 1000.0);
+    }
+    if (this.InletSeconds) {
+      if (this.InletSeconds.GetData())
+        this.InletSeconds.GetData().SetDouble(this.m_EffectState.tempo.Duration() / 1000.0);
+    }
+    if (this.InletT) {
+      if (this.InletT.GetData())
+        this.InletT.GetData().SetDouble( this.m_EffectState.tempo.ang);
+    }
+    if (this.InletTempo) {
+      if (this.InletTempo.GetData())
+        this.InletTempo.GetData().SetDouble( moMath.FMod( this.m_EffectState.tempo.ang, moMath.TWO_PI));
+    }
+
+    this.ScriptExeRun();
+  }
+
   Draw( p_tempo : moTempo ) : void {
     //console.log( `moEffect.Draw ${this.m_MobDefinition.GetName()}` );
+  }
+
+  EndDraw() {
+    this.ScriptExeDraw();
+  }
+
+  ScriptExeDraw(): void {
+
   }
 
   GetState() : moMobState {
@@ -124,6 +233,69 @@ export class moEffect extends moMoldeoObject {
 
   Selected() : boolean {
       return this.GetState().Selected();
+  }
+
+
+  TurnOn() : void  {
+    this.m_EffectState.Activate();
+    this.Activate();
+  }
+
+  TurnOff() : void {
+    this.m_EffectState.Deactivate();
+    this.Deactivate();
+  }
+
+  Enable() : void {
+    this.m_EffectState.enabled = MO_ON;
+  }
+
+  Disable() : void {
+    this.m_EffectState.enabled = MO_OFF;
+  }
+
+  SwitchOn() : void {
+    if (this.m_EffectState.Activated()) {
+      this.m_EffectState.Deactivate()
+    } else  this.m_EffectState.Activate();
+  }
+
+  SwitchEnabled() : void {
+    this.m_EffectState.enabled*= -1;
+  }
+
+
+  Synchronize() : void {
+    this.m_EffectState.synchronized = MO_ACTIVATED;
+  }
+
+
+  Unsynchronize() : void {
+    this.m_EffectState.synchronized = MO_DEACTIVATED;
+  }
+
+  Play() : void {
+    this.Unsynchronize();
+    return this.m_EffectState.tempo.Start();
+  }
+
+  Stop() : void {
+    this.Unsynchronize();
+    return this.m_EffectState.tempo.Stop();
+  }
+
+  Pause() : void {
+    this.Unsynchronize();
+    return this.m_EffectState.tempo.Pause();
+  }
+
+  Continue() : void {
+    this.Unsynchronize();
+    return this.m_EffectState.tempo.Continue();
+  }
+
+  State() : moTimerState {
+    return this.m_EffectState.tempo.State();
   }
 
 }

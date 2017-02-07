@@ -1,3 +1,10 @@
+import {
+  MOfloat, MOdouble,
+  MOint, MOuint, MOlong, MOulong,
+  MO_PI
+} from "./mo-types";
+import { moAbstract } from "./mo-abstract";
+
 
 export const EPSILON = 1.19209e-07;
 export const ZERO_TOLERANCE = 1e-06;
@@ -14,6 +21,19 @@ export const LN_10 = Math.log(10.0);
 export const INV_LN_2 = 1.0/LN_2;
 export const INV_LN_10 = 1.0/LN_10;
 
-export class moMath {
+export class moMath extends moAbstract {
+
+  constructor() {
+    super();
+  }
+
 
 }
+
+export const moMathd = new moMath();
+
+export function FMod(a: MOfloat, b: MOfloat) : MOdouble {
+  return 0.0;
+}
+
+

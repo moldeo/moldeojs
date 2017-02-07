@@ -507,8 +507,9 @@ export class moParserFunction extends moMathFunction {
         var pVarFactory: moMathVariableFactory =
         new moMathVariableFactory( this.m_Parameters, this.m_Variables, this.m_Variables_Map);
         this.m_Scope = pVarFactory.ToScope();
+        //console.log("Eval Parser with variables", this.m_Expression, this.m_Variables_Map, this.m_Scope );
 
-        this.m_ParserCode.eval(this.m_Scope);
+        this.m_LastEval = this.m_ParserCode.eval(this.m_Scope);
         return this.m_LastEval;
       } catch (err) {
         console.error("parser error", err, this.m_Scope);

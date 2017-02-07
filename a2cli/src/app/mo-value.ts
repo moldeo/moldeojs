@@ -35,6 +35,19 @@ export class moData {
       if (type in moDataTypeStr)
         this.SetType( moDataTypeStr[type] );
     }
+    if (typeof type == "object") {
+      if (type.constructor) {
+        if (type.constructor.name) {
+          if (type.constructor.name == "moDataType") {
+            this.SetType( type );
+          }
+
+          if (type.constructor.name == "moData") {
+            Object.assign(this, type );
+          }
+        }
+      }
+    }
   }
 
   SetType( p_type: moDataType ) {
@@ -45,9 +58,9 @@ export class moData {
     return this;
   }
 
-  SetText(p_text: moText) {
+  SetText(p_text: any) {
     this.m_DataType = moDataType.MO_DATA_TEXT;
-    this.m_Text = p_text;
+    this.m_Text = ""+p_text;
   }
   SetChar(p_number: any) {
     this.m_DataType = moDataType.MO_DATA_NUMBER_CHAR;
@@ -61,11 +74,11 @@ export class moData {
     this.m_DataType = moDataType.MO_DATA_NUMBER_LONG;
     this.m_Number = Number(p_number);
   }
-  SetFloat(p_float: moText) {
+  SetFloat(p_float: any) {
     this.m_DataType = moDataType.MO_DATA_NUMBER_FLOAT;
     this.m_Number =  Number(p_float);
   }
-  SetDouble(p_float: moText) {
+  SetDouble(p_float: any) {
     this.m_DataType = moDataType.MO_DATA_NUMBER_DOUBLE;
     this.m_Number = Number(p_float);
   }

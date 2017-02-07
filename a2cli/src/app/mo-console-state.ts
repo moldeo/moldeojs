@@ -72,7 +72,7 @@ export class moConsoleState extends moEffectState {
 	    this.frame = 0;
 
       this.m_RenderFrameQuality = "JPGGOOD";
-
+      super.Init();
       return true;
     }
 };
