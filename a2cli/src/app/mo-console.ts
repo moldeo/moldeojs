@@ -539,7 +539,7 @@ export class moConsole extends moMoldeoObject {
       }
     }
 
-    for (var i = 1; i < this.m_EffectManager.m_Effects.length; i++) {
+    for (var i = 0; i < this.m_EffectManager.m_Effects.length; i++) {
       var pEffect: moEffect = this.m_EffectManager.m_Effects[i];
       if (pEffect) {
         if (pEffect.Activated()) {

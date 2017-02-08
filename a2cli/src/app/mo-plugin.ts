@@ -45,22 +45,31 @@ PluginsDefinitions[1] = new moPluginDefinition(
   "/plugins/effects/image.ts",
   moMoldeoObjectType.MO_OBJECT_EFFECT,
   moEffectImage );
-/*
-import { moPreEffectErase } from "../plugins/preeffects/erase";
-PluginsDefinitions[0] = new moPluginDefinition(
-  "erase",
-  "/plugins/preeffects/erase.ts",
-  moMoldeoObjectType.MO_OBJECT_PREEFFECT,
-  moPreEffectErase );
-*/
 
+/// Effect Icon ====================================================================
+import { moEffectIcon } from "../plugins/effects/icon";
+PluginsDefinitions[2] = new moPluginDefinition(
+  "icon",
+  "/plugins/effects/icon.ts",
+  moMoldeoObjectType.MO_OBJECT_EFFECT,
+  moEffectIcon );
+
+/// Effect Particles Simple ====================================================================
+import { moEffectParticlesSimple } from "../plugins/effects/particlessimple";
+PluginsDefinitions[3] = new moPluginDefinition(
+  "particlessimple",
+  "/plugins/effects/particlessimple.ts",
+  moMoldeoObjectType.MO_OBJECT_EFFECT,
+  moEffectParticlesSimple );
 
 export const PluginsTree = {
   "preeffect": {
     "erase": PluginsDefinitions[0]
   },
   "effect": {
-    "image": PluginsDefinitions[1]
+    "image": PluginsDefinitions[1],
+    "icon": PluginsDefinitions[2],
+    "particlessimple": PluginsDefinitions[3]
   },
   "posteffect": {},
   "mastereffect": {},

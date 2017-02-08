@@ -153,7 +153,7 @@ export class moParam extends moAbstract {
       pReturnData = this.m_ParamDefinition.GetInterpolation().InterpolateData( pReturnData );
   }*/
 
-    return null;
+    return pReturnData;
   }
 
   SetExternData( p_pExternData : moData ) {
@@ -306,7 +306,7 @@ export class moParam extends moAbstract {
   }
 
   GetValue(p_valueindex?: MOint) {
-      if (p_valueindex == undefined || p_valueindex == -1)
+      if (p_valueindex == undefined || p_valueindex < 0)
         p_valueindex = this.m_CurrentIndexValue;
       return this.m_Values[p_valueindex];
     }

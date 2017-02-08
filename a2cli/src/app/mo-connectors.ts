@@ -65,7 +65,7 @@ export class moConnector extends moAbstract {
     this.m_ConnectorId = ConnectorId;
 
     var ttype: moDataType;
-    console.log("t_datatype:", p_ConnectorLabelName, typeof t_datatype, t_datatype);
+    //console.log("t_datatype:", p_ConnectorLabelName, typeof t_datatype, t_datatype);
     if (typeof t_datatype == "string") {
       ttype = moDataTypeStr["" + t_datatype];
       this.m_pData = new moData( ttype );

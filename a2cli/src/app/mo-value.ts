@@ -13,6 +13,7 @@ import {
   moGetDuration, moGetTimerState, moGetTimerStateStr
 } from "./mo-timer";
 import { moMathFunction, moParserFunction } from "./mo-math-manager";
+import { moTexture } from "./mo-texture";
 
 export class moData {
 
@@ -27,6 +28,8 @@ export class moData {
   m_AlphaFilter : MOfloat;
   m_pFilterParam : moTextFilterParam;/**pointer or reference*/
   m_pAlphaFilter : moData;/**pointer or reference*/
+
+  m_pTexture: moTexture = null;
 
   m_LastEval : MOdouble;
 
@@ -85,10 +88,12 @@ export class moData {
   //SetColor( p_color: moText);
   SetTexture(p_texture: any /**moTexture*/) {
     this.m_DataType = moDataType.MO_DATA_IMAGESAMPLE_TEXTUREBUFFER;
+    this.m_pTexture = p_texture;
   }
 
   SetTextureFiltered(p_texture: any /**moTexture*/) {
     this.m_DataType = moDataType.MO_DATA_IMAGESAMPLE_FILTERED;
+    this.m_pTexture = p_texture;
   }
 
   m_pFun: moMathFunction;
@@ -141,6 +146,10 @@ export class moData {
       }
     }
     return this.m_LastEval;
+  }
+
+  Texture(): moTexture {
+    return this.m_pTexture;
   }
 
 }

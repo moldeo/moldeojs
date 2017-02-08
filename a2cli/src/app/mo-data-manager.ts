@@ -682,8 +682,9 @@ export class moDataManager extends moResource {
     }
 
     NameToPath( p_name: moText ): moText {
-
-      return p_name;
+      var p: string = "" + this.GetDataPath();
+      var s: string = "" + p_name;
+      return p+s;
     }
 
     GetDataPath(): moText {

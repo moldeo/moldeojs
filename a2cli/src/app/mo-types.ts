@@ -42,6 +42,57 @@ export class moTextFilterParam {
 
 }
 
+export class moTexParam {
+
+    target : GLenum;
+    internal_format : GLint;
+		min_filter : GLint;
+		mag_filter : GLint;
+		wrap_s : GLint;
+    wrap_t: GLint;
+    constructor(values: Object = {}) {
+      Object.assign(this, values);
+    }
+};
+
+
+/// Parámetros internos predeterminados de una textura
+/**
+* MODefTex2DParams
+*  Parámetros internos predeterminados de una textura
+*
+*
+*/
+/*
+export const MODefTex2DParams = new moTexParam(
+{
+    target: GL_TEXTURE_2D, /// textura 2d
+    internal_format: GL_RGBA, /// 32 bits, rojo, verde, azul, opacidad
+    min_filter: GL_LINEAR, /// (GL_NEAREST_MIPMAP_LINEAR) interpolación de filtro lineal para el achicamiento
+    mag_filter: GL_LINEAR, /// (GL_NEAREST_MIPMAP_LINEAR) interpolación de filtro lineal para el agrandamiento
+    wrap_s: GL_REPEAT, /// modo de repetición en el orden horizontal
+    wrap_t: GL_REPEAT /// modo de repetición en el orden vertical
+});
+*/
+
+/// Parámetros internos predeterminados de una textura no identificados
+/**
+* MOUndefinedTex
+*  Parámetros internos predeterminados de una textura no identificados
+*
+*
+*/
+export const MOUndefinedTex = new moTexParam(
+{
+    target: 0, /// textura 2d
+    internal_format: MO_UNDEFINED, /// 32 bits, rojo, verde, azul, opacidad
+    min_filter: MO_UNDEFINED, /// (GL_NEAREST_MIPMAP_LINEAR) interpolación de filtro lineal para el achicamiento
+    mag_filter: MO_UNDEFINED, /// (GL_NEAREST_MIPMAP_LINEAR) interpolación de filtro lineal para el agrandamiento
+    wrap_s: MO_UNDEFINED, /// modo de repetición en el orden horizontal
+    wrap_t: MO_UNDEFINED /// modo de repetición en el orden vertical
+});
+
+
 export function IntToStr( num : number, nzeros?: number ) : string
 {
 /*

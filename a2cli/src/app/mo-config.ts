@@ -4,11 +4,16 @@ import * as xml2js from "xml2js";
 import { MOint, MOuint, MOboolean, MOfloat, MOdouble, MOlong, MOulong, moNumber, moTextFilterParam } from "./mo-types";
 import { moText } from "./mo-text";
 import { moAbstract } from "./mo-abstract";
-import { moValue, moValues, moValueBase, moValueBases, moValueDefinition } from "./mo-value";
+import {
+  moData, moValue, moValues,
+  moValueBase, moValueBases,
+  moValueDefinition
+} from "./mo-value";
 import { moParam, moParams, moParamIndexes, moParamDefinition, moParamDefinitions } from "./mo-param";
 import { moPreconfig, moPreConfigs } from "./mo-pre-config";
 import { moFile } from "./mo-file-manager";
 import { moColor, moColor4fArray, moColorRGBA, moColorRGB, moColorArray } from "./mo-gui-manager";
+import { moTexture } from "./mo-texture";
 
 export const MO_PARAM_NOT_SEL = -1;
 export const MO_PARAM_NOT_FOUND = -1;
@@ -78,9 +83,9 @@ export class moConfig extends moAbstract {
 		static moVector4i*             m_pVector4i;
 		static moDataMessage*          m_pMessage;
 		static moDataMessages*         m_pMessages;
-		static moSound*                m_pSound;
-		static moTexture*              m_pTexture;
-    */
+		static moSound*                m_pSound;*/
+    m_pTexture : moTexture = new moTexture();
+
     constructor() {
       super();
       this.m_ConfigDefinition = new moConfigDefinition();
@@ -353,6 +358,25 @@ export class moConfig extends moAbstract {
     }
     return false;
   }
+
+  Texture(p_paramid: any) : moTexture {
+    var param: moParam = this.GetParam(p_paramid);
+    //console.log("moConfig.Texture");
+    if (param) {
+      var pdata: moData = param.GetData();
+      //console.log(param, pdata);
+      if (pdata) {
+
+        var pTexture: moTexture = pdata.Texture();
+
+        if (pTexture) {
+          return pTexture;
+        }
+      }
+    }
+    return this.m_pTexture;
+  }
+
 
   Eval(refid: any): any {
     var Param: moParam = this.GetParam(refid);

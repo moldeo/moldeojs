@@ -92,6 +92,40 @@ export class moRenderManager extends moResource {
     //console.log("moRenderManager::constructor",  this.renderer);
   }
 
+  RenderWidth() {
+    return this.m_Renderer.getSize().width;
+  }
+
+  RenderHeight() {
+    return this.m_Renderer.getSize().height;
+  }
+
+  ScreenWidth() : MOint {
+    return this.m_Renderer.getSize().width;
+  }
+
+  ScreenHeight() : MOint {
+    return this.m_Renderer.getSize().height;
+  }
+
+  ScreenProportion() : MOfloat {
+    return this.ScreenWidth() / this.ScreenHeight();
+  }
+
+  Width() : MOint {
+    return this.ScreenWidth();
+  }
+
+  Height() : MOint {
+    return this.ScreenHeight();
+  }
+
+  Proportion() : MOfloat {
+    return this.Width()/this.Height();
+  }
+
+
+
   BeginDraw() : void {
 
   }

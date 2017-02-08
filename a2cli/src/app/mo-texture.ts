@@ -1,8 +1,17 @@
-import { MOint, MOuint } from "./mo-types";
-import { moText } from "./mo-text";
-import { moAbstract } from "./mo-abstract";
 import * as THREE from 'three';
 import Texture = THREE.Texture;
+import TextureLoader = THREE.TextureLoader;
+
+import {
+  MOint, MOuint, MOfloat, MOdouble,
+  moTexParam, MOUndefinedTex
+} from "./mo-types";
+import { moText } from "./mo-text";
+import { moAbstract } from "./mo-abstract";
+import { moFileManager } from "./mo-file-manager";
+import { moDataManager } from "./mo-data-manager";
+import { moGLManager } from "./mo-gl-manager";
+import { moResourceManager } from "./mo-resource-manager";
 
 export enum moTextureType {
         MO_TYPE_TEXTURE, /// TEXTURA BASE
@@ -20,30 +29,27 @@ export class moTexture extends moAbstract {
   m_type : moTextureType;
   m_moid : MOint = -1;
   m_name : moText = "";
-/**
-    MOboolean       m_bBuildedFromFile;
 
+		m_param : moTexParam = MOUndefinedTex;
+		m_width : MOuint = 0;
+		m_height : MOuint = 0;
+		m_bytespp : MOuint = 0;
+		m_components : MOint = 0;
+		m_max_coord_s : MOfloat = 0;
+		m_max_coord_t : MOfloat = 0;
+
+    m_bBuildedFromFile: boolean;
+
+    m_pDataMan : moDataManager;
+    m_pFileMan : moFileManager;
+    m_gl : moGLManager;
+    m_pResourceManager : moResourceManager;
+
+/*
     moFile*			m_pFile;
-    moDataManager*	m_pDataMan;
-    moFileManager*	m_pFileMan;
-    moGLManager* m_gl;
-    moResourceManager*	m_pResourceManager;
 
     moFBO* m_fbo;
     MOuint m_fbo_attach_point;
-
-    moTextureType m_type;
-    MOint m_moid;
-    MOuint m_glid;
-    moText m_name;
-
-		moTexParam m_param;
-		MOuint m_width;
-		MOuint m_height;
-		MOuint m_bytespp;
-		MOint m_components;
-		MOfloat m_max_coord_s;
-		MOfloat m_max_coord_t;
 
 		void SetParam();
 		void CalculateSize(MOuint p_width, MOuint p_height);
@@ -61,9 +67,11 @@ export class moTexture extends moAbstract {
   constructor() { super(); }
   Init(): boolean { return super.Init(); }
 
-  BuildFromFile(p_fullfilename: moText): boolean {
-
-    return false;
+  BuildFromFile( p_fullfilename: moText, p_textureloader: TextureLoader, p_callback?:any  ): boolean {
+    console.log("moTexture.BuildFromFile>", p_fullfilename);
+    this._texture = p_textureloader.load("" + p_fullfilename );
+    if (this._texture) return true;
+    return true;
   }
 
   SetMOId( p_moid : MOint ) {

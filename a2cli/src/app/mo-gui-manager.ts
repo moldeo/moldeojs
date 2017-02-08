@@ -196,7 +196,17 @@ export class moSkeleton extends THREE.Skeleton {
 }
 
 export class moMesh extends THREE.Mesh {
+  ResetMatrix() {
+    this.matrix.identity();
+    /*
+    this.position.set( 0.0, 0.0, 0.0);
+    this.scale.set( 1.0, 1.0, 1.0);
+    this.rotation.set( 0.0 , 0.0, 0.0);
+    this.updateMatrix();
+    */
+  }
   SetModelMatrix(matrix: moGLMatrixf) {
+    this.ResetMatrix();
     this.applyMatrix( matrix );
   }
 }

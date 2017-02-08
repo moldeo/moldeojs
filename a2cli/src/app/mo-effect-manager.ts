@@ -59,14 +59,16 @@ export class moEffectManager extends moAbstract {
                     );
 }
 
-  NewEffect( p_resname: moText, p_configname: moText, p_labelname: moText,
-    p_keyname: moText, p_type: moMoldeoObjectType,
-    p_paramindex: MOint, p_valueindex: MOint,
-    p_activate: boolean): moEffect {
+  NewEffect(p_resname: moText,
+    p_configname: moText,
+      p_labelname: moText,
+      p_keyname: moText, p_type: moMoldeoObjectType,
+      p_paramindex: MOint, p_valueindex: MOint,
+      p_activate: boolean): moEffect {
 
-      var peffect : any;
+    var peffect : any;
 
-      switch( p_type ) {
+    switch( p_type ) {
       case moMoldeoObjectType.MO_OBJECT_EFFECT:
         if ( ""+p_resname=="scene" ) {
           peffect = new moSceneEffect();
@@ -98,9 +100,9 @@ export class moEffectManager extends moAbstract {
         break;
       default:
         break;
-      }
+    }
 
-      if (peffect) {
+    if (peffect) {
       console.log("moEffectManager.NewEffect", peffect);
       var MDef : moMobDefinition = peffect.GetMobDefinition();
       MDef.SetConfigName( p_configname );
@@ -122,9 +124,9 @@ export class moEffectManager extends moAbstract {
 
       this.m_AllEffects.push(peffect);
       console.log("moEffectManager.NewEffect(ok?)", peffect);
-      }
+    }
 
-      return (peffect);
+    return (peffect);
 
   }
 
