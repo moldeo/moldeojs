@@ -53,7 +53,7 @@ export class ConsoleService {
 
     var consoled: boolean = this.m_Console.Init(options);
     if (consoled) {
-      console.log("Loading...");
+      //console.log("Loading...");
     } else {
       console.error("Something happened");
     }

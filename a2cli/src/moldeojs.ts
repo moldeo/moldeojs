@@ -15,6 +15,7 @@ export * from "./app/mo-math";
 export * from "./app/mo-plugin";
 export * from "./app/mo-timer";
 export * from "./app/mo-tempo";
+export * from "./app/mo-event-list";
 export * from "./app/mo-connectors";
 
 

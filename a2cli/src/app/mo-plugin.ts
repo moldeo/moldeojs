@@ -6,6 +6,12 @@ import {
   moEffectState, moSceneEffect
 } from "./mo-effect";
 import {
+  moIODevice, moIODeviceArray, moIODevices
+} from "./mo-iodevice";
+import {
+  moResource
+} from "./mo-resource";
+import {
   moDataManager
 } from "./mo-data-manager";
 
@@ -54,27 +60,36 @@ PluginsDefinitions[2] = new moPluginDefinition(
   moMoldeoObjectType.MO_OBJECT_EFFECT,
   moEffectIcon );
 
+/// Effect Plane ====================================================================
+import { moEffectPlane } from "../plugins/effects/plane";
+PluginsDefinitions[3] = new moPluginDefinition(
+  "plane",
+  "/plugins/effects/plane.ts",
+  moMoldeoObjectType.MO_OBJECT_EFFECT,
+  moEffectPlane );
+
 /// Effect Particles Simple ====================================================================
 import { moEffectParticlesSimple } from "../plugins/effects/particlessimple";
-PluginsDefinitions[3] = new moPluginDefinition(
+PluginsDefinitions[4] = new moPluginDefinition(
   "particlessimple",
   "/plugins/effects/particlessimple.ts",
   moMoldeoObjectType.MO_OBJECT_EFFECT,
   moEffectParticlesSimple );
 
 export const PluginsTree = {
-  "preeffect": {
+  "preeffects": {
     "erase": PluginsDefinitions[0]
   },
-  "effect": {
+  "effects": {
     "image": PluginsDefinitions[1],
     "icon": PluginsDefinitions[2],
-    "particlessimple": PluginsDefinitions[3]
+    "plane": PluginsDefinitions[3],
+    "particlessimple": PluginsDefinitions[4]
   },
-  "posteffect": {},
-  "mastereffect": {},
-  "iodevice": {},
-  "resource": {}
+  "posteffects": {},
+  "mastereffects": {},
+  "iodevices": {},
+  "resources": {}
 };
 
 
@@ -98,6 +113,11 @@ export class moMasterPlugin {
 export type moMasterPluginsArray = moMasterPlugin[];
 
 
+export class moIODevicePlugin {
+}
+export type moIODevicePluginsArray = moIODevicePlugin[];
+
+
 
 export function moNewEffect(p_resname: moText, plugins: any): moEffect {
 
@@ -107,7 +127,7 @@ export function moNewEffect(p_resname: moText, plugins: any): moEffect {
   //complete_name += moPluginExtension;
 var PluginDef : moPluginDefinition = PluginsDefinitionsMap[""+p_resname];
   if (PluginDef) {
-    console.log( "PluginDef", PluginDef ) ;
+    //console.log( "PluginDef", PluginDef ) ;
     return new PluginDef.Constructor();
   }
 
@@ -122,7 +142,7 @@ export function moNewPreEffect(p_resname: moText, plugins: any): moEffect {
   //complete_name += moPluginExtension;
   var PluginDef : moPluginDefinition = PluginsDefinitionsMap[""+p_resname];
   if (PluginDef) {
-    console.log( "PluginDef", PluginDef ) ;
+    //console.log( "PluginDef", PluginDef ) ;
     return new PluginDef.Constructor();
   }
 
@@ -133,7 +153,7 @@ export function moNewPostEffect( p_resname : moText, plugins : any ) : moEffect 
 
   var PluginDef: moPluginDefinition = PluginsDefinitionsMap["" + p_resname];
   if (PluginDef) {
-    console.log( "PluginDef", PluginDef ) ;
+    //console.log( "PluginDef", PluginDef ) ;
     return new PluginDef.Constructor();
   }
 
@@ -143,13 +163,31 @@ export function moNewPostEffect( p_resname : moText, plugins : any ) : moEffect 
 export function moNewMasterEffect( p_resname : moText, plugins : any ) : moEffect {
   var PluginDef : moPluginDefinition = PluginsDefinitionsMap[""+p_resname];
   if (PluginDef) {
-    console.log( "PluginDef", PluginDef ) ;
+    //console.log( "PluginDef", PluginDef ) ;
     return new PluginDef.Constructor();
   }
 
   return new moMasterEffect();
 }
 
+
+export function moNewIODevice( p_resname : moText, plugins : any ) : moIODevice {
+  var PluginDef : moPluginDefinition = PluginsDefinitionsMap[""+p_resname];
+  if (PluginDef) {
+    //console.log( "PluginDef", PluginDef ) ;
+    return new PluginDef.Constructor();
+  }
+  return new moIODevice();
+}
+
+export function moNewResource( p_resname : moText, plugins : any ) : moResource {
+  var PluginDef : moPluginDefinition = PluginsDefinitionsMap[""+p_resname];
+  if (PluginDef) {
+    //console.log( "PluginDef", PluginDef ) ;
+    return new PluginDef.Constructor();
+  }
+  return new moResource();
+}
 
 /*
 {

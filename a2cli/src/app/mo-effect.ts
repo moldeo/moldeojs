@@ -60,32 +60,32 @@ export class moEffect extends moMoldeoObject {
     if (this.InletTempo) {
       //Inlet->Init( "tempo", m_Inlets.Count(), param.GetPtr() );
       //param.SetExternData( Inlet->GetData() );
-      this.InletTempo.Init( "tempo", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.InletTempo.Init( "tempo", this.m_Inlets.length, "DOUBLE" );
       this.m_Inlets.push(this.InletTempo);
     }
 
     this.InletT = new moInlet();
     if (this.InletT) {
-      this.InletT.Init( "t", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.InletT.Init( "t", this.m_Inlets.length, "DOUBLE" );
       this.m_Inlets.push(this.InletT);
     }
 
 
     this.InletMilliseconds = new moInlet();
     if (this.InletMilliseconds) {
-      this.InletMilliseconds.Init( "milliseconds", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.InletMilliseconds.Init( "milliseconds", this.m_Inlets.length, "DOUBLE" );
       this.m_Inlets.push(this.InletMilliseconds);
     }
 
     this.InletSeconds = new moInlet();
     if (this.InletSeconds) {
-      this.InletSeconds.Init( "seconds", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+      this.InletSeconds.Init( "seconds", this.m_Inlets.length, "DOUBLE" );
       this.m_Inlets.push(this.InletSeconds);
     }
 
     if (super.Init((res) => {
-      console.log("moEffect.PreInit OK!", this);
       this.CreateConnectors();
+      console.log( `moEffect.PreInit OK! ${this.GetLabelName()}`, this);
       if (callback) callback(res);
     } )) {
       ///Al fin luego de levantar todas las configuraciones, creamos los conectores (Inlets <NO INTERNOS> y Outlets)
@@ -340,4 +340,7 @@ export class moMasterEffect extends moEffect {
 export type moMasterEffectsArray = moMasterEffect[];
 
 export class moSceneEffect extends moMasterEffect {
+  UpdateMoldeoIds( p_MoldeoSceneObjects : any ) {
+
+  }
 };

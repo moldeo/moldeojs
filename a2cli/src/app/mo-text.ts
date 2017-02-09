@@ -10,7 +10,7 @@ export class moText0 {
     //console.log( "S:",S);
     var ta: moTextArray = [];
     var sp : string[] = S.split(""+separator);
-    console.log("str:",this._str," split:", sp);
+    //console.log("str:",this._str," split:", sp);
     for (var idx in sp) {
       var txt: string = sp[idx];
       var motxt: moText = txt;

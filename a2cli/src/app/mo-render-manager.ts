@@ -7,6 +7,8 @@ import WebGLRenderer = THREE.WebGLRenderer;
 import { moSceneNode } from "./mo-3d-model-manager";
 import { moCamera3D, moObject3D } from "./mo-gui-manager";
 
+
+export var three = THREE;
 export enum moRenderManagerMode {
   RENDERMANAGER_MODE_NORMAL=0,
   RENDERMANAGER_MODE_FRAMEBUFFER=1,
@@ -145,5 +147,41 @@ export class moRenderManager extends moResource {
   EndDrawEffect(): void {
 
   }
+
+
+  BeginUpdate() : void
+  {
+  }
+
+  BeginUpdateDevice() : void
+  {
+    //Lock();
+    //if (m_pGLManager)
+    //      m_pGLManager->SaveGLState();
+  }
+
+  EndUpdateDevice() : void
+  {
+      //if (m_pGLManager)
+      //    m_pGLManager->RestoreGLState();
+      //Unlock();
+  }
+
+  EndUpdate() : void
+  {
+  }
+
+  BeginUpdateObject() : void
+  {
+  //	Lock();
+  //	m_pGLManager->SaveGLState();
+  }
+
+  EndUpdateObject() : void
+  {
+  //  m_pGLManager->RestoreGLState();
+  //  Unlock();
+  }
+
 
 }

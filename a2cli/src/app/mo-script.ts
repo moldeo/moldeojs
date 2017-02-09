@@ -12,4 +12,8 @@ export class moScript extends moAbstract {
     return super.Init();
   }
 
+  InitScript(): void {
+
+  }
+
 }

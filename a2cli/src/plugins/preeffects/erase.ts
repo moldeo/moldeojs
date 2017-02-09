@@ -1,13 +1,8 @@
-import { moEffect, moPreEffect, moEffectState } from "../../app/mo-effect";
-import { moConfigDefinition } from "../../app/mo-config";
-import { moMobDefinition } from "../../app/mo-moldeo-object";
-import { moRenderManager } from "../../app/mo-render-manager";
-import { moColor } from "../../app/mo-gui-manager";
-import { moTempo } from "../../app/mo-tempo";
+import * as MO from "moldeojs";
 
-export class moPreEffectErase extends moPreEffect {
+export class moPreEffectErase extends MO.moPreEffect {
 
-  RMan: moRenderManager;
+  RMan: MO.moRenderManager;
 
   constructor() {
     super();
@@ -16,7 +11,7 @@ export class moPreEffectErase extends moPreEffect {
 
   Init(callback?:any): boolean {
     this.RMan = this.m_pResourceManager.GetRenderMan();
-    console.log(`moPreEffecErase.Init ${this.GetName()}`);
+    console.log(`moPreEffec${this.GetName()}.Init`);
     if (this.PreInit((res) => {
 
       if (callback) callback(res);
@@ -26,14 +21,14 @@ export class moPreEffectErase extends moPreEffect {
     return true;
   }
 
-  Draw( p_tempo : moTempo ) : void {
+  Draw( p_tempo : MO.moTempo ) : void {
 
     //console.log("moPreEffectErase.Draw > Erasing", this.m_Config);
     if (this.RMan == undefined) return;
     this.BeginDraw(p_tempo);
 
     var rgb: any = this.m_Config.EvalColor("color");
-    var ccolor: moColor = new moColor( rgb.r, rgb.g, rgb.b);
+    var ccolor: MO.moColor = new MO.moColor( rgb.r, rgb.g, rgb.b);
 
 
     this.RMan.m_Renderer.setClearColor( ccolor, 1.0);
@@ -42,12 +37,12 @@ export class moPreEffectErase extends moPreEffect {
     this.EndDraw();
   }
 
-  Update() {
-    super.Update();
-    console.log("moPreEffectErase.Update Erase");
+  Update( p_Event: MO.moEventList ) : void {
+    super.Update(p_Event);
+    //console.log("moPreEffectErase.Update Erase");
   }
 
-  GetDefinition(): moConfigDefinition {
+  GetDefinition(): MO.moConfigDefinition {
     console.log("moPreEffectErase.GetDefinition Erase");
     super.GetDefinition();
 

@@ -241,6 +241,13 @@ export class moShapeGeometry extends moGeometry {
 }
 
 export class moPlaneGeometry extends THREE.PlaneGeometry {
+  m_Width: MOint;
+  m_Height: MOint;
+  constructor( w: number, h: number, ws: number, hs: number ) {
+    super(w, h, ws, hs);
+    this.m_Width = w;
+    this.m_Height = h;
+  }
 }
 export class moExtrudeGeometry extends moGeometry {
 }

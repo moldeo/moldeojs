@@ -24,7 +24,7 @@ export class MoldeojsViewComponent implements OnInit {
   ngOnInit() {
     this.MoldeoCS.updated$.subscribe((result) => {
       if (result == true) {
-        console.log("MoldeojsView > Console Service OK! Associate renderer to HTML Element", this.MoldeoCS.m_Console);
+        //console.log("MoldeojsView > Console Service OK! Associate renderer to HTML Element", this.MoldeoCS.m_Console);
         var RMan = this.MoldeoCS.m_Console.m_pResourceManager.MORenderMan;
         this.hostElement.nativeElement.appendChild( RMan.m_Renderer.domElement );
         RMan.m_Renderer.clear();
@@ -33,9 +33,10 @@ export class MoldeojsViewComponent implements OnInit {
       }
     });
 
-    this.MoldeoCS.Init({
-      "consoleconfig": "/molrepos/basic/00_Image/00_Image.mol"
-    } );
+    //this.MoldeoCS.Init({ "consoleconfig": "/molrepos/basic/00_Image/00_Image.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "/molrepos/basic/01_Icon/01_Icon.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "/molrepos/basic/02_Plane/02_Plane.mol" } );
+    this.MoldeoCS.Init({ "consoleconfig": "/molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol" } );
   }
 
   public animate() {

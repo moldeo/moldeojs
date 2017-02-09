@@ -85,7 +85,7 @@ export class moTextureManager extends moResource {
   }
 
   AddTexture(p_filename: moText, p_width: MOint = -1, p_height: MOint = -1, p_tex_param: moTexParam = MOUndefinedTex ) : MOint {
-    console.log("AddTexture", p_filename, p_width, p_height, p_tex_param );
+    //console.log("AddTexture", p_filename, p_width, p_height, p_tex_param );
     var DMan: moDataManager = this.m_pResourceManager.MODataMan;
     var name : moText = p_filename;
     var res : boolean = false;
@@ -116,7 +116,7 @@ export class moTextureManager extends moResource {
       this.m_textures_array.push(ptex);
       ptex.SetMOId(this.m_textures_array.length - 1);
       this.m_textures_array_map["" + name] = ptex.GetMOId();
-      console.log("moTextureManager.Loaded > ", name, ptex );
+      //console.log("moTextureManager.Loaded > ", name, ptex );
       return ptex.GetMOId();
 
     }	else {

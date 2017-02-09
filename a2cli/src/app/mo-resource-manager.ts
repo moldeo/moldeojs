@@ -48,6 +48,11 @@ import { moDebugManager } from "./mo-debug-manager";
 import { moScriptManager } from "./mo-script-manager";
 
 
+
+export
+{
+  moResource, moResources
+} from "./mo-resource";
 export class moResourceManager extends moAbstract {
     MOFileMan : moFileManager;
 		//MOVideoMan : moVideoManager;
@@ -68,7 +73,7 @@ export class moResourceManager extends moAbstract {
 		MOModelMan : mo3dModelManager;
 		MODebugMan : moDebugManager;
 		//MODecoderMan : moDecoderManager;
-    m_Resources: moResources;
+    m_Resources: moResources = [];
 
     constructor(private http: Http) {
       super();
@@ -184,4 +189,10 @@ export class moResourceManager extends moAbstract {
     GetTextureMan(): moTextureManager {
       return this.MOTextureMan;
     }
+
+    Resources(): moResources {
+      return this.m_Resources;
+    }
+
+
 };

@@ -103,7 +103,7 @@ export class moEffectManager extends moAbstract {
     }
 
     if (peffect) {
-      console.log("moEffectManager.NewEffect", peffect);
+      //console.log("moEffectManager.NewEffect", peffect);
       var MDef : moMobDefinition = peffect.GetMobDefinition();
       MDef.SetConfigName( p_configname );
       MDef.SetLabelName( p_labelname );
@@ -123,13 +123,28 @@ export class moEffectManager extends moAbstract {
       }
 
       this.m_AllEffects.push(peffect);
-      console.log("moEffectManager.NewEffect(ok?)", peffect);
+      //console.log("moEffectManager.NewEffect(ok?)", peffect);
     }
 
     return (peffect);
 
   }
 
+  PreEffects(): moPreEffectsArray {
+    return this.m_PreEffects;
+  }
 
+  Effects(): moEffectsArray {
+    return this.m_Effects;
+  }
+
+  PostEffects(): moPostEffectsArray {
+    return this.m_PostEffects;
+  }
+
+
+  MasterEffects(): moMasterEffectsArray {
+    return this.m_MasterEffects;
+  }
 
 }

@@ -31,6 +31,8 @@ import {
   moInlets, moInlet,
   moConnection, moConnections
 } from "./mo-connectors";
+import { moGetDuration } from "./mo-timer";
+import { moEventList } from "./mo-event-list";
 
 export const MO_INLET_NAME = 0;
 export const MO_INLET_TYPE = 1;
@@ -298,7 +300,7 @@ export class moMoldeoObject extends moScript {
 
 
   Init(callback?: any ): boolean {
-    console.log(`[${this.GetName()}] moMoldeoObject::Init()`);
+    //console.log(`[${this.GetName()}] moMoldeoObject::Init()`);
 
     if (this.m_pFileManager == undefined) {
       if (this.m_pResourceManager) {
@@ -308,40 +310,44 @@ export class moMoldeoObject extends moScript {
     }
     //console.log(this.m_MobDefinition);
 
-    /*
-    InletScreenWidth = new moInlet();
-    if (InletScreenWidth) {
-      ((moConnector*)InletScreenWidth)->Init( moText("screen_width"), m_Inlets.Count(), MO_DATA_NUMBER_DOUBLE );
-      m_Inlets.Add(InletScreenWidth);
+
+    this.InletScreenWidth = new moInlet();
+    if (this.InletScreenWidth) {
+      this.InletScreenWidth.Init( "screen_width", this.m_Inlets.length, "DOUBLE" );
+      this.m_Inlets.push( this.InletScreenWidth );
     }
 
-    InletScreenHeight = new moInlet();
-    if (InletScreenHeight) {
-      ((moConnector*)InletScreenHeight)->Init( moText("screen_height"), m_Inlets.Count(), MO_DATA_NUMBER_DOUBLE );
-      m_Inlets.Add(InletScreenHeight);
-    }
-*/
-    var InletTimeabs : moInlet = new moInlet();
-    if (InletTimeabs) {
-      InletTimeabs.Init( "timeabs", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
-      this.m_Inlets.push(InletTimeabs);
+    this.InletScreenHeight = new moInlet();
+    if (this.InletScreenHeight) {
+      this.InletScreenHeight.Init( "screen_height", this.m_Inlets.length, "DOUBLE" );
+      this.m_Inlets.push( this.InletScreenHeight );
     }
 
-    var InletPreconfig : moInlet = new moInlet();
-    if (InletPreconfig) {
-      InletPreconfig.Init( "preconfig", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_INT );
-      this.m_Inlets.push(InletPreconfig);
+    this.InletTimeabs = new moInlet();
+    if (this.InletTimeabs) {
+      this.InletTimeabs.Init( "timeabs", this.m_Inlets.length, "DOUBLE" );
+      this.m_Inlets.push(this.InletTimeabs);
     }
 
-    var confignamecompleto : moText;
+    this.InletPreconfig = new moInlet();
+    if (this.InletPreconfig) {
+      this.InletPreconfig.Init( "preconfig", this.m_Inlets.length, "INT" );
+      this.m_Inlets.push(this.InletPreconfig);
+    }
+
+    var confignamecompleto : moText = "";
     this.GetDefinition();
 
     if ( this.GetType() == moMoldeoObjectType.MO_OBJECT_CONSOLE ) {
       confignamecompleto = this.GetConfigName();
-      console.log("confignamecompleto:", confignamecompleto);
+      //console.log("confignamecompleto:", confignamecompleto);
     } else if (
       this.GetType() == moMoldeoObjectType.MO_OBJECT_PREEFFECT
-      || this.GetType() == moMoldeoObjectType.MO_OBJECT_EFFECT) {
+      || this.GetType() == moMoldeoObjectType.MO_OBJECT_EFFECT
+      /*|| this.GetType() == moMoldeoObjectType.MO_OBJECT_POSTEFFECT
+      || this.GetType() == moMoldeoObjectType.MO_OBJECT_MASTEREFFECT
+      || this.GetType() == moMoldeoObjectType.MO_OBJECT_RESOURCE
+    || this.GetType() == moMoldeoObjectType.MO_OBJECT_IODEVICE*/) {
 
       var datap: moText = this.m_pResourceManager.GetDataMan().GetDataPath();
       //confignamecompleto = "" + this.m_pResourceManager.GetDataMan().GetDataPath();
@@ -373,23 +379,23 @@ export class moMoldeoObject extends moScript {
   this.MODebug2.Message(`***** Initializing ${this.GetName()} ***** ${confignamecompleto}`);
     if (confignamecompleto != undefined && confignamecompleto + "" != "") {
       this.m_pFileManager.Load(confignamecompleto, true, (res) => {
-        console.log("loaded file .. OK");
+        //console.log("loaded file .. OK");
         if (this.m_Config.LoadConfig(res._body, (config_res) => {
-          console.log("CONFIG LOADED!", config_res);
+          //console.log("CONFIG LOADED!", config_res);
 
           /**
           DefineParamIndexes
           */
           //m_Config.Indexation();
-          /*
-          __iscript = m_Config.GetParamIndex("script");
-          if(__iscript==MO_PARAM_NOT_FOUND)
-          MODebug2->Error(moText("moMoldeoObject::Init > config: "+GetConfigName()
+          this.__iscript = this.m_Config.GetParamIndex("script");
+          /*if(this.__iscript==MO_PARAM_NOT_FOUND)
+            this.MODebug2.Error(moText("moMoldeoObject::Init > config: "+GetConfigName()
           + " config: " + GetConfigName() + " label: "+GetLabelName()+" script parameter missing"));
+          */
 
+          this.InitScript();
+          this.RegisterFunctions();
 
-          InitScript();
-          RegisterFunctions();*/
           if (callback) callback(config_res);
 
         } ) != MO_CONFIG_OK ) {
@@ -533,7 +539,134 @@ export class moMoldeoObject extends moScript {
   	return this.m_bConnectorsLoaded;
   }
 
-  Update(): void {
+  Update( p_Event : moEventList ): void {
+
+    if (this.InletScreenWidth) {
+      if (this.InletScreenWidth.GetData())
+          this.InletScreenWidth.GetData().SetDouble( this.m_pResourceManager.GetRenderMan().ScreenWidth());
+    }
+
+    if (this.InletScreenHeight) {
+      if (this.InletScreenHeight.GetData())
+        this.InletScreenHeight.GetData().SetDouble( this.m_pResourceManager.GetRenderMan().ScreenHeight());
+    }
+
+    if (this.InletTimeabs) {
+      if (this.InletTimeabs.GetData())
+          this.InletTimeabs.GetData().SetDouble(moGetDuration());
+    }
+
+    if (this.InletPreconfig) {
+        if (this.InletPreconfig.GetData())
+          this.InletPreconfig.GetData().SetInt( this.m_Config.GetCurrentPreConf() );
+    }
+
+
+/*
+	moEvent *actual,*tmp;
+	moMessage *pmessage;
+
+	actual = p_EventList->First;
+
+	///Procesamos los eventos recibidos
+	/// de los MoldeoObject Outlets
+	while(actual!=NULL) {
+		tmp = actual->next;
+		///procesamos aquellos Outlet q estan dirigidos a este objeto
+
+		if (actual->deviceid == GetId() && actual->reservedvalue3 == MO_MESSAGE) {
+
+			///pSample = (moVideoSample*)actual->pointer;
+			pmessage = (moMessage*)actual;
+
+			///process message:
+			MOint inletid = pmessage->m_InletIdDest;
+			moData pdata = pmessage->m_Data;
+      //MODebug2->Message("Receiving outlet message to inlet: ");
+			///buscar el inlet...
+			if (inletid>=0 && inletid<(int)m_Inlets.Count() ) {
+				moInlet* pinlet = m_Inlets[inletid];
+        //MODebug2->Message("Updating inlet: object: " + GetLabelName() + " inlet: " + pinlet->GetConnectorLabelName()
+        //                  + " outlet_data: " + pdata.ToText() );
+
+				///Only create Data if this is a custom Inlet
+				if (pinlet->GetData()==NULL)
+          pinlet->NewData();
+
+        ///si tiene un dato (por ejemplo es el dato referencia de un moParam)
+        /// copia directamente (ya que se refleja directamente en: pinlet->m_pParam->Data
+        /// sin embargo al estar interpolado
+				if (pinlet->GetConnectorLabelName()=="control_roll_angle") pinlet->GetInternalData()->Copy(pdata);
+				else if (pinlet->IsParameterDependent()) pinlet->GetInternalData()->Copy(pdata);
+				else pinlet->GetData()->Copy(pdata);
+
+
+				pinlet->Update();///notifica al inlet que ya esta actualizado...
+
+        //MODebug2->Message("Updating inlet: object: " + GetLabelName() + " inlet: " + pinlet->GetConnectorLabelName()
+        //                  + " outlet_data: " + pinlet->GetData()->ToText() );
+
+			}
+
+		} else if (actual->reservedvalue3 == MO_MESSAGE) {
+		    ///Broadcasting: borra su propio mensaje....
+
+			pmessage = (moMessage*)actual;
+
+			///se fija si es un mensaje generado por este objeto
+			if (pmessage->m_MoldeoIdSrc == GetId() ) {
+				p_EventList->Delete(pmessage);
+			}
+
+		}
+		///pasamos al siguiente
+		actual = tmp;
+	}
+*/
+/*
+	///generamos los mensajes emergentes de los Outlets
+	for( MOuint i=0; i<m_Outlets.Count() ; i++) {
+		moOutlet* poutlet = m_Outlets[i];
+
+    if (poutlet) {
+
+
+      bool forcingParameterEmition = false;
+      if (  poutlet->IsParameterDependent()
+            &&
+            poutlet->GetConnections()->Count()>0) {
+          ///TODO: chequear encadenamiento
+          /// ( outlet (object2) >> inlet (thisobject) (translatex)
+          /// outlet (thisobject) (translatex) >> inlet (object3)
+          forcingParameterEmition = true;
+      }
+
+      ///Emit the internal Outlet's data
+      if ( poutlet->Updated() || forcingParameterEmition ) {
+        ///solo notificamos a los inlets si los outlets estan Updated() importante revisar esto...
+        ///puede  deba ser algo condicional: claramente lo es, sobre todo para los Outlets que asociados a
+        ///parámetros, por ejemplo el alpha.. o el translatex
+
+        //MODebug2->Message( poutlet->GetConnectorLabelName() + moText(" outlet updated. MOB : ") + this->GetLabelName() );
+
+        moData pdata = (*(poutlet->GetData()));
+        moConnections* pconnections = poutlet->GetConnections();
+        for(MOuint j=0; j<pconnections->Count(); j++) {
+          moConnection* pconnection = pconnections->Get(j);
+          pmessage = new moMessage( pconnection->GetDestinationMoldeoId(),
+                                    pconnection->GetDestinationConnectorId(),
+                                    GetId(),
+                                    pdata );
+          p_EventList->Add( (moEvent*) pmessage );
+          //if (pmessage) delete pmessage;
+          //MODebug2->Message(moText("added outlet message for:") + IntToStr(pconnection->GetDestinationMoldeoId())  );
+        }
+        ///reset to update false, so it doesnt continue sending!
+        poutlet->Update(false);
+      }
+    }
+  }*/
+  this.ScriptExeUpdate();
 
   }
 
@@ -638,8 +771,8 @@ export class moMoldeoObject extends moScript {
               var Fun : moMathFunction = this.m_pResourceManager.GetMathMan().GetFunction(idx);
                 VB.SetFun( Fun );
                 if (Fun.m_isNumber == false) {
-                  this.MODebug2.Message("function defined: " + VB.Text());
-                  console.log( "function defined: " + VB.Text(), Fun );
+                  //this.MODebug2.Message("function defined: " + VB.Text());
+                  //console.log( "function defined: " + VB.Text(), Fun );
                 }
             } else {
               this.MODebug2.Error("moMoldeoObject::CreateConnectors > function couldn't be defined: "
@@ -861,6 +994,14 @@ export class moMoldeoObject extends moScript {
 
   SetScript( p_script : moText ) : void {
     this.m_Script = p_script;
+  }
+
+  RegisterFunctions() : void {
+
+  }
+
+  Activated() {
+    return this.m_MobState.Activated();
   }
 
   ToJSON(): any {

@@ -225,7 +225,7 @@ export class moFileManager extends moResource {
 
   Load( p_FileName : moText , bWaitForDownload : boolean=true, callback?:any ) {
     this.http.get(""+p_FileName).subscribe(res => {
-      console.log("moFileManager > Load > name: ", p_FileName );
+      //console.log("moFileManager > Load > name: ", p_FileName );
       //this.m_pData = res.json():
       if (callback) callback(res);
     });

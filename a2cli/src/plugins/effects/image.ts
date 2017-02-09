@@ -1,4 +1,4 @@
-import * as MO from "../../moldeojs";
+import * as MO from "moldeojs";
 
 export class moEffectImage extends MO.moEffect {
 
@@ -48,6 +48,7 @@ export class moEffectImage extends MO.moEffect {
       this.Mat.map = this.m_Config.Texture("texture")._texture;
       this.Mat.transparent = true;
       this.Mat.color = ccolor;
+      this.Mat.opacity = this.m_Config.Eval("alpha");
     }
 
     //Mat2.m_MapGLId = Mat2.m_Map->GetGLId();
@@ -72,7 +73,10 @@ export class moEffectImage extends MO.moEffect {
       //console.log("this.m_Config.Eval(anc_cuad_x)",
       //  this.m_Config.Eval("anc_cuad_x"),
       //  this.m_Config.Eval("alt_cuad_y"));
-      //this.Model.Translate(this.m_Config.Eval("pos_cuad_x"), this.m_Config.Eval("pos_cuad_y"), -0.5);
+      this.Model.Translate(
+          this.m_Config.Eval("pos_cuad_x"),
+          this.m_Config.Eval("pos_cuad_y"),
+          0.0);
     }
 
     if (this.Mesh==undefined) {
@@ -109,9 +113,9 @@ export class moEffectImage extends MO.moEffect {
 
   }
 
-  Update() {
-    super.Update();
-    console.log("moEffectImage.Update");
+  Update( p_Event: MO.moEventList ) : void {
+    super.Update(p_Event);
+    //console.log("moEffectImage.Update");
   }
 
   GetDefinition(): MO.moConfigDefinition {

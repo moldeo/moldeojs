@@ -13,11 +13,19 @@ import {
 import { moText } from "./mo-text";
 import { moConfig } from "./mo-config";
 import { moMoldeoObjectType } from "./mo-moldeo-object-type.enum";
-import { moMoldeoObject, moMoldeoObjects } from "./mo-moldeo-object";
-import { moEffect, moSceneEffect } from "./mo-effect";
+import {
+  moMoldeoObject, moMoldeoObjects,
+  MO_MOLDEOOBJECTS_OFFSET_ID
+} from "./mo-moldeo-object";
+import {
+  moEffect, moSceneEffect, moEffectsArray, moEffectState,
+  moPreEffect, moPreEffectsArray,
+  moPostEffect, moPostEffectsArray,
+  moMasterEffect, moMasterEffectsArray
+} from "./mo-effect";
 import { moEffectManager } from "./mo-effect-manager";
-import { moIODeviceManager } from "./mo-iodevice-manager";
-import { moResourceManager } from "./mo-resource-manager";
+import { moIODeviceManager, moIODevice, moIODevices, moIODeviceArray } from "./mo-iodevice-manager";
+import { moResourceManager, moResource, moResources } from "./mo-resource-manager";
 import {
   moGUIManager, moGuiObject,
   moMaterial, moMaterialBasic, moColor,
@@ -96,12 +104,14 @@ export class moConsole extends moMoldeoObject {
   m_EffectManager: moEffectManager;
   m_pIODeviceManager: moIODeviceManager;
   m_MoldeoObjects: moMoldeoObjects;
+  m_MoldeoSceneObjects : moMoldeoObjects;
 
   constructor( private http: Http ) {
     super();
     this.m_ConsoleState = new moConsoleState();
     this.m_EffectManager = new moEffectManager();
     this.m_MoldeoObjects = [];
+    this.m_MoldeoSceneObjects = [];
     this.SetName("__console__");
     this.SetLabelName("__console__");
     this.SetType( moMoldeoObjectType.MO_OBJECT_CONSOLE );
@@ -194,7 +204,7 @@ export class moConsole extends moMoldeoObject {
     //RUNNING MOLDEO OBJECT INIT for loading base
     super.Init((result) => {
       var File : moFile = new moFile(this.GetConfigName());
-      console.log("Config Loaded!", this.m_Config, result, File);
+      //console.log("Config Loaded!", this.m_Config, result, File);
 
       var res_ok = this.InitResources({
         "apppath": "/",
@@ -242,68 +252,123 @@ export class moConsole extends moMoldeoObject {
     return this.Initialized();
   }
 
+  RelativeToGeneralIndex( relativeindex : MOint, p_type : moMoldeoObjectType ) : MOint {
+
+  var mindex : MOint = -1;
+
+  switch(p_type) {
+    case moMoldeoObjectType.MO_OBJECT_EFFECT:
+      mindex = this.m_pResourceManager.Resources().length;
+      mindex+= this.m_pIODeviceManager.IODevices().length;
+      mindex+= this.m_EffectManager.PreEffects().length;
+      mindex+= this.m_EffectManager.PostEffects().length;
+      mindex+= relativeindex;
+      break;
+    case moMoldeoObjectType.MO_OBJECT_PREEFFECT:
+      mindex = this.m_pResourceManager.Resources().length;
+      mindex+= this.m_pIODeviceManager.IODevices().length;
+      mindex+= relativeindex;
+      break;
+    case moMoldeoObjectType.MO_OBJECT_POSTEFFECT:
+      mindex = this.m_pResourceManager.Resources().length;
+      mindex+= this.m_pIODeviceManager.IODevices().length;
+      mindex+= this.m_EffectManager.PreEffects().length;
+      mindex+= relativeindex;
+      break;
+    case moMoldeoObjectType.MO_OBJECT_MASTEREFFECT:
+      mindex = this.m_pResourceManager.Resources().length;
+      mindex+= this.m_pIODeviceManager.IODevices().length;
+      mindex+= this.m_EffectManager.PreEffects().length;
+      mindex+= this.m_EffectManager.PostEffects().length;
+      mindex+= this.m_EffectManager.Effects().length;
+      mindex+= relativeindex;
+      break;
+    case moMoldeoObjectType.MO_OBJECT_IODEVICE:
+      mindex = this.m_pResourceManager.Resources().length;
+      mindex+= relativeindex;
+      break;
+    case moMoldeoObjectType.MO_OBJECT_RESOURCE:
+      mindex = 0;
+      mindex+= relativeindex;
+      break;
+    case moMoldeoObjectType.MO_OBJECT_CONSOLE:
+      mindex = this.m_pResourceManager.Resources().length;
+      mindex+= this.m_pIODeviceManager.IODevices().length;
+      mindex+= this.m_EffectManager.PreEffects().length;
+      mindex+= this.m_EffectManager.PostEffects().length;
+      mindex+= this.m_EffectManager.Effects().length;
+      mindex+= this.m_EffectManager.MasterEffects().length;
+      break;
+
+    default:
+      break;
+
+  }
+  if (mindex == -1)
+    this.MODebug2.Error("moConsole::RelativeToGeneralIndex > type not found");
+  return mindex;
+
+}
+
   UpdateMoldeoIds() {
-    console.log("moConsole.UpdateMoldeoIds");
-    /*
-    int max = RelativeToGeneralIndex( 0, MO_OBJECT_CONSOLE ) + 1;
-    m_MoldeoObjects.Empty();
-    m_MoldeoObjects.Init( max, NULL);
+    //console.log("moConsole.UpdateMoldeoIds");
+    let max : MOint = this.RelativeToGeneralIndex( 0, moMoldeoObjectType.MO_OBJECT_CONSOLE ) + 1;
+    this.m_MoldeoObjects = [];
 
-    m_MoldeoSceneObjects.Empty();
+    this.m_MoldeoSceneObjects = [];
 
-    for( MOuint i=0; i<m_pResourceManager->Resources().Count(); i++ ) {
-    moResource* pResource = m_pResourceManager->Resources().GetRef(i);
-    m_MoldeoObjects.Set( RelativeToGeneralIndex( i, MO_OBJECT_RESOURCE ), pResource );
+    for( let i=0; i<this.m_pResourceManager.Resources().length; i++ ) {
+      let pResource : moResource = this.m_pResourceManager.Resources()[i];
+      this.m_MoldeoObjects[ this.RelativeToGeneralIndex( i, moMoldeoObjectType.MO_OBJECT_RESOURCE)] = pResource;
     }
 
-    for( MOuint i=0; i<m_pIODeviceManager->IODevices().Count(); i++ ) {
-    moIODevice* pIODevice = m_pIODeviceManager->IODevices().GetRef(i);
-    m_MoldeoObjects.Set( RelativeToGeneralIndex( i, MO_OBJECT_IODEVICE ), pIODevice );
+    for( let i=0; i<this.m_pIODeviceManager.IODevices().length; i++ ) {
+      let pIODevice : moIODevice = this.m_pIODeviceManager.IODevices()[i];
+      this.m_MoldeoObjects[ this.RelativeToGeneralIndex( i, moMoldeoObjectType.MO_OBJECT_IODEVICE )] = pIODevice;
     }
 
-    for( MOuint i=0; i<m_EffectManager.PreEffects().Count(); i++ ) {
-    moPreEffect* pFx = m_EffectManager.PreEffects().GetRef(i);
-    m_MoldeoObjects.Set( RelativeToGeneralIndex( i, MO_OBJECT_PREEFFECT ), pFx );
+    for( let i=0; i<this.m_EffectManager.PreEffects().length; i++ ) {
+      let pFx : moPreEffect = this.m_EffectManager.PreEffects()[i];
+      this.m_MoldeoObjects[ this.RelativeToGeneralIndex( i, moMoldeoObjectType.MO_OBJECT_PREEFFECT )] = pFx;
     }
 
-    for( MOuint i=0; i<m_EffectManager.PostEffects().Count(); i++ ) {
-    moPostEffect* pFx = m_EffectManager.PostEffects().GetRef(i);
-    m_MoldeoObjects.Set( RelativeToGeneralIndex( i, MO_OBJECT_POSTEFFECT ), pFx );
+    for( let i=0; i<this.m_EffectManager.PostEffects().length; i++ ) {
+      let pFx : moPostEffect = this.m_EffectManager.PostEffects()[i];
+      this.m_MoldeoObjects[ this.RelativeToGeneralIndex( i, moMoldeoObjectType.MO_OBJECT_POSTEFFECT )] = pFx;
     }
 
-    for( MOuint i=0; i<m_EffectManager.Effects().Count(); i++ ) {
-    moEffect* pFx = m_EffectManager.Effects().GetRef(i);
-    m_MoldeoObjects.Set( RelativeToGeneralIndex( i, MO_OBJECT_EFFECT ), pFx );
+    for( let i=0; i<this.m_EffectManager.Effects().length; i++ ) {
+      let pFx : moEffect = this.m_EffectManager.Effects()[i];
+      this.m_MoldeoObjects[ this.RelativeToGeneralIndex( i, moMoldeoObjectType.MO_OBJECT_EFFECT )] = pFx;
     }
 
-    for( MOuint i=0; i<m_EffectManager.MasterEffects().Count(); i++ ) {
-    moMasterEffect* pFx = m_EffectManager.MasterEffects().GetRef(i);
-    m_MoldeoObjects.Set( RelativeToGeneralIndex( i, MO_OBJECT_MASTEREFFECT ), pFx );
+    for( let i=0; i<this.m_EffectManager.MasterEffects().length; i++ ) {
+      let pFx : moMasterEffect = this.m_EffectManager.MasterEffects()[i];
+      this.m_MoldeoObjects[ this.RelativeToGeneralIndex( i, moMoldeoObjectType.MO_OBJECT_MASTEREFFECT )] = pFx;
     }
 
-    m_MoldeoObjects.Set( RelativeToGeneralIndex( 0, MO_OBJECT_CONSOLE ), this);
+    this.m_MoldeoObjects[ this.RelativeToGeneralIndex( 0, moMoldeoObjectType.MO_OBJECT_CONSOLE )] = this;
 
     ///SET Moldeo Objects Unique Id's
-    for( MOuint i=0; i<m_MoldeoObjects.Count(); i++) {
-    moMoldeoObject* mobject = m_MoldeoObjects.GetRef(i);
-    if (mobject) mobject->SetId(MO_MOLDEOOBJECTS_OFFSET_ID + i);
+    for( var i=0; i<this.m_MoldeoObjects.length; i++) {
+     let mobject : moMoldeoObject = this.m_MoldeoObjects[i];
+      if (mobject) mobject.SetId( MO_MOLDEOOBJECTS_OFFSET_ID + i);
     }
 
     ///PROCESSING SCENE OBJECTS (recursive)
 
-    for( MOuint i=0; i<m_EffectManager.Effects().Count(); i++ ) {
-    moEffect* pFx = m_EffectManager.Effects().GetRef(i);
-    if (pFx)
-      if (pFx->GetName()=="scene") {
-        moSceneEffect* pScene = (moSceneEffect*) pFx;
-        pScene->UpdateMoldeoIds( m_MoldeoSceneObjects );
-      }
+    for (let i = 0; i < this.m_EffectManager.Effects().length; i++ ) {
+      let pFx : moEffect = this.m_EffectManager.Effects()[i];
+      if (pFx)
+        if (pFx.GetName()=="scene") {
+          //let pScene : moSceneEffect = pFx;
+          //pScene.UpdateMoldeoIds( this.m_MoldeoSceneObjects );
+        }
     }
-    */
   }
 
   InitializeAllEffects() {
-    console.log("moConsole.InitializeAllEffects");
+    //console.log("moConsole.InitializeAllEffects");
     for ( var i= 0; i < this.m_EffectManager.m_AllEffects.length; i++ ) {
       var p_effect = this.m_EffectManager.m_AllEffects[i];
       if (p_effect) {
@@ -409,7 +474,7 @@ export class moConsole extends moMoldeoObject {
       }
       return;
     } else {
-      console.log("moConsole.LoadObjects fx_type: ", fx_type );
+      //console.log("moConsole.LoadObjects fx_type: ", fx_type );
     }
 
     var text: moText;
@@ -430,8 +495,8 @@ export class moConsole extends moMoldeoObject {
     N = this.m_Config.GetValuesCount(efx);
 
     if (this.MODebug2) {
-      this.MODebug2.Message( "moConsole::LoadObjects > Loading Object configs..." );
-      this.MODebug2.Message( "moConsole::LoadObjects > Objects number: " + N );
+      //this.MODebug2.Message( "moConsole::LoadObjects > Loading Object configs..." );
+      //this.MODebug2.Message( "moConsole::LoadObjects > Objects number: " + N );
     }
 
     if(N>0) {
@@ -463,7 +528,7 @@ export class moConsole extends moMoldeoObject {
                     }
 
                     if (this.MODebug2) {
-                      this.MODebug2.Message( "moConsole::LoadObjects > " + completecfname );
+                      //this.MODebug2.Message( "moConsole::LoadObjects > " + completecfname );
                     }
 
                 } else {
@@ -487,8 +552,8 @@ export class moConsole extends moMoldeoObject {
     }
     }
 
-    if (this.MODebug2)
-      this.MODebug2.Message( "moConsole::LoadObjects > Objects were loaded..." );
+    //if (this.MODebug2)
+      //this.MODebug2.Message( "moConsole::LoadObjects > Objects were loaded..." );
     if (callback) callback("LoadObjects ok");
   }
 
@@ -648,7 +713,120 @@ export class moConsole extends moMoldeoObject {
 
   }
   Update() : void {
+    if (!this.m_pResourceManager) return;
+    var RenderMan : moRenderManager = this.m_pResourceManager.GetRenderMan();
+/*
+    m_ScreenshotInterval = m_Config.Int(moR(CONSOLE_SCREENSHOTS));
 
+      if (m_ScreenshotInterval>30) {
+          if (!m_ScreenshotTimer.Started()) {
+              m_ScreenshotTimer.Start();
+          } else {
+
+              if ( m_ScreenshotTimer.Duration()>m_ScreenshotInterval ) {
+                  m_pResourceManager->GetRenderMan()->Screenshot(moText(""),m_LastScreenshot);
+                  m_ScreenshotTimer.Stop();
+                  m_ScreenshotTimer.Start();
+              }
+
+          }
+      }
+*/
+
+  ///TODO: each Object see all events and process a few... can and should be optimized
+  /// optimization: only send a partial event list to every object, filtered by
+  /// moMoldeoObject->GetMobDefinition()->GetMoldeoId()
+	RenderMan.BeginUpdate();
+	if (this.m_pIODeviceManager) {
+		for(var i = 0; i<(this.m_MoldeoObjects.length + this.m_MoldeoSceneObjects.length); i++) {
+			RenderMan.BeginUpdateObject();
+			var pMOB : moMoldeoObject = null;
+			if (i<this.m_MoldeoObjects.length)
+        pMOB = this.m_MoldeoObjects[i];
+			else
+        pMOB = this.m_MoldeoSceneObjects[i-this.m_MoldeoObjects.length];
+			if (pMOB) {
+                if (pMOB.GetType()!= moMoldeoObjectType.MO_OBJECT_IODEVICE)///MO_OBJECT_IODEVICE WERE ALREADY UPDATED VIA m_pIODeviceManager->Update()
+                    if (pMOB.Activated())
+                      pMOB.Update( this.m_pIODeviceManager.GetEvents());
+			}
+			RenderMan.EndUpdateObject();
+		}
+
+		this.m_pIODeviceManager.PurgeEvents();
+	}
+	RenderMan.EndUpdate();
+/*
+  moEventList* pEvents = m_pIODeviceManager->GetEvents();
+  int nevents = 0;
+
+  if (pEvents) {
+      moEvent *actual=NULL,*tmp;
+     // moMessage *pmessage;
+
+      if (pEvents) actual = pEvents->First;
+
+      ///Procesamos los eventos recibidos de los MoldeoObject Outlets
+      while(actual!=NULL) {
+        nevents++;
+        tmp = actual->next;
+        ///procesamos aquellos Outlet q estan dirigidos a este objeto
+        //moText debugstr = actual->ToJSON();
+
+        if (  actual->deviceid==MO_IODEVICE_CONSOLE
+            && actual->devicecode == MO_ACTION_MOLDEOAPI_EVENT_SEND
+            && actual->reservedvalue3 == MO_DATAMESSAGE) {
+                moDataMessage* mpDataMessage = (moDataMessage*) actual->pointer;
+                if (mpDataMessage) {
+                  //tmpstr = "MOLDEOAPI MO_DATAMESSAGE > count:" + mpDataMessage->Count();
+                  delete mpDataMessage;
+                }
+                actual->pointer = NULL;
+                pEvents->Delete(actual);
+        }
+
+        if (actual->deviceid>=MO_MOLDEOOBJECTS_OFFSET_ID) {
+          moMoldeoObject* pobj = GetObjectByIdx( actual->deviceid );
+          //debugstr = pobj->GetLabelName()+"("+IntToStr(actual->deviceid)+") >> "+actual->ToJSON();
+        }
+        actual = tmp;
+
+        //MODebug2->Message( debugstr );
+      }
+
+      //if ()
+        //MODebug2->Message("fps:"+fps_text+" nevents:"+IntToStr(nevents));
+
+  }
+  */
+/*
+  //Procesamos aquellos Mensajes enviados con acciones
+  moEvent* actual = m_pIODeviceManager->GetEvents()->First;
+  moEvent* tmp = NULL;
+  while(actual!=NULL) {
+
+      if ( actual->deviceid==MO_IODEVICE_CONSOLE
+        &&
+           actual->reservedvalue3 == MO_MESSAGE ) {
+
+          moMessage* ConsoleMessage = (moMessage*)actual;
+          this->ProcessConsoleMessage(ConsoleMessage);
+      }
+
+      if ( ( actual->deviceid == MO_IODEVICE_CONSOLE )
+            && ( actual->devicecode == MO_ACTION_MOLDEOAPI_EVENT_RECEIVE )
+            && ( actual->reservedvalue3 == MO_DATAMESSAGE ) ) {
+
+          moDataMessage* MoldeoAPIMessage = (moDataMessage*)actual->pointer;
+          this->ProcessMoldeoAPIMessage( MoldeoAPIMessage );
+     }
+
+      tmp = actual;
+      actual = tmp->next;
+  }
+
+	moMoldeoObject::Update( m_pIODeviceManager->GetEvents() );
+  */
   }
 
   Interaction() : boolean {

@@ -359,6 +359,14 @@ export class moConfig extends moAbstract {
     return false;
   }
 
+
+  GetCurrentPreConf(): MOint {
+    // TODO:
+    return 0;
+  }
+
+
+
   Texture(p_paramid: any) : moTexture {
     var param: moParam = this.GetParam(p_paramid);
     //console.log("moConfig.Texture");
@@ -377,6 +385,31 @@ export class moConfig extends moAbstract {
     return this.m_pTexture;
   }
 
+  Int(refid: any): MOint {
+    var Param: moParam = this.GetParam(refid);
+    var f: any;
+    if (Param) {
+      //console.log("EvalColor:", Param);
+      var vb: moValue = Param.GetValue();
+      if (vb) {
+        f = vb.GetSubValue(0).Int()
+      }
+    }
+    return f;
+  }
+
+  Double(refid: any): MOint {
+    var Param: moParam = this.GetParam(refid);
+    var f: any;
+    if (Param) {
+      //console.log("EvalColor:", Param);
+      var vb: moValue = Param.GetValue();
+      if (vb) {
+        f = vb.GetSubValue(0).Double()
+      }
+    }
+    return f;
+  }
 
   Eval(refid: any): any {
     var Param: moParam = this.GetParam(refid);
@@ -412,7 +445,7 @@ export class moConfig extends moAbstract {
     //console.log(` EvalColor is ${r},${g},${b}`);
     //return new moColor(r, g, b);
     //return this.mr_Color;
-    return { "r": r, "g": g, "b": g };
+    return { "r": r, "g": g, "b": b };
   }
 }
 

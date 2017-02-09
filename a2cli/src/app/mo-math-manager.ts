@@ -384,7 +384,7 @@ export class moParserFunction extends moMathFunction {
                     */
 
                     pVariable.SetParam( param );
-                    console.log("assigned param to variable:", pVariable);
+                    //console.log("assigned param to variable:", pVariable);
 
                 }
 
@@ -399,7 +399,7 @@ export class moParserFunction extends moMathFunction {
                   /*MODebug2->Log( moText("moParserFunction::Init > assigning variable [")
                   + pVariable->GetName() + moText("] to inlet with the same name. Inlet index is: " + IntToStr(m)) );*/
                 pVariable.SetInlet(pInlet);
-                console.log("assigned inlet to variable:", pVariable);
+                //console.log("assigned inlet to variable:", pVariable);
               }
 
 
