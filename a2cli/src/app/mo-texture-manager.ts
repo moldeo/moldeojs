@@ -30,6 +30,10 @@ export class moTextureManager extends moResource {
 
   default_id: MOint = -1;
   DefaultTexture: moTexture;
+
+  default_flip_id: MOint = -1;
+  DefaultTextureFlip: moTexture;
+
   moldeotrans_id: MOint = -1;
   MoldeotransTexture: moTexture;
 
@@ -43,6 +47,10 @@ export class moTextureManager extends moResource {
     this.default_id = this.AddTexture("default",512,512);
     this.DefaultTexture = this.GetTexture(this.default_id);
     this.DefaultTexture._texture = this.m_TextureLoader.load("data/icons/moldeologo.png");
+
+    this.default_flip_id = this.AddTexture("defaultflip",512,512);
+    this.DefaultTextureFlip = this.GetTexture(this.default_flip_id);
+    this.DefaultTextureFlip._texture = this.m_TextureLoader.load("data/icons/moldeologo_flip.png");
 
     this.moldeotrans_id = this.AddTexture("moldeotrans",512,512);
     this.MoldeotransTexture = this.GetTexture(this.moldeotrans_id);

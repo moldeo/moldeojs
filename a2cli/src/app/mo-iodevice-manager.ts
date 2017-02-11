@@ -17,7 +17,10 @@ export class moIODeviceManager extends moAbstract {
 /**
          * constructor genérico de la clase.
          */
-		//moIODevice*		NewIODevice( const moText& p_devname,  const moText& p_configname, const moText& p_labelname, const moText& p_keyname,  moMoldeoObjectType p_type, int paramindex = -1, int valueindex = -1, bool p_activate=true );
+		//moIODevice*		NewIODevice( const moText& p_devname,
+    // const moText& p_configname, const moText& p_labelname,
+    // const moText& p_keyname,  moMoldeoObjectType p_type,
+    // int paramindex = -1, int valueindex = -1, bool p_activate=true );
 
         /**
          * constructor genérico de la clase.

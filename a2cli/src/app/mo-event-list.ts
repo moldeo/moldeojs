@@ -76,8 +76,16 @@ export class moMessage extends moEvent {
 
 		moMessage( MOint m_MoldeoIdDest, MOint m_MoldeoIdSrc, const moData& data );
 		moMessage( MOint m_MoldeoIdDest, MOint m_InletIdDest, MOint m_MoldeoIdSrc, const moData& data );
-		moMessage( MOint p_MoldeoIdDest, MOint m_InletIdDest, moMoldeoObjectType p_TypeDest, MOint p_MoldeoIdSrc, moMoldeoObjectType p_TypeSrc, const moData& p_data );
-		moMessage( MOint p_MoldeoIdDest, MOint m_InletIdDest, moMoldeoObjectType p_TypeDest, moText	p_NameDest, MOint p_MoldeoIdSrc, moMoldeoObjectType p_TypeSrc, moText p_NameSrc, const moData& p_data );
+		moMessage( MOint p_MoldeoIdDest,
+    MOint m_InletIdDest,
+    moMoldeoObjectType p_TypeDest,
+    MOint p_MoldeoIdSrc,
+    moMoldeoObjectType p_TypeSrc,
+    const moData& p_data );
+		moMessage( MOint p_MoldeoIdDest, MOint m_InletIdDest,
+    moMoldeoObjectType p_TypeDest, moText	p_NameDest,
+    MOint p_MoldeoIdSrc, moMoldeoObjectType p_TypeSrc,
+    moText p_NameSrc, const moData& p_data );
 		virtual ~moMessage();
 
 		moData					m_Data;
@@ -104,7 +112,9 @@ export type moEvents = moEvent[];
 * Lista de eventos
 * Esta lista es creada por el moIODeviceManager, el administrador de dispositivos de entrada/salida de Moldeo
 * se crea un único moIODeviceManager por cada instancia de moConsole creado
-* Esta lista de eventos funciona de forma sincrónica con el ciclo de dibujado y está protegida de todas maneras para ser utilizada de forma asinc´ronica
+* Esta lista de eventos funciona de forma sincrónica con el
+ciclo de dibujado y está protegida de todas maneras para ser
+utilizada de forma asinc´ronica
 * a través de semáforos
 */
 

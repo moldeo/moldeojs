@@ -746,7 +746,8 @@ export class moConsole extends moMoldeoObject {
 			else
         pMOB = this.m_MoldeoSceneObjects[i-this.m_MoldeoObjects.length];
 			if (pMOB) {
-                if (pMOB.GetType()!= moMoldeoObjectType.MO_OBJECT_IODEVICE)///MO_OBJECT_IODEVICE WERE ALREADY UPDATED VIA m_pIODeviceManager->Update()
+        if (pMOB.GetType() != moMoldeoObjectType.MO_OBJECT_IODEVICE)
+                ///MO_OBJECT_IODEVICE WERE ALREADY UPDATED VIA m_pIODeviceManager->Update()
                     if (pMOB.Activated())
                       pMOB.Update( this.m_pIODeviceManager.GetEvents());
 			}

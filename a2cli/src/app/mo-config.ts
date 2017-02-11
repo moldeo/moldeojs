@@ -1,15 +1,22 @@
 import * as xml2js from "xml2js";
 
 
-import { MOint, MOuint, MOboolean, MOfloat, MOdouble, MOlong, MOulong, moNumber, moTextFilterParam } from "./mo-types";
+import {
+  MOint, MOuint, MOboolean, MOfloat, MOdouble, MOlong, MOulong,
+  moNumber, moTextFilterParam,
+  MO_RED, MO_GREEN, MO_BLUE, MO_ALPHA
+} from "./mo-types";
 import { moText } from "./mo-text";
 import { moAbstract } from "./mo-abstract";
 import {
   moData, moValue, moValues,
   moValueBase, moValueBases,
-  moValueDefinition
+  moValueDefinition,
 } from "./mo-value";
-import { moParam, moParams, moParamIndexes, moParamDefinition, moParamDefinitions } from "./mo-param";
+import {
+  moParam, moParamType, moParamTypeToText, moParamIndex,
+  moParams, moParamIndexes, moParamDefinition, moParamDefinitions
+} from "./mo-param";
 import { moPreconfig, moPreConfigs } from "./mo-pre-config";
 import { moFile } from "./mo-file-manager";
 import { moColor, moColor4fArray, moColorRGBA, moColorRGB, moColorArray } from "./mo-gui-manager";
@@ -24,7 +31,8 @@ export const MO_SELECTED = -1;
 
 export class moConfigDefinition extends moAbstract {
 
-  m_ParamDefinitions : moParamDefinitions;
+  m_ParamDefinitions: moParamDefinitions;
+  m_ParamDefinitions_Map: any = {};
   m_ParamIndexes : moParamIndexes;
   m_ObjectName : moText;
 	m_ObjectClass : moText;
@@ -48,6 +56,73 @@ export class moConfigDefinition extends moAbstract {
 
   Init(): boolean {
     return super.Init();
+  }
+
+  Exists(p_name: moText): boolean {
+    if (p_name in this.m_ParamDefinitions_Map) return true;
+    return false;
+  }
+
+
+  /// Agrega la definición de un parámetro con un valor predeterminado a tomar
+  /**
+  *
+  * @param p_name nombre del parámetro
+  * @param p_type tipo del parámetro
+  * @param p_index    índice del parámetro dentro del archivo de configuración (-1 si no está definido aún)
+  * @param p_defaultvalue  valor predeterminado
+  * @param p_OptionsStr opciones separadas por coma "opcion A, opcion B, opcion C"
+  */
+  Add(p_name: moText, p_type: moParamType,
+    p_index: MOint, p_defaultvalue?: moValue, p_OptionsStr?: moText ) {
+
+    if (this.Exists(p_name)) {
+      this.MODebug2.Error(p_name + " already defined in " + this.m_ObjectName);
+      return;
+    }
+
+    var pdef : moParamDefinition = new moParamDefinition(p_name, moParamTypeToText[p_type] );
+
+    pdef.SetIndex(p_index);
+
+    if (p_type != moParamType.MO_PARAM_MOLDEO_OBJECT)
+      pdef.SetDefault(p_defaultvalue);
+
+    pdef.SetOptions(p_OptionsStr);
+
+    //IF TYPE IS COLOR > sub 0: RED, 1: GREEN, 2: BLUE, 3: ALPHA
+    if (p_type == moParamType.MO_PARAM_COLOR) {
+      var vd : moValueDefinition;
+      vd = pdef.GetDefaultValue().GetSubValue(MO_RED).GetValueDefinition();
+      vd.SetCodeName("RED");
+      pdef.GetDefaultValue().GetSubValue(MO_RED).SetValueDefinition(vd);
+
+      vd = pdef.GetDefaultValue().GetSubValue(MO_GREEN).GetValueDefinition();
+      vd.SetCodeName("GREEN");
+      pdef.GetDefaultValue().GetSubValue(MO_GREEN).SetValueDefinition(vd);
+
+      vd = pdef.GetDefaultValue().GetSubValue(MO_BLUE).GetValueDefinition();
+      vd.SetCodeName("BLUE");
+      pdef.GetDefaultValue().GetSubValue(MO_BLUE).SetValueDefinition(vd);
+
+      vd = pdef.GetDefaultValue().GetSubValue(MO_ALPHA).GetValueDefinition();
+      vd.SetCodeName("ALPHA");
+      pdef.GetDefaultValue().GetSubValue(MO_ALPHA).SetValueDefinition(vd);
+
+      /*
+      p_defaultvalue.GetSubValue(MO_GREEN).GetValueDefinition().SetCodeName( "GREEN" );
+      p_defaultvalue.GetSubValue(MO_BLUE).GetValueDefinition().SetCodeName( "BLUE" );
+      p_defaultvalue.GetSubValue(MO_ALPHA).GetValueDefinition().SetCodeName( "ALPHA" );
+      */
+    }
+
+    if (p_type == moParamType.MO_PARAM_FONT) {
+      //p_defaultvalue.GetSubValue(0).GetValueDefinition().SetCodeName( "RED" );
+    }
+
+    this.m_ParamDefinitions.push(pdef);
+    this.m_ParamDefinitions_Map[""+p_name] = p_index;
+    this.m_ParamIndexes.push( new moParamIndex(p_index) );
   }
 
 }
@@ -415,7 +490,6 @@ export class moConfig extends moAbstract {
     var Param: moParam = this.GetParam(refid);
     var f: any;
     if (Param) {
-      //console.log("EvalColor:", Param);
       var vb: moValue = Param.GetValue();
       if (vb) {
         f = vb.GetSubValue(0).Eval()
@@ -432,7 +506,7 @@ export class moConfig extends moAbstract {
     var b: any;
     var Param: moParam = this.GetParam(refid);
     if (Param) {
-      //console.log("EvalColor:", Param);
+      //console.log("EvalColor:"+refid, Param);
       var vb: moValue = Param.GetValue();
       if (vb) {
         //console.log("EvalColor: vb:", vb);

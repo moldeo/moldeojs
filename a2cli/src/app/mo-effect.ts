@@ -85,7 +85,7 @@ export class moEffect extends moMoldeoObject {
 
     if (super.Init((res) => {
       this.CreateConnectors();
-      console.log( `moEffect.PreInit OK! ${this.GetLabelName()}`, this);
+      //console.log( `moEffect.PreInit OK! ${this.GetLabelName()}`, this);
       if (callback) callback(res);
     } )) {
       ///Al fin luego de levantar todas las configuraciones, creamos los conectores (Inlets <NO INTERNOS> y Outlets)

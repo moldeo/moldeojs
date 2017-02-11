@@ -1,5 +1,5 @@
 export enum moParamType {
-	MO_PARAM_ALPHA,			///value type: NUM or FUNCTION
+	MO_PARAM_ALPHA=0,			///value type: NUM or FUNCTION
 	MO_PARAM_COLOR,			///value type: NUM[4] or FUNCTION[4] or
 	MO_PARAM_BLENDING,		///value type: NUM or TEXT (to script or shader for chroma???)
 	MO_PARAM_POLYGONMODE,	///value type: NUM or TEXT ( 0:FILL 1:LINE 2:POINT)
@@ -70,3 +70,39 @@ export const moParamTypeStrs = {
   "OUTLET": moParamType.MO_PARAM_OUTLET,
   "UNDEFINED": moParamType.MO_PARAM_UNDEFINED
 };
+
+export const moParamTypeToText = [
+"ALPHA",
+  "COLOR",
+  "BLENDING",
+  "POLYGONMODE",
+  "SYNC",
+  "PHASE",
+  "TEXT",
+  "TEXTURE",
+  "TEXTUREFOLDER",
+  "FONT",
+  "3DMODEL",
+  "MOLDEOOBJECT",
+  "OBJECT",
+  "VIDEO",
+  "FILTER",
+  "SOUND",
+  "NUM",
+  "FUNCTION",
+  "TRANSLATEX",
+  "TRANSLATEY",
+  "TRANSLATEZ",
+  "SCALEX",
+  "SCALEY",
+  "SCALEZ",
+  "ROTATEX",
+  "ROTATEY",
+  "ROTATEZ",
+  "SCRIPT",
+  "COMPOSE",
+  "VECTOR",
+  "INLET",
+  "OUTLET",
+  "UNDEFINED"
+];

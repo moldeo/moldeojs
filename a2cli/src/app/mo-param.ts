@@ -1,6 +1,6 @@
 import { moAbstract } from "./mo-abstract";
 import { MOint, MOuint, MOboolean, MOfloat, MOdouble, MOlong, MOulong, moNumber, moTextFilterParam } from "./mo-types";
-import { moText, moTextArray } from "./mo-text";
+import { moText, moText0, moTextArray } from "./mo-text";
 import { moDataType } from "./mo-data-type.enum";
 import {
   moData, moValue, moValues, moValueBase,
@@ -10,7 +10,7 @@ import {
 import { moParamType } from "./mo-param-type.enum";
 import { moTimer } from "./mo-timer";
 export * from "./mo-param-type.enum";
-import { moParamTypeStrs } from "./mo-param-type.enum";
+import { moParamTypeStrs, moParamTypeToText } from "./mo-param-type.enum";
 
 export enum moParamInterpolationFunction {
     MO_INTERPOLATION_NONE=0,
@@ -102,7 +102,134 @@ export class moParamDefinition extends moAbstract {
 
    GetName(): moText {
      return this.m_Name;
+   }
+
+
+  GetIndex() : MOint {
+    return this.m_Index;
   }
+
+  SetIndex( p_index : MOint ) : void {
+    this.m_Index = p_index;
+  }
+
+  GetProperty() : moText {
+    return this.m_Property;
+  }
+
+  SetProperty( p_Property : moText ) : void {
+      this.m_Property = p_Property;
+  }
+
+  GetGroup() : moText {
+    return this.m_Group;
+  }
+
+  SetGroup( p_Group : moText ) : void {
+    this.m_Group = p_Group;
+  }
+
+  GetDefaultValue() : moValue {
+      return this.m_DefaultValue;
+  }
+
+  SetDefault( p_defaultvalue : moValue ) : void {
+
+    var Default : moValue = p_defaultvalue;
+    this.m_DefaultValue = p_defaultvalue;
+
+    if (  Default.GetSubValue().GetType()==moValueType.MO_VALUE_UNDEFINED  ) {
+      switch ( this.GetType()  ) {
+
+        case moParamType.MO_PARAM_TEXT:
+        case moParamType.MO_PARAM_TEXTURE:
+        case moParamType.MO_PARAM_TEXTUREFOLDER:
+        case moParamType.MO_PARAM_FILTER:
+        case moParamType.MO_PARAM_VIDEO:
+        case moParamType.MO_PARAM_SOUND:
+        case moParamType.MO_PARAM_FILE:
+        case moParamType.MO_PARAM_SCRIPT:
+        case moParamType.MO_PARAM_OBJECT:
+        case moParamType.MO_PARAM_3DMODEL:
+          //this.m_DefaultValue = new moValue( "", "TXT" );
+          break;
+
+        case moParamType.MO_PARAM_MOLDEO_OBJECT:
+          /** TODO: removing subvalues if any*/
+          //this.m_DefaultValue.RemoveSubValues();
+          break;
+
+        case moParamType.MO_PARAM_INLET:
+          //this.m_DefaultValue = new moValue( "VARIABLE1", "TXT", "NUMERIC", "TXT" );
+          break;
+
+        case moParamType.MO_PARAM_FONT:
+          //this.m_DefaultValue = new moValue( "", "TXT", "", "TXT", "", "TXT" );
+          break;
+
+        case moParamType.MO_PARAM_PHASE:
+        case moParamType.MO_PARAM_ROTATEX:
+        case moParamType.MO_PARAM_ROTATEY:
+        case moParamType.MO_PARAM_ROTATEZ:
+        case moParamType.MO_PARAM_TRANSLATEX:
+        case moParamType.MO_PARAM_TRANSLATEY:
+        case moParamType.MO_PARAM_TRANSLATEZ:
+        case moParamType.MO_PARAM_FUNCTION:
+          //this.m_DefaultValue = new moValue( "0.0", "FUNCTION" ).Ref();
+          break;
+
+        case moParamType.MO_PARAM_ALPHA:
+        case moParamType.MO_PARAM_SYNC:
+        case moParamType.MO_PARAM_SCALEX:
+        case moParamType.MO_PARAM_SCALEY:
+        case moParamType.MO_PARAM_SCALEZ:
+          //this.m_DefaultValue = new moValue( "1.0", "FUNCTION" ).Ref();
+          break;
+
+        case moParamType.MO_PARAM_POLYGONMODE:
+        case moParamType.MO_PARAM_BLENDING:
+          //this.m_DefaultValue = new moValue( "0", "INT" );
+          break;
+        case moParamType.MO_PARAM_COLOR:
+          //this.m_DefaultValue = new moValue( "1.0", "FUNCTION","1.0", "FUNCTION","1.0", "FUNCTION","1.0", "FUNCTION"  );
+          break;
+        case moParamType.MO_PARAM_COMPOSE:
+          //this.m_DefaultValue = new moValue( "composed by", "TXT","1.0", "FUNCTION","<nada></nada>", "XML","12345", "INT"  );
+          break;
+        case moParamType.MO_PARAM_VECTOR:
+          //this.m_DefaultValue = new moValue( "1.0", "FUNCTION","2.0", "FUNCTION","3.0", "FUNCTION","4.0", "FUNCTION" );
+          break;
+        case moParamType.MO_PARAM_NUMERIC:
+          //this.m_DefaultValue = new moValue( "0", "NUM" );
+          break;
+        case moParamType.MO_PARAM_UNDEFINED:
+          //this.m_DefaultValue = new moValue( "INVALID", MO_VALUE_UNDEFINED );
+          break;
+        default:
+          break;
+      };
+    }
+
+  }
+
+
+  SetOptions( p_options: moText): void;
+  SetOptions( p_options: any): void {
+    if (typeof p_options == "string") {
+      this.m_OptionsStr = p_options;
+      this.m_Options = new moText0(p_options).Explode(",");
+    } else {
+      this.m_Options = p_options;
+      this.m_OptionsStr = "";
+      var comma: moText = "";
+      for (var i = 0; i < this.m_Options.length; i++) {
+        this.m_OptionsStr += "" + comma + "" + this.m_Options[i];
+        comma = ",";
+      }
+    }
+  }
+
+
 }
 export type moParamDefinitions = moParamDefinition[];
 

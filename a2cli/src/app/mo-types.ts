@@ -37,6 +37,11 @@ export type MO_DISPLAY = any;
 export type MO_HANDLE = any;
 export const NULL = null;
 
+export const MO_RED = 0;
+export const MO_GREEN = 1;
+export const MO_BLUE = 2;
+export const MO_ALPHA = 3;
+
 export class moTextFilterParam {
 
 
