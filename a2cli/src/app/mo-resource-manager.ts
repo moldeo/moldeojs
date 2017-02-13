@@ -190,9 +190,13 @@ export class moResourceManager extends moAbstract {
       return this.MOTextureMan;
     }
 
+    GetTimeMan(): moTimeManager {
+      return this.MOTimeMan;
+    }
+
     Resources(): moResources {
       return this.m_Resources;
     }
 
 
-};
+}

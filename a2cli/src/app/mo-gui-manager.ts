@@ -211,6 +211,22 @@ export class moMesh extends THREE.Mesh {
   }
 }
 
+export class moGroup extends THREE.Group {
+  ResetMatrix() {
+    this.matrix.identity();
+    /*
+    this.position.set( 0.0, 0.0, 0.0);
+    this.scale.set( 1.0, 1.0, 1.0);
+    this.rotation.set( 0.0 , 0.0, 0.0);
+    this.updateMatrix();
+    */
+  }
+  SetModelMatrix(matrix: moGLMatrixf) {
+    this.ResetMatrix();
+    this.applyMatrix( matrix );
+  }
+}
+
 export class moShape extends THREE.Shape {
 }
 

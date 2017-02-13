@@ -10,7 +10,17 @@ export enum moMoldeoObjectType {
 	MO_OBJECT_TYPES = 7 /// referencia para la cantidad de tipos de objetos
 };
 
-export const moMoldeoObjectTypeStr = [
+export const moMoldeoObjectTypeStr = {
+  "effect": moMoldeoObjectType.MO_OBJECT_EFFECT,//0
+  "preeffect": moMoldeoObjectType.MO_OBJECT_PREEFFECT,//1
+  "posteffect": moMoldeoObjectType.MO_OBJECT_POSTEFFECT,//2
+  "mastereffect": moMoldeoObjectType.MO_OBJECT_MASTEREFFECT,//3
+  "iodevice": moMoldeoObjectType.MO_OBJECT_IODEVICE,//4
+  "resource": moMoldeoObjectType.MO_OBJECT_RESOURCE,//5
+  "console": moMoldeoObjectType.MO_OBJECT_CONSOLE//6
+};
+
+export const moMoldeoObjectTypeToText = [
   "effect",//0
   "preeffect",//1
   "posteffect",//2

@@ -13,7 +13,7 @@ import {
   moGetDuration, moGetTimerState, moGetTimerStateStr
 } from "./mo-timer";
 import { moMathFunction, moParserFunction } from "./mo-math-manager";
-import { moTexture } from "./mo-texture";
+import { moTexture, moTextureBuffer } from "./mo-texture";
 
 export class moData {
 
@@ -30,6 +30,7 @@ export class moData {
   m_pAlphaFilter : moData;/**pointer or reference*/
 
   m_pTexture: moTexture = null;
+  m_pTextureBuffer: moTextureBuffer = null;
 
   m_LastEval : MOdouble;
 
@@ -87,8 +88,13 @@ export class moData {
   }
   //SetColor( p_color: moText);
   SetTexture(p_texture: any /**moTexture*/) {
-    this.m_DataType = moDataType.MO_DATA_IMAGESAMPLE_TEXTUREBUFFER;
+    this.m_DataType = moDataType.MO_DATA_IMAGESAMPLE;
     this.m_pTexture = p_texture;
+  }
+
+  SetTextureBuffer(p_texture_buffer: any /**moTextureBuffer*/) {
+    this.m_DataType = moDataType.MO_DATA_IMAGESAMPLE_TEXTUREBUFFER;
+    this.m_pTextureBuffer = p_texture_buffer;
   }
 
   SetTextureFiltered(p_texture: any /**moTexture*/) {
@@ -150,6 +156,10 @@ export class moData {
 
   Texture(): moTexture {
     return this.m_pTexture;
+  }
+
+  TextureBuffer(): moTextureBuffer {
+    return this.m_pTextureBuffer;
   }
 
 }
@@ -219,6 +229,10 @@ export class moValueDefinition {
 
   GetTypeStr(): moText {
     var str = "UNDEFINED";
+    var strtype = moValueTypeArr[this.m_Type];
+    if (strtype)
+      return strtype;
+      /*
     switch( this.m_Type) {
       case moValueType.MO_VALUE_FUNCTION:
         str = "FUNCTION";
@@ -253,11 +267,14 @@ export class moValueDefinition {
       case moValueType.MO_VALUE_MATRIX:
         str = "MATRIX";
         break;
-    }
+    }*/
     return str;
   }
 
-  ValueTypeFromStr( p_value_type_str : moText ) : moValueType {
+  ValueTypeFromStr(p_value_type_str: moText): moValueType {
+      var vtype : moValueType = moValueTypeStr[""+p_value_type_str];
+      if (vtype != undefined) return vtype;
+        /*
       if (p_value_type_str=="FUNCTION") {
         return moValueType.MO_VALUE_FUNCTION;
       } else if (p_value_type_str=="NUM") {
@@ -281,7 +298,7 @@ export class moValueDefinition {
       } else if (p_value_type_str=="MATRIX") {
         return moValueType.MO_VALUE_MATRIX;
       }
-
+*/
       return moValueType.MO_VALUE_UNDEFINED;
   }
 
@@ -370,73 +387,117 @@ export type moValueBases = moValueBase[];
 export class moValue {
   m_List: moValueBases = [];
 
-  constructor(subvalues?: Object) {
+  //constructor(strvalues?: Object) {}
+  /*
+  constructor(strvalues?: Object);
+  constructor(p_Value?: moValue);
+  constructor(strvalue: moText, type: moText);
+  constructor(strvalue: moText, type: moValueType);
+  constructor(strvalue: moText, type: moText,
+              strvalue2: moText, type2: moText);
+  constructor(strvalue: moText, type: moText,
+              strvalue2: moText, type2: moText,
+              strvalue3: moText, type3: moText);*/
+  constructor(strvalue?: any, type?: any,
+              strvalue2?: moText, type2?: any,
+              strvalue3?: moText, type3?: any,
+              strvalue4?: moText, type4?: any) {
+    //if (strvalue == undefined)
+      //this.AddSubValue("", "UNDEFINED");
+
+    if (typeof strvalue == "object") {
+      if ("length" in strvalue) {
+        for (let i = 0; i < strvalue.length; i += 2) {
+          this.AddSubValue(strvalue[i], strvalue[i + 1]);
+        }
+      } else {
+        Object.assign(this, strvalue);
+      }
+    }
+    if (typeof strvalue == "string")
+      this.AddSubValue(strvalue, type);
+    if (typeof strvalue2 == "string")
+      this.AddSubValue(strvalue2, type2);
+    if (typeof strvalue3 == "string")
+      this.AddSubValue(strvalue3, type3);
+    if (typeof strvalue4 == "string")
+      this.AddSubValue(strvalue4, type4);
+
   }
+
 
   AddSubValue( p_valuebase: moValueBase);
   AddSubValue( strvalue: moText, type: moText);
   AddSubValue( valuebase : any, type?: moText ) {
     //console.log("moValue::AddSubValue > ", valuebase, type);
-    var vd: moValueDefinition = new moValueDefinition();
+    var vD: moValueDefinition = new moValueDefinition();
 
     if (valuebase == undefined) {
       valuebase = "";
     }
 
     if (typeof valuebase == "string") {
-      var vb: moValueBase = new moValueBase();
+      var vB: moValueBase = new moValueBase();
+
       if (type == "TEXT") {
-        vd.SetType(moValueType.MO_VALUE_TXT);
-        vb.SetText(valuebase);
+        vD.SetType(moValueType.MO_VALUE_TXT);
+        vB.SetText(valuebase);
       } else if (type == "LNK") {
-        vd.SetType(moValueType.MO_VALUE_LNK);
-        vb.SetText(valuebase);
+        vD.SetType(moValueType.MO_VALUE_LNK);
+        vB.SetText(valuebase);
       } else if (type == "XML") {
-        vd.SetType(moValueType.MO_VALUE_XML);
-        vb.SetText(valuebase);
+        vD.SetType(moValueType.MO_VALUE_XML);
+        vB.SetText(valuebase);
       } else if (type == "NUM") {
-        vd.SetType(moValueType.MO_VALUE_NUM);
-        vb.SetInt(valuebase);
+        vD.SetType(moValueType.MO_VALUE_NUM);
+        vB.SetInt(valuebase);
       } else if (type == "INT") {
-        vd.SetType(moValueType.MO_VALUE_NUM_INT);
-        vb.SetInt(valuebase);
+        vD.SetType(moValueType.MO_VALUE_NUM_INT);
+        vB.SetInt(valuebase);
       } else if (type == "CHAR") {
-        vd.SetType(moValueType.MO_VALUE_NUM_CHAR);
-        vb.SetChar(valuebase);
+        vD.SetType(moValueType.MO_VALUE_NUM_CHAR);
+        vB.SetChar(valuebase);
       } else if (type == "LONG") {
-        vd.SetType(moValueType.MO_VALUE_NUM_LONG);
-        vb.SetLong(valuebase);
+        vD.SetType(moValueType.MO_VALUE_NUM_LONG);
+        vB.SetLong(valuebase);
       } else if (type == "FLOAT") {
-        vd.SetType(moValueType.MO_VALUE_NUM_FLOAT);
-        vb.SetFloat(valuebase);
+        vD.SetType(moValueType.MO_VALUE_NUM_FLOAT);
+        vB.SetFloat(valuebase);
       } else if (type == "DOUBLE") {
-        vd.SetType(moValueType.MO_VALUE_NUM_DOUBLE);
-        vb.SetDouble(valuebase);
+        vD.SetType(moValueType.MO_VALUE_NUM_DOUBLE);
+        vB.SetDouble(valuebase);
       } else if (type == "FUNCTION") {
-        vd.SetType(moValueType.MO_VALUE_FUNCTION);
-        vb.SetFun(valuebase);
+        vD.SetType(moValueType.MO_VALUE_FUNCTION);
+        vB.SetFun(valuebase);
       } else if (type == "MATRIX") {
-        vb.SetText(valuebase);
-        vd.SetType(moValueType.MO_VALUE_MATRIX);
-      } else vb.SetText( valuebase );
-      vb.SetValueDefinition(vd);
-      this.m_List.push(vb);
+        vB.SetText(valuebase);
+        vD.SetType(moValueType.MO_VALUE_MATRIX);
+      } else {
+        vB.SetText(valuebase);
+      }
+
+      vB.SetValueDefinition(vD);
+      this.m_List.push(vB);
     } else {
-      vb = valuebase;
-      this.m_List.push(vb);
-      //console.log("moValue::AddSubValue(moValueBase) > ", vb, this.m_List);
+      vB = valuebase;
+      this.m_List.push(vB);
+        //console.log("moValue::AddSubValue(moValueBase) > ", vb, this.m_List);
     }
   }
 
-GetSubValue(  p_indexsubvalue : MOint = 0 ) : moValueBase {
-			return this.m_List[p_indexsubvalue];
-		}
-		 GetLastSubValue() : moValueBase {
-			return this.m_List[this.GetSubValueCount() - 1];
-		}
-		GetSubValueCount() : MOuint {
-			return this.m_List.length;
-		}
+  GetSubValue(  p_indexsubvalue : MOint = 0 ) : moValueBase {
+    return this.m_List[p_indexsubvalue];
+  }
+    GetLastSubValue() : moValueBase {
+    return this.m_List[this.GetSubValueCount() - 1];
+  }
+  GetSubValueCount() : MOuint {
+    return this.m_List.length;
+  }
+
+  RemoveSubValues(): void {
+    this.m_List = [];
+  }
 
 }
 export type moValues = moValue[];

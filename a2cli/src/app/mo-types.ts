@@ -112,3 +112,10 @@ export function IntToStr( num : number, nzeros?: number ) : string
   return Array(+(zero > 0 && zero)).join("0") + num;
 }
 
+export function _m(txt: string) {
+  return txt;
+}
+
+export function _moText(txt: string) {
+  return _m(txt);
+}

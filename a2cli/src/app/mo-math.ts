@@ -21,16 +21,59 @@ export const LN_10 = Math.log(10.0);
 export const INV_LN_2 = 1.0/LN_2;
 export const INV_LN_10 = 1.0/LN_10;
 
-export class moMath extends moAbstract {
+export class moMathDouble extends moAbstract {
 
   constructor() {
     super();
   }
 
+  fabs(x: number) {
+    return Math.abs(x);
+  }
+
+  UnitRandom( seed?: number ) : number {
+    return Math.random();
+  }
+
+  SymmetricRandom( seed?: number ) {
+    return Math.random() - 0.5;
+  }
+
+  IntervalRandom( seed: number ) {
+    return Math.random();
+  }
+
+  Sqrt(x: number): number {
+    return Math.sqrt(x);
+  }
+
+  Cos(x: number): number {
+    return Math.cos(x);
+  }
+
+  Sin(x: number): number {
+    return Math.sin(x);
+  }
+
+  EPSILON = EPSILON;
+  ZERO_TOLERANCE = ZERO_TOLERANCE;
+  //export const MAX_REAL = (MOlong)FLT_MAX;
+  PI : number = PI;
+  TWO_PI : number = TWO_PI;
+  HALF_PI : number = HALF_PI;
+  INVPI : number = INVPI;
+  INV_TWO_PI : number = INV_TWO_PI;
+  DEG_TO_RAD : number = DEG_TO_RAD;
+  RAD_TO_DEG : number = RAD_TO_DEG;
+  LN_2 : number = LN_2;
+  LN_10 : number = LN_10;
+  INV_LN_2 : number = INV_LN_2;
+  INV_LN_10 : number = INV_LN_10;
 
 }
 
-export const moMathd = new moMath();
+export const moMath = new moMathDouble();
+export const moMathd = new moMathDouble();
 
 export function FMod(a: MOfloat, b: MOfloat) : MOdouble {
   return 0.0;

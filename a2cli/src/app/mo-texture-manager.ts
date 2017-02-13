@@ -1,30 +1,31 @@
 import * as THREE from 'three';
 import TextureLoader = THREE.TextureLoader;
 
-import { MOint, MOuint,
-MOlong, MOulong,
-MOdouble, MOfloat,
-moTextFilterParam, moTexParam, MOUndefinedTex
+import {
+  MOint, MOuint, MOlong, MOulong, MObyte, MOubyte,
+  MOdouble, MOfloat,
+  moTextFilterParam, moTexParam, MOUndefinedTex
 } from "./mo-types";
 
 import { moText } from "./mo-text";
 import { moResource } from "./mo-resource";
-import { moTexture, moTextureArray, moTextureType } from "./mo-texture";
+import {
+  moTexture, moTextureArray, moTextureType,
+  moTextureMemory, moTextureFrames,
+  moTextureBuffer, moTextureBuffers
+} from "./mo-texture";
 import { moDataManager } from "./mo-data-manager";
-import { moFile, moFileManager } from "./mo-file-manager";
+import { moFile, moFileManager, moDirectory } from "./mo-file-manager";
+//export { moTexture, moTextureType, moTextureArray, moTextureMemory, moTextureFrames } from "./mo-texture";
 
-
-export { moTexture, moTextureType, moTextureArray } from "./mo-texture";
-export class moTextureBuffer extends moTexture {
-
-}
-export type moTextureBuffers = moTextureBuffer[];
 
 export class moTextureManager extends moResource {
 
   m_textures_array: moTextureArray = [];
   m_textures_array_map: any = {};
-  m_textures_buffers : moTextureBuffers = [];
+
+  m_textures_buffers: moTextureBuffers = [];
+  m_textures_buffers_map: any = {};
 
   m_TextureLoader: TextureLoader;
 
@@ -157,10 +158,34 @@ export class moTextureManager extends moResource {
     }
   }
 
-  GetTextureBuffer(): moTextureBuffer {
-    return null;
+  AddTextureBuffer( p_foldername: string, p_bufferformat: moText ) : MOint {
+    var ptexbuffer : moTextureBuffer = new moTextureBuffer();
+    if (ptexbuffer) {
+        if ( ptexbuffer.Init( p_foldername, p_bufferformat, this.m_pResourceManager ) ) {
+            this.m_textures_buffers.push( ptexbuffer );
+            //MODebug2->Push( moText("TextureBuffer created:") + (moText)p_foldername + moText(" idx:") +IntToStr((m_textures_buffers.Count() - 1)) );
+            return (this.m_textures_buffers.length - 1);
+        } else {
+            //MODebug2->Error( moText("moTextureManager::AddTextureBuffer Error: Initializing texturebuffer: ") + (moText)p_foldername );
+        }
+
+    } else {
+        //MODebug2->Error( moText("moTextureManager::AddTextureBuffer Error: Creating texturebuffer: ") + (moText)p_foldername );
+    }
+    return -1;
   }
 
-
-
-}
+  //GetTextureBuffer( p_foldername: MOint ): any;
+  GetTextureBuffer( p_foldername: any, p_create_tex?: boolean, p_bufferformat?: moText): any {
+    if (typeof p_foldername == "number") {
+      return this.m_textures_buffers[""+p_foldername];
+    } else if (typeof p_foldername == "string") {
+      if (this.m_textures_buffers_map[""+p_foldername])
+        return this.m_textures_buffers_map[""+p_foldername];
+      var idx = -1;
+      if (p_create_tex == true)
+        idx = this.AddTextureBuffer(p_foldername, p_bufferformat);
+      return idx;
+    }
+  }
+};

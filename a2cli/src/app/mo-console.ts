@@ -41,7 +41,8 @@ import {
 } from "./mo-render-manager";
 import { DEG_TO_RAD, PI, TWO_PI, RAD_TO_DEG } from "./mo-math";
 import { moGLManager, moGLMatrixf } from "./mo-gl-manager";
-import { moTextureManager, moTexture } from "./mo-texture-manager";
+import { moTextureManager } from "./mo-texture-manager";
+import { moTexture } from "./mo-texture";
 import {
   moConsoleState, moConsoleMode, MO_DEF_SCREEN_WIDTH, MO_DEF_SCREEN_HEIGHT, MO_DEF_RENDER_WIDTH, MO_DEF_RENDER_HEIGHT
 } from "./mo-console-state";

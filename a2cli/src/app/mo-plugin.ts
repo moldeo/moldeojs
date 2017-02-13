@@ -1,5 +1,5 @@
 import {moText}from"./mo-text";
-import { moMoldeoObjectType }from"./mo-moldeo-object";
+import { moMoldeoObjectType }from"./mo-moldeo-object-type.enum";
 import {
   moEffect, moPreEffect, moPostEffect, moMasterEffect,
   moPreEffectsArray, moPostEffectsArray, moMasterEffectsArray,

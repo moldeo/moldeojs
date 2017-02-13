@@ -1,9 +1,10 @@
 import { MOlong } from "./mo-types";
 import { moAbstract } from "./mo-abstract";
 import { moText } from "./mo-text";
-import { moMoldeoObject, moMoldeoObjectType } from './mo-moldeo-object';
+import { moMoldeoObject } from './mo-moldeo-object';
+import { moMoldeoObjectType } from './mo-moldeo-object-type.enum';
 import { moResourceType } from './mo-resource-type.enum';
-export { moResourceType } from './mo-resource-type.enum';
+//export { moResourceType } from './mo-resource-type.enum';
 
 
 /// Recurso

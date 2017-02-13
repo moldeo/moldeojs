@@ -1,10 +1,13 @@
 
 import { moEffectState } from "./mo-effect-state";
 export { moEffectState } from "./mo-effect-state";
-import { moMoldeoObject, moMobState, moMoldeoObjectType } from "./mo-moldeo-object";
+import { moConfig, moConfigDefinition } from "./mo-config";
+import { moMoldeoObject, moMobState } from "./mo-moldeo-object";
+import { moMoldeoObjectType } from "./mo-moldeo-object-type.enum";
 import { moEffectManager } from "./mo-effect-manager";
 import { moConsoleState } from "./mo-console-state";
 import { moTempo } from "./mo-tempo";
+import { moParamType, moParamTypeStrs, moParamTypeToText } from "./mo-param";
 import { moDataType, moData, moValue, moDataTypeStr } from "./mo-value";
 import {
   MO_DEACTIVATED, MO_ACTIVATED,
@@ -181,8 +184,11 @@ export class moEffect extends moMoldeoObject {
     this.ScriptExeRun();
   }
 
-  Draw( p_tempo : moTempo ) : void {
+  Draw( p_tempo : moTempo, p_parentstate : moEffectState = null ) : void {
     //console.log( `moEffect.Draw ${this.m_MobDefinition.GetName()}` );
+    this.BeginDraw(p_tempo, p_parentstate);
+    //draw here
+    this.EndDraw();
   }
 
   EndDraw() {
@@ -296,6 +302,23 @@ export class moEffect extends moMoldeoObject {
 
   State() : moTimerState {
     return this.m_EffectState.tempo.State();
+  }
+
+  GetDefinition(p_configdefinition?: moConfigDefinition): moConfigDefinition {
+
+    p_configdefinition = super.GetDefinition(p_configdefinition);
+    p_configdefinition.Add("alpha", moParamType.MO_PARAM_ALPHA, -1,
+      new moValue("1.0", "FUNCTION"));
+    p_configdefinition.Add( "color", moParamType.MO_PARAM_COLOR, -1,
+      new moValue( "1.0","FUNCTION","1.0","FUNCTION","1.0","FUNCTION","1.0","FUNCTION") );
+    p_configdefinition.Add("syncro", moParamType.MO_PARAM_SYNC, -1,
+        new moValue("1.0", "FUNCTION") );
+    p_configdefinition.Add("phase", moParamType.MO_PARAM_PHASE, -1,
+    new moValue("0.0", "FUNCTION") );
+    p_configdefinition.Add("guides", moParamType.MO_PARAM_NUMERIC, -1,
+      new moValue("0", "NUM"), "No,Yes,Full" );
+    //console.log("Effect definitions:", p_configdefinition);
+    return p_configdefinition;
   }
 
 }

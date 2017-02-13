@@ -3,7 +3,7 @@ import { Http } from "@angular/http";
 
 import { moAbstract } from "./mo-abstract";
 import { moText, moText0, moTextArray } from "./mo-text";
-import { MOlong, MOint, MOulong, MOuint, MOfloat, MOdouble, MOubyte } from "./mo-types";
+import { NULL, MOlong, MOint, MOulong, MOuint, MOfloat, MOdouble, MOubyte } from "./mo-types";
 import { moResource } from "./mo-resource";
 import { UploadItem } from 'angular2-http-file-upload';
 
@@ -213,10 +213,355 @@ export class moFile extends moAbstract {
     return "";
   }
 
+  GetFileName() : moText {
+    return this.m_FileName;
+  }
+
+  GetFullName() : moText {
+	  return ( "" + this.m_FileName + this.m_Extension );
+  }
+
 };
 
+export type moFileArray = moFile[];
+
+
+
+export class moDirectory extends moAbstract {
+  m_DirType : moFileType;
+  m_DirStatus : moFileStatus;
+  m_FileIndex : MOint;
+
+  m_DirName : moText;
+  m_DirNameArray : moTextArray;
+  m_CompletePath : moText;
+  m_Protocol : moText;
+
+  m_bExists : boolean = false;
+  m_bRemote : boolean = false;
+
+  m_pFileManager : moFileManager;
+
+  m_Files : moFileArray = [];
+  m_SubDirs: moDirectoryArray = [];
+
+  constructor(p_foldername?:moText, p_res?: moFileManager) {
+    super();
+    if (p_foldername) {
+      this.Open( p_foldername, "" );
+    }
+  }
+
+
+  Open(p_CompletePath: moText, p_Search: moText): boolean {
+
+    var path: moText = "";
+    var stdFileName: moText = "";
+    var stdCompleteFileName: moText = "";
+    //var set<string> stdListOfFileNames;
+    //var set<string> stdListOfCompleteFileNames;
+
+    this.m_CompletePath = p_CompletePath;
+    path = this.m_CompletePath;
+
+    //m_CompletePath = "\\\\\\";
+
+    this.m_DirNameArray = new moText0(this.m_CompletePath).Explode("/");
+
+    if (this.m_DirNameArray.length > 0) {
+      this.m_DirName = this.m_DirNameArray[this.m_DirNameArray.length - 1];
+    } else {
+      this.m_DirName = this.m_CompletePath;
+    }
+
+    var CompletePathSearch: moText = p_CompletePath + "" + p_Search;
+
+    /** Empty file array*/
+    this.m_Files = [];
+
+    /** Empty subdirs array*/
+    this.m_SubDirs = [];
+
+    /** Set by default m_bExists on false*/
+    this.m_bExists = false;
+
+    /** Check files*/
+    /*
+      if( bfs::exists( path ) )
+      {
+          m_bExists = true;
+
+         bfs::directory_iterator end ;
+        for(  bfs::directory_iterator iter(path) ; iter != end ; ++iter )
+          if (  bfs::is_directory( *iter ) )
+          {
+            //cout << iter->native_directory_string() << " (directory)\n" ;
+            //if( recurse_into_subdirs ) show_files(*iter) ;
+            #if BOOST_VERSION > 103500
+
+                #if BOOST_VERSION < 104800
+                    moText pSubDirName( iter->path().filename().c_str() );
+                #else
+                    moText pSubDirName( iter->path().filename().string().c_str() );
+                #endif
+            #else
+            moText pSubDirName( iter->path().leaf().c_str() );
+            #endif
+
+            moText pCompletePathSubdirName( iter->path().string().c_str() );
+
+            if (pSubDirName.Left(1) != "." ) {
+              moDirectory* pSubdir = new moDirectory( pCompletePathSubdirName );
+              if (pSubdir)
+                m_SubDirs.Add( pSubdir );
+            }
+
+          } else {
+            //cout << iter->native_file_string() << " (file)\n" ;
+            //ATENCION SEGUN LA VERSION DE BOOST hya que usar filename() o leaf()
+            //moText pFileName( iter->path().leaf().c_str() );
+
+
+            #if BOOST_VERSION > 103500
+
+
+                #if BOOST_VERSION < 104800
+                    moText pFileName( iter->path().filename().c_str() );
+                    stdFileName = iter->path().filename().c_str();
+                #else
+                    moText pFileName( iter->path().filename().string().c_str() );
+                    stdFileName = iter->path().filename().string().c_str();
+                #endif
+
+            #else
+
+            moText pFileName( iter->path().leaf().c_str() );
+
+            stdFileName = iter->path().leaf().c_str();
+
+            #endif
+
+            moText pCompletePathFilename( iter->path().string().c_str() );
+            stdCompleteFileName = iter->path().string().c_str();
+
+
+
+            if (stdFileName!="Thumbs.db") {
+                stdListOfFileNames.insert(stdFileName);
+                stdListOfCompleteFileNames.insert(stdCompleteFileName);
+            }
+
+            #ifdef _DEBUG
+            //MODebug2->Message( moText("moFileManager:: file:") + (moText)pCompletePathFilename);
+            //MODebug2->Message( moText("moFileManager:: filesize:") + IntToStr((int) bfs::file_size( iter->path().file_string().c_str() )));
+            #endif
+            //printf("%-32s %s %9.ld %s",fileInfo.name, attribs, fileInfo.size , timeBuff);
+
+          }
+
+      }
+*/
+    /** Sorted for linux */
+    /*
+    moText pCompletePathFilename;
+
+    for (std::set<string>::iterator Name = stdListOfCompleteFileNames.begin() ; Name != stdListOfCompleteFileNames.end(); ++Name)
+    {
+      //cout << *Name << endl;
+      string comp = *Name;
+      pCompletePathFilename = moText((char *)comp.c_str());
+
+      moFile * pFile = NULL;
+      if (m_pFileManager)
+        pFile = m_pFileManager ->GetFile(pCompletePathFilename);
+      else
+        pFile = new moFile(pCompletePathFilename);
+
+      if (pFile) m_Files.Add(pFile);
+  }*/
+
+    return this.m_bExists;
+
+  }
+
+
+  Exists() : boolean {
+      //this.m_bExists = bfs::exists((char*)this.m_CompletePath);
+    return this.m_bExists;
+  }
+
+
+  HasSubdirs() : boolean {
+    return (this.m_SubDirs.length>0);
+  }
+
+  IsRemote() : boolean {
+    return this.m_bRemote;
+  }
+
+  GetCompletePath() : moText {
+    return this.m_CompletePath;
+  }
+
+  GetDirName() : moText {
+    return this.m_DirName;
+  }
+
+  GetType() : moFileType {
+    return this.m_DirType;
+  }
+
+  GetProtocol() : moText {
+    return this.m_Protocol;
+  }
+
+
+
+  GetStatus() : moFileStatus {
+    return this.m_DirStatus;
+  }
+
+  FindFirst() : moFile {
+    if (this.m_bExists) {
+      if (this.m_Files.length>0) {
+        this.m_FileIndex = 0;
+        return this.m_Files[0];
+      }
+    }
+    return NULL;
+  }
+
+  FindNext() : moFile {
+    if (this.m_bExists) {
+      if (this.m_Files.length>0) {
+        if ( (this.m_FileIndex+1) < this.m_Files.length ) {
+          this.m_FileIndex++;
+          return this.m_Files[this.m_FileIndex];
+        } else {
+          this.m_FileIndex--;
+          return NULL;
+        }
+      }
+    }
+    return NULL;
+  }
+
+  FindLast() : moFile {
+    if (this.m_bExists) {
+      if (this.m_Files.length>0) {
+        this.m_FileIndex = this.m_Files.length - 1;
+        return this.m_Files[this.m_FileIndex];
+      }
+    }
+    return NULL;
+  }
+
+  Find( filename : any ) : moFile {
+    if (this.m_bExists) {
+      if (typeof filename == "number") {
+        return this.m_Files[Number(filename)];
+      }
+      for(this.m_FileIndex=0; this.m_FileIndex< this.m_Files.length; this.m_FileIndex++) {
+        if (this.m_Files[this.m_FileIndex].GetFileName()==filename)
+          return this.m_Files[this.m_FileIndex];
+      }
+    }
+    return NULL;
+  }
+
+Update() {
+
+
+
+//    void show_files( const path & directory, bool recurse_into_subdirs = true )
+//    {
+    /** Check files*/
+    /*
+    char *path;
+
+	path = m_CompletePath;
+      if( bfs::exists( path ) )
+      {
+          m_bExists = true;
+
+         bfs::directory_iterator end ;
+        for(  bfs::directory_iterator iter(path) ; iter != end ; ++iter )
+          if (  bfs::is_directory( *iter ) )
+          {
+            //cout << iter->native_directory_string() << " (directory)\n" ;
+            //if( recurse_into_subdirs ) show_files(*iter) ;
+          } else {
+            //cout << iter->native_file_string() << " (file)\n" ;
+
+            //ATENCION SEGUN LA VERSION DE BOOST hya que usar filename() o leaf()
+
+                #if BOOST_VERSION < 104300
+                    moText pFileName( iter->path().leaf().c_str() );
+                    moText pCompletePathFilename( iter->path().string().c_str() );
+                #else
+                    moText pFileName( iter->path().filename().string().c_str() );
+                    moText pCompletePathFilename( iter->path().string().c_str() );
+                #endif
+
+
+
+
+            moFile*	pFile = NULL;
+
+            if (pFileName!=moText("Thumbs.db")) {
+
+                bool founded = false;
+
+                for( int i=0; i<(int)m_Files.Count(); i++) {
+                    pFile = m_Files[i];
+                    if  (pFile->GetCompletePath()==pCompletePathFilename) {
+                        founded = true;
+                    }
+                }
+                if (!founded) {
+                        if (m_pFileManager) {
+                            pFile = m_pFileManager->GetFile( pCompletePathFilename );
+                        } else {
+                            pFile = new moFile( pCompletePathFilename );
+                        }
+                        if (pFile) {
+                            MODebug2->Message( moText("moFileManager::moDirectory::Update file added:") + (moText)pCompletePathFilename);
+                            m_Files.Add(pFile);
+                        }
+                }
+
+            }
+
+
+            //#ifdef _DEBUG
+            //MODebug2->Message( moText("moFileManager:: moDirectory::Update:") + (moText)pCompletePathFilename);
+            //#endif
+            //printf("%-32s %s %9.ld %s",fileInfo.name, attribs, fileInfo.size , timeBuff);
+
+          }
+
+      }
+*/
+      return;
+
+}
+
+
+
+  GetFiles() : moFileArray {
+    return this.m_Files;
+  }
+
+  GetSubDirs() : moDirectoryArray {
+    return this.m_SubDirs;
+  }
+
+}
+export type moDirectoryArray = moDirectory[];
 
 export class moFileManager extends moResource {
+  m_Files : moFileArray = [];
+  m_Directories : moDirectoryArray = [];
 
   constructor(private http: Http) {
     super();
@@ -231,5 +576,43 @@ export class moFileManager extends moResource {
     });
   }
 
+  Open(p_Path: moText, bWaitForDownload: boolean = true) {
 
-};
+    for (var i = 0; i < this.m_Directories.length; i++) {
+      if (this.m_Directories[i].GetCompletePath() == p_Path) {
+        return true;
+      }
+    }
+
+    var pDir: moDirectory = new moDirectory(p_Path, this);
+/*
+    if (pDir) {
+      if (pDir.GetType() == moFileType.MO_FILETYPE_LOCAL
+        && pDir.Exists() == false) {
+        delete pDir;
+        return false;
+      }
+      if (bWaitForDownload && pDir.IsRemote()) {
+        while (pDir.GetStatus() != moFileStatus.MO_FILESTATUS_READY) {
+          pDir.Update();
+        }
+      }
+      this.m_Directories.push(pDir);
+      return true;
+    }*/
+    return false;
+  }
+
+  GetDirectory( p_Path : moText ): moDirectory {
+    if ( this.Open(p_Path) ) {
+      for(var i = 0; i< this.m_Directories.length; i++ ) {
+        if ( this.m_Directories[i].GetCompletePath() == p_Path ) {
+          return this.m_Directories[i];
+        }
+      }
+    }
+  }
+
+
+
+}

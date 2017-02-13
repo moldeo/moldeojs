@@ -1,6 +1,5 @@
 import * as xml2js from "xml2js";
 
-
 import {
   MOint, MOuint, MOboolean, MOfloat, MOdouble, MOlong, MOulong,
   moNumber, moTextFilterParam,
@@ -20,7 +19,9 @@ import {
 import { moPreconfig, moPreConfigs } from "./mo-pre-config";
 import { moFile } from "./mo-file-manager";
 import { moColor, moColor4fArray, moColorRGBA, moColorRGB, moColorArray } from "./mo-gui-manager";
-import { moTexture } from "./mo-texture";
+import { moTexture, moTextureBuffer } from "./mo-texture";
+
+
 
 export const MO_PARAM_NOT_SEL = -1;
 export const MO_PARAM_NOT_FOUND = -1;
@@ -63,6 +64,15 @@ export class moConfigDefinition extends moAbstract {
     return false;
   }
 
+  GetParamDefinitions(): moParamDefinitions {
+    return this.m_ParamDefinitions;
+  }
+
+  Empty(): void {
+    this.m_ParamDefinitions = [];
+    this.m_ParamDefinitions_Map = {};
+    this.m_ParamIndexes = [];
+  }
 
   /// Agrega la definición de un parámetro con un valor predeterminado a tomar
   /**
@@ -74,7 +84,9 @@ export class moConfigDefinition extends moAbstract {
   * @param p_OptionsStr opciones separadas por coma "opcion A, opcion B, opcion C"
   */
   Add(p_name: moText, p_type: moParamType,
-    p_index: MOint, p_defaultvalue?: moValue, p_OptionsStr?: moText ) {
+    p_index?: MOint,
+    p_defaultvalue?: moValue,
+    p_OptionsStr?: moText) {
 
     if (this.Exists(p_name)) {
       this.MODebug2.Error(p_name + " already defined in " + this.m_ObjectName);
@@ -85,10 +97,15 @@ export class moConfigDefinition extends moAbstract {
 
     pdef.SetIndex(p_index);
 
-    if (p_type != moParamType.MO_PARAM_MOLDEO_OBJECT)
-      pdef.SetDefault(p_defaultvalue);
+    if (p_type != moParamType.MO_PARAM_MOLDEO_OBJECT) {
+      if (p_defaultvalue == undefined)
+        p_defaultvalue = new moValue("","UNDEFINED");
 
-    pdef.SetOptions(p_OptionsStr);
+      pdef.SetDefault(p_defaultvalue);
+    }
+
+    if (p_OptionsStr)
+      pdef.SetOptions(p_OptionsStr);
 
     //IF TYPE IS COLOR > sub 0: RED, 1: GREEN, 2: BLUE, 3: ALPHA
     if (p_type == moParamType.MO_PARAM_COLOR) {
@@ -130,173 +147,166 @@ export class moConfigDefinition extends moAbstract {
 
 export class moConfig extends moAbstract {
 
-    m_ConfigLoaded : MOboolean = false;
-    m_Params: moParams = [];//los parametros del config
-    m_ParamsByName: any = {};
-    m_PreConfigs : moPreConfigs = [];
-		m_ConfigDefinition : moConfigDefinition;
+  m_ConfigLoaded : MOboolean = false;
+  m_Params: moParams = [];//los parametros del config
+  m_ParamsByName: any = {};
+  m_PreConfigs : moPreConfigs = [];
+  m_ConfigDefinition : moConfigDefinition = new moConfigDefinition();
 
-		m_MajorVersion : MOint = 0;
-		m_MinorVersion : MOint = 0;
-		m_FileName : moText;
+  m_MajorVersion : MOint = 0;
+  m_MinorVersion : MOint = 0;
+  m_FileName : moText;
 
-		m_CurrentParam : MOint = 0;// el indice que indica cual es el parametro actual.
-		m_PreconfParamNum : MOint = 0;
-		m_PreconfActual: MOint = 0;
+  m_CurrentParam : MOint = 0;// el indice que indica cual es el parametro actual.
+  m_PreconfParamNum : MOint = 0;
+  m_PreconfActual: MOint = 0;
 
-    ///solo para poder devolver una referencia
-    /*
-    static moFont*         m_pFont;
-		static moMathFunction* m_pFun;
-		static moTextureBuffer* m_pTextureBuffer;
-		static moSceneNode*            m_pModel;
-		static moVector2d*             m_pVector2d;
-		static moVector2i*             m_pVector2i;
-		static moVector3d*             m_pVector3d;
-		static moVector3i*             m_pVector3i;
-		static moVector4d*             m_pVector4d;
-		static moVector4i*             m_pVector4i;
-		static moDataMessage*          m_pMessage;
-		static moDataMessages*         m_pMessages;
-		static moSound*                m_pSound;*/
-    m_pTexture : moTexture = new moTexture();
+  m_pTexture: moTexture = new moTexture();
+  m_pTextureBuffer: moTextureBuffer = new moTextureBuffer();
+  ///solo para poder devolver una referencia
+  /*
+  static moFont*         m_pFont;
+  static moMathFunction* m_pFun;
+  static moTextureBuffer* m_pTextureBuffer;
+  static moSceneNode*            m_pModel;
+  static moVector2d*             m_pVector2d;
+  static moVector2i*             m_pVector2i;
+  static moVector3d*             m_pVector3d;
+  static moVector3i*             m_pVector3i;
+  static moVector4d*             m_pVector4d;
+  static moVector4i*             m_pVector4i;
+  static moDataMessage*          m_pMessage;
+  static moDataMessages*         m_pMessages;
+  static moSound*                m_pSound;
+  */
 
-    constructor() {
-      super();
-      this.m_ConfigDefinition = new moConfigDefinition();
-    }
+  constructor() {
+    super();
+  }
 
-    Set( p_objectname : moText, p_objectclass : moText ) : void {
-      this.m_ConfigDefinition.Set( p_objectname, p_objectclass);
-    }
+  Set( p_objectname : moText, p_objectclass : moText ) : void {
+    this.m_ConfigDefinition.Set( p_objectname, p_objectclass);
+  }
 
-    GetName(): moText {
-      return this.m_FileName;
-    }
+  GetName(): moText {
+    return this.m_FileName;
+  }
 
-    /// Devuelve el nombre del objeto asociado a este config
-    /**
-    * El nombre del objeto no especifica la clase.
-    * @return el nombre del objeto
-    */
-    GetObjectName() : moText {
-      return this.m_ConfigDefinition.GetObjectName();
-    }
+  /// Devuelve el nombre del objeto asociado a este config
+  /**
+  * El nombre del objeto no especifica la clase.
+  * @return el nombre del objeto
+  */
+  GetObjectName() : moText {
+    return this.m_ConfigDefinition.GetObjectName();
+  }
 
-    /// Devuelve el nombre de la clase del objeto asociado a este config
-    /**
-    * El nombre de la clase puede ser del objeto del que deriva este.
-    * @return el nombre de la clase
-    */
-    GetObjectClass() : moText {
-      return this.m_ConfigDefinition.GetObjectClass();
-    }
+  /// Devuelve el nombre de la clase del objeto asociado a este config
+  /**
+  * El nombre de la clase puede ser del objeto del que deriva este.
+  * @return el nombre de la clase
+  */
+  GetObjectClass() : moText {
+    return this.m_ConfigDefinition.GetObjectClass();
+  }
 
 
-    GetConfigDefinition() : moConfigDefinition {
-      return this.m_ConfigDefinition;
-    }
+  GetConfigDefinition() : moConfigDefinition {
+    return this.m_ConfigDefinition;
+  }
 
-    CreateParam( p_ParamDef: moParamDefinition ) : void {
+  CreateParam( p_ParamDef: moParamDefinition ) : void {
+    //
+  }
 
-    }
+  CreateDefault(p_fullconfigname: moText) : boolean {
+    return false;
+  }
 
-    CreateDefault(p_fullconfigname: moText) : boolean {
-      return false;
-    }
+  IsConfigLoaded(): boolean {
+    return this.m_ConfigLoaded;
+  }
 
-    IsConfigLoaded(): boolean {
-      return this.m_ConfigLoaded;
-    }
+  //LoadConfig( config: moFile ): boolean;
 
-    //LoadConfig( config: moFile ): boolean;
-    LoadConfig( configtext: any, callback?: any ): MOint {
-      //console.log("configname:", { "fullconfig": configtext });
-      //return MO_CONFIGFILE_NOT_FOUND;
-      if ( configtext && typeof configtext == "string" ) {
-          //console.log("moConfig::LoadConfig > Full text", configname);
-          //parse XML:
-          xml2js.parseString( configtext, (err, result) => {
-            //console.log(result);
-            //console.log('Parsing done');
-            this.m_ParamsByName = {};
+  LoadConfig( configtext: any, callback?: any ): MOint {
+    //console.log("configname:", { "fullconfig": configtext });
+    //return MO_CONFIGFILE_NOT_FOUND;
+    if ( configtext && typeof configtext == "string" ) {
+        //console.log("moConfig::LoadConfig > Full text", configname);
+        //parse XML:
+        xml2js.parseString( configtext, (err, result) => {
+          //console.log(result);
+          //console.log('Parsing done');
+          this.m_ParamsByName = {};
 
-            if ("MOCONFIG" in result) {
-              if ("CONFIGPARAMS" in result["MOCONFIG"]) {
-                var CFGPARAMS = result["MOCONFIG"]["CONFIGPARAMS"][0]["PARAM"];
-                this.m_Params = [];
-                for (var PARAM_I in CFGPARAMS) {
-                  var PARAM = CFGPARAMS[PARAM_I];
-                  //console.log("Adding Param:", PARAM);
-                  var p_param_def = new moParamDefinition(
-                    PARAM["$"]["name"],
-                    PARAM["$"]["type"],
-                    PARAM["$"]["property"],
-                    PARAM["$"]["group"],
-                    PARAM["$"]["interpolation"],
-                    PARAM["$"]["duration"],
-                    PARAM["$"]["options"]
-                  );
-                  var p_param = new moParam( p_param_def );
-                  this.m_Params.push(p_param);
-                  this.m_ParamsByName[""+p_param.m_ParamDefinition.m_Name] = p_param;
-                  var PARAMVALS = PARAM["VAL"];
-                  for (var PARAMVAL_I in PARAMVALS) {
-                    var VAL = PARAMVALS[PARAMVAL_I];
-                    var newValue: moValue = new moValue();
-                    var VALSUBS = VAL["D"];
-                    for (var SUBVAL_I in VALSUBS) {
-                      var SUBVAL = VALSUBS[SUBVAL_I];
-                      //console.log(" <D> Subvalue:", SUBVAL);
-                      var vbd: moValueDefinition = new moValueDefinition();
+          if ("MOCONFIG" in result) {
+            if ("CONFIGPARAMS" in result["MOCONFIG"]) {
+              var CFGPARAMS = result["MOCONFIG"]["CONFIGPARAMS"][0]["PARAM"];
+              this.m_Params = [];
+              for (var PARAM_I in CFGPARAMS) {
+                var PARAM = CFGPARAMS[PARAM_I];
+                //console.log("Adding Param:", PARAM);
+                var p_param_def = new moParamDefinition(
+                  PARAM["$"]["name"],
+                  PARAM["$"]["type"],
+                  PARAM["$"]["property"],
+                  PARAM["$"]["group"],
+                  PARAM["$"]["interpolation"],
+                  PARAM["$"]["duration"],
+                  PARAM["$"]["options"]
+                );
+                var p_param = new moParam( p_param_def );
+                this.m_Params.push(p_param);
+                this.m_ParamsByName[""+p_param.m_ParamDefinition.m_Name] = p_param;
+                var PARAMVALS = PARAM["VAL"];
+                for (var PARAMVAL_I in PARAMVALS) {
+                  var VAL = PARAMVALS[PARAMVAL_I];
+                  var newValue: moValue = new moValue();
+                  var VALSUBS = VAL["D"];
+                  for (var SUBVAL_I in VALSUBS) {
+                    var SUBVAL = VALSUBS[SUBVAL_I];
+                    //console.log(" <D> Subvalue:", SUBVAL);
+                    var vbd: moValueDefinition = new moValueDefinition();
 
-                      var subvalue: moText = SUBVAL["_"];
-                      var subvaluetype: moText = SUBVAL["$"]["type"];
+                    var subvalue: moText = SUBVAL["_"];
+                    var subvaluetype: moText = SUBVAL["$"]["type"];
 
-                      newValue.AddSubValue( subvalue, subvaluetype );
-                      //console.log("newValue:", newValue);
-                      //var subvaluedata: moText = SUBVAL[0];
-                      if (newValue.m_List.length) {
-                        if (SUBVAL["$"]["code"])
-                          newValue.m_List[newValue.m_List.length - 1].SetCodeName(SUBVAL["$"]["code"]);
-                        if (SUBVAL["$"]["attribute"])
-                          newValue.m_List[newValue.m_List.length - 1].SetAttribute(SUBVAL["$"]["attribute"]);
-                        if (SUBVAL["$"]["min"])
-                          newValue.m_List[newValue.m_List.length - 1].SetRange(
-                            SUBVAL["$"]["min"],
-                            SUBVAL["$"]["max"]);
-                      }
+                    newValue.AddSubValue( subvalue, subvaluetype );
+                    //console.log("newValue:", newValue);
+                    //var subvaluedata: moText = SUBVAL[0];
+                    if (newValue.m_List.length) {
+                      if (SUBVAL["$"]["code"])
+                        newValue.m_List[newValue.m_List.length - 1].SetCodeName(SUBVAL["$"]["code"]);
+                      if (SUBVAL["$"]["attribute"])
+                        newValue.m_List[newValue.m_List.length - 1].SetAttribute(SUBVAL["$"]["attribute"]);
+                      if (SUBVAL["$"]["min"])
+                        newValue.m_List[newValue.m_List.length - 1].SetRange(
+                          SUBVAL["$"]["min"],
+                          SUBVAL["$"]["max"]);
                     }
-                    p_param.AddValue(newValue);
-                    p_param.m_ParamDefinition.m_Index = this.m_Params.length - 1;
                   }
+                  p_param.AddValue(newValue);
+                  p_param.m_ParamDefinition.m_Index = this.m_Params.length - 1;
                 }
-                //console.log("Added params:", this.m_Params);
-
               }
-            }//fin "CONFIGPARAMS"
+              //console.log("Added params:", this.m_Params);
 
-            if ("PRECONFIGS" in result["MOCONFIG"]) {
+            }
+          }//fin "CONFIGPARAMS"
 
-            }//fin "PRECONFIGS"
-            this.m_ConfigLoaded = true;
-            if (callback) callback(MO_CONFIG_OK);
-            return MO_CONFIG_OK;
-          });
-        return MO_CONFIG_OK;//MUST BE MO_CONFIG_LOADING
-      }
-      this.m_ConfigLoaded = false;
-      return MO_CONFIGFILE_NOT_FOUND;
+          if ("PRECONFIGS" in result["MOCONFIG"]) {
+
+          }//fin "PRECONFIGS"
+          this.m_ConfigLoaded = true;
+          if (callback) callback(MO_CONFIG_OK);
+          return MO_CONFIG_OK;
+        });
+      return MO_CONFIG_OK;//MUST BE MO_CONFIG_LOADING
     }
-
-
-    Text(param_id: any) : moText {
-      var param: moParam;
-      param = this.GetParam(param_id);
-      if (param && param.m_Values.length>0)
-        return param.m_Values[0].m_List[0].m_Text;
-      return "";
-    }
+    this.m_ConfigLoaded = false;
+    return MO_CONFIGFILE_NOT_FOUND;
+  }
 
   GetParams() : moParams {
     return this.m_Params;
@@ -441,6 +451,13 @@ export class moConfig extends moAbstract {
   }
 
 
+  Text(param_id: any) : moText {
+    var param: moParam;
+    param = this.GetParam(param_id);
+    if (param && param.m_Values.length>0)
+      return param.m_Values[0].m_List[0].m_Text;
+    return "";
+  }
 
   Texture(p_paramid: any) : moTexture {
     var param: moParam = this.GetParam(p_paramid);
@@ -460,11 +477,28 @@ export class moConfig extends moAbstract {
     return this.m_pTexture;
   }
 
+  TextureBuffer(p_paramid: any) : moTextureBuffer {
+    var param: moParam = this.GetParam(p_paramid);
+    //console.log("moConfig.Texture");
+    if (param) {
+      var pdata: moData = param.GetData();
+      //console.log(param, pdata);
+      if (pdata) {
+
+        var pTextureBuffer: moTextureBuffer = pdata.TextureBuffer();
+        if (pTextureBuffer) {
+          return pTextureBuffer;
+        }
+      }
+    }
+    return this.m_pTextureBuffer;
+  }
+
+
   Int(refid: any): MOint {
     var Param: moParam = this.GetParam(refid);
-    var f: any;
+    var f: MOint;
     if (Param) {
-      //console.log("EvalColor:", Param);
       var vb: moValue = Param.GetValue();
       if (vb) {
         f = vb.GetSubValue(0).Int()
@@ -477,7 +511,6 @@ export class moConfig extends moAbstract {
     var Param: moParam = this.GetParam(refid);
     var f: any;
     if (Param) {
-      //console.log("EvalColor:", Param);
       var vb: moValue = Param.GetValue();
       if (vb) {
         f = vb.GetSubValue(0).Double()
@@ -498,28 +531,20 @@ export class moConfig extends moAbstract {
     return f;
   }
 
-//moVector4d color4D = m_Config.EvalColor( moR(ERASE_COLOR) );
-  //mr_Color: moColor = new moColor(0.0,0.0,0.0);
   EvalColor( refid: any ) : any {
-    var r: any;
-    var g: any;
-    var b: any;
+    var rgba: any = { r: 1.0, g: 1.0, b: 1.0, a: 1.0 };
     var Param: moParam = this.GetParam(refid);
     if (Param) {
-      //console.log("EvalColor:"+refid, Param);
       var vb: moValue = Param.GetValue();
       if (vb) {
-        //console.log("EvalColor: vb:", vb);
-        r = vb.GetSubValue(0).Eval();
-        g = vb.GetSubValue(1).Eval();
-        b = vb.GetSubValue(2).Eval();
+        rgba.r = vb.GetSubValue(0).Eval();
+        rgba.g = vb.GetSubValue(1).Eval();
+        rgba.b = vb.GetSubValue(2).Eval();
+        rgba.a = vb.GetSubValue(3).Eval();
         //this.mr_Color.setRGB(r,g,b);
       }
     }
-    //console.log(` EvalColor is ${r},${g},${b}`);
-    //return new moColor(r, g, b);
-    //return this.mr_Color;
-    return { "r": r, "g": g, "b": b };
+    return rgba;
   }
 }
 

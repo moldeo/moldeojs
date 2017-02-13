@@ -36,8 +36,8 @@ export class moEffectPlane extends MO.moEffect {
     return true;
   }
 
-  Draw( p_tempo : MO.moTempo ) : void {
-    this.BeginDraw(p_tempo);
+  Draw( p_tempo : MO.moTempo, p_parentstate : MO.moEffectState = null ) : void {
+    this.BeginDraw(p_tempo, p_parentstate);
 
 
     if (this.RM == undefined) return;

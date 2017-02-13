@@ -1,13 +1,19 @@
 import * as MO from "moldeojs";
 import {
-  NULL,
-  moVector2f, moVector3f, moVector4f,
-  moColor, moText, moData, moValue, moParam, moParamType, moTimer,
-  MOdouble, MOfloat, MOint, MOuint, MOlong, MOulong,
+  NULL, moIsTimerStopped,
+  MOdouble, MOfloat, MOint, MOuint, MOlong, MOulong, MObyte,
+  moVector2f, moVector3f, moVector4f, moMath, moMathd,
+  moColor, moText, _m, moSlash, moData, moDataType, moValue, moParam, moParamType,
+  moTimer, moGetTicks,
   moAbstract, moMesh, moMaterial, moMaterialBase, moMaterialBasic,
+  moInlet, moOutlet, moTempo, moEffectState,
+  moTexture, moTextureType, moTextureAnimated, moTextureMemory,
+  moTextureBuffer, moTextureManager,
   moGLManager, moGLMatrixf, moRenderManager
 }
   from "moldeojs";
+
+var THREE = MO.three;
 
 ///Emitter Type
 /**
@@ -134,8 +140,7 @@ export enum moParticlesSimpleTextureMode {
 };
 export var TEXMODE = moParticlesSimpleTextureMode;
 
-
-export const TextureModeOptions : MO.moTextArray = [];
+export const TextureModeOptions: MO.moTextArray = [];
 
 ///Creation Method
 export enum moParticlesCreationMethod {
@@ -219,7 +224,7 @@ export var LIGHTMODE = moParticlesSimpleLightMode;
 
 
 export enum moParticlesSimpleParamIndex {
-  PARTICLES_INLET,
+  PARTICLES_INLET=0,
   PARTICLES_OUTLET,
   PARTICLES_SCRIPT,
 	PARTICLES_ALPHA,
@@ -325,9 +330,24 @@ export enum moParticlesSimpleParamIndex {
   PARTICLES_LIGHTZ
 };
 export var PAR = moParticlesSimpleParamIndex;
-
+export var PARS = { "inlet": 0, "outlet": 1 };
+export var PARA = { "0": "inlet", "1": "outlet" };
+export function moR(idx: number) : moText {
+  var str = "";
+  str = PARA[""+idx];
+  return str;
+}
+export function moDefineParamIndex(idx: number, name : moText ) {
+  PARS["" + name] = idx;
+  PARA[""+idx] = ""+name;
+}
 
 export class moParticlesSimple extends moAbstract {
+
+  Geometry : any;
+  Material : any;
+  Mesh : any;
+  Model: any;
 
   Pos3d : moVector3f = new moVector3f(0.0,0.0,0.0); ///Position absolute
   Destination : moVector3f = new moVector3f(0.0,0.0,0.0); ///Destination
@@ -360,8 +380,8 @@ export class moParticlesSimple extends moAbstract {
   ///particle size
   /**
       This size is dependent on particles number and Emitter size
-      Size.X > EmitterSize.X() / m_cols
-      Size.Y > EmitterSize.Y() / m_rows
+      Size.X > EmitterSize.x / m_cols
+      Size.Y > EmitterSize.y / m_rows
   */
   Size: moVector2f = new moVector2f(0.0, 0.0);///particle size
   TSize : moVector2f = new moVector2f(0.0,0.0);///particle texture size
@@ -467,6 +487,7 @@ class moParticlesSimplePhysics extends moAbstract {
     this.gravitational = 0.0;
     this.viscousdrag = 0.0;
 
+    this.EmitionTimer = new moTimer();
     this.EmitionTimer.Stop();
 
     this.m_ParticleScript = "";
@@ -541,11 +562,12 @@ export enum enumRevelationStatus {
     PARTICLES_RESTORING = 4,
     PARTICLES_RESTORINGALL = 5
 };
-
+export var REVSTA = enumRevelationStatus;
 
 export type moParticlesSimpleArray = moParticlesSimple[];
-//typedef std::map< double, moParticlesSimple* > TMapDepthToParticleSimple;
 
+//typedef std::map< double, moParticlesSimple* > TMapDepthToParticleSimple;
+export type TMapDepthToParticleSimple = {};
 
 export class moEffectParticlesSimple extends MO.moEffect {
 
@@ -558,1822 +580,2442 @@ export class moEffectParticlesSimple extends MO.moEffect {
   Model: MO.moGLMatrixf;
   Mesh: MO.moMesh;
   Scene: MO.moSceneNode;
+  SceneParticles: MO.moSceneNode;
+  GroupedParticles: MO.moGroup;
 
-  constructor() {
-    super();
-    this.SetName("particlessimple");
-  }
+  m_pParticleTime : moInlet;
+  m_pParticleIndex : moInlet;
 
-  Init(callback?:any): boolean {
-    this.RM = this.m_pResourceManager.GetRenderMan();
-    this.GL = this.m_pResourceManager.GetGLMan();
+  m_ParticlesSimpleArrayOrdered : moParticlesSimpleArray = [];
+  //std::vector < moParticlesSimple* >  m_ParticlesSimpleVector;
+  m_ParticlesSimpleVector: moParticlesSimpleArray = [];
 
-    console.log(`moEffect${this.GetName()}.Init ${this.GetName()}`);
-    if (this.PreInit((res) => {
-      if (callback) callback(res);
-    }) == false) {
-      return false;
-    }
+  m_ParticlesSimpleArray : moParticlesSimpleArray = [];
+  m_ParticlesSimpleArrayTmp : moParticlesSimpleArray = [];
+  m_Physics : moParticlesSimplePhysics =  new moParticlesSimplePhysics();
+
+  m_bTrackerInit : boolean;
+  //m_pTrackerData : moTrackerSystemData;
+  m_InletTrackerSystemIndex : MOint;
 /*
-    ///IMPORTANT: add inlets before PreInit so inlets name are availables for function variables!!
-    m_pParticleTime = new moInlet();
-
-    if (m_pParticleTime) {
-      ((moConnector*)m_pParticleTime)->Init( moText("particletime"), m_Inlets.Count(), MO_DATA_NUMBER_DOUBLE );
-      m_Inlets.Add(m_pParticleTime);
-    }
-
-    m_pParticleIndex = new moInlet();
-
-    if (m_pParticleIndex) {
-      ((moConnector*)m_pParticleIndex)->Init( moText("particleindex"), m_Inlets.Count(), MO_DATA_NUMBER_LONG );
-      m_Inlets.Add(m_pParticleIndex);
-    }
+        #ifdef USE_TUIO
+        moTUIOSystemData*       m_pTUIOData;
+        MOint                   m_InletTuioSystemIndex;
+        #endif
 */
-/*
-  m_Physics.m_ParticleScript = moText("");
 
-    m_Rate = 0;
-    last_tick = 0;
-    frame = 0;
+  m_TrackerBarycenter : moVector2f;
 
-    ortho = false;
+  //setUpLighting() : void;
 
-    m_bTrackerInit = false;
-    m_pTrackerData = NULL;
+  m_rows : MOint;
+  m_cols : MOint;
+  normalf : MOfloat; ///width of full floor usually 100.0
 
-    UpdateParameters();
-
-    ResetTimers();
-
-    InitParticlesSimple(  m_Config.Int( moR(PARTICLES_WIDTH) ),
-                          m_Config.Int( moR(PARTICLES_HEIGHT)) );
+  time_tofull_revelation : MOlong;
+  time_tofull_restoration : MOlong;
+  time_of_revelation : MOlong;
+  time_of_restoration : MOlong;
+  drawing_features : MOlong; /// 0: nothing 1: motion  2: all
+  texture_mode : MOlong;
 
 
-    pTextureDest = NULL;
-    pSubSample = NULL;
-    samplebuffer = NULL;
+  ortho : boolean;
 
-    glidori  = 0;
-    glid = 0;
-    original_width = 0;
-    original_height = 0;
-    original_proportion = 1.0;
+///internal
+  MotionTimer : moTimer = new moTimer();
 
-    midi_red = midi_green = midi_blue = 1.0;
-    midi_maxage = 1.0; //in millis
-    midi_emitionperiod = 1.0;//in millisec
-    midi_emitionrate = 1.0; // n per emitionperiod
-    midi_randomvelocity = 1.0; //inicial vel
-    midi_randommotion = 1.0; //motion dynamic
-    #ifdef USE_TUIO
-    m_InletTuioSystemIndex = GetInletIndex("TUIOSYSTEM");
-    #endif
-    m_InletTrackerSystemIndex = GetInletIndex("TRACKERKLT");
-    */
-    return true;
-  }
+  TimerFullRevelation : moTimer = new moTimer(); ///begins on first motion activity!!!!
+  TimerFullRestoration : moTimer = new moTimer();///begins on full revelation finished....
+  TimerOfRevelation : moTimer = new moTimer(); ///begins on revealing all
+  TimerOfRestoration : moTimer = new moTimer();///begins on restoring all
 
+  FeatureActivity : moTimer = new moTimer();///start on first feature activity, ends on
+  MotionActivity : moTimer = new moTimer();///start on first motion activity, ends on no motion
+  NoMotionActivity : moTimer = new moTimer();///start on no motion, ends on first motion activity
 
-ResetTimers() : void {
-/*
-    TimerFullRevelation.Stop();
-    TimerFullRestoration.Stop();
-    TimerOfRevelation.Stop();
-    TimerOfRestoration.Stop();
+  revelation_status : enumRevelationStatus; /// 5: full revealed 0: full hidden
 
-    FeatureActivity.Stop();
-    MotionActivity.Stop();
-    NoMotionActivity.Stop();
-    m_Physics.EmitionTimer.Stop();
+  m_Rate : MOlong;
 
-      for ( int i=0; i < m_ParticlesSimpleArray.Count(); i++ ) {
-            moParticlesSimple* pPar = m_ParticlesSimpleArray[i];
-            pPar->Age.Stop();
-            pPar->Age.SetRelativeTimer( (moTimerAbsolute*)&m_EffectState.tempo );
-            pPar->Visible = false;
+  last_tick : MOlong;
+
+  //special for script
+  pTextureDest : moTexture;
+  pSubSample : moTexture;
+  samplebuffer : MObyte[];
+
+  glidori : MOint;
+  glid : MOint;
+  frame : MOint;
+
+  original_width : MOint;
+  original_height : MOint;
+  original_proportion : MOfloat;
+
+  emiper : MOlong;
+  emiperi : MOlong;
+
+  /*
+    midi_red, midi_green, midi_blue;
+    midi_maxage; //in millis
+    midi_emitionperiod;//in millisec
+    midi_emitionrate; // n per emitionperiod
+    midi_randomvelocity; //inicial vel
+    midi_randommotion; //motion dynamic
+  */
+    tx: MOdouble;
+    ty: MOdouble;
+    tz: MOdouble;
+    sx: MOdouble;
+    sy: MOdouble;
+    sz: MOdouble;
+    rx: MOdouble;
+    ry: MOdouble;
+    rz: MOdouble;
+
+    m_Rot : moVector4f;//[4]
+    m_TS : moVector4f;//[4]
+
+    m_OrderedParticles : TMapDepthToParticleSimple;
+    m_OrderingMode : moParticlesOrderingMode;
+
+    dtrel : MOdouble;
+    dt : MOdouble;
+    gral_ticks : MOlong;
+
+    constructor() {
+      super();
+      this.SetName("particlessimple");
+    }
+
+    Init(callback?:any): boolean {
+      this.RM = this.m_pResourceManager.GetRenderMan();
+      this.GL = this.m_pResourceManager.GetGLMan();
+
+      ///IMPORTANT: add inlets before PreInit so inlets name are availables for function variables!!
+      this.m_pParticleTime = new moInlet();
+
+      if (this.m_pParticleTime) {
+        this.m_pParticleTime.Init( "particletime", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+        this.m_Inlets.push( this.m_pParticleTime );
       }
 
-  m_Physics.m_pLastBordParticle = NULL;*/
-}
+      this.m_pParticleIndex = new moInlet();
 
-ReInit() : void {
+      if (this.m_pParticleIndex) {
+        this.m_pParticleIndex.Init( "particleindex", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_LONG );
+        this.m_Inlets.push( this.m_pParticleIndex );
+      }
+
+
+      console.log(`moEffect${this.GetName()}.Init ${this.GetName()}`);
+      if (this.PreInit((res) => {
+
+        moDefineParamIndex( PAR.PARTICLES_INLET, _m("inlet") );
+        moDefineParamIndex( PAR.PARTICLES_OUTLET, _m("outlet") );
+        moDefineParamIndex( PAR.PARTICLES_SCRIPT, _m("script") );
+
+        moDefineParamIndex( PAR.PARTICLES_ALPHA, _m("alpha") );
+        moDefineParamIndex( PAR.PARTICLES_COLOR, _m("color") );
+        moDefineParamIndex( PAR.PARTICLES_SYNC, _m("syncro") );
+        moDefineParamIndex( PAR.PARTICLES_PHASE, _m("phase") );
+        moDefineParamIndex( PAR.PARTICLES_PARTICLECOLOR, _m("particlecolor") );
+        moDefineParamIndex( PAR.PARTICLES_FONT, _m("font") );
+        moDefineParamIndex( PAR.PARTICLES_TEXT, _m("text") );
+        moDefineParamIndex( PAR.PARTICLES_ORTHO, _m("ortho") );
+
+
+        moDefineParamIndex( PAR.PARTICLES_TEXTURE, _m("texture") );
+        moDefineParamIndex( PAR.PARTICLES_FOLDERS, _m("folders") );
+        moDefineParamIndex( PAR.PARTICLES_TEXTUREMODE, _m("texture_mode") );
+        moDefineParamIndex( PAR.PARTICLES_BLENDING, _m("blending") );
+
+        moDefineParamIndex( PAR.PARTICLES_WIDTH, _m("width") );
+        moDefineParamIndex( PAR.PARTICLES_HEIGHT, _m("height") );
+        moDefineParamIndex( PAR.PARTICLES_SIZEX, _m("sizex") );
+        moDefineParamIndex( PAR.PARTICLES_SIZEY, _m("sizey") );
+        moDefineParamIndex( PAR.PARTICLES_SIZEZ, _m("sizez") );
+
+        moDefineParamIndex( PAR.PARTICLES_GRAVITY, _m("gravity") );
+        moDefineParamIndex( PAR.PARTICLES_VISCOSITY, _m("viscosity") );
+
+        moDefineParamIndex( PAR.PARTICLES_MAXAGE, _m("maxage") );
+        moDefineParamIndex( PAR.PARTICLES_EMITIONPERIOD, _m("emitionperiod") );
+        moDefineParamIndex( PAR.PARTICLES_EMITIONRATE, _m("emitionrate") );
+        moDefineParamIndex( PAR.PARTICLES_DEATHPERIOD, _m("deathperiod") );
+        moDefineParamIndex( PAR.PARTICLES_SCRIPT2, _m("particlescript") );
+
+        moDefineParamIndex( PAR.PARTICLES_FADEIN, _m("fadein") );
+        moDefineParamIndex( PAR.PARTICLES_FADEOUT, _m("fadeout") );
+        moDefineParamIndex( PAR.PARTICLES_SIZEIN, _m("sizein") );
+        moDefineParamIndex( PAR.PARTICLES_SIZEOUT, _m("sizeout") );
+
+        moDefineParamIndex( PAR.PARTICLES_RANDOMMETHOD, _m("randommethod") );
+        moDefineParamIndex( PAR.PARTICLES_CREATIONMETHOD, _m("creationmethod") );
+        moDefineParamIndex( PAR.PARTICLES_ORIENTATIONMODE, _m("orientationmode") );
+
+        moDefineParamIndex( PAR.PARTICLES_RANDOMPOSITION, _m("randomposition") );
+        moDefineParamIndex( PAR.PARTICLES_RANDOMPOSITION_X, _m("randompositionx") );
+        moDefineParamIndex( PAR.PARTICLES_RANDOMPOSITION_Y, _m("randompositiony") );
+        moDefineParamIndex( PAR.PARTICLES_RANDOMPOSITION_Z, _m("randompositionz") );
+
+        moDefineParamIndex( PAR.PARTICLES_RANDOMVELOCITY, _m("randomvelocity") );
+        moDefineParamIndex( PAR.PARTICLES_RANDOMVELOCITY_X, _m("randomvelocityx") );
+        moDefineParamIndex( PAR.PARTICLES_RANDOMVELOCITY_Y, _m("randomvelocityy") );
+        moDefineParamIndex( PAR.PARTICLES_RANDOMVELOCITY_Z, _m("randomvelocityz") );
+
+        moDefineParamIndex( PAR.PARTICLES_RANDOMMOTION, _m("randommotion") );
+        moDefineParamIndex( PAR.PARTICLES_RANDOMMOTION_X, _m("randommotionx") );
+        moDefineParamIndex( PAR.PARTICLES_RANDOMMOTION_Y, _m("randommotiony") );
+        moDefineParamIndex( PAR.PARTICLES_RANDOMMOTION_Z, _m("randommotionz") );
+
+        moDefineParamIndex( PAR.PARTICLES_EMITTERTYPE, _m("emittertype") );
+        moDefineParamIndex( PAR.PARTICLES_EMITTERVECTOR_X, _m("emittervectorx") );
+        moDefineParamIndex( PAR.PARTICLES_EMITTERVECTOR_Y, _m("emittervectory") );
+        moDefineParamIndex( PAR.PARTICLES_EMITTERVECTOR_Z, _m("emittervectorz") );
+
+        moDefineParamIndex( PAR.PARTICLES_ATTRACTORTYPE, _m("attractortype") );
+        moDefineParamIndex( PAR.PARTICLES_ATTRACTORMODE, _m("attractormode") );
+        moDefineParamIndex( PAR.PARTICLES_ATTRACTORVECTOR_X, _m("attractorvectorx") );
+        moDefineParamIndex( PAR.PARTICLES_ATTRACTORVECTOR_Y, _m("attractorvectory") );
+        moDefineParamIndex( PAR.PARTICLES_ATTRACTORVECTOR_Z, _m("attractorvectorz") );
+
+
+        moDefineParamIndex( PAR.PARTICLES_SCALEX_PARTICLE, _m("scalex_particle") );
+        moDefineParamIndex( PAR.PARTICLES_SCALEY_PARTICLE, _m("scaley_particle") );
+        moDefineParamIndex( PAR.PARTICLES_SCALEZ_PARTICLE, _m("scalez_particle") );
+        moDefineParamIndex( PAR.PARTICLES_ROTATEX_PARTICLE, _m("rotatex_particle") );
+        moDefineParamIndex( PAR.PARTICLES_ROTATEY_PARTICLE, _m("rotatey_particle") );
+        moDefineParamIndex( PAR.PARTICLES_ROTATEZ_PARTICLE, _m("rotatez_particle") );
+
+        moDefineParamIndex( PAR.PARTICLES_TIMETOREVELATION, _m("time_to_revelation") );
+        moDefineParamIndex( PAR.PARTICLES_TIMEOFREVELATION, _m("time_of_revelation") );
+        moDefineParamIndex( PAR.PARTICLES_TIMETORESTORATION, _m("time_to_restoration") );
+        moDefineParamIndex( PAR.PARTICLES_TIMEOFRESTORATION, _m("time_of_restoration") );
+        moDefineParamIndex( PAR.PARTICLES_DRAWINGFEATURES, _m("drawing_features") );
+
+        moDefineParamIndex( PAR.PARTICLES_TRANSLATEX, _m("translatex") );
+        moDefineParamIndex( PAR.PARTICLES_TRANSLATEY, _m("translatey") );
+        moDefineParamIndex( PAR.PARTICLES_TRANSLATEZ, _m("translatez") );
+        moDefineParamIndex( PAR.PARTICLES_SCALEX, _m("scalex") );
+        moDefineParamIndex( PAR.PARTICLES_SCALEY, _m("scaley") );
+        moDefineParamIndex( PAR.PARTICLES_SCALEZ, _m("scalez") );
+        moDefineParamIndex( PAR.PARTICLES_ROTATEX, _m("rotatex") );
+        moDefineParamIndex( PAR.PARTICLES_ROTATEY, _m("rotatey") );
+        moDefineParamIndex( PAR.PARTICLES_ROTATEZ, _m("rotatez") );
+        moDefineParamIndex( PAR.PARTICLES_EYEX, _m("eyex") );
+        moDefineParamIndex( PAR.PARTICLES_EYEY, _m("eyey") );
+        moDefineParamIndex( PAR.PARTICLES_EYEZ, _m("eyez") );
+        moDefineParamIndex( PAR.PARTICLES_VIEWX, _m("viewx") );
+        moDefineParamIndex( PAR.PARTICLES_VIEWY, _m("viewy") );
+        moDefineParamIndex( PAR.PARTICLES_VIEWZ, _m("viewz") );
+        moDefineParamIndex( PAR.PARTICLES_UPVIEWX, _m("upviewx") );
+        moDefineParamIndex( PAR.PARTICLES_UPVIEWY, _m("upviewy") );
+        moDefineParamIndex( PAR.PARTICLES_UPVIEWZ, _m("upviewz") );
+        moDefineParamIndex( PAR.PARTICLES_ORDERING_MODE, _m("orderingmode") );
+        moDefineParamIndex( PAR.PARTICLES_LIGHTMODE, _m("lightmode") );
+        moDefineParamIndex( PAR.PARTICLES_LIGHTX, _m("lightx") );
+        moDefineParamIndex( PAR.PARTICLES_LIGHTY, _m("lighty") );
+        moDefineParamIndex( PAR.PARTICLES_LIGHTZ, _m("lightz") );
+
+        //console.log("attractormode:", moR(PAR.PARTICLES_ATTRACTORMODE) );
+
+        this.m_Physics.m_ParticleScript = "";
+
+        this.m_Rate = 0;
+        this.last_tick = 0;
+        this.frame = 0;
+
+        this.ortho = false;
+
+        //this.m_bTrackerInit = false;
+        //this.m_pTrackerData = NULL;
+
+
+        this.UpdateParameters();
+
+        this.ResetTimers();
+
+        this.InitParticlesSimple(  this.m_Config.Int( "width" ), this.m_Config.Int( "height" ));
+
+
+        this.pTextureDest = NULL;
+        this.pSubSample = NULL;
+        this.samplebuffer = NULL;
+
+        this.glidori  = 0;
+        this.glid = 0;
+        this.original_width = 0;
+        this.original_height = 0;
+        this.original_proportion = 1.0;
+
+        console.log(`ParticlesSimple ${this.GetLabelName()}`, this );
+        if (callback) callback(res);
+      }) == false) {
+        return false;
+      }
 /*
-    MODebug2->Push(moText("moEffectParticlesSimple::ReInit Face construction activated!!!!"));
-
-    int i;
-    int j;
-    int lum = 0;
-    int lumindex = 0;
-    int contrast = 0;
-
-    UpdateParameters();
-    //ResetTimers();
-
-    m_pResourceManager->GetTimeMan()->ClearByObjectId(  this->GetId() );
-
-
-    //m_ParticlesSimpleArray.Init( p_cols*p_rows, NULL );
-    //m_ParticlesSimpleArrayTmp.Init( p_cols*p_rows, NULL );
-
-    for( i=0; i<m_cols ; i++) {
-        for( j=0; j<m_rows ; j++) {
-            moParticlesSimple* pPar = m_ParticlesSimpleArray[i+j*m_cols];
-
-            if (pPar) {
-
-                pPar->Pos = moVector2f( (float) i, (float) j);
-                pPar->ImageProportion = 1.0;
-                pPar->Color = moVector3f(1.0,1.0,1.0);
-                pPar->GLId2 = 0;
-
-                if (texture_mode==PARTICLES_TEXTUREMODE_MANY2PATCH) {
-
-                    ///take the texture preselected
-                    moTextureBuffer* pTexBuf = m_Config[moR(PARTICLES_FOLDERS)][MO_SELECTED][0].TextureBuffer();
-
-                    pPar->GLId = glidori;
-                    pPar->GLId2 = glid;
-                    //pPar->GLId2 = 0;
-
-                    pPar->TCoord2 = moVector2f( 0.0, 0.0 );
-                    pPar->TSize2 = moVector2f( 1.0f, 1.0f );
-
-                    pPar->TCoord = moVector2f( (float) (i ) / (float) m_cols, (float) (j) / (float) m_rows );
-                    pPar->TSize = moVector2f( 1.0f / (float) m_cols, 1.0f / (float) m_rows );
-
-                    ///calculamos la luminancia del cuadro correspondiente
-                    //int x0, y0, x1, y1;
-                    float lumf = 0.0;
-
-                    if (pSubSample && samplebuffer) {
-
-                        if (pSubSample->GetWidth()!=m_cols) MODebug2->Error(moText("pSubSample width doesnt match m_cols"));
-                        if (pSubSample->GetHeight()!=m_rows) MODebug2->Error(moText("pSubSample height doesnt match m_rows"));
-
-                        int r = samplebuffer[ (i + j*pSubSample->GetWidth() ) *3 ];
-                        int g = samplebuffer[ (i+1 + j*pSubSample->GetWidth() ) *3 ];
-                        int b = samplebuffer[ (i+2 + j*pSubSample->GetWidth() ) *3 ];
-                        //MODebug2->Message(moText("r:")+IntToStr(r)+moText(" g:")+IntToStr(g)+moText(" b:")+IntToStr(b));
-
-                        lum = (r+g+b)/3;
-
-                        //lum = ( + samplebuffer[ (i+1 + j*pSubSample->GetWidth() ) *3 ]
-                        // + samplebuffer[ (i+2 + j*pSubSample->GetWidth() ) *3 ] ) / 3;
-                        lum = ((lum & 1) << 7) | ((lum & 2) << 5) | ((lum & 4) << 3) | ((lum & 8) << 1)
-                        | ((lum & 16) >> 1) | ((lum & 32) >> 3) | ((lum & 64) >> 5) | ((lum & 128) >> 7);
-                        if (lum<0) lum = 0;
-                        //MODebug2->Message(moText("lum:")+IntToStr(lum));
-
-                        if (lum>=0) {
-                            lum = lum*1.2;
-
-                            lumf = ( 100.0 * (float)lum ) / (float)255.0;
-                            lumindex = (int) lumf;
-                            if (lumindex>99) lumindex = 99;
-                            //MODebug2->Push( moText("## Lum Index R G B ##") +IntToStr(lum)+IntToStr(r)+IntToStr(g)+IntToStr(b));
-
-                        } else {
-                            MODebug2->Message(moText("ReInit error:## lum is negative!!! ##")+IntToStr(lum)
-                                    +moText("subs: w:") + IntToStr(pSubSample->GetWidth())
-                                    +moText("subs: h:") + IntToStr(pSubSample->GetHeight())
-                            );
-                            lumindex = 99;
-                        }
-
-                    } else MODebug2->Push(moText("ReInit error: no texture nor samplebuffer"));
-
-
-                     if (pTexBuf && pTextureDest && samplebuffer) {
-
-                         int nim = pTexBuf->GetImagesProcessed();
-
-                         pPar->ImageProportion = 1.0;
-
-                         if (nim>0) {
-
-                             moTextureFrames& pTextFrames(pTexBuf->GetBufferLevels( lumindex, 0 ) );
-
-                             int nc = pTextFrames.Count();
-                             int irandom = -1;
-
-                             irandom = (int)( moMathf::UnitRandom() * (double)nc );
-                             //irandom = 0;
-
-                            moTextureMemory* pTexMem = pTextFrames.GetRef( irandom );
-
-                            if (pTexMem) {
-                                pPar->GLId = glidori;
-                                pTexMem->GetReference();
-                                pPar->GLId2 = pTexMem->GetGLId();
-                                pPar->pTextureMemory = pTexMem;
-                                if (pTexMem ->GetHeight() > 0)
-                                  pPar ->ImageProportion = (float) pTexMem->GetWidth() / (float) pTexMem->GetHeight();
-                            } else {
-                                #ifdef _DEBUG
-                                MODebug2 ->Message(moText("Sample not founded: lumindex:")
-                                  + IntToStr(lumindex) + moText(" irandom:") + IntToStr(irandom));
-                                #endif
-                                pPar->GLId = glidori;
-                                pPar->GLId2 = pPar->GLId;
-                                pPar->Color.X() = ((float)lum )/ 255.0f;
-                                pPar->Color.Y() = ((float)lum )/ 255.0f;
-                                pPar->Color.Z() = ((float)lum )/ 255.0f;
-                                pPar->Color.X()*= pPar->Color.X();
-                                pPar->Color.Y()*= pPar->Color.Y();
-                                pPar->Color.Z()*= pPar->Color.Z();
-                            }
-
-                            //MODebug2->Push( moText("creating particle: irandom:")
-                            // + IntToStr(irandom) + moText(" nc:") + IntToStr(nc)
-                            //
-                            // + moText(" count:") + IntToStr(pTexBuf->GetImagesProcessed())
-                            // + moText(" glid:") + IntToStr(pPar->GLId) + moText(" glid2:") + IntToStr(pPar->GLId2) );
-
-                         }
-
-                     } else {
-                         MODebug2->Error( moText("particles error creating texture") );
-                     }
-
-
-                     //MODebug2->Log( moText("i:") + IntToStr(i) + moText(" J:")
-                     // + IntToStr(j) + moText(" lum:") + IntToStr(lum) + moText(" lumindex:")
-                     // + IntToStr(lumindex) + moText(" glid:") + IntToStr(pPar->GLId)
-                     // + moText(" glid2:") + IntToStr(pPar->GLId2));
-
-                }
-
-
-                pPar->Size = moVector2f( m_Physics.m_EmitterSize.X() / (float) m_cols, m_Physics.m_EmitterSize.Y() / (float) m_rows );
-                pPar->Force = moVector3f( 0.0f, 0.0f, 0.0f );
-
-                SetParticlePosition( pPar );
-
-                if (m_Physics.m_EmitionPeriod>0) {
-                    pPar->Age.Stop();
-                    pPar->Visible = false;
-                } else {
-                    pPar->Age.Stop();
-                    pPar->Age.Start();
-                    pPar->Visible = true;
-                }
-
-                ///Set Timer management
-                pPar->Age.SetObjectId( this->GetId() );
-                pPar->Age.SetTimerId( i + j*m_cols );
-                m_pResourceManager->GetTimeMan()->AddTimer( &pPar->Age );
-
-                m_ParticlesSimpleArray.Set( i + j*m_cols, pPar );
-
-                moParticlesSimple* pParTmp = m_ParticlesSimpleArrayTmp[i + j*m_cols];
-                pParTmp->Pos3d = pPar->Pos3d;
-                pParTmp->Velocity = pPar->Velocity;
-                pParTmp->Mass = pPar->Mass;
-                pParTmp->Force = pPar->Force;
-                pParTmp->Fixed = pPar->Fixed;
-                m_ParticlesSimpleArrayTmp.Set( i + j*m_cols, pParTmp );
-
-            } else MODebug2->Error(moText("ParticleSimple::ReInit::no particle pointer"));
-        }
-    }
-
+      midi_red = midi_green = midi_blue = 1.0;
+      midi_maxage = 1.0; //in millis
+      midi_emitionperiod = 1.0;//in millisec
+      midi_emitionrate = 1.0; // n per emitionperiod
+      midi_randomvelocity = 1.0; //inicial vel
+      midi_randommotion = 1.0; //motion dynamic
+      #ifdef USE_TUIO
+      m_InletTuioSystemIndex = GetInletIndex("TUIOSYSTEM");
+      #endif
+      m_InletTrackerSystemIndex = GetInletIndex("TRACKERKLT");
 */
-}
+      return true;
+    }
 
 
-UpdateDt() : void {
-/*
-    /// 60 FPS = 16.666 milliseconds
-    /// dtrel is frame relative where if dtrel = 1 = 1 frame (60fps)
-    dtrel = (double) ( m_EffectState.tempo.ticks - last_tick ) / (double)16.666666;
+  ResetTimers() : void {
 
-    dt = m_Config.Eval( moR(PARTICLES_SYNC)) * dtrel * (double)(m_EffectState.tempo.delta) /  (double)100.0;
+    this.TimerFullRevelation.Stop();
+    this.TimerFullRestoration.Stop();
+    this.TimerOfRevelation.Stop();
+    this.TimerOfRestoration.Stop();
 
-    last_tick = m_EffectState.tempo.ticks;
+    this.FeatureActivity.Stop();
+    this.MotionActivity.Stop();
+    this.NoMotionActivity.Stop();
+    this.m_Physics.EmitionTimer.Stop();
+
+    for ( var i=0; i < this.m_ParticlesSimpleArray.length; i++ ) {
+          var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[i];
+          pPar.Age.Stop();
+          pPar.Age.SetRelativeTimer( this.m_EffectState.tempo );
+          pPar.Visible = false;
+    }
+
+    this.m_Physics.m_pLastBordParticle = NULL;
+  }
+
+  ReInit(): void {
+    /*
+      MODebug2.Message("moEffectParticlesSimple::ReInit Face construction activated!!!!");
+
+      i : MOint;
+      int j;
+      int lum = 0;
+      int lumindex = 0;
+      int contrast = 0;
+
+      UpdateParameters();
+      //ResetTimers();
+
+      m_pResourceManager->GetTimeMan()->ClearByObjectId(  this->GetId() );
+
+
+      //m_ParticlesSimpleArray.Init( p_cols*p_rows, NULL );
+      //m_ParticlesSimpleArrayTmp.Init( p_cols*p_rows, NULL );
+
+      for( i=0; i<m_cols ; i++) {
+          for( j=0; j<m_rows ; j++) {
+              var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[i+j*m_cols];
+
+              if (pPar) {
+
+                  pPar.Pos = moVector2f(  i,  j);
+                  pPar.ImageProportion = 1.0;
+                  pPar.Color = new moVector3f(1.0,1.0,1.0);
+                  pPar.GLId2 = 0;
+
+                  if (texture_mode==PAR.PARTICLES_TEXTUREMODE_MANY2PATCH) {
+
+                      ///take the texture preselected
+                      moTextureBuffer* pTexBuf = this.m_Config[moR(PAR.PARTICLES_FOLDERS)][MO_SELECTED][0].TextureBuffer();
+
+                      pPar.GLId = glidori;
+                      pPar.GLId2 = glid;
+                      //pPar.GLId2 = 0;
+
+                      pPar.TCoord2 = moVector2f( 0.0, 0.0 );
+                      pPar.TSize2 = moVector2f( 1.0, 1.0 );
+
+                      pPar.TCoord = moVector2f(  (i ) /  m_cols,  (j) /  m_rows );
+                      pPar.TSize = moVector2f( 1.0 /  m_cols, 1.0 /  m_rows );
+
+                      ///calculamos la luminancia del cuadro correspondiente
+                      //int x0, y0, x1, y1;
+                      float lumf = 0.0;
+
+                      if (pSubSample && samplebuffer) {
+
+                          if (pSubSample->GetWidth()!=m_cols) this.MODebug2.Error(moText("pSubSample width doesnt match m_cols"));
+                          if (pSubSample->GetHeight()!=m_rows) this.MODebug2.Error(moText("pSubSample height doesnt match m_rows"));
+
+                          int r = samplebuffer[ (i + j*pSubSample->GetWidth() ) *3 ];
+                          int g = samplebuffer[ (i+1 + j*pSubSample->GetWidth() ) *3 ];
+                          int b = samplebuffer[ (i+2 + j*pSubSample->GetWidth() ) *3 ];
+                          //this.MODebug2.Message(moText("r:")+IntToStr(r)+moText(" g:")+IntToStr(g)+moText(" b:")+IntToStr(b));
+
+                          lum = (r+g+b)/3;
+
+                          //lum = ( + samplebuffer[ (i+1 + j*pSubSample->GetWidth() ) *3 ]
+                          // + samplebuffer[ (i+2 + j*pSubSample->GetWidth() ) *3 ] ) / 3;
+                          lum = ((lum & 1) << 7) | ((lum & 2) << 5) | ((lum & 4) << 3) | ((lum & 8) << 1)
+                          | ((lum & 16) >> 1) | ((lum & 32) >> 3) | ((lum & 64) >> 5) | ((lum & 128) >> 7);
+                          if (lum<0) lum = 0;
+                          //this.MODebug2.Message(moText("lum:")+IntToStr(lum));
+
+                          if (lum>=0) {
+                              lum = lum*1.2;
+
+                              lumf = ( 100.0 * lum ) / 255.0;
+                              lumindex = (int) lumf;
+                              if (lumindex>99) lumindex = 99;
+                              //this.MODebug2.Push( moText("## Lum Index R G B ##") +IntToStr(lum)+IntToStr(r)+IntToStr(g)+IntToStr(b));
+
+                          } else {
+                              this.MODebug2.Message(moText("ReInit error:## lum is negative!!! ##")+IntToStr(lum)
+                                      +moText("subs: w:") + IntToStr(pSubSample->GetWidth())
+                                      +moText("subs: h:") + IntToStr(pSubSample->GetHeight())
+                              );
+                              lumindex = 99;
+                          }
+
+                      } else this.MODebug2.Push(moText("ReInit error: no texture nor samplebuffer"));
+
+
+                      if (pTexBuf && pTextureDest && samplebuffer) {
+
+                          int nim = pTexBuf->GetImagesProcessed();
+
+                          pPar.ImageProportion = 1.0;
+
+                          if (nim>0) {
+
+                              moTextureFrames& pTextFrames(pTexBuf->GetBufferLevels( lumindex, 0 ) );
+
+                              int nc = pTextFrames.Count();
+                              int irandom = -1;
+
+                              irandom = (int)( moMath.UnitRandom() * nc );
+                              //irandom = 0;
+
+                              moTextureMemory* pTexMem = pTextFrames.GetRef( irandom );
+
+                              if (pTexMem) {
+                                  pPar.GLId = glidori;
+                                  pTexMem->GetReference();
+                                  pPar.GLId2 = pTexMem->GetGLId();
+                                  pPar.pTextureMemory = pTexMem;
+                                  if (pTexMem ->GetHeight() > 0)
+                                    pPar ->ImageProportion =  pTexMem->GetWidth() /  pTexMem->GetHeight();
+                              } else {
+                                  #ifdef _DEBUG
+                                  this.MODebug2.Message(moText("Sample not founded: lumindex:")
+                                    + IntToStr(lumindex) + moText(" irandom:") + IntToStr(irandom));
+                                  #endif
+                                  pPar.GLId = glidori;
+                                  pPar.GLId2 = pPar.GLId;
+                                  pPar.Color.x = (lum )/ 255.0;
+                                  pPar.Color.y = (lum )/ 255.0;
+                                  pPar.Color.z = (lum )/ 255.0;
+                                  pPar.Color.x*= pPar.Color.x;
+                                  pPar.Color.y*= pPar.Color.y;
+                                  pPar.Color.z*= pPar.Color.z;
+                              }
+
+                              //this.MODebug2.Push( moText("creating particle: irandom:")
+                              // + IntToStr(irandom) + moText(" nc:") + IntToStr(nc)
+                              //
+                              // + moText(" count:") + IntToStr(pTexBuf->GetImagesProcessed())
+                              // + moText(" glid:") + IntToStr(pPar.GLId) + moText(" glid2:") + IntToStr(pPar.GLId2) );
+
+                          }
+
+                      } else {
+                          this.MODebug2.Error( moText("particles error creating texture") );
+                      }
+
+
+                      //this.MODebug2.Log( moText("i:") + IntToStr(i) + moText(" J:")
+                      // + IntToStr(j) + moText(" lum:") + IntToStr(lum) + moText(" lumindex:")
+                      // + IntToStr(lumindex) + moText(" glid:") + IntToStr(pPar.GLId)
+                      // + moText(" glid2:") + IntToStr(pPar.GLId2));
+
+                  }
+
+
+                  pPar.Size = moVector2f( emitS.x /  m_cols,
+                   emitS.y /  m_rows );
+                  pPar.Force = new moVector3f( 0.0, 0.0, 0.0 );
+
+                  SetParticlePosition( pPar );
+
+                  if (this.m_Physics.m_EmitionPeriod>0) {
+                      pPar.Age.Stop();
+                      pPar.Visible = false;
+                  } else {
+                      pPar.Age.Stop();
+                      pPar.Age.Start();
+                      pPar.Visible = true;
+                  }
+
+                  ///Set Timer management
+                  pPar.Age.SetObjectId( this->GetId() );
+                  pPar.Age.SetTimerId( i + j*m_cols );
+                  m_pResourceManager->GetTimeMan()->AddTimer( &pPar.Age );
+
+                  m_ParticlesSimpleArray.Set( i + j*m_cols, pPar );
+
+                  moParticlesSimple* pParTmp = this.m_ParticlesSimpleArrayTmp[i + j*m_cols];
+                  pParTmp->Pos3d = pPar.Pos3d;
+                  pParTmp->Velocity = pPar.Velocity;
+                  pParTmp->Mass = pPar.Mass;
+                  pParTmp->Force = pPar.Force;
+                  pParTmp->Fixed = pPar.Fixed;
+                  m_ParticlesSimpleArrayTmp.Set( i + j*m_cols, pParTmp );
+
+              } else this.MODebug2.Error(moText("ParticleSimple::ReInit::no particle pointer"));
+          }
+      }
+
+  */
+  }
+
+
+  UpdateDt() : void {
+
+      /// 60 FPS = 16.666 milliseconds
+      /// dtrel is frame relative where if dtrel = 1 = 1 frame (60fps)
+      var dtrel = ( this.m_EffectState.tempo.ticks - this.last_tick ) / 16.666666;
+      this.dt = this.m_Config.Eval(moR(PAR.PARTICLES_SYNC)) * dtrel * this.m_EffectState.tempo.delta / 100.0;
+      this.last_tick = this.m_EffectState.tempo.ticks;
+  }
+
+  UpdateParameters() : void {
+
+      this.UpdateDt();  // now in ::Update()
+
+      //time_tofull_restoration = this.m_Config.Int( moR(PAR.PARTICLES_TIMETORESTORATION) );
+      //time_of_restoration = this.m_Config.Int( moR(PAR.PARTICLES_TIMEOFRESTORATION) );
+
+      //time_tofull_revelation = this.m_Config.Int( moR(PAR.PARTICLES_TIMETOREVELATION));
+      //time_of_revelation = m_Config.Int( moR(PAR.PARTICLES_TIMEOFREVELATION) );
+
+      this.ortho = (this.m_Config.Int( "ortho" ) != 0);
+
+      if ( moIsTimerStopped() || !this.m_EffectState.tempo.Started() ) {
+          this.ResetTimers();
+          //this.MODebug2.Message("moEffectParticlesSimple::UpdateParameters  > ResetTimers!!!");
+          console.log("moEffectParticlesSimple::UpdateParameters  > ResetTimers!!!");
+      }
+
+      //if script is modified... recompile
+      /*
+    if ( this.m_Physics.m_ParticleScript!=this.m_Config.Text( moR(PAR.PARTICLES_SCRIPT2) ) ) {
+
+          this.m_Physics.m_ParticleScript = this.m_Config.Text( moR(PAR.PARTICLES_SCRIPT2) );
+          var fullscript = this.m_pResourceManager.GetDataMan().GetDataPath()+ moSlash + this.m_Physics.m_ParticleScript;
+
+          if ( this.CompileFile(fullscript) ) {
+
+              //this.MODebug2.Message(moText("ParticlesSimple script loaded ") + (moText)fullscript );
+
+              this.SelectScriptFunction( "Init" );
+              //AddFunctionParam( m_FramesPerSecond );
+              this.RunSelectedFunction();
+
+          }// else this.MODebug2.Error(moText("ParticlesSimple couldnt compile lua script ") + (moText)fullscript );
+    }
+
+      if (moScript::IsInitialized()) {
+          if (ScriptHasFunction("RunSystem")) {
+              SelectScriptFunction("RunSystem");
+              //passing number of particles
+              AddFunctionParam( (int) ( m_rows*m_cols ) );
+              AddFunctionParam(  dt );
+              RunSelectedFunction(1);
+          }
+      }
 */
-}
-
-UpdateParameters() : void {
-
-/*
-    this->UpdateDt();  // now in ::Update()
-
-    time_tofull_restoration = m_Config.Int( moR(PARTICLES_TIMETORESTORATION) );
-    time_of_restoration = m_Config.Int( moR(PARTICLES_TIMEOFRESTORATION) );
-
-    time_tofull_revelation = m_Config.Int( moR(PARTICLES_TIMETOREVELATION));
-    time_of_revelation = m_Config.Int( moR(PARTICLES_TIMEOFREVELATION) );
-
-    ortho = (bool) m_Config.Int( moR(PARTICLES_ORTHO) );
-
-    if ( moIsTimerStopped() || !m_EffectState.tempo.Started() ) {
-        ResetTimers();
-        //MODebug2->Message("moEffectParticlesSimple::UpdateParameters  > ResetTimers!!!");
-    }
-
-    //if script is modified... recompile
-	if ((moText)m_Physics.m_ParticleScript!=m_Config.Text( moR(PARTICLES_SCRIPT2) ) ) {
-
-        m_Physics.m_ParticleScript = m_Config.Text( moR(PARTICLES_SCRIPT2) );
-        moText fullscript = m_pResourceManager->GetDataMan()->GetDataPath()+ moSlash + (moText)m_Physics.m_ParticleScript;
-
-        if ( CompileFile(fullscript) ) {
-
-            MODebug2->Message(moText("ParticlesSimple script loaded ") + (moText)fullscript );
-
-            SelectScriptFunction( "Init" );
-            //AddFunctionParam( m_FramesPerSecond );
-            RunSelectedFunction();
-
-        } else MODebug2->Error(moText("ParticlesSimple couldnt compile lua script ") + (moText)fullscript );
-	}
-
-    if (moScript::IsInitialized()) {
-        if (ScriptHasFunction("RunSystem")) {
-            SelectScriptFunction("RunSystem");
-            //passing number of particles
-            AddFunctionParam( (int) ( m_rows*m_cols ) );
-            AddFunctionParam( (float) dt );
-            RunSelectedFunction(1);
-        }
-    }
-
-    drawing_features = m_Config.Int( moR(PARTICLES_DRAWINGFEATURES));
-    texture_mode = m_Config.Int( moR(PARTICLES_TEXTUREMODE));
-
-    m_Physics.m_EyeVector = moVector3f(
-                                        m_Config.Eval( moR(PARTICLES_EYEX)),
-                                        m_Config.Eval( moR(PARTICLES_EYEY)),
-                                        m_Config.Eval( moR(PARTICLES_EYEZ))
-                                       );
-
-    m_Physics.m_TargetViewVector = moVector3f(
-                                        m_Config.Eval( moR(PARTICLES_VIEWX)),
-                                        m_Config.Eval( moR(PARTICLES_VIEWY)),
-                                        m_Config.Eval( moR(PARTICLES_VIEWZ))
-                                       );
-
-    m_Physics.m_UpViewVector = moVector3f(
-                                        m_Config.Eval( moR(PARTICLES_UPVIEWX)),
-                                        m_Config.Eval( moR(PARTICLES_UPVIEWY)),
-                                        m_Config.Eval( moR(PARTICLES_UPVIEWZ))
-                                       );
-
-    m_Physics.m_SourceLighMode = (moParticlesSimpleLightMode) m_Config.Int( moR(PARTICLES_LIGHTMODE));
-    m_Physics.m_SourceLightVector = moVector3f(
-                                        m_Config.Eval( moR(PARTICLES_LIGHTX)),
-                                        m_Config.Eval( moR(PARTICLES_LIGHTY)),
-                                        m_Config.Eval( moR(PARTICLES_LIGHTZ))
-                                       );
-
-    m_Physics.gravitational = m_Config.Eval( moR(PARTICLES_GRAVITY));
-    m_Physics.viscousdrag = m_Config.Eval( moR(PARTICLES_VISCOSITY));
-
-
-    //emiper = (float)m_Config[moR(PARTICLES_EMITIONPERIOD)][MO_SELECTED][0].Int();
-    //emiper = emiper * midi_emitionperiod;
-    //emiperi = (long) emiper;
-    //MODebug2->Message(moText("Emiper:")+IntToStr(emiperi));
-
-    //m_Physics.m_MaxAge = m_Config.Int( moR(PARTICLES_MAXAGE) );
-    m_Physics.m_MaxAge = (long) m_Config.Eval( moR(PARTICLES_MAXAGE) );
-    //m_Physics.m_EmitionPeriod = emiperi;
-    //emiperi = m_Config[moR(PARTICLES_EMITIONPERIOD)][MO_SELECTED][0].Int() * midi_emitionperiod;
-    //m_Physics.m_EmitionPeriod = emiperi;
-    m_Physics.m_EmitionPeriod = (long) m_Config.Eval( moR(PARTICLES_EMITIONPERIOD) );
-    //m_Physics.m_EmitionPeriod = m_Config[moR(PARTICLES_EMITIONPERIOD)][MO_SELECTED][0].Int();
-    //MODebug2->Message(moText("Emiperiod:")+IntToStr(m_Physics.m_EmitionPeriod));
-
-    //m_Physics.m_EmitionRate = m_Config.Int( moR(PARTICLES_EMITIONRATE) );
-    m_Physics.m_EmitionRate = (long) m_Config.Eval( moR(PARTICLES_EMITIONRATE) );
-    m_Physics.m_DeathPeriod = m_Config.Int( moR(PARTICLES_DEATHPERIOD) );
-
-
-    m_Physics.m_RandomMethod = (moParticlesRandomMethod) m_Config.Int( moR(PARTICLES_RANDOMMETHOD) );
-    m_Physics.m_CreationMethod = (moParticlesCreationMethod) m_Config.Int( moR(PARTICLES_CREATIONMETHOD) );
-
-    m_Physics.m_OrientationMode = (moParticlesOrientationMode) m_Config.Int( moR(PARTICLES_ORIENTATIONMODE) );
-
-    m_Physics.m_FadeIn = m_Config.Eval( moR(PARTICLES_FADEIN));
-    m_Physics.m_FadeOut = m_Config.Eval( moR(PARTICLES_FADEOUT));
-    m_Physics.m_SizeIn = m_Config.Eval( moR(PARTICLES_SIZEIN));
-    m_Physics.m_SizeOut = m_Config.Eval( moR(PARTICLES_SIZEOUT));
-
-    m_Physics.m_RandomPosition = m_Config.Eval( moR(PARTICLES_RANDOMPOSITION));
-    m_Physics.m_RandomVelocity = m_Config.Eval( moR(PARTICLES_RANDOMVELOCITY));
-    m_Physics.m_RandomMotion = m_Config.Eval( moR(PARTICLES_RANDOMMOTION));
-
-
-    m_Physics.m_EmitterType = (moParticlesSimpleEmitterType) m_Config.Int( moR(PARTICLES_EMITTERTYPE));
-    m_Physics.m_AttractorType = (moParticlesSimpleAttractorType) m_Config.Int( moR(PARTICLES_ATTRACTORTYPE));
-
-    m_Physics.m_PositionVector = moVector3f(m_Config.Eval( moR(PARTICLES_RANDOMPOSITION_X)),
-                                            m_Config.Eval( moR(PARTICLES_RANDOMPOSITION_Y)),
-                                            m_Config.Eval( moR(PARTICLES_RANDOMPOSITION_Z)) );
-
-    m_Physics.m_EmitterSize = moVector3f(   m_Config.Eval( moR(PARTICLES_SIZEX)),
-                                            m_Config.Eval( moR(PARTICLES_SIZEY)),
-                                            m_Config.Eval( moR(PARTICLES_SIZEZ)));
-
-    m_Physics.m_VelocityVector =  moVector3f( m_Config.Eval( moR(PARTICLES_RANDOMVELOCITY_X)),
-                                            m_Config.Eval( moR(PARTICLES_RANDOMVELOCITY_Y)),
-                                            m_Config.Eval( moR(PARTICLES_RANDOMVELOCITY_Z)));
-
-    m_Physics.m_MotionVector =  moVector3f( m_Config.Eval( moR(PARTICLES_RANDOMMOTION_X)),
-                                            m_Config.Eval( moR(PARTICLES_RANDOMMOTION_Y)),
-                                            m_Config.Eval( moR(PARTICLES_RANDOMMOTION_Z)));
-
-    m_Physics.m_EmitterVector = moVector3f( m_Config.Eval( moR(PARTICLES_EMITTERVECTOR_X)),
-                                            m_Config.Eval( moR(PARTICLES_EMITTERVECTOR_Y)),
-                                            m_Config.Eval( moR(PARTICLES_EMITTERVECTOR_Z)));
-
-    if (m_bTrackerInit && m_Physics.m_EmitterType==PARTICLES_EMITTERTYPE_TRACKER2) {
-        m_Physics.m_EmitterVector = moVector3f( m_TrackerBarycenter.X()*normalf, m_TrackerBarycenter.Y()*normalf, 0.0f );
-    }
-
-    m_Physics.m_AttractorMode = (moParticlesSimpleAttractorMode) m_Config.Int( moR(PARTICLES_ATTRACTORMODE));
-    m_Physics.m_AttractorVector = moVector3f( m_Config.Eval( moR(PARTICLES_ATTRACTORVECTOR_X)),
-                                            m_Config.Eval( moR(PARTICLES_ATTRACTORVECTOR_Y)),
-                                            m_Config.Eval( moR(PARTICLES_ATTRACTORVECTOR_Z)));
-
-    if (original_proportion!=1.0f) {
-            if (original_proportion>1.0f) {
-                m_Physics.m_AttractorVector.Y() = m_Physics.m_AttractorVector.Y() / original_proportion;
-            } else {
-                m_Physics.m_AttractorVector.X() = m_Physics.m_AttractorVector.X() * original_proportion;
-            }
-    }
-
-    normalf = m_Physics.m_EmitterSize.X();
-
-    m_OrderingMode = (moParticlesOrderingMode) m_Config.Int( moR(PARTICLES_ORDERING_MODE) );
-
-    float ralpha,rbeta,rgama;
-
-    ralpha = moMathf::DegToRad( m_Config.Eval( moR(PARTICLES_ROTATEX) ) );
-    rbeta = moMathf::DegToRad( m_Config.Eval( moR(PARTICLES_ROTATEY) ) );
-    rgama = moMathf::DegToRad( m_Config.Eval( moR(PARTICLES_ROTATEZ) ) );
-
-    float r01 = cos(rbeta)*cos(rgama);
-    float r02 = cos(rgama)*sin(ralpha)*sin(rbeta) - cos(ralpha)*sin(rgama);
-    float r03 = cos(ralpha)*cos(rgama)*sin(rbeta)+sin(ralpha)*sin(rgama);
-    float r04 = 0;
-
-    float r11 = cos(rbeta)*sin(rgama);
-    float r12 = cos(ralpha)*cos(rgama) + sin(ralpha)*sin(rbeta)*sin(rgama);
-    float r13 = -cos(rgama)*sin(ralpha) + cos(ralpha)*sin(rbeta)*sin(rgama);
-    float r14 = 0;
-
-    float r21 = -sin(rbeta);
-    float r22 = cos(rbeta)*sin(ralpha);
-    float r23 = cos(ralpha)*cos(rbeta);
-    float r24 = 0;
-
-    m_Rot[0] = moVector4f(  r01, r02, r03, r04 );
-    m_Rot[1] = moVector4f(  r11, r12, r13, r14 );
-    m_Rot[2] = moVector4f(  r21, r22, r23, r24 );
-    m_Rot[3] = moVector4f(  0, 0, 0, 1 );
-
-
-    m_TS[0] = moVector4f(  m_Config.Eval( moR(PARTICLES_SCALEX) ), 0, 0, m_Config.Eval( moR(PARTICLES_TRANSLATEX) ) );
-    m_TS[1] = moVector4f(  0, m_Config.Eval( moR(PARTICLES_SCALEY) ), 0, m_Config.Eval( moR(PARTICLES_TRANSLATEY) ) );
-    m_TS[2] = moVector4f(  0, 0, m_Config.Eval( moR(PARTICLES_SCALEZ) ), m_Config.Eval( moR(PARTICLES_TRANSLATEZ) ) );
-    m_TS[3] = moVector4f(  0, 0, 0, 1 );
-*/
-}
-
-SetParticlePosition( pParticle : moParticlesSimple ) : void {
-/*
-    float left =  - (m_Physics.m_EmitterSize.X()) / 2.0;
-    float top =  m_Physics.m_EmitterSize.Y() / 2.0;
-    float randomvelx = 0;
-    float randomvely = 0;
-    float randomvelz = 0;
-    float randomposx = 0;
-    float randomposy = 0;
-    float randomposz = 0;
-    double alpha;
-    double phi;
-    double radius;
-    double z;
-    double radius1;
-    double radius2;
-
-    double len=0,index=0,index_normal=0;
-
-    randomposx = ( fabs(m_Physics.m_RandomPosition) >0.0)? (0.5-moMathf::UnitRandom())*m_Physics.m_RandomPosition*
-    m_Physics.m_PositionVector.X() : m_Physics.m_PositionVector.X();
-    randomposy = ( fabs(m_Physics.m_RandomPosition) >0.0)? (0.5-moMathf::UnitRandom())*m_Physics.m_RandomPosition
-    *m_Physics.m_PositionVector.Y() : m_Physics.m_PositionVector.Y();
-    randomposz = ( fabs(m_Physics.m_RandomPosition) >0.0)? (0.5-moMathf::UnitRandom())*m_Physics.m_RandomPosition
-    *m_Physics.m_PositionVector.Z() : m_Physics.m_PositionVector.Z();
-
-    randomvelx = ( fabs(m_Physics.m_RandomVelocity) >0.0)? (moMathf::UnitRandom())*m_Physics.m_RandomVelocity
-    *m_Physics.m_VelocityVector.X() : m_Physics.m_VelocityVector.X();
-    randomvely = ( fabs(m_Physics.m_RandomVelocity) >0.0)? (moMathf::UnitRandom())*m_Physics.m_RandomVelocity
-    *m_Physics.m_VelocityVector.Y() : m_Physics.m_VelocityVector.Y();
-    randomvelz = ( fabs(m_Physics.m_RandomVelocity) >0.0)? (moMathf::UnitRandom())*m_Physics.m_RandomVelocity
-    *m_Physics.m_VelocityVector.Z() : m_Physics.m_VelocityVector.Z();
-
-    moVector4d fullcolor;
-    fullcolor = m_Config.EvalColor( moR(PARTICLES_PARTICLECOLOR));
-    pParticle->Color = moVector3f(
-                              fullcolor.X(),
-                              fullcolor.Y(),
-                              fullcolor.Z() );
-
-    pParticle->Mass = 10.0f;
-    pParticle->Fixed = false;
-
-    pParticle->U = moVector3f( 1.0, 0.0, 0.0 );
-    pParticle->V = moVector3f( 0.0, 1.0, 0.0 );
-    pParticle->W = moVector3f( 0.0, 0.0, 1.0 );
-
-    pParticle->dpdt = moVector3f( 0.0f, 0.0f, 0.0f );
-    pParticle->dvdt = moVector3f( 0.0f, 0.0f, 0.0f );
-
-    if (m_Physics.m_FadeIn>0.0) pParticle->Alpha = 0.0;///fade in ? to middle age?
-    else pParticle->Alpha = fullcolor.W();
-
-    if (m_Physics.m_SizeIn>0.0) pParticle->Scale = 0.0;///fade in ? to middle age?
-    else pParticle->Scale = 1.0;
-
-    switch(m_Physics.m_EmitterType) {
-
-        case PARTICLES_EMITTERTYPE_GRID:
-            //GRID POSITION
-           switch(m_Physics.m_CreationMethod) {
-                case PARTICLES_CREATIONMETHOD_LINEAR:
-                    pParticle->Pos3d = moVector3f(   ( left + pParticle->Pos.X()*pParticle->Size.X()
-                    + pParticle->Size.X()*randomposx/2.0 )*m_Physics.m_EmitterVector.X() ,
-                                                     ( top - pParticle->Pos.Y()*pParticle->Size.Y()
-                                                     - pParticle->Size.Y()*randomposy/2.0 )*m_Physics.m_EmitterVector.Y(),
-                                                    randomposz*m_Physics.m_EmitterVector.Z() );
-                    pParticle->Velocity = moVector3f( randomvelx,
-                                                      randomvely,
-                                                      randomvelz );
-                    break;
-
-                case PARTICLES_CREATIONMETHOD_PLANAR:
-                case PARTICLES_CREATIONMETHOD_VOLUMETRIC:
-                    pParticle->Pos3d = moVector3f(   ( left + moMathf::UnitRandom()*m_Physics.m_EmitterSize.X()
-                    + pParticle->Size.X()*randomposx/2.0 )*m_Physics.m_EmitterVector.X() ,
-                                                     ( top - moMathf::UnitRandom()*m_Physics.m_EmitterSize.Y()
-                                                     - pParticle->Size.Y()*randomposy/2.0 )*m_Physics.m_EmitterVector.Y(),
-                                                    randomposz*m_Physics.m_EmitterVector.Z() );
-                    pParticle->Velocity = moVector3f( randomvelx,
-                                                      randomvely,
-                                                      randomvelz );
-                    break;
-            }
-
-            break;
-
-        case PARTICLES_EMITTERTYPE_SPHERE:
-            //SPHERE POSITION
-            switch(m_Physics.m_CreationMethod) {
-                case PARTICLES_CREATIONMETHOD_LINEAR:
-                    alpha = 2 * moMathf::PI * pParticle->Pos.X() / (double)m_cols;
-                    phi = moMathf::PI * pParticle->Pos.Y() / (double)m_rows;
-                    radius = moMathf::Sqrt( m_Physics.m_EmitterSize.X()
-                    *m_Physics.m_EmitterSize.X()+m_Physics.m_EmitterSize.Y()
-                    *m_Physics.m_EmitterSize.Y()) / 2.0;
-
-                    pParticle ->Pos3d = moVector3f((radius * moMathf::Cos(alpha) * moMathf::Sin(phi)
-                      + randomposx) * m_Physics.m_EmitterVector.X(),
-                      (radius * moMathf::Sin(alpha) * moMathf::Sin(phi)
-                        + randomposy ) * m_Physics.m_EmitterVector.Y(),
-                                                    (radius*moMathf::Cos(phi) + randomposz ) * m_Physics.m_EmitterVector.Z() );
-
-                    pParticle->Velocity = moVector3f( randomvelx,
-                                                      randomvely,
-                                                      randomvelz );
-                    break;
-
-                case  PARTICLES_CREATIONMETHOD_PLANAR:
-                    alpha = 2 * (moMathf::PI) * moMathf::UnitRandom();
-                    phi = moMathf::PI * moMathf::UnitRandom();
-                    radius = moMathf::Sqrt(m_Physics.m_EmitterSize.X() * m_Physics.m_EmitterSize.X()
-                      + m_Physics.m_EmitterSize.Y() * m_Physics.m_EmitterSize.Y()) / 2.0;
-                    pParticle->Pos3d = moVector3f(
-                                        (radius*moMathf::Cos(alpha)*moMathf::Sin(phi) + randomposx)* m_Physics.m_EmitterVector.X(),
-                                        (radius*moMathf::Sin(alpha)*moMathf::Sin(phi) + randomposy)* m_Physics.m_EmitterVector.Y(),
-                                        (radius*moMathf::Cos(phi) + randomposz)* m_Physics.m_EmitterVector.Z()
+      this.drawing_features = this.m_Config.Int( moR(PAR.PARTICLES_DRAWINGFEATURES));
+      this.texture_mode = this.m_Config.Int( moR(PAR.PARTICLES_TEXTUREMODE));
+
+      this.m_Physics.m_EyeVector = new moVector3f(
+                                          this.m_Config.Eval( moR(PAR.PARTICLES_EYEX)),
+                                          this.m_Config.Eval( moR(PAR.PARTICLES_EYEY)),
+                                          this.m_Config.Eval( moR(PAR.PARTICLES_EYEZ))
                                         );
-                    pParticle->Velocity = moVector3f( randomvelx,
-                                                      randomvely,
-                                                      randomvelz );
-                    break;
 
-                case  PARTICLES_CREATIONMETHOD_VOLUMETRIC:
-                    alpha = 2 * moMathf::PI * moMathf::UnitRandom();
-                    phi = moMathf::PI * moMathf::UnitRandom();
-                    radius = moMathf::Sqrt(m_Physics.m_EmitterSize.X() * m_Physics.m_EmitterSize.X()
-                      + m_Physics.m_EmitterSize.Y() * m_Physics.m_EmitterSize.Y()) * moMathf::UnitRandom() / 2.0;
+      this.m_Physics.m_TargetViewVector = new moVector3f(
+                                          this.m_Config.Eval( moR(PAR.PARTICLES_VIEWX)),
+                                          this.m_Config.Eval( moR(PAR.PARTICLES_VIEWY)),
+                                          this.m_Config.Eval( moR(PAR.PARTICLES_VIEWZ))
+                                        );
 
-                    pParticle ->Pos3d = moVector3f((radius * moMathf::Cos(alpha) * moMathf::Sin(phi)
-                      + randomposx) * m_Physics.m_EmitterVector.X(),
-                      (radius * moMathf::Sin(alpha) * moMathf::Sin(phi)
-                        + randomposy ) * m_Physics.m_EmitterVector.Y(),
-                                                    (radius*moMathf::Cos(phi) + randomposz ) * m_Physics.m_EmitterVector.Z() );
+      this.m_Physics.m_UpViewVector = new moVector3f(
+                                          this.m_Config.Eval( moR(PAR.PARTICLES_UPVIEWX)),
+                                          this.m_Config.Eval( moR(PAR.PARTICLES_UPVIEWY)),
+                                          this.m_Config.Eval( moR(PAR.PARTICLES_UPVIEWZ))
+                                        );
 
-                    pParticle->Velocity = moVector3f( randomvelx,
-                                                      randomvely,
-                                                      randomvelz );
-                    break;
-            }
-            break;
+      this.m_Physics.m_SourceLighMode = this.m_Config.Int( moR(PAR.PARTICLES_LIGHTMODE)) as moParticlesSimpleLightMode;
+      this.m_Physics.m_SourceLightVector = new moVector3f(
+                                          this.m_Config.Eval( moR(PAR.PARTICLES_LIGHTX)),
+                                          this.m_Config.Eval( moR(PAR.PARTICLES_LIGHTY)),
+                                          this.m_Config.Eval( moR(PAR.PARTICLES_LIGHTZ))
+                                        );
 
-        case PARTICLES_EMITTERTYPE_TUBE:
-            //SPHERE POSITION
-            switch(m_Physics.m_CreationMethod) {
-                case PARTICLES_CREATIONMETHOD_LINEAR:
-                    alpha = 2 * moMathf::PI * pParticle->Pos.X() / (double)m_cols;
-                    radius1 = m_Physics.m_EmitterSize.X() / 2.0;
-                    radius2 = m_Physics.m_EmitterSize.Y() / 2.0;
-                    z = m_Physics.m_EmitterSize.Z() * ( 0.5f - ( pParticle->Pos.Y() / (double)m_rows ) );
-
-                    pParticle->Pos3d = moVector3f(  ( radius1*moMathf::Cos(alpha) + randomposx ) * m_Physics.m_EmitterVector.X(),
-                                                    ( radius1*moMathf::Sin(alpha) + randomposy ) * m_Physics.m_EmitterVector.Y(),
-                                                    ( z + randomposz ) * m_Physics.m_EmitterVector.Z() );
-
-                    pParticle->Velocity = moVector3f( randomvelx,
-                                                      randomvely,
-                                                      randomvelz );
-                    break;
-
-                case  PARTICLES_CREATIONMETHOD_PLANAR:
-                    alpha = 2 * moMathf::PI * moMathf::UnitRandom();
-                    radius1 = m_Physics.m_EmitterSize.X() / 2.0;
-                    radius2 = m_Physics.m_EmitterSize.Y() / 2.0;
-                    z = m_Physics.m_EmitterSize.Z() * ( 0.5f - moMathf::UnitRandom());
-
-                    pParticle->Pos3d = moVector3f(  ( radius1*moMathf::Cos(alpha) + randomposx ) * m_Physics.m_EmitterVector.X(),
-                                                    ( radius1*moMathf::Sin(alpha) + randomposy ) * m_Physics.m_EmitterVector.Y(),
-                                                    ( z + randomposz ) * m_Physics.m_EmitterVector.Z() );
-
-                    pParticle->Velocity = moVector3f( randomvelx,
-                                                      randomvely,
-                                                      randomvelz );
-                    break;
-
-                case  PARTICLES_CREATIONMETHOD_VOLUMETRIC:
-                    alpha = 2 * moMathf::PI * moMathf::UnitRandom();
-                    radius1 = m_Physics.m_EmitterSize.X() / 2.0;
-                    radius2 = m_Physics.m_EmitterSize.Y() / 2.0;
-                    radius = radius1 + moMathf::UnitRandom()*(radius2-radius1)*moMathf::UnitRandom();
-                    z = m_Physics.m_EmitterSize.Z() * ( 0.5f - moMathf::UnitRandom());
-
-                    pParticle->Pos3d = moVector3f(  ( radius*moMathf::Cos(alpha) + randomposx ) * m_Physics.m_EmitterVector.X(),
-                                                    ( radius*moMathf::Sin(alpha) + randomposy ) * m_Physics.m_EmitterVector.Y(),
-                                                    ( z + randomposz ) * m_Physics.m_EmitterVector.Z() );
-
-                    pParticle->Velocity = moVector3f( randomvelx,
-                                                      randomvely,
-                                                      randomvelz );
-                    break;
-            }
-            break;
-
-        case PARTICLES_EMITTERTYPE_JET:
-            //SPHERE POSITION
-            switch(m_Physics.m_CreationMethod) {
-                case PARTICLES_CREATIONMETHOD_LINEAR:
-
-                    //z = m_Physics.m_EmitterSize.Z() * moMathf::UnitRandom();
-                    len = m_Physics.m_EmitterVector.Length();
-                    index = pParticle->Pos.X()+pParticle->Pos.Y()*(double)m_cols;
-                    index_normal = 0.0; ///si no hay particulas siempre en 0
-
-                    if (m_cols*m_rows) {
-                        index_normal = index / (double)(m_cols*m_rows);
-                    }
-                    z = index_normal;
-
-                    pParticle->Pos3d = moVector3f(  m_Physics.m_EmitterVector.X()*( z + randomposx ),
-                                                    m_Physics.m_EmitterVector.Y()*( z + randomposy ),
-                                                    m_Physics.m_EmitterVector.Z()*( z + randomposz) );
-
-                    pParticle->Velocity = moVector3f(   randomvelx,
-                                                        randomvely,
-                                                        randomvelz);
-                    break;
-                case PARTICLES_CREATIONMETHOD_PLANAR:
-                case PARTICLES_CREATIONMETHOD_VOLUMETRIC:
-                    z = m_Physics.m_EmitterSize.Z() * moMathf::UnitRandom();
-
-                    pParticle->Pos3d = moVector3f(  m_Physics.m_EmitterVector.X()*( z + randomposx ),
-                                                    m_Physics.m_EmitterVector.Y()*( z + randomposy ),
-                                                    m_Physics.m_EmitterVector.Z()*( z + randomposz) );
-
-                    pParticle->Velocity = moVector3f(   randomvelx,
-                                                        randomvely,
-                                                        randomvelz);
-                    break;
-
-            }
-            break;
-
-        case PARTICLES_EMITTERTYPE_POINT:
-            //SPHERE POSITION
-            pParticle->Pos3d = moVector3f(  randomposx+m_Physics.m_EmitterVector.X(),
-                                            randomposy+m_Physics.m_EmitterVector.Y(),
-                                            randomposz+m_Physics.m_EmitterVector.Z() );
-
-            pParticle->Velocity = moVector3f(   randomvelx,
-                                                randomvely,
-                                                randomvelz);
-
-            break;
-        case PARTICLES_EMITTERTYPE_SPIRAL:
-            //SPIRAL POSITION
-            switch(m_Physics.m_CreationMethod) {
-                case PARTICLES_CREATIONMETHOD_LINEAR:
-                case  PARTICLES_CREATIONMETHOD_PLANAR:
-                case  PARTICLES_CREATIONMETHOD_VOLUMETRIC:
-                    alpha = 2 * moMathf::PI * pParticle->Pos.X() / (double)m_cols;
-                    radius1 = m_Physics.m_EmitterSize.X() / 2.0;
-                    radius2 = m_Physics.m_EmitterSize.Y() / 2.0;
-                    z = m_Physics.m_EmitterSize.Z() * (0.5f - (pParticle ->Pos.Y() / (double)m_rows )
-                    - (pParticle ->Pos.X() / (double)(m_cols * m_rows)) );
-
-                    pParticle->Pos3d = moVector3f(  ( radius1*moMathf::Cos(alpha) + randomposx ) * m_Physics.m_EmitterVector.X(),
-                                                    ( radius1*moMathf::Sin(alpha) + randomposy ) * m_Physics.m_EmitterVector.Y(),
-                                                    ( z + randomposz ) * m_Physics.m_EmitterVector.Z() );
-
-                    pParticle->Velocity = moVector3f( randomvelx,
-                                                      randomvely,
-                                                      randomvelz );
-                    break;
-            }
-            break;
-        case PARTICLES_EMITTERTYPE_CIRCLE:
-            //CIRCLE POSITION
-            switch(m_Physics.m_CreationMethod) {
-                case PARTICLES_CREATIONMETHOD_LINEAR:
-                    alpha = 2 * moMathf::PI * ( pParticle->Pos.X() + pParticle->Pos.Y()*m_cols ) / ((double)m_cols*(double)m_rows );
-                    radius1 = m_Physics.m_EmitterSize.X() / 2.0;
-                    radius2 = m_Physics.m_EmitterSize.Y() / 2.0;
-                    z = 0.0;
-                    //z = m_Physics.m_EmitterSize.Z() * ( 0.5f
-                    // - ( pParticle->Pos.Y() / (double)m_rows ) - (pParticle->Pos.X() / (double)(m_cols*m_rows)) );
-
-                    pParticle->Pos3d = moVector3f(  ( radius1*moMathf::Cos(alpha) + randomposx ) * m_Physics.m_EmitterVector.X(),
-                                                    ( radius1*moMathf::Sin(alpha) + randomposy ) * m_Physics.m_EmitterVector.Y(),
-                                                    ( z + randomposz ) );
-
-                    pParticle->Velocity = moVector3f( randomvelx,
-                                                      randomvely,
-                                                      randomvelz );
-                    break;
-                case  PARTICLES_CREATIONMETHOD_PLANAR:
-                case  PARTICLES_CREATIONMETHOD_VOLUMETRIC:
-                    alpha = 2 * moMathf::PI *  ( pParticle->Pos.X()*m_rows + pParticle->Pos.Y()) / ((double)m_cols*(double)m_rows );
-                    radius1 = m_Physics.m_EmitterSize.X() / 2.0;
-                    radius2 = m_Physics.m_EmitterSize.Y() / 2.0;
-                    z = 0.0;
-                    //z = m_Physics.m_EmitterSize.Z() * ( 0.5f - ( pParticle->Pos.Y() / (double)m_rows )
-                    // - (pParticle->Pos.X() / (double)(m_cols*m_rows)) );
-                    randomposx = randomposx + (radius1-radius2)*moMathf::Cos(alpha);
-                    randomposy = randomposy + (radius1-radius2)*moMathf::Sin(alpha);
-                    pParticle->Pos3d = moVector3f(  ( radius1*moMathf::Cos(alpha) + randomposx ) * m_Physics.m_EmitterVector.X(),
-                                                    ( radius1*moMathf::Sin(alpha) + randomposy ) * m_Physics.m_EmitterVector.Y(),
-                                                    ( z + randomposz ) );
-
-                    pParticle->Velocity = moVector3f( randomvelx,
-                                                      randomvely,
-                                                      randomvelz );
-                    break;
-            }
-            break;
-
-        case PARTICLES_EMITTERTYPE_TRACKER:
-            switch(m_Physics.m_CreationMethod) {
-                case PARTICLES_CREATIONMETHOD_CENTER:
-                    if (m_pTrackerData) {
-                        pParticle->Pos3d = moVector3f( (m_pTrackerData->GetBarycenter().X() - 0.5)*normalf,
-                         (-m_pTrackerData->GetBarycenter().Y()+0.5)*normalf, 0.0 );
-                        pParticle->Pos3d+= moVector3f( randomposx, randomposy, randomposz );
-                        pParticle->Velocity = moVector3f( randomvelx, randomvely, randomvelz );
-                    }
-                    break;
-
-                case PARTICLES_CREATIONMETHOD_LINEAR:
-                case PARTICLES_CREATIONMETHOD_PLANAR:
-                case PARTICLES_CREATIONMETHOD_VOLUMETRIC:
+      this.m_Physics.gravitational = this.m_Config.Eval( moR(PAR.PARTICLES_GRAVITY));
+      this.m_Physics.viscousdrag = this.m_Config.Eval( moR(PAR.PARTICLES_VISCOSITY));
 
 
+      //emiper = this.m_Config[moR(PAR.PARTICLES_EMITIONPERIOD)][MO_SELECTED][0].Int();
+      //emiper = emiper * midi_emitionperiod;
+      //emiperi = (long) emiper;
+      //this.MODebug2.Message(moText("Emiper:")+IntToStr(emiperi));
 
-                    if (m_pTrackerData) {
-                        bool bfounded = false;
-                        int np =  (int) ( moMathf::UnitRandom() * m_pTrackerData->GetFeaturesCount() );
+      //this.m_Physics.m_MaxAge = this.m_Config.Int( moR(PAR.PARTICLES_MAXAGE) );
+      this.m_Physics.m_MaxAge = this.m_Config.Int( moR(PAR.PARTICLES_MAXAGE) );
+      //emiperi = this.m_Config[moR(PAR.PARTICLES_EMITIONPERIOD)][MO_SELECTED][0].Int() * midi_emitionperiod;
+      //this.m_Physics.m_EmitionPeriod = emiperi;
+      this.m_Physics.m_EmitionPeriod = this.m_Config.Int( moR(PAR.PARTICLES_EMITIONPERIOD) );
+      //this.m_Physics.m_EmitionPeriod = this.m_Config[moR(PAR.PARTICLES_EMITIONPERIOD)][MO_SELECTED][0].Int();
+      //this.MODebug2.Message(moText("Emiperiod:")+IntToStr(this.m_Physics.m_EmitionPeriod));
 
-                        moTrackerFeature *pTF = NULL;
-
-                        pTF = m_pTrackerData->GetFeature( np );
-                        if (pTF->valid) {
-                            pParticle->Pos3d = moVector3f( (pTF->x - 0.5)*normalf, (-pTF->y+0.5)*normalf, 0.0 );
-                            bfounded = true;
-                        }
-
-                        np = 0;
-                        //como no encontro un feature valido para usar de generador arranca desde el primero....
-                        //error, deberia tomar el baricentro.... o tomar al azar otro...
-                        int cn=0;
-                        if (!bfounded) {
-                            do {
-                                pTF = m_pTrackerData->GetFeature( np );
-                                if (pTF->valid) {
-                                    pParticle->Pos3d = moVector3f( (pTF->x - 0.5)*normalf, (-pTF->y+0.5)*normalf, 0.0 );
-                                    bfounded = true;
-                                }
-                                np =  (int) ( moMathf::UnitRandom() * m_pTrackerData->GetFeaturesCount() );
-                                cn++;
-                            } while (!pTF->valid && np < m_pTrackerData->GetFeaturesCount() && cn<5 );
-                            if (!bfounded) pParticle->Pos3d = moVector3f( (m_pTrackerData->GetBarycenter().X() - 0.5)*normalf,
-                            (-m_pTrackerData->GetBarycenter().Y()+0.5)*normalf, 0.0 );
-                        }
+      //this.m_Physics.m_EmitionRate = this.m_Config.Int( moR(PAR.PARTICLES_EMITIONRATE) );
+      this.m_Physics.m_EmitionRate = this.m_Config.Int( moR(PAR.PARTICLES_EMITIONRATE) );
+      this.m_Physics.m_DeathPeriod = this.m_Config.Int( moR(PAR.PARTICLES_DEATHPERIOD) );
 
 
-                    } else {
-                        pParticle->Pos3d = moVector3f( 0, 0, 0 );
-                    }
+      this.m_Physics.m_RandomMethod = this.m_Config.Int( moR(PAR.PARTICLES_RANDOMMETHOD) ) as moParticlesRandomMethod;
+      this.m_Physics.m_CreationMethod = this.m_Config.Int( moR(PAR.PARTICLES_CREATIONMETHOD) ) as moParticlesCreationMethod;
 
-                    pParticle->Pos3d+= moVector3f( randomposx, randomposy, randomposz );
+      this.m_Physics.m_OrientationMode = this.m_Config.Int( moR(PAR.PARTICLES_ORIENTATIONMODE) ) as moParticlesOrientationMode;
 
-                    pParticle->Velocity = moVector3f(   randomvelx,
-                                                        randomvely,
-                                                        randomvelz);
-                    break;
+      this.m_Physics.m_FadeIn = this.m_Config.Eval( moR(PAR.PARTICLES_FADEIN));
+      this.m_Physics.m_FadeOut = this.m_Config.Eval( moR(PAR.PARTICLES_FADEOUT));
+      this.m_Physics.m_SizeIn = this.m_Config.Eval( moR(PAR.PARTICLES_SIZEIN));
+      this.m_Physics.m_SizeOut = this.m_Config.Eval( moR(PAR.PARTICLES_SIZEOUT));
 
-            }
-            break;
-    };
+      this.m_Physics.m_RandomPosition = this.m_Config.Eval( moR(PAR.PARTICLES_RANDOMPOSITION));
+      this.m_Physics.m_RandomVelocity = this.m_Config.Eval( moR(PAR.PARTICLES_RANDOMVELOCITY));
+      this.m_Physics.m_RandomMotion = this.m_Config.Eval( moR(PAR.PARTICLES_RANDOMMOTION));
 
-*/
-}
 
-InitParticlesSimple( p_cols : MOint, p_rows : MOint, p_forced : boolean ) : void {
+      this.m_Physics.m_EmitterType = this.m_Config.Int( moR(PAR.PARTICLES_EMITTERTYPE)) as moParticlesSimpleEmitterType;
+      this.m_Physics.m_AttractorType = this.m_Config.Int( moR(PAR.PARTICLES_ATTRACTORTYPE)) as moParticlesSimpleAttractorType;
+
+      this.m_Physics.m_PositionVector = new moVector3f(this.m_Config.Eval( moR(PAR.PARTICLES_RANDOMPOSITION_X)),
+                                              this.m_Config.Eval( moR(PAR.PARTICLES_RANDOMPOSITION_Y)),
+                                              this.m_Config.Eval( moR(PAR.PARTICLES_RANDOMPOSITION_Z)) );
+
+      this.m_Physics.m_EmitterSize = new moVector3f(   this.m_Config.Eval( moR(PAR.PARTICLES_SIZEX)),
+                                              this.m_Config.Eval( moR(PAR.PARTICLES_SIZEY)),
+                                              this.m_Config.Eval( moR(PAR.PARTICLES_SIZEZ)));
+
+      this.m_Physics.m_VelocityVector = new moVector3f(
+        this.m_Config.Eval(moR(PAR.PARTICLES_RANDOMVELOCITY_X)),
+        this.m_Config.Eval( moR(PAR.PARTICLES_RANDOMVELOCITY_Y)),
+        this.m_Config.Eval( moR(PAR.PARTICLES_RANDOMVELOCITY_Z)));
+
+      this.m_Physics.m_MotionVector = new moVector3f(
+        this.m_Config.Eval(moR(PAR.PARTICLES_RANDOMMOTION_X)),
+        this.m_Config.Eval( moR(PAR.PARTICLES_RANDOMMOTION_Y)),
+        this.m_Config.Eval( moR(PAR.PARTICLES_RANDOMMOTION_Z)));
+
+      this.m_Physics.m_EmitterVector = new moVector3f(
+        this.m_Config.Eval(moR(PAR.PARTICLES_EMITTERVECTOR_X)),
+        this.m_Config.Eval(moR(PAR.PARTICLES_EMITTERVECTOR_Y)),
+        this.m_Config.Eval(moR(PAR.PARTICLES_EMITTERVECTOR_Z)) );
+
+  /*
+  if (this.m_bTrackerInit && this.m_Physics.m_EmitterType==PAR.PARTICLES_EMITTERTYPE_TRACKER2) {
+          this.m_Physics.m_EmitterVector = new moVector3f( m_TrackerBarycenter.x
+          *normalf, m_TrackerBarycenter.y*normalf, 0.0 );
+      }
+      */
+
+      this.m_Physics.m_AttractorMode = this.m_Config.Int(moR(PAR.PARTICLES_ATTRACTORMODE)) as moParticlesSimpleAttractorMode;
 /*
-    int i,j;
+      console.log("moR(PAR.PARTICLES_ATTRACTORMODE)",
+        moR(PAR.PARTICLES_ATTRACTORMODE),
+        this.m_Config.Int(moR(PAR.PARTICLES_ATTRACTORMODE)));
+        this.m_Physics.m_AttractorVector = new moVector3f(
+        this.m_Config.Eval(moR(PAR.PARTICLES_ATTRACTORVECTOR_X)),
+        this.m_Config.Eval( moR(PAR.PARTICLES_ATTRACTORVECTOR_Y)),
+        this.m_Config.Eval( moR(PAR.PARTICLES_ATTRACTORVECTOR_Z)));
+*/
+      if (this.original_proportion!=1.0) {
+              if (this.original_proportion>1.0) {
+                  this.m_Physics.m_AttractorVector.y = this.m_Physics.m_AttractorVector.y / this.original_proportion;
+              } else {
+                  this.m_Physics.m_AttractorVector.x = this.m_Physics.m_AttractorVector.x * this.original_proportion;
+              }
+      }
 
-    bool m_bNewImage = false;
+      this.normalf = this.m_Physics.m_EmitterSize.x;
+
+      this.m_OrderingMode = this.m_Config.Int( moR(PAR.PARTICLES_ORDERING_MODE) ) as moParticlesOrderingMode;
+/*
+      float ralpha,rbeta,rgama;
+
+      ralpha = moMath.DegToRad( this.m_Config.Eval( moR(PAR.PARTICLES_ROTATEX) ) );
+      rbeta = moMath.DegToRad( this.m_Config.Eval( moR(PAR.PARTICLES_ROTATEY) ) );
+      rgama = moMath.DegToRad( this.m_Config.Eval( moR(PAR.PARTICLES_ROTATEZ) ) );
+
+      float r01 = cos(rbeta)*cos(rgama);
+      float r02 = cos(rgama)*sin(ralpha)*sin(rbeta) - cos(ralpha)*sin(rgama);
+      float r03 = cos(ralpha)*cos(rgama)*sin(rbeta)+sin(ralpha)*sin(rgama);
+      float r04 = 0;
+
+      float r11 = cos(rbeta)*sin(rgama);
+      float r12 = cos(ralpha)*cos(rgama) + sin(ralpha)*sin(rbeta)*sin(rgama);
+      float r13 = -cos(rgama)*sin(ralpha) + cos(ralpha)*sin(rbeta)*sin(rgama);
+      float r14 = 0;
+
+      float r21 = -sin(rbeta);
+      float r22 = cos(rbeta)*sin(ralpha);
+      float r23 = cos(ralpha)*cos(rbeta);
+      float r24 = 0;
+
+      m_Rot[0] = moVector4f(  r01, r02, r03, r04 );
+      m_Rot[1] = moVector4f(  r11, r12, r13, r14 );
+      m_Rot[2] = moVector4f(  r21, r22, r23, r24 );
+      m_Rot[3] = moVector4f(  0, 0, 0, 1 );
+
+
+      m_TS[0] = moVector4f(  this.m_Config.Eval( moR(PAR.PARTICLES_SCALEX) ), 0, 0, this.m_Config.Eval( moR(PAR.PARTICLES_TRANSLATEX) ) );
+      m_TS[1] = moVector4f(  0, this.m_Config.Eval( moR(PAR.PARTICLES_SCALEY) ), 0, this.m_Config.Eval( moR(PAR.PARTICLES_TRANSLATEY) ) );
+      m_TS[2] = moVector4f(  0, 0, this.m_Config.Eval( moR(PAR.PARTICLES_SCALEZ) ), this.m_Config.Eval( moR(PAR.PARTICLES_TRANSLATEZ) ) );
+      m_TS[3] = moVector4f(  0, 0, 0, 1 );
+  */
+
+      //console.log("UpdateParameters:", this.m_Physics);
+  }
+
+/**
+ * Set Particle Position
+*/
+  SetParticlePosition( pParticle : moParticlesSimple ) : void {
+
+      var emitV = this.m_Physics.m_EmitterVector;
+      var emitS = this.m_Physics.m_EmitterSize;
+      var Po : moVector2f = pParticle.Pos;
+      var Si : moVector2f = pParticle.Size;
+
+      var left : MOdouble =  - (emitS.x) / 2.0;
+      var top : MOdouble =  emitS.y / 2.0;
+      var randomvelx : MOdouble = 0;
+      var randomvely : MOdouble = 0;
+      var randomvelz : MOdouble = 0;
+      var randomposx : MOdouble = 0;
+      var randomposy : MOdouble = 0;
+      var randomposz : MOdouble = 0;
+      var alpha : MOdouble;
+      var phi : MOdouble;
+      var radius : MOdouble;
+      var z : MOdouble;
+      var radius1 : MOdouble;
+      var radius2 : MOdouble;
+
+      var len: MOdouble = 0;
+      var index: MOint = 0;
+      var index_normal: MOint = 0;
+      //position
+      var rpos : number = this.m_Physics.m_RandomPosition;
+      var posV : moVector3f = this.m_Physics.m_PositionVector;
+      //velocity
+      var rvel : number = this.m_Physics.m_RandomVelocity;
+      var velV : moVector3f = this.m_Physics.m_VelocityVector;
+
+      var randompos: moVector3f = (moMath.fabs(rpos) > 0.0) ? posV.multiplyScalar(rpos*(0.5-moMath.UnitRandom())): posV;
+      randomposx = randompos.x;
+      randomposy = randompos.y;
+      randomposz = randompos.z;
+
+      var randomvel: moVector3f = (moMath.fabs(rvel) > 0.0) ? velV.multiplyScalar(rpos * moMath.UnitRandom()) : velV;
+      randomvelx = randomvel.x;
+      randomvely = randomvel.y;
+      randomvelz = randomvel.z;
+
+      var fullcolor = this.m_Config.EvalColor( moR(PAR.PARTICLES_PARTICLECOLOR));
+      pParticle.Color = new moColor( fullcolor.r, fullcolor.g, fullcolor.b );
+      pParticle.Mass = 10.0;
+      pParticle.Fixed = false;
+
+      pParticle.U = new moVector3f( 1.0, 0.0, 0.0 );
+      pParticle.V = new moVector3f( 0.0, 1.0, 0.0 );
+      pParticle.W = new moVector3f( 0.0, 0.0, 1.0 );
+
+      pParticle.dpdt = new moVector3f( 0.0, 0.0, 0.0 );
+      pParticle.dvdt = new moVector3f( 0.0, 0.0, 0.0 );
+
+      if (this.m_Physics.m_FadeIn > 0.0) {
+        pParticle.Alpha = 0.0;///fade in ? to middle age?
+      } else {
+        pParticle.Alpha = fullcolor.a;
+      }
+
+      if (this.m_Physics.m_SizeIn > 0.0) {
+        pParticle.Scale = 0.0;///fade in ? to middle age?
+      } else {
+        pParticle.Scale = 1.0;
+      }
+
+      switch(this.m_Physics.m_EmitterType) {
+
+          case EMIT.PARTICLES_EMITTERTYPE_GRID:
+              //GRID POSITION
+            switch(this.m_Physics.m_CreationMethod) {
+                  case CREAMODE.PARTICLES_CREATIONMETHOD_LINEAR:
+                    pParticle.Pos3d =
+                      new moVector3f( ( left+Po.x*Si.x  + Si.x*(1+randomposx) / 2.0 )*emitV.x,
+                                      ( top -Po.y*Si.y  - Si.y*(1+randomposy) / 2.0 )*emitV.y,
+                                      randomposz*emitV.z);
+                    //console.log("pParticle", pParticle);
+                      pParticle.Velocity = new moVector3f( randomvelx, randomvely, randomvelz );
+                    break;
+
+                  case CREAMODE.PARTICLES_CREATIONMETHOD_PLANAR:
+                  case CREAMODE.PARTICLES_CREATIONMETHOD_VOLUMETRIC:
+                    pParticle.Pos3d = new moVector3f(
+                      (left + moMath.UnitRandom() * emitS.x + Si.x * (1+randomposx) / 2.0) * emitV.x,
+                      ( top - moMath.UnitRandom()* emitS.y - Si.y*(1+randomposy)/2.0 )*emitV.y,
+                      randomposz * emitV.z);
+
+                      pParticle.Velocity = new moVector3f( randomvelx,
+                                                        randomvely,
+                                                        randomvelz );
+                      break;
+              }
+
+              break;
+
+          case EMIT.PARTICLES_EMITTERTYPE_SPHERE:
+              //SPHERE POSITION
+              switch(this.m_Physics.m_CreationMethod) {
+                  case CREAMODE.PARTICLES_CREATIONMETHOD_LINEAR:
+                      alpha = 2 * moMath.PI * Po.x / this.m_cols;
+                      phi = moMath.PI * Po.y / this.m_rows;
+                      radius = moMath.Sqrt( emitS.x*emitS.x+emitS.y*emitS.y) / 2.0;
+
+                      pParticle.Pos3d = new moVector3f(
+                        (radius * moMath.Cos(alpha) * moMath.Sin(phi)
+                        + randomposx) * emitV.x,
+                        (radius * moMath.Sin(alpha) * moMath.Sin(phi)
+                          + randomposy ) * emitV.y,
+                                                      (radius*moMath.Cos(phi) + randomposz ) * emitV.z );
+
+                      pParticle.Velocity = new moVector3f( randomvelx,
+                                                        randomvely,
+                                                        randomvelz );
+                      break;
+
+                  case  CREAMODE.PARTICLES_CREATIONMETHOD_PLANAR:
+                      alpha = 2 * (moMath.PI) * moMath.UnitRandom();
+                      phi = moMath.PI * moMath.UnitRandom();
+                      radius = moMath.Sqrt(emitS.x * emitS.x
+                        + emitS.y * emitS.y) / 2.0;
+                      pParticle.Pos3d = new moVector3f(
+                                          (radius*moMath.Cos(alpha)*moMath.Sin(phi) + randomposx)* emitV.x,
+                                          (radius*moMath.Sin(alpha)*moMath.Sin(phi) + randomposy)* emitV.y,
+                                          (radius*moMath.Cos(phi) + randomposz)* emitV.z
+                                          );
+                      pParticle.Velocity = new moVector3f( randomvelx,
+                                                        randomvely,
+                                                        randomvelz );
+                      break;
+
+                  case  CREAMODE.PARTICLES_CREATIONMETHOD_VOLUMETRIC:
+                      alpha = 2 * moMath.PI * moMath.UnitRandom();
+                      phi = moMath.PI * moMath.UnitRandom();
+                      radius = moMath.Sqrt(emitS.x * emitS.x
+                        + emitS.y * emitS.y) * moMath.UnitRandom() / 2.0;
+
+                      pParticle.Pos3d = new moVector3f((radius * moMath.Cos(alpha) * moMath.Sin(phi)
+                        + randomposx) * emitV.x,
+                        (radius * moMath.Sin(alpha) * moMath.Sin(phi)
+                          + randomposy ) * emitV.y,
+                                                      (radius*moMath.Cos(phi) + randomposz ) * emitV.z );
+
+                      pParticle.Velocity = new moVector3f( randomvelx,
+                                                        randomvely,
+                                                        randomvelz );
+                      break;
+              }
+              break;
+/*
+          case EMIT.PARTICLES_EMITTERTYPE_TUBE:
+              //SPHERE POSITION
+              switch(this.m_Physics.m_CreationMethod) {
+                  case PARTICLES_CREATIONMETHOD_LINEAR:
+                      alpha = 2 * moMath.PI * pParticle.Pos.x / m_cols;
+                      radius1 = emitS.x / 2.0;
+                      radius2 = emitS.y / 2.0;
+                      z = emitS.z * ( 0.5f - ( pParticle.Pos.y / m_rows ) );
+
+                      pParticle.Pos3d = new moVector3f(  ( radius1*moMath.Cos(alpha) + randomposx ) * emitV.x,
+                                                      ( radius1*moMath.Sin(alpha) + randomposy ) * emitV.y,
+                                                      ( z + randomposz ) * emitV.z );
+
+                      pParticle.Velocity = new moVector3f( randomvelx,
+                                                        randomvely,
+                                                        randomvelz );
+                      break;
+
+                  case  PARTICLES_CREATIONMETHOD_PLANAR:
+                      alpha = 2 * moMath.PI * moMath.UnitRandom();
+                      radius1 = emitS.x / 2.0;
+                      radius2 = emitS.y / 2.0;
+                      z = emitS.z * ( 0.5f - moMath.UnitRandom());
+
+                      pParticle.Pos3d = new moVector3f(  ( radius1*moMath.Cos(alpha) + randomposx ) * emitV.x,
+                                                      ( radius1*moMath.Sin(alpha) + randomposy ) * emitV.y,
+                                                      ( z + randomposz ) * emitV.z );
+
+                      pParticle.Velocity = new moVector3f( randomvelx,
+                                                        randomvely,
+                                                        randomvelz );
+                      break;
+
+                  case  PARTICLES_CREATIONMETHOD_VOLUMETRIC:
+                      alpha = 2 * moMath.PI * moMath.UnitRandom();
+                      radius1 = emitS.x / 2.0;
+                      radius2 = emitS.y / 2.0;
+                      radius = radius1 + moMath.UnitRandom()*(radius2-radius1)*moMath.UnitRandom();
+                      z = emitS.z * ( 0.5f - moMath.UnitRandom());
+
+                      pParticle.Pos3d = new moVector3f(  ( radius*moMath.Cos(alpha) + randomposx ) * emitV.x,
+                                                      ( radius*moMath.Sin(alpha) + randomposy ) * emitV.y,
+                                                      ( z + randomposz ) * emitV.z );
+
+                      pParticle.Velocity = new moVector3f( randomvelx,
+                                                        randomvely,
+                                                        randomvelz );
+                      break;
+              }
+              break;
+*/
+
+/*
+          case EMIT.PARTICLES_EMITTERTYPE_JET:
+              //SPHERE POSITION
+              switch(this.m_Physics.m_CreationMethod) {
+                  case PARTICLES_CREATIONMETHOD_LINEAR:
+
+                      //z = emitS.z * moMath.UnitRandom();
+                      len = emitV.length();
+                      index = pParticle.Pos.x+pParticle.Pos.y*m_cols;
+                      index_normal = 0.0; ///si no hay particulas siempre en 0
+
+                      if (m_cols*m_rows) {
+                          index_normal = index / (m_cols*m_rows);
+                      }
+                      z = index_normal;
+
+                      pParticle.Pos3d = new moVector3f(  emitV.x*( z + randomposx ),
+                                                      emitV.y*( z + randomposy ),
+                                                      emitV.z*( z + randomposz) );
+
+                      pParticle.Velocity = new moVector3f(   randomvelx,
+                                                          randomvely,
+                                                          randomvelz);
+                      break;
+                  case PARTICLES_CREATIONMETHOD_PLANAR:
+                  case PARTICLES_CREATIONMETHOD_VOLUMETRIC:
+                      z = emitS.z * moMath.UnitRandom();
+
+                      pParticle.Pos3d = new moVector3f(  emitV.x*( z + randomposx ),
+                                                      emitV.y*( z + randomposy ),
+                                                      emitV.z*( z + randomposz) );
+
+                      pParticle.Velocity = new moVector3f(   randomvelx,
+                                                          randomvely,
+                                                          randomvelz);
+                      break;
+
+              }
+              break;
+*/
+          case EMIT.PARTICLES_EMITTERTYPE_POINT:
+              //SPHERE POSITION
+              pParticle.Pos3d = new moVector3f(  randomposx+emitV.x,
+                                              randomposy+emitV.y,
+                                              randomposz+emitV.z );
+
+              pParticle.Velocity = new moVector3f(   randomvelx,
+                                                  randomvely,
+                                                  randomvelz);
+
+              break;
+
+
+/*
+          case EMIT.PARTICLES_EMITTERTYPE_SPIRAL:
+              //SPIRAL POSITION
+              switch(this.m_Physics.m_CreationMethod) {
+                  case PARTICLES_CREATIONMETHOD_LINEAR:
+                  case  PARTICLES_CREATIONMETHOD_PLANAR:
+                  case  PARTICLES_CREATIONMETHOD_VOLUMETRIC:
+                      alpha = 2 * moMath.PI * pParticle.Pos.x / m_cols;
+                      radius1 = emitS.x / 2.0;
+                      radius2 = emitS.y / 2.0;
+                      z = emitS.z * (0.5f - (pParticle.Pos.y / m_rows )
+                      - (pParticle.Pos.x / (m_cols * m_rows)) );
+
+                      pParticle.Pos3d = new moVector3f(  ( radius1*moMath.Cos(alpha) + randomposx ) * emitV.x,
+                                                      ( radius1*moMath.Sin(alpha) + randomposy ) * emitV.y,
+                                                      ( z + randomposz ) * emitV.z );
+
+                      pParticle.Velocity = new moVector3f( randomvelx,
+                                                        randomvely,
+                                                        randomvelz );
+                      break;
+              }
+              break;
+*/
+/*
+          case EMIT.PARTICLES_EMITTERTYPE_CIRCLE:
+              //CIRCLE POSITION
+              switch(this.m_Physics.m_CreationMethod) {
+                  case PARTICLES_CREATIONMETHOD_LINEAR:
+                      alpha = 2 * moMath.PI * ( pParticle.Pos.x + pParticle.Pos.y*m_cols ) / (m_cols*m_rows );
+                      radius1 = emitS.x / 2.0;
+                      radius2 = emitS.y / 2.0;
+                      z = 0.0;
+                      //z = emitS.z * ( 0.5f
+                      // - ( pParticle.Pos.y / m_rows ) - (pParticle.Pos.x / (m_cols*m_rows)) );
+
+                      pParticle.Pos3d = new moVector3f(  ( radius1*moMath.Cos(alpha) + randomposx ) * emitV.x,
+                                                      ( radius1*moMath.Sin(alpha) + randomposy ) * emitV.y,
+                                                      ( z + randomposz ) );
+
+                      pParticle.Velocity = new moVector3f( randomvelx,
+                                                        randomvely,
+                                                        randomvelz );
+                      break;
+                  case  PARTICLES_CREATIONMETHOD_PLANAR:
+                  case  PARTICLES_CREATIONMETHOD_VOLUMETRIC:
+                      alpha = 2 * moMath.PI *  ( pParticle.Pos.x*m_rows + pParticle.Pos.y) / (m_cols*m_rows );
+                      radius1 = emitS.x / 2.0;
+                      radius2 = emitS.y / 2.0;
+                      z = 0.0;
+                      //z = emitS.z * ( 0.5f - ( pParticle.Pos.y / m_rows )
+                      // - (pParticle.Pos.x / (m_cols*m_rows)) );
+                      randomposx = randomposx + (radius1-radius2)*moMath.Cos(alpha);
+                      randomposy = randomposy + (radius1-radius2)*moMath.Sin(alpha);
+                      pParticle.Pos3d = new moVector3f(  ( radius1*moMath.Cos(alpha) + randomposx ) * emitV.x,
+                                                      ( radius1*moMath.Sin(alpha) + randomposy ) * emitV.y,
+                                                      ( z + randomposz ) );
+
+                      pParticle.Velocity = new moVector3f( randomvelx,
+                                                        randomvely,
+                                                        randomvelz );
+                      break;
+              }
+              break;
+*/
+
+/*
+          case EMIT.PARTICLES_EMITTERTYPE_TRACKER:
+              switch(this.m_Physics.m_CreationMethod) {
+                  case PARTICLES_CREATIONMETHOD_CENTER:
+                      if (m_pTrackerData) {
+                          pParticle.Pos3d = new moVector3f( (m_pTrackerData->GetBarycenter().x - 0.5)*normalf,
+                          (-m_pTrackerData->GetBarycenter().y+0.5)*normalf, 0.0 );
+                          pParticle.Pos3d+= new moVector3f( randomposx, randomposy, randomposz );
+                          pParticle.Velocity = new moVector3f( randomvelx, randomvely, randomvelz );
+                      }
+                      break;
+
+                  case PARTICLES_CREATIONMETHOD_LINEAR:
+                  case PARTICLES_CREATIONMETHOD_PLANAR:
+                  case PARTICLES_CREATIONMETHOD_VOLUMETRIC:
+
+
+
+                      if (m_pTrackerData) {
+                          bool bfounded = false;
+                          int np =  (int) ( moMath.UnitRandom() * m_pTrackerData->GetFeaturesCount() );
+
+                          moTrackerFeature *pTF = NULL;
+
+                          pTF = m_pTrackerData->GetFeature( np );
+                          if (pTF->valid) {
+                              pParticle.Pos3d = new moVector3f( (pTF->x - 0.5)*normalf, (-pTF->y+0.5)*normalf, 0.0 );
+                              bfounded = true;
+                          }
+
+                          np = 0;
+                          //como no encontro un feature valido para usar de generador arranca desde el primero....
+                          //error, deberia tomar el baricentro.... o tomar al azar otro...
+                          int cn=0;
+                          if (!bfounded) {
+                              do {
+                                  pTF = m_pTrackerData->GetFeature( np );
+                                  if (pTF->valid) {
+                                      pParticle.Pos3d = new moVector3f( (pTF->x - 0.5)*normalf, (-pTF->y+0.5)*normalf, 0.0 );
+                                      bfounded = true;
+                                  }
+                                  np =  (int) ( moMath.UnitRandom() * m_pTrackerData->GetFeaturesCount() );
+                                  cn++;
+                              } while (!pTF->valid && np < m_pTrackerData->GetFeaturesCount() && cn<5 );
+                              if (!bfounded) pParticle.Pos3d = new moVector3f( (m_pTrackerData->GetBarycenter().x - 0.5)*normalf,
+                              (-m_pTrackerData->GetBarycenter().y+0.5)*normalf, 0.0 );
+                          }
+
+
+                      } else {
+                          pParticle.Pos3d = new moVector3f( 0, 0, 0 );
+                      }
+
+                      pParticle.Pos3d+= new moVector3f( randomposx, randomposy, randomposz );
+
+                      pParticle.Velocity = new moVector3f(   randomvelx,
+                                                          randomvely,
+                                                          randomvelz);
+                      break;
+
+              }
+              break;
+*/
+      };
+
+
+  }
+
+  Shot(): void {
+
+  }
+
+  InitParticlesSimple( p_cols : MOint, p_rows : MOint, p_forced : boolean=true ) : void {
+
+    var m_bNewImage : boolean = false;
 
     //Texture Mode MANY2PATCH takes a Shot "texture capture of actual camera"
-    if (texture_mode==PARTICLES_TEXTUREMODE_MANY2PATCH) {
-        Shot();
+    if (this.texture_mode==TEXMODE.PARTICLES_TEXTUREMODE_MANY2PATCH) {
+        this.Shot();
     }
 
     //Reset timers related to this object: one for each particle.
-    if (m_pResourceManager){
-        if (m_pResourceManager->GetTimeMan()) {
-          m_pResourceManager->GetTimeMan()->ClearByObjectId(  this->GetId() );
+    if (this.m_pResourceManager){
+        if (this.m_pResourceManager.GetTimeMan()) {
+          this.m_pResourceManager.GetTimeMan().ClearByObjectId(  this.GetId() );
         }
     }
 
-
-        if (m_ParticlesSimpleArray.Count()>0) {
-
-            m_ParticlesSimpleArray.Empty();
-        }
-
-        if (m_ParticlesSimpleArrayTmp.Count()>0) {
-
-            m_ParticlesSimpleArrayTmp.Empty();
-        }
-        if (m_ParticlesSimpleArrayOrdered.Count()>0) {
-            m_ParticlesSimpleArrayOrdered.Empty();
-        }
-
-        if ( !m_ParticlesSimpleVector.empty() ) {
-          m_ParticlesSimpleVector.clear();
-        }
-
+    if (this.m_ParticlesSimpleArray.length>0) this.m_ParticlesSimpleArray = [];
+    if (this.m_ParticlesSimpleArrayTmp.length>0) this.m_ParticlesSimpleArrayTmp = [];
+    if (this.m_ParticlesSimpleArrayOrdered.length>0) this.m_ParticlesSimpleArrayOrdered = [];
+    if (this.m_ParticlesSimpleVector.length ) {
+      this.m_ParticlesSimpleVector = [];
+    }
+/*
     m_ParticlesSimpleVector.resize( p_cols*p_rows, NULL );
     m_ParticlesSimpleArrayOrdered.Init( p_cols*p_rows, NULL );
     m_ParticlesSimpleArray.Init( p_cols*p_rows, NULL );
     m_ParticlesSimpleArrayTmp.Init( p_cols*p_rows, NULL );
+*/
+    var orderindex : MOint = 0;
+    for( var j=0; j<p_rows ; j++) {
+      for( var i=0; i<p_cols ; i++) {
 
-    int orderindex = 0;
-    for( j=0; j<p_rows ; j++) {
-            for( i=0; i<p_cols ; i++) {
+        var pPar : moParticlesSimple = new moParticlesSimple();
+        this.m_ParticlesSimpleVector[orderindex] = pPar;
+        orderindex++;
 
-            moParticlesSimple* pPar = new moParticlesSimple();
-            m_ParticlesSimpleVector[orderindex] = pPar;
-            orderindex++;
+        pPar.ViewDepth = 0.0;
+        pPar.Pos = new moVector2f( i, j);
+        pPar.ImageProportion = 1.0;
+        //pPar.Color = new moVector3f(1.0,1.0,1.0);
+        var fullcolor = this.m_Config.EvalColor( moR(PAR.PARTICLES_PARTICLECOLOR));
+        pPar.Color = new moColor(
+                                  fullcolor.r,
+                                  fullcolor.g,
+                                  fullcolor.b );
+        pPar.GLId2 = 0;
 
-            pPar->ViewDepth = 0.0;
-            pPar->Pos = moVector2f( (float) i, (float) j);
-            pPar->ImageProportion = 1.0;
-            //pPar->Color = moVector3f(1.0,1.0,1.0);
-            moVector4d fullcolor;
-            fullcolor = m_Config.EvalColor( moR(PARTICLES_PARTICLECOLOR));
-            pPar->Color = moVector3f(
-                                      fullcolor.X(),
-                                      fullcolor.Y(),
-                                      fullcolor.Z() );
-            pPar->GLId2 = 0;
+        if (this.texture_mode==TEXMODE.PARTICLES_TEXTUREMODE_UNIT) {
 
-            if (texture_mode==PARTICLES_TEXTUREMODE_UNIT) {
-
-                pPar->TCoord = moVector2f( 0.0, 0.0 );
-                pPar->TSize = moVector2f( 1.0f, 1.0f );
-
-            }
-            else if (texture_mode==PARTICLES_TEXTUREMODE_PATCH) {
-
-                pPar->TCoord = moVector2f( (float) (i) / (float) p_cols, (float) (j) / (float) p_rows );
-                pPar->TSize = moVector2f( 1.0f / (float) p_cols, 1.0f / (float) p_rows );
-
-            }
-            else if (texture_mode==PARTICLES_TEXTUREMODE_MANY || texture_mode==PARTICLES_TEXTUREMODE_MANYBYORDER ) {
-
-                pPar->TCoord = moVector2f( 0.0, 0.0 );
-                pPar->TSize = moVector2f( 1.0f, 1.0f );
-
-            }
-            else if (texture_mode==PARTICLES_TEXTUREMODE_MANY2PATCH) {
-
-                ///take the texture preselected
-                moTextureBuffer* pTexBuf = m_Config[moR(PARTICLES_FOLDERS)][MO_SELECTED][0].TextureBuffer();
-
-                pPar->GLId = glidori; //first id for Image reference to patch (and blend after)
-                pPar->GLId2 = glid; //second id for each patch image
-
-                pPar->TCoord2 = moVector2f( 0.0, 0.0 ); //coords for patch
-                pPar->TSize2 = moVector2f( 1.0f, 1.0f );
-
-                pPar->TCoord = moVector2f( (float) (i ) / (float) p_cols, (float) (j) / (float) p_rows );//grid
-                pPar->TSize = moVector2f( 1.0f / (float) p_cols, 1.0f / (float) p_rows );//sizes
-
-                ///calculamos la luminancia del cuadro correspondiente
-                //int x0, y0, x1, y1;
-                int lum = 0;
-                int lumindex = 0;
-                int contrast = 0;
-
-                ///samplebuffer en la posicion i,j ?
-                if (pSubSample && samplebuffer) {
-
-                    lum = (samplebuffer[ (i + j*pSubSample->GetWidth() ) *3 ]
-                           + samplebuffer[ (i+1 + j*pSubSample->GetWidth() ) *3 ]
-                           + samplebuffer[ (i+2 + j*pSubSample->GetWidth() ) *3 ]) / 3;
-
-                    if (lum<0) lum = -lum;
-                    ///pasamos de color a porcentaje 0..255 a 0..99
-                    if (lum>=0) {
-                        lumindex = (int)( 100.0 * (float)lum / (float)256)  - 1;
-                        if (lumindex>99) lumindex = 99;
-                    }
-                } else {
-                    MODebug2->Message(moText("pSubSample: ")+IntToStr((long)pSubSample) +
-                                    moText("samplebuffer: ")+IntToStr((long)samplebuffer));
-                }
-
-                 if (pTexBuf) {
-
-                     ///cantidad de imagenes en el buffer
-                     int nim = pTexBuf->GetImagesProcessed();
-
-                     pPar->ImageProportion = 1.0;
-
-
-                     if (nim>0) {
-
-                        ///Tomamos de GetBufferLevels...
-
-                         moTextureFrames& pTextFrames(pTexBuf->GetBufferLevels( lumindex, 0 ) );
-
-                         int nc = pTextFrames.Count();
-                         int irandom = -1;
-
-                         irandom = (int)(  moMathf::UnitRandom() * (double)nc );
-
-                        moTextureMemory* pTexMem = pTextFrames.GetRef( irandom );
-
-                        if (pTexMem) {
-                            pPar->GLId = glidori;
-                            pTexMem->GetReference();
-                            pPar->GLId2 = pTexMem->GetGLId();
-                            pPar->pTextureMemory = pTexMem;
-                            if (pTexMem->GetHeight()>0) pPar->ImageProportion = (float) pTexMem->GetWidth() / (float) pTexMem->GetHeight();
-                        } else {
-                            pPar->GLId = glidori;
-                            pPar->GLId2 = pPar->GLId;
-                            pPar->Color.X() = ((float)lum )/ 255.0f;
-                            pPar->Color.Y() = ((float)lum )/ 255.0f;
-                            pPar->Color.Z() = ((float)lum )/ 255.0f;
-                            pPar->Color.X()*= pPar->Color.X();
-                            pPar->Color.Y()*= pPar->Color.Y();
-                            pPar->Color.Z()*= pPar->Color.Z();
-                        }
-                         //MODebug2->Push( moText("creating particle: irandom:") + IntToStr(irandom)
-                         // + moText(" count:") + IntToStr(pTexBuf->GetImagesProcessed())
-                         // + moText(" glid:") + IntToStr(pPar->GLId) );
-
-                     }
-
-                 } else MODebug2->Error( moText("particles error creating texture") );
-
-            }
-
-            pPar->Size = moVector2f( m_Physics.m_EmitterSize.X() / (float) p_cols, m_Physics.m_EmitterSize.Y() / (float) p_rows );
-            pPar->Force = moVector3f( 0.0f, 0.0f, 0.0f );
-
-            SetParticlePosition( pPar );
-
-
-            if (m_Physics.m_EmitionPeriod>0) {
-                pPar->Age.Stop();
-                pPar->Visible = false;
-            } else {
-                pPar->Age.Start();
-                pPar->Visible = true;
-            }
-
-            ///Set Timer management
-            pPar->Age.SetObjectId( this->GetId() );
-            pPar->Age.SetTimerId( i + j*p_cols );
-            pPar->Age.SetRelativeTimer( (moTimerAbsolute*)&m_EffectState.tempo );
-            m_pResourceManager->GetTimeMan()->AddTimer( &pPar->Age );
-
-            m_ParticlesSimpleArray.Set( i + j*p_cols, pPar );
-
-            moParticlesSimple* pParTmp = new moParticlesSimple();
-            pParTmp->Pos3d = pPar->Pos3d;
-            pParTmp->Velocity = pPar->Velocity;
-            pParTmp->Mass = pPar->Mass;
-            pParTmp->Force = pPar->Force;
-            pParTmp->Fixed = pPar->Fixed;
-            m_ParticlesSimpleArrayTmp.Set( i + j*p_cols, pParTmp );
+            pPar.TCoord = new moVector2f( 0.0, 0.0 );
+            pPar.TSize = new moVector2f( 1.0, 1.0 );
 
         }
+        else if (this.texture_mode==TEXMODE.PARTICLES_TEXTUREMODE_PATCH) {
+
+            pPar.TCoord = new moVector2f( i * 1.0/p_cols, j * 1.0/p_rows );
+            pPar.TSize = new moVector2f( 1.0 / p_cols, 1.0 / p_rows );
+
+        }
+        else if (this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_MANY
+          || this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_MANYBYORDER) {
+
+            pPar.TCoord = new moVector2f( 0.0, 0.0 );
+            pPar.TSize = new moVector2f( 1.0, 1.0 );
+
+        }
+        else if (this.texture_mode==TEXMODE.PARTICLES_TEXTUREMODE_MANY2PATCH) {
+
+          ///take the texture preselected
+          var pTexBuf : moTextureBuffer = this.m_Config.TextureBuffer(moR(PAR.PARTICLES_FOLDERS));
+            //moTextureBuffer
+
+            pPar.GLId = this.glidori; //first id for Image reference to patch (and blend after)
+            pPar.GLId2 = this.glid; //second id for each patch image
+
+            pPar.TCoord2 = new moVector2f( 0.0, 0.0 ); //coords for patch
+            pPar.TSize2 = new moVector2f( 1.0, 1.0 );
+
+            pPar.TCoord = new moVector2f( i / p_cols, j / p_rows );//grid
+            pPar.TSize = new moVector2f( 1.0 / p_cols, 1.0 / p_rows );//sizes
+  /*
+            ///calculamos la luminancia del cuadro correspondiente
+            //int x0, y0, x1, y1;
+            var lum : MOint = 0;
+            var lumindex : MOint = 0;
+            var contrast : MOint = 0;
+
+            ///samplebuffer en la posicion i,j ?
+            if (this.pSubSample && this.samplebuffer) {
+
+                lum = (samplebuffer[ (i + j*pSubSample->GetWidth() ) *3 ]
+                      + samplebuffer[ (i+1 + j*pSubSample->GetWidth() ) *3 ]
+                      + samplebuffer[ (i+2 + j*pSubSample->GetWidth() ) *3 ]) / 3;
+
+                if (lum<0) lum = -lum;
+                ///pasamos de color a porcentaje 0..255 a 0..99
+                if (lum>=0) {
+                    lumindex = (int)( 100.0 * lum / 256)  - 1;
+                    if (lumindex>99) lumindex = 99;
+                }
+            } else {
+                this.MODebug2.Message(moText("pSubSample: ")+IntToStr((long)pSubSample) +
+                                moText("samplebuffer: ")+IntToStr((long)samplebuffer));
+            }
+  */
+  /*
+            if (pTexBuf) {
+
+                ///cantidad de imagenes en el buffer
+                var nim : MOint = pTexBuf.GetImagesProcessed();
+
+                pPar.ImageProportion = 1.0;
+
+
+                if (nim>0) {
+
+                    ///Tomamos de GetBufferLevels...
+
+                    moTextureFrames& pTextFrames(pTexBuf->GetBufferLevels( lumindex, 0 ) );
+
+                    int nc = pTextFrames.Count();
+                    int irandom = -1;
+
+                    irandom = (int)(  moMath.UnitRandom() * nc );
+
+                    moTextureMemory* pTexMem = pTextFrames.GetRef( irandom );
+
+                    if (pTexMem) {
+                        pPar.GLId = glidori;
+                        pTexMem->GetReference();
+                        pPar.GLId2 = pTexMem->GetGLId();
+                        pPar.pTextureMemory = pTexMem;
+                        if (pTexMem->GetHeight()>0) pPar.ImageProportion =
+                             pTexMem->GetWidth() /  pTexMem->GetHeight();
+                    } else {
+                        pPar.GLId = glidori;
+                        pPar.GLId2 = pPar.GLId;
+                        pPar.Color.x = (lum )/ 255.0;
+                        pPar.Color.y = (lum )/ 255.0;
+                        pPar.Color.z = (lum )/ 255.0;
+                        pPar.Color.x*= pPar.Color.x;
+                        pPar.Color.y*= pPar.Color.y;
+                        pPar.Color.z*= pPar.Color.z;
+                    }
+                    //this.MODebug2.Push( moText("creating particle: irandom:") + IntToStr(irandom)
+                    // + moText(" count:") + IntToStr(pTexBuf->GetImagesProcessed())
+                    // + moText(" glid:") + IntToStr(pPar.GLId) );
+
+                }
+
+            } else this.MODebug2.Error( _moText("particles error creating texture") );
+  */
+        }
+
+        pPar.Size = new moVector2f( this.m_Physics.m_EmitterSize.x / p_cols,
+                                    this.m_Physics.m_EmitterSize.y / p_rows );
+        pPar.Force = new moVector3f( 0.0, 0.0, 0.0 );
+
+        this.SetParticlePosition( pPar );
+
+
+        if (this.m_Physics.m_EmitionPeriod>0) {
+            pPar.Age.Stop();
+            pPar.Visible = false;
+        } else {
+            pPar.Age.Start();
+            pPar.Visible = true;
+        }
+
+        ///Set Timer management
+        pPar.Age.SetObjectId( this.GetId() );
+        pPar.Age.SetTimerId( i + j*p_cols );
+        pPar.Age.SetRelativeTimer( this.m_EffectState.tempo );
+
+        this.m_pResourceManager.GetTimeMan().AddTimer( pPar.Age);
+
+        this.m_ParticlesSimpleArray[ i + j*p_cols ] = pPar;
+
+        var pParTmp : moParticlesSimple = new moParticlesSimple();
+        pParTmp.Pos3d = pPar.Pos3d;
+        pParTmp.Velocity = pPar.Velocity;
+        pParTmp.Mass = pPar.Mass;
+        pParTmp.Force = pPar.Force;
+        pParTmp.Fixed = pPar.Fixed;
+        this.m_ParticlesSimpleArrayTmp[ i + j*p_cols]= pParTmp;
+
+      }
     }
 
-    m_rows = p_rows;
-    m_cols = p_cols;
-*/
-}
+    this.m_rows = p_rows;
+    this.m_cols = p_cols;
 
-/// Mata y regenera particulas, tambien las actualiza....
-Regenerate() : void {
-/*
-    int i,j;
-    float randommotionx,randommotiony,randommotionz;
-    long LastImageIndex = -1;
+  }
 
-    long emitiontimer_duration = m_Physics.EmitionTimer.Duration();
-    //MODebug2->Message("dur:"+IntToStr(emitiontimer_duration));
+  /// Mata y regenera particulas, tambien las actualiza....
+  Regenerate() : void {
 
-    //Reset EmitionTimer if out-of-timeline
-    if (emitiontimer_duration<0)
-        m_Physics.EmitionTimer.Start();
+    var randommotionx;
+    var randommotiony;
+    var randommotionz;
 
+    var LastImageIndex = -1;
 
-    for( j=0; j<m_rows ; j++) {
-      for( i=0; i<m_cols ; i++) {
+    var emitiontimer_duration = this.m_Physics.EmitionTimer.Duration();
+      //this.MODebug2.Message("dur:"+IntToStr(emitiontimer_duration));
+
+      //Reset EmitionTimer if out-of-timeline
+      if (emitiontimer_duration<0)
+          this.m_Physics.EmitionTimer.Start();
 
 
-            moParticlesSimple* pPar = m_ParticlesSimpleArray[i+j*m_cols];
-
-            pPar->pTextureMemory = NULL;
-
-            // Reset/Kill out-of-timeline particle....
-            // Make particle die if particle Age is out of sync with moGetTicks absolute time (kind of reset the particles)
-            if (pPar->Age.Duration() > moGetTicks() ) {
-                pPar->Age.Stop();
-                pPar->Visible = false;
-                pPar->MOId = -1; //reseteamos la textura asociada
-                if (pPar->pTextureMemory) {
-                    pPar->pTextureMemory->ReleaseReference();
-                    pPar->pTextureMemory = NULL;
-                    pPar->GLId = 0;
-                }
-            }
+      for( var j=0; j<this.m_rows ; j++) {
+        for( var i=0; i<this.m_cols ; i++) {
 
 
-            //KILL PARTICLE
+              var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[i+j*this.m_cols];
 
-            // Reset/Kill particle if Age > MaxAge , if MaxAge is 0, never die!!!
-            if ( pPar->Visible) {
-                if (
-                        (
-                                (m_Physics.m_MaxAge>0) &&
-                                (pPar->Age.Duration() > m_Physics.m_MaxAge)
-                         )
-                        ||
-                        (
-                                (pPar->MaxAge>0) &&
-                               (pPar->Age.Duration() > pPar->MaxAge)
-                        )
-                    ) {
+              pPar.pTextureMemory = NULL;
 
-                    pPar->Age.Stop();
-                    pPar->Visible = false;
-                    pPar->MOId = -1; //reseteamos la textura asociada
+              // Reset/Kill out-of-timeline particle....
+              // Make particle die if particle Age is out of sync with moGetTicks absolute time (kind of reset the particles)
 
-                    // Update rate ??...
-                    if (m_Rate>0) m_Rate--;
+              if (pPar.Age.Duration() > moGetTicks() ) {
+                  pPar.Age.Stop();
+                  pPar.Visible = false;
+                  pPar.MOId = -1; //reseteamos la textura asociada
+                  /*
+                  if (pPar.pTextureMemory) {
+                      pPar.pTextureMemory->ReleaseReference();
+                      pPar.pTextureMemory = NULL;
+                      pPar.GLId = 0;
+                  }
+                  */
+              }
 
-                    if (pPar->pTextureMemory) {
-                        pPar->pTextureMemory->ReleaseReference();
-                        pPar->pTextureMemory = NULL;
-                        pPar->GLId = 0;
+
+              //KILL PARTICLE
+
+              // Reset/Kill particle if Age > MaxAge , if MaxAge is 0, never die!!!
+              //
+              if ( pPar.Visible) {
+                  if (
+                          (
+                                  (this.m_Physics.m_MaxAge>0) &&
+                                  (pPar.Age.Duration() > this.m_Physics.m_MaxAge)
+                          )
+                          ||
+                          (
+                                  (pPar.MaxAge>0) &&
+                                (pPar.Age.Duration() > pPar.MaxAge)
+                          )
+                      ) {
+
+                      pPar.Age.Stop();
+                      console.log("Stopping");
+                      pPar.Visible = false;
+                      pPar.MOId = -1; //reseteamos la textura asociada
+
+                      // Update rate ??...
+                      if (this.m_Rate>0)
+                        this.m_Rate--;
+                      /*
+                      if (pPar.pTextureMemory) {
+                          pPar.pTextureMemory->ReleaseReference();
+                          pPar.pTextureMemory = NULL;
+                          pPar.GLId = 0;
+                      }*/
+
+                  }
+              }
+
+              //REBORN PARTICLE
+              //this.m_Physics.EmitionTimer.Duration()
+              //this.MODebug2.Message("dur:"+IntToStr(emitiontimer_duration)+" vs:"+IntToStr(this.m_Physics.m_EmitionPeriod) );
+
+
+              // Rate is actual particle# emitted in this EmitionPeriod
+              if ( this.m_Rate<this.m_Physics.m_EmitionRate &&
+                  (this.m_Physics.EmitionTimer.Duration() > this.m_Physics.m_EmitionPeriod)
+                  && pPar.Visible==false ) {
+
+                  var letsborn : boolean = true;
+                  var id_last_particle = 0;
+                  var this_id_particle = 0;
+
+                  if (this.m_Physics.m_CreationMethod==CREAMODE.PARTICLES_CREATIONMETHOD_LINEAR ) {
+                    //in linear creation method, need to track the last particle born, just to maintain linearity
+                    if (this.m_Physics.m_pLastBordParticle)
+                      id_last_particle = this.m_Physics.m_pLastBordParticle.Pos.x
+                        + this.m_Physics.m_pLastBordParticle.Pos.y * this.m_cols;
+                    else id_last_particle = -1;
+
+                    this_id_particle = i+j*this.m_cols;
+
+                    if ( //last born was last in array
+                    id_last_particle==(this.m_rows*this.m_cols-1)
+                        && //this is first one in array
+                          this_id_particle == 0 ) {
+                        ///OK
+                        letsborn = true;
+                    } else if ( this_id_particle == (id_last_particle+1) ) {
+                        // this one is just the next one to the last born, just what we wanted!
+                        ///OK
+                        letsborn = true;
+                    } else {
+                      // no linearity, yet
+                      ///wait for the other cycle
+                      letsborn = false;
                     }
 
-                }
-            }
-
-            //REBORN PARTICLE
-            //m_Physics.EmitionTimer.Duration()
-            //MODebug2->Message("dur:"+IntToStr(emitiontimer_duration)+" vs:"+IntToStr(m_Physics.m_EmitionPeriod) );
-
-
-            // Rate is actual particle# emitted in this EmitionPeriod
-            if ( m_Rate<m_Physics.m_EmitionRate &&
-                (m_Physics.EmitionTimer.Duration() > m_Physics.m_EmitionPeriod)
-                && pPar->Visible==false ) {
-
-                bool letsborn = true;
-                int id_last_particle = 0;
-                int this_id_particle = 0;
-
-                if (m_Physics.m_CreationMethod==PARTICLES_CREATIONMETHOD_LINEAR ) {
-                  //in linear creation method, need to track the last particle born, just to maintain linearity
-                  if (m_Physics.m_pLastBordParticle)
-                    id_last_particle = m_Physics.m_pLastBordParticle->Pos.X() + m_Physics.m_pLastBordParticle->Pos.Y()*m_cols;
-                  else id_last_particle = -1;
-
-                  this_id_particle = i+j*m_cols;
-
-                  if ( //last born was last in array
-                  id_last_particle==(m_rows*m_cols-1)
-                       && //this is first one in array
-                        this_id_particle == 0 ) {
-                      ///OK
-                      letsborn = true;
-                  } else if ( this_id_particle == (id_last_particle+1) ) {
-                      // this one is just the next one to the last born, just what we wanted!
-                      ///OK
-                      letsborn = true;
-                  } else {
-                    // no linearity, yet
-                    ///wait for the other cycle
-                    letsborn = false;
                   }
 
-                }
+                  //this.m_Physics.EmitionTimer.Start();
+                  if (letsborn) {
+                    pPar.Visible = true;
+                    pPar.Age.Start();
 
-                //m_Physics.EmitionTimer.Start();
-                if (letsborn) {
-                  pPar->Visible = true;
-                  pPar->Age.Start();
+                    //guardamos la referencia a esta particula, que servira para la proxima
+                    if (this.m_Physics.m_pLastBordParticle) {
+                      //guardamos la referencia del imageindex de la ultima particula
+                      // (para mantener el orden en MANYBYORDER)
+                      LastImageIndex = this.m_Physics.m_pLastBordParticle.ImageIndex;
+                    }
+                    this.m_Physics.m_pLastBordParticle = pPar;
 
-                  //guardamos la referencia a esta particula, que servira para la proxima
-                  if (m_Physics.m_pLastBordParticle) {
-                    //guardamos la referencia del imageindex de la ultima particula (para mantener el orden en MANYBYORDER)
-                    LastImageIndex = m_Physics.m_pLastBordParticle->ImageIndex;
-                  }
-                  m_Physics.m_pLastBordParticle = pPar;
+                    //Update the rate counter
+                    this.m_Rate++;
 
-                  //Update the rate counter
-                  m_Rate++;
-
-                  //Sets the particle position
-                  SetParticlePosition( pPar );
-                  //MODebug2->Message("frame:"+IntToStr(frame) );
-                  //MODebug2->Message("i:"+IntToStr(i) );
-                  //MODebug2->Message("j:"+IntToStr(j) );
-                  //MODebug2->Message("px:"+FloatToStr(pPar->Pos3d.X()) );
-                  //MODebug2->Message("py:"+FloatToStr(pPar->Pos3d.Y()) );
+                    //Sets the particle position
+                    this.SetParticlePosition( pPar );
+                    //this.MODebug2.Message("frame:"+IntToStr(frame) );
+                    //this.MODebug2.Message("i:"+IntToStr(i) );
+                    //this.MODebug2.Message("j:"+IntToStr(j) );
+                    //this.MODebug2.Message("px:"+FloatToStr(pPar.Pos3d.x) );
+                    //this.MODebug2.Message("py:"+FloatToStr(pPar.Pos3d.y) );
 
 
-                   //SPECIAL CASE for texture folders
-                   ///asigna un id al azar!!!! de todos los que componen el moTextureBuffer
-                   ///hay q pedir el moTextureBuffer
-                   if ( texture_mode==PARTICLES_TEXTUREMODE_MANY || texture_mode==PARTICLES_TEXTUREMODE_MANYBYORDER ) {
-                       moTextureBuffer* pTexBuf = m_Config[ moR(PARTICLES_FOLDERS) ][MO_SELECTED][0].TextureBuffer();
-                       //m_Config[moR(PARTICLES_TEXTURE)].GetData()->GetGLId(&m_EffectState.tempo, 1, NULL );
-                       if (pTexBuf) {
-                           int nim = pTexBuf->GetImagesProcessed();
-                           //MODebug2->Push( "nim: " + IntToStr(nim) );
+                    //SPECIAL CASE for texture folders
+                    ///asigna un id al azar!!!! de todos los que componen el moTextureBuffer
+                    ///hay q pedir el moTextureBuffer
+                    if (this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_MANY
+                      || this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_MANYBYORDER) {
+                        var pTexBuf : moTextureBuffer = this.m_Config.TextureBuffer(moR(PAR.PARTICLES_FOLDERS));
+                        //this.m_Config[moR(PARTICLES_TEXTURE)].GetData()->GetGLId(&m_EffectState.tempo, 1, NULL );
+                        if (pTexBuf) {
+                            var nim = pTexBuf.GetImagesProcessed();
+                            //this.MODebug2.Push( "nim: " + IntToStr(nim) );
 
-                           pPar->ImageProportion = 1.0;
+                            pPar.ImageProportion = 1.0;
 
-                           if (nim>0) {
+                            if (nim>0) {
 
-                               float frandom = moMathf::UnitRandom() * nim;
+                                var frandom = moMath.UnitRandom() * nim;
 
-                               //MODebug2->Push( "frandom: " + FloatToStr(frandom) );
+                                //this.MODebug2.Push( "frandom: " + FloatToStr(frandom) );
 
-                               //int irandom = ( ::rand() * nim )/ RAND_MAX;
-                               int irandom = (int)frandom;
-                               if (irandom>=nim) irandom = nim - 1;//last one repeated if out of bound
+                                //int irandom = ( ::rand() * nim )/ RAND_MAX;
+                                var irandom = Math.round(frandom);
+                                if (irandom>=nim) irandom = nim - 1;//last one repeated if out of bound
 
-                               if (texture_mode==PARTICLES_TEXTUREMODE_MANYBYORDER) {
-                                irandom = LastImageIndex+1;
-                                if (irandom>=nim) irandom = 0;
-                               }
-
-                               LastImageIndex = irandom;
-                               pPar->ImageIndex = LastImageIndex;
-
-                               //MODebug2->Push( "irandom: " + IntToStr(irandom) + " rand: " + IntToStr(::rand()) );
-
-                               pPar->GLId = pTexBuf->GetFrame( irandom );
-
-                               moTextureMemory* pTexMem = pTexBuf->GetTexture( irandom );
-                               if (pTexMem) {
-                                  pPar->pTextureMemory = pTexMem;
-                                  if (pTexMem->GetHeight()>0)
-                                  pPar->ImageProportion = (float) pTexMem->GetWidth() / (float) pTexMem->GetHeight();
+                                if ( this.texture_mode==TEXMODE.PARTICLES_TEXTUREMODE_MANYBYORDER) {
+                                  irandom = LastImageIndex+1;
+                                  if (irandom>=nim) irandom = 0;
                                 }
 
-                               ///MODebug2->Push( moText("creating particle: irandom:")
-                               // + IntToStr(irandom) + moText(" count:")
-                               // + IntToStr(pTexBuf->GetImagesProcessed()) + moText(" glid:") + IntToStr(pPar->GLId) );
+                                LastImageIndex = irandom;
+                                pPar.ImageIndex = LastImageIndex;
+
+                                //this.MODebug2.Push( "irandom: " + IntToStr(irandom) + " rand: " + IntToStr(::rand()) );
+
+                                ////pPar.GLId = pTexBuf.GetFrame( irandom );
+
+                                var pTexMem : moTextureMemory = pTexBuf.GetTexture( irandom );
+                                if (pTexMem) {
+                                    pPar.pTextureMemory = pTexMem;
+                                    if (pTexMem.GetHeight()>0)
+                                    pPar.ImageProportion =  pTexMem.GetWidth() /  pTexMem.GetHeight();
+                                  }
+
+                                ///this.MODebug2.Push( moText("creating particle: irandom:")
+                                // + IntToStr(irandom) + moText(" count:")
+                                // + IntToStr(pTexBuf->GetImagesProcessed()) + moText(" glid:") + IntToStr(pPar.GLId) );
 
 
-                           } else {
-                               ///pPar->GLId = 0;
-                           }
-                           pPar->TCoord = moVector2f( 0.0, 0.0 );
-                           pPar->TSize = moVector2f( 1.0f, 1.0f );
+                            } else {
+                                ///pPar.GLId = 0;
+                            }
+                            pPar.TCoord = new moVector2f( 0.0, 0.0 );
+                            pPar.TSize = new moVector2f( 1.0, 1.0 );
 
-                       } else MODebug2->Error( moText("PARTICLES_TEXTUREMODE_MANY particles error creating texture") );
-                   }
-
-                } ///fin letsborn
-
-            }
-
-            // Ok, check if EmitionRate is reached
-            if (m_Rate>=m_Physics.m_EmitionRate) {
-                //reset timer
-                m_Physics.EmitionTimer.Start();
-                m_Rate = 0;
-            }
-
-            //FADEIN
-            if ( pPar->Visible && m_Physics.m_FadeIn>0.0) {
-                //must be in lifetime range
-                if ( m_Physics.m_MaxAge>0 &&  pPar->Age.Duration() < m_Physics.m_MaxAge  ) {
-                    //only apply in the first half-lifetime lapsus
-                    if ( pPar->Age.Duration() < ( m_Physics.m_FadeIn * m_Physics.m_MaxAge / 2.0 ) ) {
-
-                        pPar->Alpha = ( 2.0 * pPar->Age.Duration() / ( m_Physics.m_FadeIn * m_Physics.m_MaxAge ) );
-
-                    } else pPar->Alpha = 1.0 ;
-                } else if ( m_Physics.m_MaxAge==0) {
-                    //proportional to particle Age (in seconds) 1 second life = 100% opacity
-                    pPar->Alpha = m_Physics.m_FadeIn * pPar->Age.Duration() / 1000.0;
-                }
-            }
-
-            //FADEOUT
-            if ( pPar->Visible && m_Physics.m_FadeOut>0.0) {
-                //must be in lifetime range
-                if ( m_Physics.m_MaxAge>0 && (pPar->Age.Duration() < m_Physics.m_MaxAge) ) {
-                    //only apply in the last half-lifetime lapsus
-                    if ( (m_Physics.m_MaxAge/2.0) < pPar->Age.Duration() ) {
-                        if (  (m_Physics.m_FadeOut*m_Physics.m_MaxAge / 2.0) > (m_Physics.m_MaxAge - pPar->Age.Duration()) ) {
-
-                            pPar->Alpha = ( m_Physics.m_MaxAge - pPar->Age.Duration() ) / (m_Physics.m_FadeOut *m_Physics.m_MaxAge / 2.0);
-
-                        }
+                        } else this.MODebug2.Error("PARTICLES_TEXTUREMODE_MANY particles error creating texture");
                     }
-                }
 
-            }
+                  } ///fin letsborn
 
-            //SIZEIN
-            if ( pPar->Visible && m_Physics.m_SizeIn>0.0
-                    && (m_Physics.m_MaxAge>0) &&  (pPar->Age.Duration() < m_Physics.m_MaxAge) ) {
+              }
 
-                if ( pPar->Age.Duration() < ( m_Physics.m_SizeIn * m_Physics.m_MaxAge / 2.0 )) {
+              // Ok, check if EmitionRate is reached
+              if (this.m_Rate>=this.m_Physics.m_EmitionRate) {
+                  //reset timer
+                  this.m_Physics.EmitionTimer.Start();
+                  this.m_Rate = 0;
+              }
 
-                    pPar->Scale = ( 2.0 * pPar->Age.Duration() / ( m_Physics.m_SizeIn * m_Physics.m_MaxAge ) );
+              //FADEIN
+              if ( pPar.Visible && this.m_Physics.m_FadeIn>0.0) {
+                  //must be in lifetime range
+                  if ( this.m_Physics.m_MaxAge>0 &&  pPar.Age.Duration() < this.m_Physics.m_MaxAge  ) {
+                      //only apply in the first half-lifetime lapsus
+                      if ( pPar.Age.Duration() < ( this.m_Physics.m_FadeIn * this.m_Physics.m_MaxAge / 2.0 ) ) {
 
-                } else pPar->Scale = 1.0 ;
+                          pPar.Alpha = ( 2.0 * pPar.Age.Duration() / ( this.m_Physics.m_FadeIn * this.m_Physics.m_MaxAge ) );
 
-
-            }
-
-
-            //SIZEOUT
-            if ( pPar->Visible && m_Physics.m_SizeOut>0.0 && (m_Physics.m_MaxAge>0)
-                && ( (m_Physics.m_MaxAge/2.0) < pPar->Age.Duration() ) && (pPar->Age.Duration() < m_Physics.m_MaxAge) ) {
-
-                if (  (m_Physics.m_SizeOut*m_Physics.m_MaxAge / 2.0) > (m_Physics.m_MaxAge
-                - pPar->Age.Duration()) && pPar->Age.Duration() < m_Physics.m_MaxAge ) {
-
-                    pPar->Scale = ( m_Physics.m_MaxAge - pPar->Age.Duration() ) / (m_Physics.m_SizeOut *m_Physics.m_MaxAge / 2.0);
-
-                }
-
-
-            }
-
-            if ( pPar->Visible ) {
-
-                randommotionx = (m_Physics.m_RandomMotion>0)?
-                (0.5-moMathf::UnitRandom())*m_Physics.m_MotionVector.X() : m_Physics.m_MotionVector.X();
-                randommotiony = (m_Physics.m_RandomMotion>0)?
-                (0.5-moMathf::UnitRandom())*m_Physics.m_MotionVector.Y() : m_Physics.m_MotionVector.Y();
-                randommotionz = (m_Physics.m_RandomMotion>0)?
-                (0.5-moMathf::UnitRandom())*m_Physics.m_MotionVector.Z() : m_Physics.m_MotionVector.Z();
-
-                m_Physics.m_MotionVector.Normalize();
-                if ( m_Physics.m_MotionVector.Length() > 0.0 ) {
-                    if (m_Physics.m_RandomMotion>0.0) {
-                        pPar->Velocity+= moVector3f( randommotionx, randommotiony, randommotionz ) * m_Physics.m_RandomMotion;
-                    }
-                }
-
-            }
-
-
-
-
-        }
-    }
-    */
-}
-
-
-DrawParticlesSimple( tempogral : MO.moTempo , parentstate : MO.moEffectState  ) : void {
-/*
-    int i,j;
-    int cols2,rows2;
-
-
-
-
-    //if ((moGetTicks() % 1000) == 0) TrackParticle(1);
-
-    cols2 = m_Config.Int( moR(PARTICLES_WIDTH));
-    rows2 = m_Config.Int( moR(PARTICLES_HEIGHT) );
-
-    if (cols2!=m_cols || rows2!=m_rows) {
-        InitParticlesSimple(cols2,rows2);
-    }
-
-    /// TODO: what is this???? gross bug
-     gral_ticks  = tempogral->ticks;
-
-
-
-    if (!m_Physics.EmitionTimer.Started())
-        m_Physics.EmitionTimer.Start();
-
-
-
-    //glBindTexture( GL_TEXTURE_2D, 0 );
-    if ( texture_mode!=PARTICLES_TEXTUREMODE_MANY && texture_mode!=PARTICLES_TEXTUREMODE_MANY2PATCH ) {
-        //glBindTexture( GL_TEXTURE_2D, 0 );
-        if (glid>=0) glBindTexture( GL_TEXTURE_2D, glid );
-        else glBindTexture( GL_TEXTURE_2D, 0);
-    }
-    //glColor4f(1.0,1.0,1.0,1.0);
-    //glDisable( GL_CULL_FACE);
-    //glDisable( GL_DEPTH_TEST);
-    //glFrontFace( GL_CW);
-    //glPolygonMode( GL_LINES, GL_FRONT_AND_BACK);
-
-    //SetBlending( (moBlendingModes) m_Config[moR(PARTICLES_BLENDING)][MO_SELECTED][0].Int() );
-
-
-    float sizexd2,sizeyd2;
-    float tsizex,tsizey;
-
-    moFont* pFont = m_Config[moR(PARTICLES_FONT) ][MO_SELECTED][0].Font();
-    moText Texto;
-
-    //Update particle position, velocity, aging, death and rebirth.
-    UpdateParticles( dt, 0 ); //Euler mode
-    OrderParticles();
-    ParticlesSimpleAnimation( tempogral, parentstate );
-
-    float idxt = 0.0;
-
-    //Now really draw each particle
-    int orderedindex = 0;
-    for( j = 0; j<m_rows ; j++) {
-      for( i = 0; i<m_cols ; i++) {
-
-            idxt = 0.5 + (float)( i + j * m_cols ) / (float)( m_cols * m_rows * 2 );
-
-            moParticlesSimple* pPar = m_ParticlesSimpleArray.GetRef( i + j*m_cols );
-
-            switch(m_OrderingMode) {
-              case PARTICLES_ORDERING_MODE_NONE:
-                break;
-              case PARTICLES_ORDERING_MODE_COMPLETE:
-                {
-                  pPar = m_ParticlesSimpleVector[ orderedindex ];
-                  pPar->ViewDepth = CalculateViewDepth( pPar );
-                }
-                break;
-              case PARTICLES_ORDERING_MODE_ZPOSITION:
-                pPar = m_ParticlesSimpleVector[ orderedindex ];
-                break;
-              default:
-
-                break;
-            }
-
-            orderedindex+= 1;
-            double part_timer;
-            if (pPar) {
-              if (pPar->Visible) {
-
-
-                  if (texture_mode==PARTICLES_TEXTUREMODE_MANY
-                   || texture_mode==PARTICLES_TEXTUREMODE_MANYBYORDER
-                  || texture_mode==PARTICLES_TEXTUREMODE_MANY2PATCH ) {
-                      //pPar->GLId = 22;
-                      if (pPar->GLId>0) {
-                          glActiveTextureARB( GL_TEXTURE0_ARB );
-                          glEnable(GL_TEXTURE_2D);
-                          //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-                          glBindTexture( GL_TEXTURE_2D, pPar->GLId );
-                      }
-                      if (pPar->GLId2>0) {
-                          glActiveTextureARB( GL_TEXTURE1_ARB );
-                          glEnable(GL_TEXTURE_2D);
-                          //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-                          glBindTexture( GL_TEXTURE_2D, pPar->GLId2 );
-                      }
+                      } else pPar.Alpha = 1.0 ;
+                  } else if ( this.m_Physics.m_MaxAge==0) {
+                      //proportional to particle Age (in seconds) 1 second life = 100% opacity
+                      pPar.Alpha = this.m_Physics.m_FadeIn * pPar.Age.Duration() / 1000.0;
                   }
+              }
 
-                  if (moScript::IsInitialized()) {
-                      if (ScriptHasFunction("RunParticle")) {
-                          SelectScriptFunction("RunParticle");
-                          AddFunctionParam( (int) ( i + j*m_cols ) );
-                          AddFunctionParam( (float)dt );
-                          if (!RunSelectedFunction(1)) {
-                              MODebug2->Error( moText("RunParticle function not executed") );
+              //FADEOUT
+              if ( pPar.Visible && this.m_Physics.m_FadeOut>0.0) {
+                  //must be in lifetime range
+                  if ( this.m_Physics.m_MaxAge>0 && (pPar.Age.Duration() < this.m_Physics.m_MaxAge) ) {
+                      //only apply in the last half-lifetime lapsus
+                      if ( (this.m_Physics.m_MaxAge/2.0) < pPar.Age.Duration() ) {
+
+                          if (  (this.m_Physics.m_FadeOut
+                          *this.m_Physics.m_MaxAge / 2.0) > (this.m_Physics.m_MaxAge - pPar.Age.Duration()) ) {
+
+                              pPar.Alpha = ( this.m_Physics.m_MaxAge
+                              - pPar.Age.Duration() ) / (this.m_Physics.m_FadeOut *this.m_Physics.m_MaxAge / 2.0);
+
                           }
                       }
                   }
 
-                  sizexd2 = (pPar->Size.X()* pPar->ImageProportion )/2.0;
-                  sizeyd2 = pPar->Size.Y()/2.0;
-                  tsizex = pPar->TSize.X();
-                  tsizey = pPar->TSize.Y();
-                  part_timer = 0.001f * (double)(pPar->Age.Duration()); // particule ang = durationinmilis / 1000 ...
+              }
 
-                  if (m_pParticleTime) {
-                    if (m_pParticleTime->GetData()) {
-                        m_pParticleTime->GetData()->SetDouble(part_timer);
-                        m_pParticleTime->Update(true);
+              //SIZEIN
+              if ( pPar.Visible && this.m_Physics.m_SizeIn>0.0
+                      && (this.m_Physics.m_MaxAge>0) &&  (pPar.Age.Duration() < this.m_Physics.m_MaxAge) ) {
+
+                  if ( pPar.Age.Duration() < ( this.m_Physics.m_SizeIn * this.m_Physics.m_MaxAge / 2.0 )) {
+
+                      pPar.Scale = ( 2.0 * pPar.Age.Duration() / ( this.m_Physics.m_SizeIn * this.m_Physics.m_MaxAge ) );
+
+                  } else pPar.Scale = 1.0 ;
+
+
+              }
+
+
+              //SIZEOUT
+              if ( pPar.Visible && this.m_Physics.m_SizeOut>0.0 && (this.m_Physics.m_MaxAge>0)
+                  && ( (this.m_Physics.m_MaxAge/2.0) < pPar.Age.Duration() ) && (pPar.Age.Duration() < this.m_Physics.m_MaxAge) ) {
+
+                  if (  (this.m_Physics.m_SizeOut*this.m_Physics.m_MaxAge / 2.0) > (this.m_Physics.m_MaxAge
+                  - pPar.Age.Duration()) && pPar.Age.Duration() < this.m_Physics.m_MaxAge ) {
+
+                      pPar.Scale = ( this.m_Physics.m_MaxAge - pPar.Age.Duration() ) /
+                      (this.m_Physics.m_SizeOut *this.m_Physics.m_MaxAge / 2.0);
+
+                  }
+
+
+              }
+
+              if ( pPar.Visible ) {
+
+                  randommotionx = (this.m_Physics.m_RandomMotion>0)?
+                  (0.5-moMath.UnitRandom())*this.m_Physics.m_MotionVector.x : this.m_Physics.m_MotionVector.x;
+                  randommotiony = (this.m_Physics.m_RandomMotion>0)?
+                  (0.5-moMath.UnitRandom())*this.m_Physics.m_MotionVector.y : this.m_Physics.m_MotionVector.y;
+                  randommotionz = (this.m_Physics.m_RandomMotion>0)?
+                  (0.5-moMath.UnitRandom())*this.m_Physics.m_MotionVector.z : this.m_Physics.m_MotionVector.z;
+
+                  this.m_Physics.m_MotionVector.normalize();
+                  if ( this.m_Physics.m_MotionVector.length() > 0.0 ) {
+                      if (this.m_Physics.m_RandomMotion>0.0) {
+                        pPar.Velocity.add(new moVector3f(
+                          randommotionx,
+                          randommotiony,
+                          randommotionz)).multiplyScalar(this.m_Physics.m_RandomMotion);
+                      }
+                  }
+
+              }
+
+
+
+
+          }
+      }
+
+  }
+
+  OrderParticles() : void {
+
+    /// order here or elsewhere
+    switch( this.m_OrderingMode ) {
+
+        case ORDMODE.PARTICLES_ORDERING_MODE_COMPLETE:
+          ////sort( m_ParticlesSimpleVector.begin(), m_ParticlesSimpleVector.end(), sortParticlesByComplete );
+          break;
+
+        case ORDMODE.PARTICLES_ORDERING_MODE_ZDEPTHTEST:
+          break;
+
+        case ORDMODE.PARTICLES_ORDERING_MODE_ZPOSITION:
+          ////sort( m_ParticlesSimpleVector.begin(), m_ParticlesSimpleVector.end(), sortParticlesByZCoord );
+          break;
+
+        case ORDMODE.PARTICLES_ORDERING_MODE_NONE:
+          break;
+        default:
+          break;
+    }
+  }
+
+
+  UpdateParticles( dt : MOdouble, method : MOint ) : void
+  {
+    switch (method) {
+      case 0:
+        /* Euler */
+        this.Regenerate();
+        this.CalculateForces();
+        this.CalculateDerivatives(false,dt);
+        if (dt!=0.0)
+        for ( i=0; i<this.m_ParticlesSimpleArray.length; i++ ) {
+          var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[i];
+
+          if (pPar && dt != 0.0) {
+            var dp: moVector3f = pPar.dpdt;
+            dp.multiplyScalar( dt );
+            pPar.Pos3d.add(dp);
+            var dv: moVector3f = pPar.dvdt;
+            dv.multiplyScalar(dt);
+            pPar.Velocity.add(dv);
+          }
+        }
+        break;
+      case 1:
+        /* Midpoint */
+        this.Regenerate();
+        this.CalculateForces();
+        this.CalculateDerivatives(false,dt);
+        if (dt!=0.0)
+        for (var i=0;i<this.m_ParticlesSimpleArray.length;i++) {
+              var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[i];
+              var ptmpPar : moParticlesSimple = this.m_ParticlesSimpleArrayTmp[i];
+              if (pPar && ptmpPar &&  dt!=0.0) {
+                  ptmpPar.Pos3d = pPar.Pos3d;
+                  ptmpPar.Velocity = pPar.Velocity;
+                  ptmpPar.Force = pPar.Force;
+                  ptmpPar.Pos3d = pPar.dpdt;
+                  ptmpPar.Pos3d.multiplyScalar(dt / 2);
+                  var p2: moVector3f = pPar.dvdt;
+                  p2.multiplyScalar(dt / 2);
+                  ptmpPar.Pos3d.add(p2);
+              }
+        }
+        this.CalculateForces(true);
+        this.CalculateDerivatives(true,dt);
+        if (dt!=0.0)
+        for ( var i=0; i < this.m_ParticlesSimpleArray.length; i++ ) {
+              var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[i];
+              var ptmpPar : moParticlesSimple = this.m_ParticlesSimpleArrayTmp[i];
+              if (pPar && ptmpPar && dt != 0.0) {
+                  var dp: moVector3f = pPar.dpdt;
+                  dp.multiplyScalar(dt);
+                  pPar.Pos3d.add(dp);
+                  var dv: moVector3f = pPar.dvdt;
+                  dv.multiplyScalar(dt);
+                  pPar.Velocity.add(dv);
+              }
+        }
+        break;
+    }
+  }
+
+
+  CalculateViewDepth( pPar : moParticlesSimple ) : MOdouble {
+
+    var viewdepth = 0.0;
+    /// TODO: pPar.Pos3d must be transformed to
+  /*
+    var pos3d_tr : moVector3f;
+    var pos3d_rot : moVector4f;
+    var pos4d : moVector4f;
+
+    //pos3d_trans =
+    pos4d = new moVector4f( pPar.Pos3d.x, pPar.Pos3d.y, pPar.Pos3d.z, 1 );
+    pos3d_rot.x = m_Rot[0].Dot( pos4d );
+    pos3d_rot.y = m_Rot[1].Dot( pos4d );
+    pos3d_rot.z = m_Rot[2].Dot( pos4d );
+    pos3d_rot.w = 1.0;
+
+    pos3d_tr.x = m_TS[0].Dot( pos3d_rot );
+    pos3d_tr.y = m_TS[1].Dot( pos3d_rot );
+    pos3d_tr.z = m_TS[2].Dot( pos3d_rot );
+
+    viewdepth = ( this.m_Physics.m_EyeVector - this.m_Physics.m_TargetViewVector ).Dot( pos3d_tr );
+  */
+    return viewdepth;
+  }
+
+
+  CalculateForces( tmparray : boolean = false ) : void
+  {
+    /*
+    int i,p1,p2;
+    //moVector3f down(1.0,1.0,-1.0);
+    moVector3f zero(0.0,0.0,0.0);
+    moVector3f f;
+    moVector3f atdis;
+    double len,dx,dy,dz;
+
+
+    float left =  - (m_Physics.m_EmitterSize.X()) / 2.0;
+      float top =  m_Physics.m_EmitterSize.Y() / 2.0;
+
+    for ( i=0; i < m_ParticlesSimpleArray.Count(); i++ ) {
+        var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[i];
+        pPar.Force = zero;
+
+        //// Gravitation
+        switch(m_Physics.m_AttractorType) {
+          case PARTICLES_ATTRACTORTYPE_POINT:
+              pPar.Force = ( m_Physics.m_AttractorVector - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
+              break;
+
+          case PARTICLES_ATTRACTORTYPE_JET:
+              {
+                //pPar.Force = ( m_Physics.m_AttractorVector - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
+                double dot1 = m_Physics.m_AttractorVector.Dot( pPar.Pos3d );
+                double det = m_Physics.m_AttractorVector.length();
+                double mu = 0.0;
+                if (det>0) {
+                    mu = dot1 / det;
+                }
+                pPar.Force = (m_Physics.m_AttractorVector * mu- pPar.Pos3d )*  (m_Physics.gravitational * pPar.Mass );
+              }
+              break;
+
+          case PARTICLES_ATTRACTORTYPE_TRACKER:
+              if (m_pTrackerData) {
+                  pPar.Force = ( moVector3f( 0.5f - m_pTrackerData->GetBarycenter().X(), 0.5f - m_pTrackerData->GetBarycenter().Y(), 0.0 ) - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
+              }
+              break;
+          case PARTICLES_ATTRACTORTYPE_GRID:
+              switch( m_Physics.m_AttractorMode ) {
+                  case PARTICLES_ATTRACTORMODE_STICK:
+                  case PARTICLES_ATTRACTORMODE_ACCELERATION:
+
+                      pPar.Destination = moVector3f(   ( left + pPar.Pos.X()*pPar.Size.X() + pPar.Size.X()/2.0 )*m_Physics.m_AttractorVector.X() ,
+                                                      ( top - pPar.Pos.Y()*pPar.Size.Y() - pPar.Size.Y()/2.0 )*m_Physics.m_AttractorVector.Y(),
+                                                          m_Physics.m_AttractorVector.Z() );
+
+                      if (m_Physics.m_AttractorMode==PARTICLES_ATTRACTORMODE_STICK && moVector3f( pPar.Destination - pPar.Pos3d ).length() < 0.1 ) {
+                          pPar.Pos3d = pPar.Destination;
+                          pPar.Velocity = zero;
+                          pPar.Force = zero;
+                      } else pPar.Force = ( pPar.Destination - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
+                      break;
+                  case PARTICLES_ATTRACTORMODE_LINEAR:
+                      pPar.Destination = moVector3f(   ( left + pPar.Pos.X()*pPar.Size.X() + pPar.Size.X()/2.0 )*m_Physics.m_AttractorVector.X() ,
+                                                      ( top - pPar.Pos.Y()*pPar.Size.Y() - pPar.Size.Y()/2.0 )*m_Physics.m_AttractorVector.Y(),
+                                                          m_Physics.m_AttractorVector.Z() );
+
+                      pPar.Pos3d = pPar.Pos3d + ( pPar.Destination - pPar.Pos3d) * m_Physics.gravitational;
+
+                      //atdis =( pPar.Destination - pPar.Pos3d);
+                      //if ( 0.04 < atdis.length()  && atdis.length() < 0.05 )  {
+                          //MODebug2->Message( moText("Position reached : X:") + FloatToStr(pPar.Pos3d.X()) + moText(" Y:") + FloatToStr(pPar.Pos3d.Y()) );
+                    // }
+                      break;
+                  default:
+                      break;
+              }
+              break;
+
+          }
+
+
+        /// Viscous drag
+        pPar.Force-= pPar.Velocity*m_Physics.viscousdrag;
+    }
+
+    // Handle the spring interaction
+    /*
+    for (i=0;i<ns;i++) {
+        p1 = s[i].from;
+        p2 = s[i].to;
+        dx = p[p1].p.x - p[p2].p.x;
+        dy = p[p1].p.y - p[p2].p.y;
+        dz = p[p1].p.z - p[p2].p.z;
+        len = sqrt(dx*dx + dy*dy + dz*dz);
+        f.x  = s[i].springconstant  * (len - s[i].restlength);
+        f.x += s[i].dampingconstant * (p[p1].v.x - p[p2].v.x) * dx / len;
+        f.x *= - dx / len;
+        f.y  = s[i].springconstant  * (len - s[i].restlength);
+        f.y += s[i].dampingconstant * (p[p1].v.y - p[p2].v.y) * dy / len;
+        f.y *= - dy / len;
+        f.z  = s[i].springconstant  * (len - s[i].restlength);
+        f.z += s[i].dampingconstant * (p[p1].v.z - p[p2].v.z) * dz / len;
+        f.z *= - dz / len;
+        if (!p[p1].fixed) {
+          p[p1].f.x += f.x;
+          p[p1].f.y += f.y;
+          p[p1].f.z += f.z;
+        }
+        if (!p[p2].fixed) {
+          p[p2].f.x -= f.x;
+          p[p2].f.y -= f.y;
+          p[p2].f.z -= f.z;
+        }
+    }
+  */
+  }
+
+  /*
+    Calculate the derivatives
+    dp/dt = v
+    dv/dt = f / m
+  */
+  CalculateDerivatives( tmparray : boolean, dt : MOdouble ) : void {
+    if (tmparray) {
+      for ( var i=0; i<this.m_ParticlesSimpleArrayTmp.length; i++) {
+          if (dt>0) this.m_ParticlesSimpleArrayTmp[i].dpdt = this.m_ParticlesSimpleArrayTmp[i].Velocity;
+          if (dt > 0) {
+            this.m_ParticlesSimpleArrayTmp[i].dvdt = this.m_ParticlesSimpleArrayTmp[i].Force;
+            this.m_ParticlesSimpleArrayTmp[i].dvdt.multiplyScalar( 1.0 / this.m_ParticlesSimpleArrayTmp[i].Mass);
+          }
+
+      }
+    } else {
+      for ( var i=0; i<this.m_ParticlesSimpleArray.length; i++) {
+        if (dt>0) this.m_ParticlesSimpleArray[i].dpdt = this.m_ParticlesSimpleArray[i].Velocity;
+
+        if (dt > 0) {
+          this.m_ParticlesSimpleArray[i].dvdt = this.m_ParticlesSimpleArray[i].Force;
+          this.m_ParticlesSimpleArray[i].dvdt.multiplyScalar( 1.0 / this.m_ParticlesSimpleArray[i].Mass);
+        }
+
+      }
+    }
+  }
+
+ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : void {
+
+    switch(this.revelation_status) {
+        case REVSTA.PARTICLES_FULLRESTORED:
+            /*
+            if (MotionActivity.Started()) {
+                if (!TimerFullRevelation.Started()) {
+                    TimerFullRevelation.Start();
+                    revelation_status = PARTICLES_REVEALING;
+                }
+            }*/
+            break;
+        case REVSTA.PARTICLES_FULLREVEALED:
+            /*
+            if (!TimerFullRestoration.Started()) {
+                TimerFullRestoration.Start();
+            }
+
+            if (TimerFullRestoration.Duration() > time_tofull_restoration ) {
+                TimerFullRestoration.Stop();
+                revelation_status = PARTICLES_RESTORINGALL;
+            }*/
+            break;
+        case REVSTA.PARTICLES_REVEALINGALL:
+            //RevealingAll();
+            break;
+
+        case REVSTA.PARTICLES_RESTORINGALL:
+            //RestoringAll();
+            break;
+
+        case REVSTA.PARTICLES_REVEALING:
+            /*
+            if (TimerFullRevelation.Started()) {
+                if (TimerFullRevelation.Duration() > time_tofull_revelation ) {
+                    TimerFullRevelation.Stop();
+                    revelation_status = PARTICLES_REVEALINGALL;
+                }
+            }
+*/
+            for( var i = 0; i<this.m_cols ; i++) {
+                for( var j = 0; j<this.m_rows ; j++) {
+
+                    var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[ i + j*this.m_cols ];
+
+
+
+                }
+
+            }
+            break;
+
+    }
+
+
+}
+
+
+  DrawParticlesSimple( tempogral : MO.moTempo , parentstate : MO.moEffectState  ) : void {
+
+      //if ((moGetTicks() % 1000) == 0) TrackParticle(1);
+
+      var cols2 = this.m_Config.Int( moR(PAR.PARTICLES_WIDTH));
+      var rows2 = this.m_Config.Int( moR(PAR.PARTICLES_HEIGHT) );
+
+      if (cols2!=this.m_cols || rows2!=this.m_rows) {
+          this.InitParticlesSimple(cols2,rows2);
+      }
+
+
+      /// TODO: what is this???? gross bug
+      var gral_ticks  = tempogral.ticks;
+
+      if (!this.m_Physics.EmitionTimer.Started())
+          this.m_Physics.EmitionTimer.Start();
+
+
+
+      //glBindTexture( GL_TEXTURE_2D, 0 );
+      if (  this.texture_mode != TEXMODE.PARTICLES_TEXTUREMODE_MANY
+        &&  this.texture_mode != TEXMODE.PARTICLES_TEXTUREMODE_MANY2PATCH) {
+          //if (glid>=0) glBindTexture( GL_TEXTURE_2D, glid );
+          //else glBindTexture( GL_TEXTURE_2D, 0);
+      }
+
+      var sizexd2; var sizeyd2;
+      var tsizex; var tsizey;
+
+      ////var pFont: moFont = this.m_Config.Font(moR(PARTICLES_FONT));
+      var Texto : moText;
+
+      //Update particle position, velocity, aging, death and rebirth.
+      //console.log("dt:", this.dt);
+      this.UpdateParticles(this.dt, 0); //Euler mode
+      this.OrderParticles();
+      ////this.ParticlesSimpleAnimation( tempogral, parentstate );
+
+      var idxt = 0.0;
+
+      //Now really draw each particle
+      var orderedindex = 0;
+      for( var j = 0; j<this.m_rows ; j++) {
+        for( var i = 0; i<this.m_cols ; i++) {
+
+              idxt = 0.5 + ( i + j * this.m_cols ) / ( this.m_cols * this.m_rows * 2 );
+
+              var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[ i + j*this.m_cols ];
+
+              switch(this.m_OrderingMode) {
+                case ORDMODE.PARTICLES_ORDERING_MODE_NONE:
+                  break;
+                case ORDMODE.PARTICLES_ORDERING_MODE_COMPLETE:
+                  {
+                    pPar = this.m_ParticlesSimpleVector[ orderedindex ];
+                    pPar.ViewDepth = this.CalculateViewDepth( pPar );
+                  }
+                  break;
+                case ORDMODE.PARTICLES_ORDERING_MODE_ZPOSITION:
+                  pPar = this.m_ParticlesSimpleVector[ orderedindex ];
+                  break;
+                default:
+
+                  break;
+              }
+
+              orderedindex+= 1;
+              var part_timer;
+              if (pPar) {
+                if (pPar.Visible) {
+
+
+                  if (this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_MANY
+                    || this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_MANYBYORDER
+                    || this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_MANY2PATCH) {
+                    //pPar.GLId = 22;
+                    if (pPar.GLId > 0) {
+                      //glActiveTextureARB( GL_TEXTURE0_ARB );
+                      //glEnable(GL_TEXTURE_2D);
+                      //glBindTexture( GL_TEXTURE_2D, pPar.GLId );
+                    }
+                    if (pPar.GLId2 > 0) {
+                      //glActiveTextureARB( GL_TEXTURE1_ARB );
+                      //glEnable(GL_TEXTURE_2D);
+                      //glBindTexture( GL_TEXTURE_2D, pPar.GLId2 );
+                    }
+                  }
+                  /*
+                                      if (this.IsInitialized()) {
+                                          if (this.ScriptHasFunction("RunParticle")) {
+                                              this.SelectScriptFunction("RunParticle");
+                                              this.AddFunctionParam( (int) ( i + j*m_cols ) );
+                                              this.AddFunctionParam( dt );
+                                              if (!this.RunSelectedFunction(1)) {
+                                                  this.MODebug2.Error( moText("RunParticle function not executed") );
+                                              }
+                                          }
+                                      }
+                                      */
+
+                  sizexd2 = (pPar.Size.x * pPar.ImageProportion) / 2.0;
+                  sizeyd2 = pPar.Size.y / 2.0;
+                  tsizex = pPar.TSize.x;
+                  tsizey = pPar.TSize.y;
+                  part_timer = 0.001 * (pPar.Age.Duration()); // particule ang = durationinmilis / 1000 ...
+
+                  if (this.m_pParticleTime) {
+                    if (this.m_pParticleTime.GetData()) {
+                      this.m_pParticleTime.GetData().SetDouble(part_timer);
+                      this.m_pParticleTime.Update(true);
                     }
                   }
 
-                  if (m_pParticleIndex) {
-                    if (m_pParticleIndex->GetData()) {
-                        m_pParticleIndex->GetData()->SetLong( ((long)pPar->Pos.X()) + ((long)pPar->Pos.Y())*m_cols );
-                        m_pParticleIndex->Update(true);
+                  if (this.m_pParticleIndex) {
+                    if (this.m_pParticleIndex.GetData()) {
+                      this.m_pParticleIndex.GetData().SetLong((pPar.Pos.x) + (pPar.Pos.y) * this.m_cols);
+                      this.m_pParticleIndex.Update(true);
                     }
                   }
 
-                  glPushMatrix();
+                  //glPushMatrix();
 
-                  moVector3f CO(m_Physics.m_EyeVector - pPar->Pos3d);
-                  moVector3f U,V,W;
-                  moVector3f CPU,CPW;
-                  moVector3f A,B,C,D;
+                  var CO: moVector3f = new moVector3f();
+                  CO.copy(this.m_Physics.m_EyeVector);
+                  CO.sub(pPar.Pos3d);
+                  var U: moVector3f;
+                  var V: moVector3f;
+                  var W: moVector3f;
+                  var CPU: moVector3f;
+                  var CPW: moVector3f;
+                  var A: moVector3f = new moVector3f(0.0,0.0,0.0);
+                  var B: moVector3f = new moVector3f(0.0,0.0,0.0);
+                  var C: moVector3f = new moVector3f(0.0,0.0,0.0);
+                  var D: moVector3f = new moVector3f(0.0,0.0,0.0);
 
-                  moVector3f CENTRO;
+                  var CENTRO: moVector3f;
 
-                  U = moVector3f( 0.0f, 0.0f, 1.0f );
-                  V = moVector3f( 1.0f, 0.0f, 0.0f );
-                  W = moVector3f( 0.0f, 1.0f, 0.0f );
+                  U = new moVector3f(0.0, 0.0, 1.0);
+                  V = new moVector3f(1.0, 0.0, 0.0);
+                  W = new moVector3f(0.0, 1.0, 0.0);
 
                   U = CO;
-                  U.Normalize();
+                  U.normalize();
 
                   //orientation always perpendicular to plane (X,Y)
-                  switch(m_Physics.m_OrientationMode) {
+                  switch (this.m_Physics.m_OrientationMode) {
 
-                          case PARTICLES_ORIENTATIONMODE_FIXED:
-                              //cuadrado centrado en Pos3d....
-                              U = moVector3f( 0.0f, 0.0f, 1.0f );
-                              V = moVector3f( 1.0f, 0.0f, 0.0f );
-                              W = moVector3f( 0.0f, 1.0f, 0.0f );
-                              break;
+                    case ORIMODE.PARTICLES_ORIENTATIONMODE_FIXED:
+                      //cuadrado centrado en Pos3d....
+                      U = new moVector3f(0.0, 0.0, 1.0);
+                      V = new moVector3f(1.0, 0.0, 0.0);
+                      W = new moVector3f(0.0, 1.0, 0.0);
+                      break;
 
-                          case PARTICLES_ORIENTATIONMODE_CAMERA:
-                          // TODO: fix this
-                              V = moVector3f( -CO.Y(), CO.X(), 0.0f );
-                              V.Normalize();
+                    case ORIMODE.PARTICLES_ORIENTATIONMODE_CAMERA:
+                      // TODO: fix this
+                      V = new moVector3f(-CO.y, CO.x, 0.0);
+                      V.normalize();
 
-                              CPU = moVector3f( U.X(), U.Y(), 0.0f );
-                              W = moVector3f( 0.0f, 0.0f, CPU.Length() );
-                              CPU.Normalize();
-                              CPW = CPU * -U.Z();
-                              W+= CPW;
-                              break;
+                      CPU = new moVector3f(U.x, U.y, 0.0);
+                      W = new moVector3f(0.0, 0.0, CPU.length());
+                      CPU.normalize();
+                      CPW = CPU.multiplyScalar(-U.z);
+                      W.add(CPW);
+                      break;
 
-                          case PARTICLES_ORIENTATIONMODE_MOTION:
-                          // TODO: fix this
-                              if (pPar->Velocity.Length()>0) U = pPar->Velocity;
-                              U.Normalize();
-                              if (U.Length() < 0.5) {
-                                  U = moVector3f( 0.0, 0.0, 1.0 );
-                                  U.Normalize();
-                              }
-                              V = moVector3f( -U.Y(), U.X(), 0.0f );
-                              V.Normalize();
-                              CPU = moVector3f( U.X(), U.Y(), 0.0f );
-                              W = moVector3f( 0.0f, 0.0f, CPU.Length() );
-                              CPU.Normalize();
-                              CPW = CPU * -U.Z();
-                              W+= CPW;
-                              break;
+                    case ORIMODE.PARTICLES_ORIENTATIONMODE_MOTION:
+                      // TODO: fix this
+                      if (pPar.Velocity.length() > 0) U = pPar.Velocity;
+                      U.normalize();
+                      if (U.length() < 0.5) {
+                        U = new moVector3f(0.0, 0.0, 1.0);
+                        U.normalize();
+                      }
+                      V = new moVector3f(-U.y, U.x, 0.0);
+                      V.normalize();
+                      CPU = new moVector3f(U.x, U.y, 0.0);
+                      W = new moVector3f(0.0, 0.0, CPU.length());
+                      CPU.normalize();
+                      CPW = CPU.multiplyScalar(-U.z);
+                      W.add(CPW);
+                      break;
                   }
 
-                  A = V * -sizexd2 + W * sizeyd2;
-                  B = V *sizexd2 +  W * sizeyd2;
-                  C = V *sizexd2 + W * -sizeyd2;
-                  D = V * -sizexd2 + W * -sizeyd2;
+                  V.multiplyScalar(sizexd2);
+                  W.multiplyScalar(sizeyd2);
+
+                  A.copy(V).multiplyScalar(-1);
+                  A.add(W);
+
+                  B.copy(V).add(W);
+
+                  C.copy(V).sub(W);
+
+                  D.copy(V).multiplyScalar(-1);
+                  D.sub(W);
 
 
                   //cuadrado centrado en Pos3d....
 
                   //TODO: dirty code here!!!
-                  if (texture_mode==PARTICLES_TEXTUREMODE_UNIT || texture_mode==PARTICLES_TEXTUREMODE_PATCH) {
+                  if (this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_UNIT
+                    || this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_PATCH) {
 
-                      MOfloat cycleage = m_EffectState.tempo.ang;
+                    var cycleage = this.m_EffectState.tempo.ang;
 
-                      //if (m_Physics.m_MaxAge>0) cycleage = (float) ((double)pPar->Age.Duration() /  (double)m_Physics.m_MaxAge );
-                      cycleage = part_timer;
+                    //if (this.m_Physics.m_MaxAge>0) cycleage =  (pPar.Age.Duration() /
+                    //   this.m_Physics.m_MaxAge );
+                    cycleage = part_timer;
+                    var glid = pPar.GLId;
 
-                      int glid = pPar->GLId;
-
-                      if ( pPar->MOId==-1 ) {
-
-                          glid = m_Config.GetGLId( moR(PARTICLES_TEXTURE), cycleage, 1.0, NULL );
-
-                      } else {
+                    if (pPar.MOId == -1) {
+                      ////glid = this.m_Config.GetGLId( moR(PARTICLES_TEXTURE), cycleage, 1.0, NULL );
+                    } else {
 
 
-                          if ( pPar->MOId>-1 ) {
+                      if (pPar.MOId > -1) {
 
-                              moTexture* pTex = m_pResourceManager->GetTextureMan()->GetTexture(pPar->MOId);
+                        var pTex: moTexture = this.m_pResourceManager.GetTextureMan().GetTexture(pPar.MOId);
 
-                              if (pTex) {
+                        if (pTex) {
 
-                                  if (
-                                      pTex->GetType()==MO_TYPE_VIDEOBUFFER
-                                      || pTex->GetType()==MO_TYPE_CIRCULARVIDEOBUFFER
-                                      || pTex->GetType()==MO_TYPE_MOVIE
-                                      || pTex->GetType()==MO_TYPE_TEXTURE_MULTIPLE
-                                       ) {
-                                      moTextureAnimated *pTA = (moTextureAnimated*)pTex;
+                          if (
+                            pTex.GetType() == moTextureType.MO_TYPE_VIDEOBUFFER
+                            || pTex.GetType() == moTextureType.MO_TYPE_CIRCULARVIDEOBUFFER
+                            || pTex.GetType() == moTextureType.MO_TYPE_MOVIE
+                            || pTex.GetType() == moTextureType.MO_TYPE_TEXTURE_MULTIPLE
+                          ) {
+                            var pTA: moTextureAnimated = pTex as moTextureAnimated;
 
-                                      if (pPar->FrameForced) {
-                                          glid = pTA->GetGLId( pPar->ActualFrame );
-                                      } else {
-                                          glid = pTA->GetGLId((MOfloat)cycleage);
-                                          pPar->ActualFrame = pTA->GetActualFrame();
+                            if (pPar.FrameForced) {
+                              ////glid = pTA.GetGLId( pPar.ActualFrame );
+                            } else {
+                              ////glid = pTA.GetGLId(cycleage);
+                              ////pPar.ActualFrame = pTA.GetActualFrame();
 
-                                          pPar->FramePS = pTA->GetFramesPerSecond();
-                                          pPar->FrameCount = pTA->GetFrameCount();
-                                      }
+                              ////pPar.FramePS = pTA.GetFramesPerSecond();
+                              ////pPar.FrameCount = pTA.GetFrameCount();
+                            }
 
-                                  } else {
-                                      glid = pTex->GetGLId();
-                                  }
-
-                              }
+                          } else {
+                            ////glid = pTex.GetGLId();
                           }
+
+                        }
                       }
+                    }
 
-                      glBindTexture( GL_TEXTURE_2D , glid );
+                    /////glBindTexture( GL_TEXTURE_2D , glid );
                   }
 
-                  glTranslatef( pPar->Pos3d.X(), pPar->Pos3d.Y(),  pPar->Pos3d.Z() );
-
-                  glRotatef(  m_Config.Eval( moR(PARTICLES_ROTATEZ_PARTICLE) ) + pPar->Rotation.Z(), U.X(), U.Y(), U.Z() );
-                  glRotatef(  m_Config.Eval( moR(PARTICLES_ROTATEY_PARTICLE) ) + pPar->Rotation.Y(), W.X(), W.Y(), W.Z() );
-                  glRotatef(  m_Config.Eval( moR(PARTICLES_ROTATEX_PARTICLE) ) + pPar->Rotation.X(), V.X(), V.Y(), V.Z() );
-
-                  //scale
-                  glScalef(   m_Config.Eval( moR(PARTICLES_SCALEX_PARTICLE) )*pPar->Scale,
-                              m_Config.Eval( moR(PARTICLES_SCALEY_PARTICLE) )*pPar->Scale,
-                              m_Config.Eval( moR(PARTICLES_SCALEZ_PARTICLE) )*pPar->Scale);
-
-
-                  glColor4f(  m_Config[moR(PARTICLES_COLOR)][MO_SELECTED][MO_RED].Eval() * pPar->Color.X() * m_EffectState.tintr,
-                              m_Config[moR(PARTICLES_COLOR)][MO_SELECTED][MO_GREEN].Eval() * pPar->Color.Y() * m_EffectState.tintg,
-                              m_Config[moR(PARTICLES_COLOR)][MO_SELECTED][MO_BLUE].Eval() * pPar->Color.Z() * m_EffectState.tintb,
-                              m_Config[moR(PARTICLES_COLOR)][MO_SELECTED][MO_ALPHA].Eval()
-                              * m_Config.Eval( moR(PARTICLES_ALPHA))
-                              * m_EffectState.alpha * pPar->Alpha );
-
-                  glBegin(GL_QUADS);
-                      //glColor4f( 1.0, 0.5, 0.5, idxt );
-
-                      if (pPar->GLId2>0) {
-                          //glColor4f( 1.0, 0.5, 0.5, idxt );
-                          glMultiTexCoord2fARB( GL_TEXTURE0_ARB, pPar->TCoord.X(), pPar->TCoord.Y() );
-                          glMultiTexCoord2fARB( GL_TEXTURE1_ARB, pPar->TCoord2.X(), pPar->TCoord2.Y());
-                      } else glTexCoord2f( pPar->TCoord.X(), pPar->TCoord.Y() );
-                      glNormal3f( -U.X(), -U.Y(), -U.Z() );
-                      glVertex3f( A.X(), A.Y(), A.Z());
-
-                      //glColor4f( 0.5, 1.0, 0.5, idxt );
-
-                      if (pPar->GLId2>0) {
-                          glMultiTexCoord2fARB( GL_TEXTURE0_ARB, pPar->TCoord.X()+tsizex, pPar->TCoord.Y() );
-                          glMultiTexCoord2fARB( GL_TEXTURE1_ARB, pPar->TCoord2.X()+pPar->TSize2.X(), pPar->TCoord2.Y());
-                      } else glTexCoord2f( pPar->TCoord.X()+tsizex, pPar->TCoord.Y() );
-                      glNormal3f( -U.X(), -U.Y(), -U.Z() );
-                      glVertex3f( B.X(), B.Y(), B.Z());
-
-                      //glColor4f( 0.5, 0.5, 1.0, idxt );
-                      if (pPar->GLId2>0) {
-                          glMultiTexCoord2fARB( GL_TEXTURE0_ARB, pPar->TCoord.X()+tsizex, pPar->TCoord.Y()+tsizey );
-                          glMultiTexCoord2fARB( GL_TEXTURE1_ARB, pPar->TCoord2.X()+pPar->TSize2.X(), pPar->TCoord2.Y()+pPar->TSize2.Y());
-                      } else glTexCoord2f( pPar->TCoord.X()+tsizex, pPar->TCoord.Y()+tsizey );
-                      glNormal3f( -U.X(), -U.Y(), -U.Z() );
-                      glVertex3f( C.X(), C.Y(), C.Z());
-
-                      //glColor4f( 1.0, 1.0, 1.0, idxt );
-                      if (pPar->GLId2>0) {
-                          glMultiTexCoord2fARB( GL_TEXTURE0_ARB, pPar->TCoord.X(), pPar->TCoord.Y()+pPar->TSize.Y());
-                          glMultiTexCoord2fARB( GL_TEXTURE1_ARB, pPar->TCoord2.X(), pPar->TCoord2.Y()+pPar->TSize2.Y());
-                      } else glTexCoord2f( pPar->TCoord.X(), pPar->TCoord.Y()+tsizey );
-                      glNormal3f( -U.X(), -U.Y(), -U.Z() );
-                      glVertex3f( D.X(), D.Y(), D.Z());
-                  glEnd();
-
-                  //draw vectors associated...
-                  if ( drawing_features>2 ) {
-                      CENTRO = moVector3f( 0.0 , 0.0, 0.0 );
-
-                      glDisable( GL_TEXTURE_2D );
-                      glLineWidth( 8.0 );
-                      glBegin(GL_LINES);
-                          ///draw U
-                          glColor4f( 0.0, 1.0, 1.0, 1.0);
-                          glVertex3f( CENTRO.X(), CENTRO.Y(), 0.0001);
-
-                          glColor4f( 0.0, 1.0, 1.0, 1.0);
-                          glVertex3f( CENTRO.X() + U.X(), CENTRO.Y() + U.Y(), 0.0001);
-
-                      glEnd();
-
-                      glBegin(GL_LINES);
-                          ///draw V
-                          glColor4f( 1.0, 0.0, 1.0, 1.0);
-                          glVertex3f( CENTRO.X(), CENTRO.Y(), 0.0001);
-
-                          glColor4f( 1.0, 0.0, 1.0, 1.0);
-                          glVertex3f( CENTRO.X() + V.X(), CENTRO.Y() + V.Y(), 0.0001);
-
-                      glEnd();
-
-                      glBegin(GL_LINES);
-                          ///draw W
-                          glColor4f( 0.0, 0.0, 1.0, 1.0);
-                          glVertex3f( CENTRO.X(), CENTRO.Y(), 0.0001);
-
-                          glColor4f( 0.0, 0.0, 1.0, 1.0);
-                          glVertex3f( CENTRO.X() + W.X(), CENTRO.Y() + W.Y(), 0.0001);
-
-                      glEnd();
-                      glEnable( GL_TEXTURE_2D );
+                  if (pPar.Geometry == undefined) {
+                    pPar.Geometry = new MO.moPlaneGeometry( pPar.Size.x*pPar.ImageProportion, pPar.Size.y, 1, 1);
+                    /*
+                    pPar.Geometry = new THREE.Geometry();
+                    pPar.Geometry.vertices.push(new THREE.Vector3(A.x, A.y, A.z));
+                    pPar.Geometry.vertices.push(new THREE.Vector3(B.x, B.y, B.z));
+                    pPar.Geometry.vertices.push(new THREE.Vector3(C.x, C.y, C.z));
+                    pPar.Geometry.vertices.push(new THREE.Vector3(D.x, D.y, D.z));
+                    pPar.Geometry.faces.push(new THREE.Face3(0, 1, 2)); // counter-clockwise winding order
+                    pPar.Geometry.faces.push(new THREE.Face3(0, 2, 3));
+                    pPar.Geometry.computeFaceNormals();
+                    pPar.Geometry.computeVertexNormals();
+                    */
+                    var rgba = this.m_Config.EvalColor(moR(PAR.PARTICLES_COLOR));
+                    pPar.Material = new MO.moMaterialBasic({
+                      color: 0xffffff,
+                      map: this.m_Config.Texture("texture")._texture,
+                      side: THREE.DoubleSide,
+                      vertexColors: THREE.VertexColors,
+                      transparent: true,
+                      opacity: rgba.a * pPar.Alpha * this.m_EffectState.alpha
+                    });
+                    pPar.Material.color = new moColor(rgba.r, rgba.g, rgba.b);
+                    pPar.Mesh = new MO.moMesh( pPar.Geometry, pPar.Material);
+                    pPar.Model = new MO.moGLMatrixf();
+                    pPar.Mesh.SetModelMatrix( pPar.Model );
+                    this.GroupedParticles.add( pPar.Mesh );
+                    //console.log("Added Mesh:", pPar.Mesh, pPar);
                   }
 
+                  pPar.Model.Scale(
+                    this.m_Config.Eval("scalex_particle"),
+                    this.m_Config.Eval("scaley_particle"),
+                    this.m_Config.Eval("scalez_particle"));
+                  pPar.Model.Rotate(this.m_Config.Eval("rotatez_particle") * MO.DEG_TO_RAD,
+                      0.0, 0.0, 1.0);
+                  pPar.Model.Rotate(this.m_Config.Eval("rotatey_particle") * MO.DEG_TO_RAD,
+                        0.0, 1.0, 0.0);
+                  pPar.Model.Rotate(this.m_Config.Eval("rotatex_particle") * MO.DEG_TO_RAD,
+                    1.0, 0.0, 0.0);
+                  pPar.Model.Translate(
+                      pPar.Pos3d.x,
+                      pPar.Pos3d.y,
+                      pPar.Pos3d.z);
+                  pPar.Mesh.SetModelMatrix( pPar.Model );
 
-                  glPopMatrix();
-              }
+                    ////glTranslatef( pPar.Pos3d.x, pPar.Pos3d.y,  pPar.Pos3d.z );
 
-            }
-        }
-    }
+                    ////glRotatef(  this.m_Config.Eval( moR(PARTICLES_ROTATEZ_PARTICLE) ) + pPar.Rotation.z, U.x, U.y, U.z );
+                    ////glRotatef(  this.m_Config.Eval( moR(PARTICLES_ROTATEY_PARTICLE) ) + pPar.Rotation.y, W.x, W.y, W.z );
+                    ////glRotatef(  this.m_Config.Eval( moR(PARTICLES_ROTATEX_PARTICLE) ) + pPar.Rotation.x, V.x, V.y, V.z );
 
-    if (pFont && drawing_features>2) {
-        for( i = 0; i<m_cols ; i++) {
-            for( j = 0; j<m_rows ; j++) {
-
-                moParticlesSimple* pPar = m_ParticlesSimpleArray.GetRef( i + j*m_cols );
-                if ((i + j*m_cols) % 10 == 0 ) {
-                    Texto = moText( IntToStr(i + j*m_cols));
-                    Texto.Left(5);
-                    Texto+= moText("F:")+moText( (moText)FloatToStr( pPar->Force.X() ).Left(5) + moText(",")
-                                + (moText)FloatToStr( pPar->Force.Y() ).Left(5)
-                                + moText(",") + (moText)FloatToStr( pPar->Force.Z() ).Left(5) );
-
-                    Texto+= moText("V:")+ moText( (moText)FloatToStr( pPar->Velocity.X() ).Left(5) + moText(",")
-                                + (moText)FloatToStr( pPar->Velocity.Y() ).Left(5)
-                                + moText(",") + (moText)FloatToStr( pPar->Velocity.Z() ).Left(5) );
-
-                    pFont->Draw( pPar->Pos3d.X(),
-                                 pPar->Pos3d.Y(),
-                                 Texto );
+                    //scale
+                    ////glScalef(   this.m_Config.Eval( moR(PARTICLES_SCALEX_PARTICLE) )*pPar.Scale,
+                    ////            this.m_Config.Eval( moR(PAR.PARTICLES_SCALEY_PARTICLE) )*pPar.Scale,
+                    ////            this.m_Config.Eval( moR(PAR.PARTICLES_SCALEZ_PARTICLE) )*pPar.Scale);
 
 
-                    Texto = moText( moText("(") + (moText)FloatToStr(pPar->TCoord.X()).Left(4)
-                    + moText(",") + (moText)FloatToStr(pPar->TCoord.Y()).Left(4) + moText(")") );
+                    ////glColor4f(  this.m_Config[moR(PARTICLES_COLOR)][MO_SELECTED][MO_RED].Eval() * pPar.Color.x * m_EffectState.tintr,
+                    ////            this.m_Config[moR(PARTICLES_COLOR)][MO_SELECTED][MO_GREEN].Eval() * pPar.Color.y * m_EffectState.tintg,
+                    ////            this.m_Config[moR(PARTICLES_COLOR)][MO_SELECTED][MO_BLUE].Eval() * pPar.Color.z * m_EffectState.tintb,
+                    ////            this.m_Config[moR(PARTICLES_COLOR)][MO_SELECTED][MO_ALPHA].Eval()
+                    ////            * this.m_Config.Eval( moR(PARTICLES_ALPHA))
+                    ////            * m_EffectState.alpha * pPar.Alpha );
+/*
+                    glBegin(GL_QUADS);
+                        //glColor4f( 1.0, 0.5, 0.5, idxt );
 
-                    pFont->Draw( pPar->Pos3d.X()-sizexd2,
-                                 pPar->Pos3d.Y()+sizeyd2-2,
-                                 Texto );
+                        if (pPar.GLId2>0) {
+                            //glColor4f( 1.0, 0.5, 0.5, idxt );
+                            glMultiTexCoord2fARB( GL_TEXTURE0_ARB, pPar.TCoord.x, pPar.TCoord.y );
+                            glMultiTexCoord2fARB( GL_TEXTURE1_ARB, pPar.TCoord2.x, pPar.TCoord2.y);
+                        } else glTexCoord2f( pPar.TCoord.x, pPar.TCoord.y );
+                        glNormal3f( -U.x, -U.y, -U.z );
+                        glVertex3f( A.x, A.y, A.z);
 
-                    Texto = moText( moText("(") + (moText)FloatToStr(pPar->TCoord.X()+tsizex).Left(4)
-                    + moText(",") + (moText)FloatToStr(pPar->TCoord.Y()).Left(4) + moText(")"));
+                        //glColor4f( 0.5, 1.0, 0.5, idxt );
 
-                    pFont->Draw( pPar->Pos3d.X()+sizexd2-12,
-                                 pPar->Pos3d.Y()+sizeyd2-5,
-                                 Texto );
+                        if (pPar.GLId2>0) {
+                            glMultiTexCoord2fARB( GL_TEXTURE0_ARB, pPar.TCoord.x+tsizex, pPar.TCoord.y );
+                            glMultiTexCoord2fARB( GL_TEXTURE1_ARB, pPar.TCoord2.x+pPar.TSize2.x, pPar.TCoord2.y);
+                        } else glTexCoord2f( pPar.TCoord.x+tsizex, pPar.TCoord.y );
+                        glNormal3f( -U.x, -U.y, -U.z );
+                        glVertex3f( B.x, B.y, B.z);
 
-                    Texto = moText( moText("(") + (moText)FloatToStr(pPar->TCoord.X()+tsizex).Left(4)
-                    + moText(",") + (moText)FloatToStr(pPar->TCoord.Y()+tsizey).Left(4) + moText(")"));
+                        //glColor4f( 0.5, 0.5, 1.0, idxt );
+                        if (pPar.GLId2>0) {
+                            glMultiTexCoord2fARB( GL_TEXTURE0_ARB, pPar.TCoord.x+tsizex, pPar.TCoord.y+tsizey );
+                            glMultiTexCoord2fARB( GL_TEXTURE1_ARB, pPar.TCoord2.x+pPar.TSize2.x, pPar.TCoord2.y+pPar.TSize2.y);
+                        } else glTexCoord2f( pPar.TCoord.x+tsizex, pPar.TCoord.y+tsizey );
+                        glNormal3f( -U.x, -U.y, -U.z );
+                        glVertex3f( C.x, C.y, C.z);
 
-                    pFont->Draw( pPar->Pos3d.X()+sizexd2-12,
-                                 pPar->Pos3d.Y()-sizeyd2+2,
-                                 Texto );
-
-                    Texto = moText( moText("(") + (moText)FloatToStr(pPar->TCoord.X()).Left(4)
-                    + moText(",") + (moText)FloatToStr(pPar->TCoord.Y()+tsizey).Left(4) + moText(")"));
-
-                    pFont->Draw( pPar->Pos3d.X()-sizexd2,
-                                 pPar->Pos3d.Y()-sizeyd2+5,
-                                 Texto );
-                }
-
-            }
-        }
-    }
-
-    if (pFont && drawing_features>2) {
-
-                Texto = moText( moText("T2 Rest.:") + IntToStr(TimerFullRestoration.Duration()));
-                pFont->Draw( -10.0f,
-                             0.0f,
-                             Texto );
-
-                Texto = moText( moText("T2 Revel.:") + IntToStr(TimerFullRevelation.Duration()));
-                pFont->Draw( -10.0f,
-                             3.0f,
-                             Texto );
-
-                Texto = moText( moText("T Revel.:") + IntToStr(TimerOfRevelation.Duration())
-                + moText(" rev: ") + IntToStr(time_of_revelation));
-                pFont->Draw( -10.0f,
-                             6.0f,
-                             Texto );
-
-                Texto = moText( moText("T Rest.:") + IntToStr(TimerOfRestoration.Duration())
-                + moText(" res: ") + IntToStr(time_of_restoration) );
-                pFont->Draw( -10.0f,
-                             9.0f,
-                             Texto );
-
-                Texto = moText("Status: ");
-
-                switch(revelation_status) {
-                    case PARTICLES_FULLRESTORED:
-                        Texto+= moText("Full Restored");
-                        break;
-                    case PARTICLES_REVEALING:
-                        Texto+= moText("Revealing");
-                        break;
-                    case PARTICLES_REVEALINGALL:
-                        Texto+= moText("Revealing");
-                        break;
-                    case PARTICLES_FULLREVEALED:
-                        Texto+= moText("Full Revealed");
-                        break;
-                    case PARTICLES_RESTORING:
-                        Texto+= moText("Restoring");
-                        break;
-                    case PARTICLES_RESTORINGALL:
-                        Texto+= moText("Restoring All");
-                        break;
-                }
-                pFont->Draw( -10.0f,
-                             13.0f,
-                             Texto );
-    }
+                        //glColor4f( 1.0, 1.0, 1.0, idxt );
+                        if (pPar.GLId2>0) {
+                            glMultiTexCoord2fARB( GL_TEXTURE0_ARB, pPar.TCoord.x, pPar.TCoord.y+pPar.TSize.y);
+                            glMultiTexCoord2fARB( GL_TEXTURE1_ARB, pPar.TCoord2.x, pPar.TCoord2.y+pPar.TSize2.y);
+                        } else glTexCoord2f( pPar.TCoord.x, pPar.TCoord.y+tsizey );
+                        glNormal3f( -U.x, -U.y, -U.z );
+                        glVertex3f( D.x, D.y, D.z);
+                        glEnd();
 */
-}
+
+/*
+                    //draw vectors associated...
+                    if ( drawing_features>2 ) {
+                        CENTRO = new moVector3f( 0.0 , 0.0, 0.0 );
+
+                        glDisable( GL_TEXTURE_2D );
+                        glLineWidth( 8.0 );
+                        glBegin(GL_LINES);
+                            ///draw U
+                            glColor4f( 0.0, 1.0, 1.0, 1.0);
+                            glVertex3f( CENTRO.x, CENTRO.y, 0.0001);
+
+                            glColor4f( 0.0, 1.0, 1.0, 1.0);
+                            glVertex3f( CENTRO.x + U.x, CENTRO.y + U.y, 0.0001);
+
+                        glEnd();
+
+                        glBegin(GL_LINES);
+                            ///draw V
+                            glColor4f( 1.0, 0.0, 1.0, 1.0);
+                            glVertex3f( CENTRO.x, CENTRO.y, 0.0001);
+
+                            glColor4f( 1.0, 0.0, 1.0, 1.0);
+                            glVertex3f( CENTRO.x + V.x, CENTRO.y + V.y, 0.0001);
+
+                        glEnd();
+
+                        glBegin(GL_LINES);
+                            ///draw W
+                            glColor4f( 0.0, 0.0, 1.0, 1.0);
+                            glVertex3f( CENTRO.x, CENTRO.y, 0.0001);
+
+                            glColor4f( 0.0, 0.0, 1.0, 1.0);
+                            glVertex3f( CENTRO.x + W.x, CENTRO.y + W.y, 0.0001);
+
+                        glEnd();
+                        glEnable( GL_TEXTURE_2D );
+                    }
 
 
-  Draw( p_tempo : MO.moTempo ) : void {
-    this.BeginDraw(p_tempo);
+                    glPopMatrix();
+                    */
+                }
 
+              }
+          }
+      }
+
+/*
+      if (pFont && drawing_features>2) {
+          for( i = 0; i<m_cols ; i++) {
+              for( j = 0; j<m_rows ; j++) {
+
+                  var pPar : moParticlesSimple = this.m_ParticlesSimpleArray.GetRef( i + j*m_cols );
+                  if ((i + j*m_cols) % 10 == 0 ) {
+                      Texto = moText( IntToStr(i + j*m_cols));
+                      Texto.Left(5);
+                      Texto+= moText("F:")+moText( (moText)FloatToStr( pPar.Force.x ).Left(5) + moText(",")
+                                  + (moText)FloatToStr( pPar.Force.y ).Left(5)
+                                  + moText(",") + (moText)FloatToStr( pPar.Force.z ).Left(5) );
+
+                      Texto+= moText("V:")+ moText( (moText)FloatToStr( pPar.Velocity.x ).Left(5) + moText(",")
+                                  + (moText)FloatToStr( pPar.Velocity.y ).Left(5)
+                                  + moText(",") + (moText)FloatToStr( pPar.Velocity.z ).Left(5) );
+
+                      pFont->Draw( pPar.Pos3d.x,
+                                  pPar.Pos3d.y,
+                                  Texto );
+
+
+                      Texto = moText( moText("(") + (moText)FloatToStr(pPar.TCoord.x).Left(4)
+                      + moText(",") + (moText)FloatToStr(pPar.TCoord.y).Left(4) + moText(")") );
+
+                      pFont->Draw( pPar.Pos3d.x-sizexd2,
+                                  pPar.Pos3d.y+sizeyd2-2,
+                                  Texto );
+
+                      Texto = moText( moText("(") + (moText)FloatToStr(pPar.TCoord.x+tsizex).Left(4)
+                      + moText(",") + (moText)FloatToStr(pPar.TCoord.y).Left(4) + moText(")"));
+
+                      pFont->Draw( pPar.Pos3d.x+sizexd2-12,
+                                  pPar.Pos3d.y+sizeyd2-5,
+                                  Texto );
+
+                      Texto = moText( moText("(") + (moText)FloatToStr(pPar.TCoord.x+tsizex).Left(4)
+                      + moText(",") + (moText)FloatToStr(pPar.TCoord.y+tsizey).Left(4) + moText(")"));
+
+                      pFont->Draw( pPar.Pos3d.x+sizexd2-12,
+                                  pPar.Pos3d.y-sizeyd2+2,
+                                  Texto );
+
+                      Texto = moText( moText("(") + (moText)FloatToStr(pPar.TCoord.x).Left(4)
+                      + moText(",") + (moText)FloatToStr(pPar.TCoord.y+tsizey).Left(4) + moText(")"));
+
+                      pFont->Draw( pPar.Pos3d.x-sizexd2,
+                                  pPar.Pos3d.y-sizeyd2+5,
+                                  Texto );
+                  }
+
+              }
+          }
+      }
+
+      if (pFont && drawing_features>2) {
+
+                  Texto = moText( moText("T2 Rest.:") + IntToStr(TimerFullRestoration.Duration()));
+                  pFont->Draw( -10.0,
+                              0.0,
+                              Texto );
+
+                  Texto = moText( moText("T2 Revel.:") + IntToStr(TimerFullRevelation.Duration()));
+                  pFont->Draw( -10.0,
+                              3.0,
+                              Texto );
+
+                  Texto = moText( moText("T Revel.:") + IntToStr(TimerOfRevelation.Duration())
+                  + moText(" rev: ") + IntToStr(time_of_revelation));
+                  pFont->Draw( -10.0,
+                              6.0,
+                              Texto );
+
+                  Texto = moText( moText("T Rest.:") + IntToStr(TimerOfRestoration.Duration())
+                  + moText(" res: ") + IntToStr(time_of_restoration) );
+                  pFont->Draw( -10.0,
+                              9.0,
+                              Texto );
+
+                  Texto = moText("Status: ");
+
+                  switch(revelation_status) {
+                      case REVSTA.PARTICLES_FULLRESTORED:
+                          Texto+= moText("Full Restored");
+                          break;
+                      case REVSTA.PARTICLES_REVEALING:
+                          Texto+= moText("Revealing");
+                          break;
+                      case REVSTA.PARTICLES_REVEALINGALL:
+                          Texto+= moText("Revealing");
+                          break;
+                      case REVSTA.PARTICLES_FULLREVEALED:
+                          Texto+= moText("Full Revealed");
+                          break;
+                      case REVSTA.PARTICLES_RESTORING:
+                          Texto+= moText("Restoring");
+                          break;
+                      case REVSTA.PARTICLES_RESTORINGALL:
+                          Texto+= moText("Restoring All");
+                          break;
+                  }
+                  pFont->Draw( -10.0,
+                              13.0,
+                              Texto );
+      }
+  */
+  }
+
+
+  Draw( p_tempo : MO.moTempo, p_parentstate : MO.moEffectState ) : void {
+    this.BeginDraw(p_tempo, p_parentstate);
 
     if (this.RM == undefined) return;
+
+    this.UpdateParameters();
 
     var rgb: any = this.m_Config.EvalColor("color");
     var ccolor: MO.moColor = new MO.moColor( rgb.r, rgb.g, rgb.b);
     //console.log("ccolor:", rgb.r,rgb.g,rgb.b);
-    console.log("emittertype:",this.m_Config.Int("emittertype"));
+    //console.log("emittertype:",this.m_Config.Int("emittertype"));
     ///MESH MATERIAL
     if (this.Mat==undefined) {
       this.Mat = new MO.moMaterialBasic();
@@ -2391,8 +3033,8 @@ DrawParticlesSimple( tempogral : MO.moTempo , parentstate : MO.moEffectState  ) 
 
     //Mat2.m_MapGLId = Mat2.m_Map->GetGLId();
     //Mat2.m_Color = moColor(1.0, 1.0, 1.0);
-    //Mat2.m_vLight = moVector3f( -1.0, -1.0, -1.0 );
-    //Mat2.m_vLight.Normalize();
+    //Mat2.m_vLight = new moVector3f( -1.0, -1.0, -1.0 );
+    //Mat2.m_vLight.normalize();
 
     ///MESH GEOMETRY
     if (this.Plane == undefined) {
@@ -2421,9 +3063,11 @@ DrawParticlesSimple( tempogral : MO.moTempo , parentstate : MO.moEffectState  ) 
 
     if (this.Model) {
 
-      this.Model.Scale(this.m_Config.Eval("scalex"),
+      this.Model.Scale(
+        this.m_Config.Eval("scalex"),
         this.m_Config.Eval("scaley"),
         this.m_Config.Eval("scalez"));
+
       this.Model.Rotate(this.m_Config.Eval("rotatez") * MO.DEG_TO_RAD,
         0.0, 0.0, 1.0);
       this.Model.Rotate(this.m_Config.Eval("rotatey") * MO.DEG_TO_RAD,
@@ -2445,6 +3089,16 @@ DrawParticlesSimple( tempogral : MO.moTempo , parentstate : MO.moEffectState  ) 
       this.Mesh.SetModelMatrix(this.Model);
     }
 
+    if (this.SceneParticles == undefined) {
+        this.SceneParticles = new MO.moSceneNode();
+    }
+    if (this.GroupedParticles == undefined) {
+      this.GroupedParticles = new MO.moGroup();
+      this.SceneParticles.add(this.GroupedParticles);
+    } else {
+      this.GroupedParticles.SetModelMatrix(this.Model);
+    }
+
     if (this.Scene==undefined) {
       this.Scene = new MO.moSceneNode();
       this.Scene.add(this.Mesh);
@@ -2452,21 +3106,49 @@ DrawParticlesSimple( tempogral : MO.moTempo , parentstate : MO.moEffectState  ) 
 
 
     ///CAMERA PERSPECTIVE
-    if (this.Camera==undefined)
-      this.Camera = new MO.moCamera3D();
+    //if (this.Camera == undefined) {
+      //this.Camera = new MO.moCamera3D();
+      this.Camera = new THREE.PerspectiveCamera(60, 1.0, 0.01, 1000.0);
+    //}
+
+    this.Camera.translateX(this.m_Physics.m_EyeVector.x);
+    this.Camera.translateY(this.m_Physics.m_EyeVector.y);
+    this.Camera.translateZ(this.m_Physics.m_EyeVector.z);
+    this.Camera.lookAt(this.m_Physics.m_TargetViewVector as THREE.Vector3);
+
+    //}
+
+
       this.Camera.frustumCulled = true;
       this.Camera.castShadow = false;
 
     this.GL.SetDefaultPerspectiveView(
       this.RM.m_Renderer.getSize().width,
       this.RM.m_Renderer.getSize().height);
+      /*
+    this.GL.LookAt(   this.m_Physics.m_EyeVector.x,
+                      this.m_Physics.m_EyeVector.y,
+                      this.m_Physics.m_EyeVector.z,
+                      this.m_Physics.m_TargetViewVector.x,
+                      this.m_Physics.m_TargetViewVector.y,
+                      this.m_Physics.m_TargetViewVector.z,
+                      this.m_Physics.m_UpViewVector.x,
+                      this.m_Physics.m_UpViewVector.y,
+                      this.m_Physics.m_UpViewVector.z );
+                      */
+    //this.Camera.position = this.m_Physics.m_EyeVector;
+    //this.Camera.projectionMatrix = this.GL.GetProjectionMatrix();
+    //this.Camera = this.m_Physics.m_TargetViewVector as THREE.Vector3;
 
-    this.Camera.projectionMatrix = this.GL.GetProjectionMatrix();
+    //console.log("this.Camera:", this.Camera, this.m_Physics.m_EyeVector,
+    //  this.m_Physics.m_TargetViewVector, this.m_Physics.m_UpViewVector);
 
-    this.DrawParticlesSimple( p_tempo, this.m_EffectState /*, parentstate*/ );
+    //this.RM.Render(this.Scene, this.Camera);
+
+    this.DrawParticlesSimple(p_tempo, this.m_EffectState /*, parentstate*/);
 
     ///RENDERING
-    this.RM.Render( this.Scene, this.Camera);
+    this.RM.Render( this.SceneParticles, this.Camera);
     //console.log("moEffectImage.Draw", this.Scene, this.Camera, this.Mat.map );
 
 
@@ -2479,6 +3161,7 @@ DrawParticlesSimple( tempogral : MO.moTempo , parentstate : MO.moEffectState  ) 
 
   Update( p_Event: MO.moEventList ) : void {
     super.Update(p_Event);
+
   }
 
   GetDefinition(): MO.moConfigDefinition {

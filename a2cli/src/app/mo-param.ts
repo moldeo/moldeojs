@@ -151,20 +151,20 @@ export class moParamDefinition extends moAbstract {
         case moParamType.MO_PARAM_SCRIPT:
         case moParamType.MO_PARAM_OBJECT:
         case moParamType.MO_PARAM_3DMODEL:
-          //this.m_DefaultValue = new moValue( "", "TXT" );
+          this.m_DefaultValue = new moValue( "", "TXT" );
           break;
 
         case moParamType.MO_PARAM_MOLDEO_OBJECT:
           /** TODO: removing subvalues if any*/
-          //this.m_DefaultValue.RemoveSubValues();
+          this.m_DefaultValue.RemoveSubValues();
           break;
 
         case moParamType.MO_PARAM_INLET:
-          //this.m_DefaultValue = new moValue( "VARIABLE1", "TXT", "NUMERIC", "TXT" );
+          this.m_DefaultValue = new moValue( "VARIABLE1", "TXT", "NUMERIC", "TXT" );
           break;
 
         case moParamType.MO_PARAM_FONT:
-          //this.m_DefaultValue = new moValue( "", "TXT", "", "TXT", "", "TXT" );
+          this.m_DefaultValue = new moValue( "", "TXT", "", "TXT", "", "TXT" );
           break;
 
         case moParamType.MO_PARAM_PHASE:
@@ -175,7 +175,7 @@ export class moParamDefinition extends moAbstract {
         case moParamType.MO_PARAM_TRANSLATEY:
         case moParamType.MO_PARAM_TRANSLATEZ:
         case moParamType.MO_PARAM_FUNCTION:
-          //this.m_DefaultValue = new moValue( "0.0", "FUNCTION" ).Ref();
+          this.m_DefaultValue = new moValue( "0.0", "FUNCTION" );
           break;
 
         case moParamType.MO_PARAM_ALPHA:
@@ -183,27 +183,31 @@ export class moParamDefinition extends moAbstract {
         case moParamType.MO_PARAM_SCALEX:
         case moParamType.MO_PARAM_SCALEY:
         case moParamType.MO_PARAM_SCALEZ:
-          //this.m_DefaultValue = new moValue( "1.0", "FUNCTION" ).Ref();
+          this.m_DefaultValue = new moValue( "1.0", "FUNCTION" );
           break;
 
         case moParamType.MO_PARAM_POLYGONMODE:
         case moParamType.MO_PARAM_BLENDING:
-          //this.m_DefaultValue = new moValue( "0", "INT" );
+          this.m_DefaultValue = new moValue( "0", "INT" );
           break;
         case moParamType.MO_PARAM_COLOR:
-          //this.m_DefaultValue = new moValue( "1.0", "FUNCTION","1.0", "FUNCTION","1.0", "FUNCTION","1.0", "FUNCTION"  );
+          this.m_DefaultValue = new moValue( "1.0", "FUNCTION","1.0", "FUNCTION","1.0", "FUNCTION","1.0", "FUNCTION"  );
           break;
         case moParamType.MO_PARAM_COMPOSE:
-          //this.m_DefaultValue = new moValue( "composed by", "TXT","1.0", "FUNCTION","<nada></nada>", "XML","12345", "INT"  );
+          this.m_DefaultValue = new moValue( "composed by", "TXT","1.0", "FUNCTION","<nada></nada>", "XML","12345", "INT"  );
           break;
         case moParamType.MO_PARAM_VECTOR:
-          //this.m_DefaultValue = new moValue( "1.0", "FUNCTION","2.0", "FUNCTION","3.0", "FUNCTION","4.0", "FUNCTION" );
+          this.m_DefaultValue = new moValue(
+            "1.0", "FUNCTION",
+            "2.0", "FUNCTION",
+            "3.0", "FUNCTION",
+            "4.0", "FUNCTION");
           break;
         case moParamType.MO_PARAM_NUMERIC:
-          //this.m_DefaultValue = new moValue( "0", "NUM" );
+          this.m_DefaultValue = new moValue( "0", "NUM" );
           break;
         case moParamType.MO_PARAM_UNDEFINED:
-          //this.m_DefaultValue = new moValue( "INVALID", MO_VALUE_UNDEFINED );
+          this.m_DefaultValue = new moValue( "INVALID", moValueType.MO_VALUE_UNDEFINED );
           break;
         default:
           break;

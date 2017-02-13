@@ -33,7 +33,7 @@ export class moGLMatrixf extends THREE.Matrix4 {
   }
   MakeLookAt(eyeX: MOfloat = 0.0, eyeY: MOfloat = 0.0, eyeZ: MOfloat = -10.0,
     centerX: MOfloat = 0.0, centerY: MOfloat = 0.0, centerZ: MOfloat = 0.0,
-    upX: MOfloat = 0.0, upY: MOfloat = 0.0, upZ: MOfloat = 1.0): moGLMatrixf {
+    upX: MOfloat = 0.0, upY: MOfloat = 1.0, upZ: MOfloat = 0.0): moGLMatrixf {
     var eye: moVector3f = new moVector3f(eyeX, eyeY, eyeZ);
     var center: moVector3f = new moVector3f( centerX, centerY, centerZ );
     var up: moVector3f = new moVector3f( upX, upY, upZ );
@@ -186,10 +186,18 @@ export class moGLManager extends moResource {
 
   LookAt(eyeX: MOfloat = 0.0, eyeY: MOfloat = 0.0, eyeZ: MOfloat = -10.0,
     centerX: MOfloat = 0.0, centerY: MOfloat = 0.0, centerZ: MOfloat = 0.0,
-    upX: MOfloat = 0.0, upY: MOfloat = 0.0, upZ: MOfloat = 1.0) {
+    upX: MOfloat = 0.0, upY: MOfloat = 1.0, upZ: MOfloat = 0.0) {
     var Lat : moGLMatrixf = new moGLMatrixf();
     Lat.MakeIdentity();
-    Lat.MakeLookAt( eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ );
+    Lat.MakeLookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
+    var Lat2: moGLMatrixf;
+
+    Lat = Lat.multiply(this.m_ProjectionMatrix) as moGLMatrixf;
+    //this.m_ProjectionMatrix.copy( Lat );
+    //this.m_ProjectionMatrix.transpose();
+    //this.m_ProjectionMatrix.multiply(Lat.transpose());
+    this.m_ProjectionMatrix.copy(Lat);
+
   }
 
 }

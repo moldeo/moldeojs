@@ -1,7 +1,8 @@
 import { moAbstract } from "./mo-abstract";
 import { MOint } from "./mo-types";
 import { moText } from "./mo-text";
-import { moMoldeoObject, moMoldeoObjectType, moMobDefinition } from "./mo-moldeo-object";
+import { moMoldeoObject, moMobDefinition } from "./mo-moldeo-object";
+import { moMoldeoObjectType } from './mo-moldeo-object-type.enum';
 import {
   moEffect, moEffectsArray,
   moPreEffect, moPreEffectsArray,

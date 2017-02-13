@@ -1,8 +1,12 @@
 
 import { moAbstract } from "./mo-abstract";
 import { moScript } from "./mo-script";
-import { moMoldeoObjectType, moMoldeoObjectTypeStr } from "./mo-moldeo-object-type.enum";
-export { moMoldeoObjectType, moMoldeoObjectTypeStr } from "./mo-moldeo-object-type.enum";
+import {
+  moMoldeoObjectType, moMoldeoObjectTypeStr,
+  moMoldeoObjectTypeToText
+} from "./mo-moldeo-object-type.enum";
+//export { moMoldeoObjectType, moMoldeoObjectTypeStr,
+// moMoldeoObjectTypeToText } from "./mo-moldeo-object-type.enum";
 import {
   MOswitch, MOint,
   MO_ACTIVATED, MO_DEACTIVATED, MO_OFF, MO_ON,
@@ -23,8 +27,8 @@ import { moConfig, moConfigDefinition, MO_CONFIG_OK } from "./mo-config";
 import { moSlash } from "./mo-file-manager";
 import { moFileManager } from "./mo-file-manager";
 import { moResourceManager } from "./mo-resource-manager";
-import { moTextureManager, moTextureBuffer, moTextureBuffers } from "./mo-texture-manager";
-import { moTexture, moTextureType, moTextureArray } from "./mo-texture";
+import { moTextureManager } from "./mo-texture-manager";
+import { moTexture, moTextureType, moTextureArray, moTextureBuffer } from "./mo-texture";
 import { moMathManager, moMathFunction, moParserFunction } from "./mo-math-manager";
 import {
   moOutlets, moOutlet,
@@ -151,6 +155,11 @@ export class moMobDefinition {
     return this.m_Type;
   }
 
+  GetTypeStr(): moText {
+    var typestr = moMoldeoObjectTypeToText[this.m_Type];
+    return typestr;
+  }
+
   SetType( p_type : moMoldeoObjectType  ) : void {
     this.m_Type = p_type;
   }
@@ -233,7 +242,7 @@ export class moMobDefinition {
   }
 
   GetTypeToName(p_type: moMoldeoObjectType) : moText {
-    return moMoldeoObjectTypeStr[p_type];
+    return moMoldeoObjectTypeToText[p_type];
   }
 
   GetMobIndex() : moMobIndex  {
@@ -420,8 +429,10 @@ export class moMoldeoObject extends moScript {
   }
 */
   if (this.m_bConnectorsLoaded) {
-    this.MODebug2.Error("moMoldeoObject::CreateConnectors > Calling twice. Can't continue. Sorry for object: "
-    +this.GetName()+ " config: " + this.GetConfigName() + " label:"+this.GetLabelName() );
+    this.MODebug2.Error("moMoldeoObject::CreateConnectors > Calling twice."
+      + " Can't continue. Sorry for object: "
+      + this.GetName()
+      + " config: " + this.GetConfigName() + " label:" + this.GetLabelName());
     return false;
   }
 /*
@@ -734,16 +745,14 @@ export class moMoldeoObject extends moScript {
     if ( p_configdefinition==undefined ) {
       p_configdefinition = this.m_Config.GetConfigDefinition();
     }
-/*
-    p_configdefinition.GetParamDefinitions().Empty();
-    p_configdefinition.ParamIndexes().Empty();
 
-    p_configdefinition.Set( GetName(), m_MobDefinition.GetTypeStr() );
+    p_configdefinition.Empty();
+    p_configdefinition.Set( this.GetName(), this.m_MobDefinition.GetTypeStr() );
 
-    p_configdefinition.Add( moText("inlet"), MO_PARAM_INLET );
-    p_configdefinition.Add( moText("outlet"), MO_PARAM_OUTLET );
-    p_configdefinition.Add(moText("script"), MO_PARAM_SCRIPT);
-*/
+    p_configdefinition.Add( "inlet", moParamType.MO_PARAM_INLET );
+    p_configdefinition.Add( "outlet", moParamType.MO_PARAM_OUTLET );
+    p_configdefinition.Add( "script", moParamType.MO_PARAM_SCRIPT);
+    //console.log("definitions:", p_configdefinition);
     return p_configdefinition;
   }
 
@@ -790,7 +799,7 @@ export class moMoldeoObject extends moScript {
     if (value.GetSubValueCount()<=0) return false;
 
     var valuebase0 : moValueBase = value.GetSubValue(0);
-    var idx: MOint;
+    var idx: MOint = -1;
     var TexMan: moTextureManager = this.m_pResourceManager.GetTextureMan();
 
     switch( param_type ) {
@@ -798,14 +807,16 @@ export class moMoldeoObject extends moScript {
         case moParamType.MO_PARAM_TEXTUREFOLDER:
             ///es una carpeta pero puede tener otros parametros
             ///
-            /*
-            if ( ! (valuebase0.Text().trim() == "") ) {
+            if ( ! (""+valuebase0.Text() == "") ) {
 
                 ///si tenemos un segundo parametro deberia ser el formato del buffer (JPG o PNG)
                 if (p_refresh) {
 
                 }
-                idx = this.m_pResourceManager.GetTextureMan().GetTextureBuffer( valuebase0.Text(), true, "PNG" );
+                idx = this.m_pResourceManager.GetTextureMan().GetTextureBuffer(
+                  valuebase0.Text(),
+                  true,
+                  "PNG");
                 if (idx>-1) {
 
                     var pTextureBuffer : moTextureBuffer = this.m_pResourceManager.GetTextureMan().GetTextureBuffer(idx);
@@ -814,7 +825,7 @@ export class moMoldeoObject extends moScript {
                 }
                 return false;
 
-            }*/
+            }
 
 
             break;
