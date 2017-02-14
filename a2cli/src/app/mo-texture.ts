@@ -197,6 +197,14 @@ export class moTextureBuffer extends moTexture {
     return this.m_Frames[index];
   }
 
+  LoadCompleted() {
+
+  }
+
+  UpdateImages() {
+
+  }
+
 };
 export type moTextureBuffers = moTextureBuffer[];
 

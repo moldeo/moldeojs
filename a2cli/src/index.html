@@ -3,12 +3,18 @@
 <head>
   <meta charset="utf-8">
   <title>A2cli</title>
-  <base href="/">
+  <base href="./">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
+  <script>
+    var fs = undefined;
+    if (window["require"]) {
+       fs = require("fs");
+    }
+  </script>
   <app-root>Loading...</app-root>
 </body>
 </html>

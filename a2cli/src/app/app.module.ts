@@ -16,6 +16,8 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { ConsoleService } from "./console.service";
 
+
+
 const appRoutes: Routes = [
   //{ path: 'about', component: AboutComponent },
 ];
@@ -34,7 +36,7 @@ const appRoutes: Routes = [
     HttpModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [Uploader, ConsoleService],
+  providers: [Uploader, ConsoleService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

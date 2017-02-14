@@ -1,5 +1,4 @@
 import { Http } from "@angular/http";
-//import { File } from "@angular/";
 
 import { moAbstract } from "./mo-abstract";
 import { moText, moText0, moTextArray } from "./mo-text";
@@ -17,6 +16,8 @@ export class MyUploadItem extends UploadItem {
     }
 };
 
+export const FS : any = window["fs"];
+export const EXEDIR = (window["__dirname"]==undefined)? "" : window["__dirname"];
 
 /**
 * Los distintos tipos de accesos a los archivos soportados por el moFileManager
@@ -89,8 +90,27 @@ export class moFile extends moAbstract {
   SetCompletePath( p_completepath : moText ) : void {
 
 	//check if http. ftp or other...set remote
-    this.m_CompletePath = p_completepath;
 
+    //just to check is not the ref object
+    var str: string = "" + p_completepath;
+    this.m_CompletePath = str;
+    if (EXEDIR != "") {
+      if (str.indexOf(EXEDIR) == 0) {
+        //do nothing
+      } else {
+        this.m_CompletePath = "" + EXEDIR +moSlash+str;
+      }
+    }
+    console.log("this.m_CompletePath", this.m_CompletePath);
+  /*  console.log("str", str);
+    console.log("this.m_CompletePath", this.m_CompletePath);
+    this.m_CompletePath = "" + EXEDIR;
+    console.log("this.m_CompletePath", this.m_CompletePath);
+    this.m_CompletePath = this.m_CompletePath + "/";
+    console.log("this.m_CompletePath", this.m_CompletePath);
+    this.m_CompletePath = this.m_CompletePath + "" + str;
+    console.log("this.m_CompletePath", this.m_CompletePath);
+*/
 /*
 	moText Left8 = m_CompletePath;
 	Left8.Left(8);
@@ -116,60 +136,69 @@ export class moFile extends moAbstract {
       this.m_bRemote = true;
       this.m_bExists = false;
     } else {
-        var FileNameA : moTextArray;
-        this.m_Protocol = "file:///";
-
+      var FileNameA: moTextArray;
+      this.m_Protocol = "file:///";
+      //this.m_CompletePath = window["__dirname"]+"" + moSlash + this.m_CompletePath;
+      console.log("moFile opening > ", this.m_CompletePath);
       //moText m_Drive = m_CompletePath.Scan(":");
       //std::string str;
       //str = bfs::extension( (char*)m_CompletePath );
-      this.m_Extension = this.m_CompletePath.substring( this.m_CompletePath.lastIndexOf("."), this.m_CompletePath.length  );
+      this.m_Extension = this.m_CompletePath.substring(this.m_CompletePath.lastIndexOf("."), this.m_CompletePath.length);
       this.m_Path = "";
-      var pathStart : moText = this.m_CompletePath;
-      pathStart = pathStart.substr(0,1);
+      var pathStart: moText = this.m_CompletePath;
+      pathStart = pathStart.substr(0, 1);
       //cout << "pathStart:" << pathStart << " slash:" << moSlash << endl;
-          var T0 : moText0 = new moText0(this.m_CompletePath);
-          this.m_Dirs = T0.Explode("/");
-          if (this.m_CompletePath.length>0)
-            if ( pathStart == moSlash )
-              this.m_Path = moSlash;
+      var T0: moText0 = new moText0(this.m_CompletePath);
+      this.m_Dirs = T0.Explode("/");
+      if (this.m_CompletePath.length > 0)
+        if (pathStart == moSlash)
+          this.m_Path = moSlash;
 
-          if ( this.m_Dirs.length > 0 ) {
-              this.m_Drive = this.m_Dirs[0];
-              this.m_FileName = this.m_Dirs[this.m_Dirs.length-1];
-              FileNameA = new moText0( this.m_FileName ).Explode(".");
-              this.m_FileName = FileNameA[0];
-              //this.m_Dirs.Remove(m_Dirs.Count()-1);
-              this.m_Dirs.pop();
-          }
+      if (this.m_Dirs.length > 0) {
+        this.m_Drive = this.m_Dirs[0];
+        this.m_FileName = this.m_Dirs[this.m_Dirs.length - 1];
+        FileNameA = new moText0(this.m_FileName).Explode(".");
+        this.m_FileName = FileNameA[0];
+        //this.m_Dirs.Remove(m_Dirs.Count()-1);
+        this.m_Dirs.pop();
+      }
 
-          for( var d=0; d < this.m_Dirs.length; d++ ) {
-            if (""+this.m_Dirs[d]!="" && ""+this.m_Dirs[d]!="/" && ""+this.m_Dirs[d]!=".")// && m_Dirs[d]!="..")
-              this.m_Path = "" + this.m_Path + this.m_Dirs[d] + moSlash;
+      for (var d = 0; d < this.m_Dirs.length; d++) {
+        if ("" + this.m_Dirs[d] != "" && "" + this.m_Dirs[d] != "/" && "" + this.m_Dirs[d] != ".")// && m_Dirs[d]!="..")
+          this.m_Path = "" + this.m_Path + this.m_Dirs[d] + moSlash;
 
-          }
+      }
 
       this.m_FileType = moFileType.MO_FILETYPE_LOCAL;
       this.m_bRemote = false;
 
-          this.m_CompletePath = "" + this.m_Path + this.m_FileName + this.m_Extension;
-/*
-      this.m_bExists = bfs::exists((char*)m_CompletePath);
+      this.m_CompletePath = "" + this.m_Path + this.m_FileName + this.m_Extension;
 
-          char *path;
-          path = m_CompletePath;
-          try {
-              if ( Exists() && !bfs::is_directory(path)) m_FileSize = (long) bfs::file_size( path );
-              else m_FileSize = 0;
-          } catch( const bfs::filesystem_error& e ) {
-              moDebugManager::Error("moFile::moFile > error: " + moText( e.what()) );
-              m_FileSize = 0;
-          }
-  */
-  	}
+      console.log("moFile > ", this.m_CompletePath, this);
+
+      if (FS == undefined) { this.m_bExists = true; return; }
+
+      var stat = FS.statSync(this.m_CompletePath);
+      console.log("moFile:",stat);
+
+      this.m_bExists = FS.existsSync(this.m_CompletePath);
+
+      var path = this.m_CompletePath;
+      try {
+        if (this.Exists() && !stat.isDirectory())
+          this.m_FileSize = stat["size"];
+        else
+          this.m_FileSize = 0;
+      } catch (err) {
+            this.MODebug2.Error("moFile::moFile > error: " + err);
+            this.m_FileSize = 0;
+      }
+
+    }
   }
 
   Exists(): boolean {
-    return true;
+    return this.m_bExists;
   }
 
   GetPath() : moText {
@@ -189,16 +218,16 @@ export class moFile extends moAbstract {
     }
 
     path = ""+this.m_CompletePath;
-/*
-    try {
 
-      bfs::path abspath = bfs::canonical( path );
-      absolutePath = (char*)abspath.string().c_str();
+    if (FS) {
+      try {
 
-    } catch( const bfs::filesystem_error& e ) {
+        absolutePath = FS.realpathSync(path);
 
+      } catch ( err ) {
+
+      }
     }
-  */
       return absolutePath;
   }
 
@@ -282,85 +311,43 @@ export class moDirectory extends moAbstract {
     /** Empty subdirs array*/
     this.m_SubDirs = [];
 
+    if (FS == undefined) return (this.m_bExists = true);
+
     /** Set by default m_bExists on false*/
     this.m_bExists = false;
 
     /** Check files*/
-    /*
-      if( bfs::exists( path ) )
-      {
-          m_bExists = true;
+    var file_names = [];
 
-         bfs::directory_iterator end ;
-        for(  bfs::directory_iterator iter(path) ; iter != end ; ++iter )
-          if (  bfs::is_directory( *iter ) )
-          {
-            //cout << iter->native_directory_string() << " (directory)\n" ;
-            //if( recurse_into_subdirs ) show_files(*iter) ;
-            #if BOOST_VERSION > 103500
-
-                #if BOOST_VERSION < 104800
-                    moText pSubDirName( iter->path().filename().c_str() );
-                #else
-                    moText pSubDirName( iter->path().filename().string().c_str() );
-                #endif
-            #else
-            moText pSubDirName( iter->path().leaf().c_str() );
-            #endif
-
-            moText pCompletePathSubdirName( iter->path().string().c_str() );
-
-            if (pSubDirName.Left(1) != "." ) {
-              moDirectory* pSubdir = new moDirectory( pCompletePathSubdirName );
-              if (pSubdir)
-                m_SubDirs.Add( pSubdir );
-            }
-
+    if( FS.existsSync( path ) )
+    {
+        this.m_bExists = true;
+        var files = FS.readdirSync(path);
+        var files_sort = {};
+        for (var i = 0; i < files.length; i++) {
+          var name = path + "" + moSlash + files[i];
+          if (FS.statSync(name).isDirectory()){
+            var pSubdir : moDirectory = new moDirectory( name );
+            this.m_SubDirs.push( pSubdir );
           } else {
-            //cout << iter->native_file_string() << " (file)\n" ;
-            //ATENCION SEGUN LA VERSION DE BOOST hya que usar filename() o leaf()
-            //moText pFileName( iter->path().leaf().c_str() );
-
-
-            #if BOOST_VERSION > 103500
-
-
-                #if BOOST_VERSION < 104800
-                    moText pFileName( iter->path().filename().c_str() );
-                    stdFileName = iter->path().filename().c_str();
-                #else
-                    moText pFileName( iter->path().filename().string().c_str() );
-                    stdFileName = iter->path().filename().string().c_str();
-                #endif
-
-            #else
-
-            moText pFileName( iter->path().leaf().c_str() );
-
-            stdFileName = iter->path().leaf().c_str();
-
-            #endif
-
-            moText pCompletePathFilename( iter->path().string().c_str() );
-            stdCompleteFileName = iter->path().string().c_str();
-
-
-
-            if (stdFileName!="Thumbs.db") {
-                stdListOfFileNames.insert(stdFileName);
-                stdListOfCompleteFileNames.insert(stdCompleteFileName);
-            }
-
-            #ifdef _DEBUG
-            //MODebug2->Message( moText("moFileManager:: file:") + (moText)pCompletePathFilename);
-            //MODebug2->Message( moText("moFileManager:: filesize:") + IntToStr((int) bfs::file_size( iter->path().file_string().c_str() )));
-            #endif
-            //printf("%-32s %s %9.ld %s",fileInfo.name, attribs, fileInfo.size , timeBuff);
-
+            // stdFileName
+            // stdCompleteFileName
+            // stdListOfFileNames
+            // stdListOfCompleteFileNames
+            //this.m_Files.push(name);
+            file_names.push(name);
           }
+        }
 
-      }
-*/
+    }
+
+
+    file_names.sort();
+    for (var i = 0; i < file_names.length; i++) {
+      var pFile: moFile = new moFile(file_names[i]);
+      this.m_Files.push(pFile);
+    }
+
     /** Sorted for linux */
     /*
     moText pCompletePathFilename;
@@ -566,6 +553,7 @@ export class moFileManager extends moResource {
   constructor(private http: Http) {
     super();
     this.SetName("_filemanager_");
+    console.log("dirname:",window["__dirname"]);
   }
 
   Load( p_FileName : moText , bWaitForDownload : boolean=true, callback?:any ) {

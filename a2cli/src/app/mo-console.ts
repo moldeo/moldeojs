@@ -46,7 +46,7 @@ import { moTexture } from "./mo-texture";
 import {
   moConsoleState, moConsoleMode, MO_DEF_SCREEN_WIDTH, MO_DEF_SCREEN_HEIGHT, MO_DEF_RENDER_WIDTH, MO_DEF_RENDER_HEIGHT
 } from "./mo-console-state";
-import { moFile, moSlash, moFileManager } from "./mo-file-manager";
+import { moFile, moSlash, moFileManager, EXEDIR } from "./mo-file-manager";
 import { moTempo } from "./mo-tempo";
 import {
   moTimer, moTimerAbsolute, moTimerState, GlobalMoldeoTimer,
@@ -208,7 +208,7 @@ export class moConsole extends moMoldeoObject {
       //console.log("Config Loaded!", this.m_Config, result, File);
 
       var res_ok = this.InitResources({
-        "apppath": "/",
+        "apppath": EXEDIR,
         "datapath": File.GetPath(),
         "consoleconfig": this.m_Config,
         "callback": options["start_loading"]

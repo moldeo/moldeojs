@@ -697,14 +697,14 @@ export class moEffectParticlesSimple extends MO.moEffect {
       this.m_pParticleTime = new moInlet();
 
       if (this.m_pParticleTime) {
-        this.m_pParticleTime.Init( "particletime", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
+        this.m_pParticleTime.Init( "particletime", this.m_Inlets.length, "DOUBLE" );
         this.m_Inlets.push( this.m_pParticleTime );
       }
 
       this.m_pParticleIndex = new moInlet();
 
       if (this.m_pParticleIndex) {
-        this.m_pParticleIndex.Init( "particleindex", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_LONG );
+        this.m_pParticleIndex.Init( "particleindex", this.m_Inlets.length, "LONG" );
         this.m_Inlets.push( this.m_pParticleIndex );
       }
 
@@ -1237,11 +1237,12 @@ export class moEffectParticlesSimple extends MO.moEffect {
       console.log("moR(PAR.PARTICLES_ATTRACTORMODE)",
         moR(PAR.PARTICLES_ATTRACTORMODE),
         this.m_Config.Int(moR(PAR.PARTICLES_ATTRACTORMODE)));
+*/
         this.m_Physics.m_AttractorVector = new moVector3f(
         this.m_Config.Eval(moR(PAR.PARTICLES_ATTRACTORVECTOR_X)),
         this.m_Config.Eval( moR(PAR.PARTICLES_ATTRACTORVECTOR_Y)),
         this.m_Config.Eval( moR(PAR.PARTICLES_ATTRACTORVECTOR_Z)));
-*/
+
       if (this.original_proportion!=1.0) {
               if (this.original_proportion>1.0) {
                   this.m_Physics.m_AttractorVector.y = this.m_Physics.m_AttractorVector.y / this.original_proportion;
@@ -1321,19 +1322,23 @@ export class moEffectParticlesSimple extends MO.moEffect {
       //position
       var rpos : number = this.m_Physics.m_RandomPosition;
       var posV : moVector3f = this.m_Physics.m_PositionVector;
+      var posVx: moVector3f = new moVector3f(); posVx.copy(posV);
       //velocity
       var rvel : number = this.m_Physics.m_RandomVelocity;
       var velV : moVector3f = this.m_Physics.m_VelocityVector;
+      var velVx: moVector3f = new moVector3f(); velVx.copy(velV);
 
-      var randompos: moVector3f = (moMath.fabs(rpos) > 0.0) ? posV.multiplyScalar(rpos*(0.5-moMath.UnitRandom())): posV;
+      var randompos: moVector3f = (moMath.fabs(rpos) > 0.0) ? posVx.multiplyScalar(rpos*(0.5-moMath.UnitRandom())): posVx;
       randomposx = randompos.x;
       randomposy = randompos.y;
       randomposz = randompos.z;
 
-      var randomvel: moVector3f = (moMath.fabs(rvel) > 0.0) ? velV.multiplyScalar(rpos * moMath.UnitRandom()) : velV;
+      var randomvel: moVector3f = (moMath.fabs(rvel) > 0.0) ? velVx.multiplyScalar(rvel * moMath.UnitRandom()) : velVx;
       randomvelx = randomvel.x;
       randomvely = randomvel.y;
       randomvelz = randomvel.z;
+      //if (pParticle.Pos.x == 0 && pParticle.Pos.y == 0)
+      //  console.log("randomvel:", randomvelx, randomvely, randomvelz);
 
       var fullcolor = this.m_Config.EvalColor( moR(PAR.PARTICLES_PARTICLECOLOR));
       pParticle.Color = new moColor( fullcolor.r, fullcolor.g, fullcolor.b );
@@ -1441,15 +1446,15 @@ export class moEffectParticlesSimple extends MO.moEffect {
                       break;
               }
               break;
-/*
+
           case EMIT.PARTICLES_EMITTERTYPE_TUBE:
               //SPHERE POSITION
               switch(this.m_Physics.m_CreationMethod) {
-                  case PARTICLES_CREATIONMETHOD_LINEAR:
-                      alpha = 2 * moMath.PI * pParticle.Pos.x / m_cols;
+                  case CREAMODE.PARTICLES_CREATIONMETHOD_LINEAR:
+                      alpha = 2 * moMath.PI * pParticle.Pos.x / this.m_cols;
                       radius1 = emitS.x / 2.0;
                       radius2 = emitS.y / 2.0;
-                      z = emitS.z * ( 0.5f - ( pParticle.Pos.y / m_rows ) );
+                      z = emitS.z * ( 0.5 - ( pParticle.Pos.y / this.m_rows ) );
 
                       pParticle.Pos3d = new moVector3f(  ( radius1*moMath.Cos(alpha) + randomposx ) * emitV.x,
                                                       ( radius1*moMath.Sin(alpha) + randomposy ) * emitV.y,
@@ -1460,11 +1465,11 @@ export class moEffectParticlesSimple extends MO.moEffect {
                                                         randomvelz );
                       break;
 
-                  case  PARTICLES_CREATIONMETHOD_PLANAR:
+                  case  CREAMODE.PARTICLES_CREATIONMETHOD_PLANAR:
                       alpha = 2 * moMath.PI * moMath.UnitRandom();
                       radius1 = emitS.x / 2.0;
                       radius2 = emitS.y / 2.0;
-                      z = emitS.z * ( 0.5f - moMath.UnitRandom());
+                      z = emitS.z * ( 0.5 - moMath.UnitRandom());
 
                       pParticle.Pos3d = new moVector3f(  ( radius1*moMath.Cos(alpha) + randomposx ) * emitV.x,
                                                       ( radius1*moMath.Sin(alpha) + randomposy ) * emitV.y,
@@ -1475,12 +1480,12 @@ export class moEffectParticlesSimple extends MO.moEffect {
                                                         randomvelz );
                       break;
 
-                  case  PARTICLES_CREATIONMETHOD_VOLUMETRIC:
+                  case  CREAMODE.PARTICLES_CREATIONMETHOD_VOLUMETRIC:
                       alpha = 2 * moMath.PI * moMath.UnitRandom();
                       radius1 = emitS.x / 2.0;
                       radius2 = emitS.y / 2.0;
                       radius = radius1 + moMath.UnitRandom()*(radius2-radius1)*moMath.UnitRandom();
-                      z = emitS.z * ( 0.5f - moMath.UnitRandom());
+                      z = emitS.z * ( 0.5 - moMath.UnitRandom());
 
                       pParticle.Pos3d = new moVector3f(  ( radius*moMath.Cos(alpha) + randomposx ) * emitV.x,
                                                       ( radius*moMath.Sin(alpha) + randomposy ) * emitV.y,
@@ -1492,21 +1497,19 @@ export class moEffectParticlesSimple extends MO.moEffect {
                       break;
               }
               break;
-*/
 
-/*
           case EMIT.PARTICLES_EMITTERTYPE_JET:
               //SPHERE POSITION
               switch(this.m_Physics.m_CreationMethod) {
-                  case PARTICLES_CREATIONMETHOD_LINEAR:
+                  case CREAMODE.PARTICLES_CREATIONMETHOD_LINEAR:
 
                       //z = emitS.z * moMath.UnitRandom();
                       len = emitV.length();
-                      index = pParticle.Pos.x+pParticle.Pos.y*m_cols;
+                      index = pParticle.Pos.x+pParticle.Pos.y*this.m_cols;
                       index_normal = 0.0; ///si no hay particulas siempre en 0
 
-                      if (m_cols*m_rows) {
-                          index_normal = index / (m_cols*m_rows);
+                      if (this.m_cols*this.m_rows) {
+                          index_normal = index / (this.m_cols*this.m_rows);
                       }
                       z = index_normal;
 
@@ -1518,8 +1521,8 @@ export class moEffectParticlesSimple extends MO.moEffect {
                                                           randomvely,
                                                           randomvelz);
                       break;
-                  case PARTICLES_CREATIONMETHOD_PLANAR:
-                  case PARTICLES_CREATIONMETHOD_VOLUMETRIC:
+                  case CREAMODE.PARTICLES_CREATIONMETHOD_PLANAR:
+                  case CREAMODE.PARTICLES_CREATIONMETHOD_VOLUMETRIC:
                       z = emitS.z * moMath.UnitRandom();
 
                       pParticle.Pos3d = new moVector3f(  emitV.x*( z + randomposx ),
@@ -1533,7 +1536,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
 
               }
               break;
-*/
+
           case EMIT.PARTICLES_EMITTERTYPE_POINT:
               //SPHERE POSITION
               pParticle.Pos3d = new moVector3f(  randomposx+emitV.x,
@@ -1546,19 +1549,17 @@ export class moEffectParticlesSimple extends MO.moEffect {
 
               break;
 
-
-/*
           case EMIT.PARTICLES_EMITTERTYPE_SPIRAL:
               //SPIRAL POSITION
               switch(this.m_Physics.m_CreationMethod) {
-                  case PARTICLES_CREATIONMETHOD_LINEAR:
-                  case  PARTICLES_CREATIONMETHOD_PLANAR:
-                  case  PARTICLES_CREATIONMETHOD_VOLUMETRIC:
-                      alpha = 2 * moMath.PI * pParticle.Pos.x / m_cols;
+                  case CREAMODE.PARTICLES_CREATIONMETHOD_LINEAR:
+                  case CREAMODE.PARTICLES_CREATIONMETHOD_PLANAR:
+                  case CREAMODE.PARTICLES_CREATIONMETHOD_VOLUMETRIC:
+                      alpha = 2 * moMath.PI * pParticle.Pos.x / this.m_cols;
                       radius1 = emitS.x / 2.0;
                       radius2 = emitS.y / 2.0;
-                      z = emitS.z * (0.5f - (pParticle.Pos.y / m_rows )
-                      - (pParticle.Pos.x / (m_cols * m_rows)) );
+                      z = emitS.z * (0.5 - (pParticle.Pos.y / this.m_rows )
+                      - (pParticle.Pos.x / (this.m_cols * this.m_rows)) );
 
                       pParticle.Pos3d = new moVector3f(  ( radius1*moMath.Cos(alpha) + randomposx ) * emitV.x,
                                                       ( radius1*moMath.Sin(alpha) + randomposy ) * emitV.y,
@@ -1570,13 +1571,13 @@ export class moEffectParticlesSimple extends MO.moEffect {
                       break;
               }
               break;
-*/
-/*
+
           case EMIT.PARTICLES_EMITTERTYPE_CIRCLE:
               //CIRCLE POSITION
               switch(this.m_Physics.m_CreationMethod) {
-                  case PARTICLES_CREATIONMETHOD_LINEAR:
-                      alpha = 2 * moMath.PI * ( pParticle.Pos.x + pParticle.Pos.y*m_cols ) / (m_cols*m_rows );
+                  case CREAMODE.PARTICLES_CREATIONMETHOD_LINEAR:
+                      alpha = 2 * moMath.PI *
+                        (pParticle.Pos.x + pParticle.Pos.y * this.m_cols) / (this.m_cols * this.m_rows);
                       radius1 = emitS.x / 2.0;
                       radius2 = emitS.y / 2.0;
                       z = 0.0;
@@ -1591,9 +1592,9 @@ export class moEffectParticlesSimple extends MO.moEffect {
                                                         randomvely,
                                                         randomvelz );
                       break;
-                  case  PARTICLES_CREATIONMETHOD_PLANAR:
-                  case  PARTICLES_CREATIONMETHOD_VOLUMETRIC:
-                      alpha = 2 * moMath.PI *  ( pParticle.Pos.x*m_rows + pParticle.Pos.y) / (m_cols*m_rows );
+                  case  CREAMODE.PARTICLES_CREATIONMETHOD_PLANAR:
+                  case  CREAMODE.PARTICLES_CREATIONMETHOD_VOLUMETRIC:
+                      alpha = 2 * moMath.PI *  ( pParticle.Pos.x*this.m_rows + pParticle.Pos.y) / (this.m_cols*this.m_rows );
                       radius1 = emitS.x / 2.0;
                       radius2 = emitS.y / 2.0;
                       z = 0.0;
@@ -1611,7 +1612,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
                       break;
               }
               break;
-*/
+
 
 /*
           case EMIT.PARTICLES_EMITTERTYPE_TRACKER:
@@ -1901,7 +1902,8 @@ export class moEffectParticlesSimple extends MO.moEffect {
 
 
               var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[i+j*this.m_cols];
-
+              //if (i == 0 && j == 0)
+                //console.log(`par: ${this.m_Rate} D: ${pPar.Age.Duration()} V: ${pPar.Visible}`);
               pPar.pTextureMemory = NULL;
 
               // Reset/Kill out-of-timeline particle....
@@ -1939,7 +1941,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
                       ) {
 
                       pPar.Age.Stop();
-                      console.log("Stopping");
+                      //console.log("Stopping");
                       pPar.Visible = false;
                       pPar.MOId = -1; //reseteamos la textura asociada
 
@@ -2215,14 +2217,18 @@ export class moEffectParticlesSimple extends MO.moEffect {
         this.CalculateForces();
         this.CalculateDerivatives(false,dt);
         if (dt!=0.0)
-        for ( i=0; i<this.m_ParticlesSimpleArray.length; i++ ) {
+        for ( var i=0; i<this.m_ParticlesSimpleArray.length; i++ ) {
           var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[i];
 
           if (pPar && dt != 0.0) {
-            var dp: moVector3f = pPar.dpdt;
-            dp.multiplyScalar( dt );
+            var dp: moVector3f = new moVector3f();
+            dp.copy(pPar.dpdt);
+            dp.multiplyScalar(dt);
+            //if (i == 0)
+            //console.log("dp:", dp);
             pPar.Pos3d.add(dp);
-            var dv: moVector3f = pPar.dvdt;
+            var dv: moVector3f = new moVector3f();
+            dv.copy(pPar.dvdt);
             dv.multiplyScalar(dt);
             pPar.Velocity.add(dv);
           }
@@ -2296,83 +2302,100 @@ export class moEffectParticlesSimple extends MO.moEffect {
 
   CalculateForces( tmparray : boolean = false ) : void
   {
-    /*
-    int i,p1,p2;
+
+    var p1;
+    var p2;
     //moVector3f down(1.0,1.0,-1.0);
-    moVector3f zero(0.0,0.0,0.0);
-    moVector3f f;
-    moVector3f atdis;
-    double len,dx,dy,dz;
+    var zero : moVector3f = new moVector3f(0.0,0.0,0.0);
+    var f: moVector3f = new moVector3f();
+    var atdis : moVector3f;
+    var len;
+    var dx;
+    var dy;
+    var dz;
 
 
-    float left =  - (m_Physics.m_EmitterSize.X()) / 2.0;
-      float top =  m_Physics.m_EmitterSize.Y() / 2.0;
+    var left =  - this.m_Physics.m_EmitterSize.x / 2.0;
+    var top =  this.m_Physics.m_EmitterSize.y / 2.0;
 
-    for ( i=0; i < m_ParticlesSimpleArray.Count(); i++ ) {
+    for ( var i=0; i < this.m_ParticlesSimpleArray.length; i++ ) {
         var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[i];
-        pPar.Force = zero;
+        pPar.Force.copy(zero);
 
         //// Gravitation
-        switch(m_Physics.m_AttractorType) {
-          case PARTICLES_ATTRACTORTYPE_POINT:
-              pPar.Force = ( m_Physics.m_AttractorVector - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
+        switch(this.m_Physics.m_AttractorType) {
+          case ATTYPE.PARTICLES_ATTRACTORTYPE_POINT:
+              pPar.Force.copy(this.m_Physics.m_AttractorVector);
+              pPar.Force.sub(pPar.Pos3d);
+              pPar.Force.multiplyScalar(this.m_Physics.gravitational * pPar.Mass);
+              //if (i == 0)
+                //console.log("attractor:",this.m_Physics.m_AttractorVector," force", pPar.Force, "grav:", this.m_Physics.gravitational, " mass:", pPar.Mass );
               break;
 
-          case PARTICLES_ATTRACTORTYPE_JET:
-              {
-                //pPar.Force = ( m_Physics.m_AttractorVector - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
-                double dot1 = m_Physics.m_AttractorVector.Dot( pPar.Pos3d );
-                double det = m_Physics.m_AttractorVector.length();
-                double mu = 0.0;
-                if (det>0) {
-                    mu = dot1 / det;
-                }
-                pPar.Force = (m_Physics.m_AttractorVector * mu- pPar.Pos3d )*  (m_Physics.gravitational * pPar.Mass );
+          case ATTYPE.PARTICLES_ATTRACTORTYPE_JET:
+            {
+              //pPar.Force = ( m_Physics.m_AttractorVector - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
+              var dot1 = this.m_Physics.m_AttractorVector.dot(pPar.Pos3d);
+              var det = this.m_Physics.m_AttractorVector.length();
+              var mu = 0.0;
+              if (det > 0) {
+                mu = dot1 / det;
               }
+              pPar.Force.copy(this.m_Physics.m_AttractorVector);
+              pPar.Force.multiplyScalar(mu);
+              pPar.Force.sub(pPar.Pos3d);
+              pPar.Force.multiplyScalar(this.m_Physics.gravitational * pPar.Mass);
+            }
+            break;
+            /*
+                      case PARTICLES_ATTRACTORTYPE_TRACKER:
+                          if (m_pTrackerData) {
+                              pPar.Force = ( moVector3f( 0.5f - m_pTrackerData->GetBarycenter().X(), 0.5f - m_pTrackerData->GetBarycenter().Y(), 0.0 ) - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
+                          }
+                          break;
+                      case PARTICLES_ATTRACTORTYPE_GRID:
+                          switch( m_Physics.m_AttractorMode ) {
+                              case PARTICLES_ATTRACTORMODE_STICK:
+                              case PARTICLES_ATTRACTORMODE_ACCELERATION:
+
+                                  pPar.Destination = moVector3f(   ( left + pPar.Pos.X()*pPar.Size.X() + pPar.Size.X()/2.0 )*m_Physics.m_AttractorVector.X() ,
+                                                                  ( top - pPar.Pos.Y()*pPar.Size.Y() - pPar.Size.Y()/2.0 )*m_Physics.m_AttractorVector.Y(),
+                                                                      m_Physics.m_AttractorVector.Z() );
+
+                                  if (m_Physics.m_AttractorMode==PARTICLES_ATTRACTORMODE_STICK && moVector3f( pPar.Destination - pPar.Pos3d ).length() < 0.1 ) {
+                                      pPar.Pos3d = pPar.Destination;
+                                      pPar.Velocity = zero;
+                                      pPar.Force = zero;
+                                  } else pPar.Force = ( pPar.Destination - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
+                                  break;
+                              case PARTICLES_ATTRACTORMODE_LINEAR:
+                                  pPar.Destination = moVector3f(   ( left + pPar.Pos.X()*pPar.Size.X() + pPar.Size.X()/2.0 )*m_Physics.m_AttractorVector.X() ,
+                                                                  ( top - pPar.Pos.Y()*pPar.Size.Y() - pPar.Size.Y()/2.0 )*m_Physics.m_AttractorVector.Y(),
+                                                                      m_Physics.m_AttractorVector.Z() );
+
+                                  pPar.Pos3d = pPar.Pos3d + ( pPar.Destination - pPar.Pos3d) * m_Physics.gravitational;
+
+                                  //atdis =( pPar.Destination - pPar.Pos3d);
+                                  //if ( 0.04 < atdis.length()  && atdis.length() < 0.05 )  {
+                                      //MODebug2->Message( moText("Position reached : X:") + FloatToStr(pPar.Pos3d.X()) + moText(" Y:") + FloatToStr(pPar.Pos3d.Y()) );
+                                // }
+                                  break;
+
+                              default:
+                                  break;
+                          }
+                          break;
+            */
+            default:
               break;
-
-          case PARTICLES_ATTRACTORTYPE_TRACKER:
-              if (m_pTrackerData) {
-                  pPar.Force = ( moVector3f( 0.5f - m_pTrackerData->GetBarycenter().X(), 0.5f - m_pTrackerData->GetBarycenter().Y(), 0.0 ) - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
-              }
-              break;
-          case PARTICLES_ATTRACTORTYPE_GRID:
-              switch( m_Physics.m_AttractorMode ) {
-                  case PARTICLES_ATTRACTORMODE_STICK:
-                  case PARTICLES_ATTRACTORMODE_ACCELERATION:
-
-                      pPar.Destination = moVector3f(   ( left + pPar.Pos.X()*pPar.Size.X() + pPar.Size.X()/2.0 )*m_Physics.m_AttractorVector.X() ,
-                                                      ( top - pPar.Pos.Y()*pPar.Size.Y() - pPar.Size.Y()/2.0 )*m_Physics.m_AttractorVector.Y(),
-                                                          m_Physics.m_AttractorVector.Z() );
-
-                      if (m_Physics.m_AttractorMode==PARTICLES_ATTRACTORMODE_STICK && moVector3f( pPar.Destination - pPar.Pos3d ).length() < 0.1 ) {
-                          pPar.Pos3d = pPar.Destination;
-                          pPar.Velocity = zero;
-                          pPar.Force = zero;
-                      } else pPar.Force = ( pPar.Destination - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
-                      break;
-                  case PARTICLES_ATTRACTORMODE_LINEAR:
-                      pPar.Destination = moVector3f(   ( left + pPar.Pos.X()*pPar.Size.X() + pPar.Size.X()/2.0 )*m_Physics.m_AttractorVector.X() ,
-                                                      ( top - pPar.Pos.Y()*pPar.Size.Y() - pPar.Size.Y()/2.0 )*m_Physics.m_AttractorVector.Y(),
-                                                          m_Physics.m_AttractorVector.Z() );
-
-                      pPar.Pos3d = pPar.Pos3d + ( pPar.Destination - pPar.Pos3d) * m_Physics.gravitational;
-
-                      //atdis =( pPar.Destination - pPar.Pos3d);
-                      //if ( 0.04 < atdis.length()  && atdis.length() < 0.05 )  {
-                          //MODebug2->Message( moText("Position reached : X:") + FloatToStr(pPar.Pos3d.X()) + moText(" Y:") + FloatToStr(pPar.Pos3d.Y()) );
-                    // }
-                      break;
-                  default:
-                      break;
-              }
-              break;
-
           }
 
 
         /// Viscous drag
-        pPar.Force-= pPar.Velocity*m_Physics.viscousdrag;
+        var Vis: moVector3f = new moVector3f();
+        Vis.copy(pPar.Velocity);
+        Vis.multiplyScalar(this.m_Physics.viscousdrag);
+        pPar.Force.sub(Vis);
     }
 
     // Handle the spring interaction
@@ -2542,7 +2565,8 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
               idxt = 0.5 + ( i + j * this.m_cols ) / ( this.m_cols * this.m_rows * 2 );
 
               var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[ i + j*this.m_cols ];
-
+              //if (i == 0 && j == 0)
+              //  console.log(`par: ${pPar.Visible}`);
               switch(this.m_OrderingMode) {
                 case ORDMODE.PARTICLES_ORDERING_MODE_NONE:
                   break;
@@ -2561,10 +2585,12 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
               }
 
               orderedindex+= 1;
-              var part_timer;
+              var part_timer : number;
               if (pPar) {
-                if (pPar.Visible) {
+                if (pPar.Material)
+                  pPar.Material.visible = pPar.Visible;
 
+                if (pPar.Visible) {
 
                   if (this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_MANY
                     || this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_MANYBYORDER
@@ -2598,12 +2624,13 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                   sizeyd2 = pPar.Size.y / 2.0;
                   tsizex = pPar.TSize.x;
                   tsizey = pPar.TSize.y;
-                  part_timer = 0.001 * (pPar.Age.Duration()); // particule ang = durationinmilis / 1000 ...
+                  part_timer = 0.001 * Number(pPar.Age.Duration()); // particule ang = durationinmilis / 1000 ...
 
                   if (this.m_pParticleTime) {
                     if (this.m_pParticleTime.GetData()) {
                       this.m_pParticleTime.GetData().SetDouble(part_timer);
                       this.m_pParticleTime.Update(true);
+                      //if (i==0 && j==0) console.log("ptime", this.m_pParticleTime.GetData().Double());
                     }
                   }
 
@@ -2611,6 +2638,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                     if (this.m_pParticleIndex.GetData()) {
                       this.m_pParticleIndex.GetData().SetLong((pPar.Pos.x) + (pPar.Pos.y) * this.m_cols);
                       this.m_pParticleIndex.Update(true);
+                      //if (i==0 && j==0) console.log("pindex", this.m_pParticleIndex.GetData().Long());
                     }
                   }
 
@@ -2745,6 +2773,8 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                     /////glBindTexture( GL_TEXTURE_2D , glid );
                   }
 
+                  var rgba = this.m_Config.EvalColor(moR(PAR.PARTICLES_PARTICLECOLOR));
+
                   if (pPar.Geometry == undefined) {
                     pPar.Geometry = new MO.moPlaneGeometry( pPar.Size.x*pPar.ImageProportion, pPar.Size.y, 1, 1);
                     /*
@@ -2758,9 +2788,9 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                     pPar.Geometry.computeFaceNormals();
                     pPar.Geometry.computeVertexNormals();
                     */
-                    var rgba = this.m_Config.EvalColor(moR(PAR.PARTICLES_COLOR));
+
                     pPar.Material = new MO.moMaterialBasic({
-                      color: 0xffffff,
+                      /*color: 0xffffff,*/
                       map: this.m_Config.Texture("texture")._texture,
                       side: THREE.DoubleSide,
                       vertexColors: THREE.VertexColors,
@@ -2768,6 +2798,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                       opacity: rgba.a * pPar.Alpha * this.m_EffectState.alpha
                     });
                     pPar.Material.color = new moColor(rgba.r, rgba.g, rgba.b);
+                    //if (i == 0 && j == 0) console.log("col", rgba);
                     pPar.Mesh = new MO.moMesh( pPar.Geometry, pPar.Material);
                     pPar.Model = new MO.moGLMatrixf();
                     pPar.Mesh.SetModelMatrix( pPar.Model );
@@ -2775,6 +2806,12 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                     //console.log("Added Mesh:", pPar.Mesh, pPar);
                   }
 
+                  pPar.Material.color = new moColor(
+                    rgba.r * this.Mat.color.r,
+                    rgba.g * this.Mat.color.g,
+                    rgba.b * this.Mat.color.b);
+                  pPar.Material.map = this.m_Config.Texture("texture")._texture;
+                  pPar.Material.opacity = rgba.a * pPar.Alpha * this.m_EffectState.alpha*this.Mat.opacity;
                   pPar.Model.Scale(
                     this.m_Config.Eval("scalex_particle"),
                     this.m_Config.Eval("scaley_particle"),
@@ -3012,8 +3049,8 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 
     this.UpdateParameters();
 
-    var rgb: any = this.m_Config.EvalColor("color");
-    var ccolor: MO.moColor = new MO.moColor( rgb.r, rgb.g, rgb.b);
+    var rgba: any = this.m_Config.EvalColor("color");
+    var ccolor: MO.moColor = new MO.moColor( rgba.r, rgba.g, rgba.b);
     //console.log("ccolor:", rgb.r,rgb.g,rgb.b);
     //console.log("emittertype:",this.m_Config.Int("emittertype"));
     ///MESH MATERIAL
@@ -3028,7 +3065,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
       this.Mat.needsUpdate = true;
       this.Mat.side = MO.three.DoubleSide;
       this.Mat.wireframe = false;
-      this.Mat.opacity = this.m_Config.Eval("alpha");
+      this.Mat.opacity = this.m_Config.Eval("alpha")*rgba.a;
     }
 
     //Mat2.m_MapGLId = Mat2.m_Map->GetGLId();

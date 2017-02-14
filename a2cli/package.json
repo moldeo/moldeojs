@@ -15,7 +15,12 @@
     "test": "ng test",
     "pree2e": "webdriver-manager update",
     "e2e": "protractor",
-    "typings": "typings"
+    "typings": "typings",
+    "build": "ng build && cp -R src/molrepos dist/molrepos && cp -R src/data dist/data",
+    "prepare": "cp -a electron/. dist/",
+    "electron": "npm run prepare && electron ./dist",
+    "package": "npm run build && npm run prepare && ./node_modules/electron-packager/cli.js dist App --platform=linux --arch=all --out=dist-app --overwrite",
+    "buildelectron": "npm run build && npm run electron"
   },
   "private": true,
   "dependencies": {
@@ -27,7 +32,6 @@
     "@angular/platform-browser": "2.4.2",
     "@angular/platform-browser-dynamic": "2.4.2",
     "@angular/router": "3.4.2",
-    "angular2-http-file-upload": "^1.0.5",
     "bootstrap": "^3.3.7",
     "core-js": "^2.4.1",
     "mathjs": "^3.9.1",
@@ -47,6 +51,8 @@
     "@types/three": "^0.81.0",
     "angular-cli": "1.0.0-beta.24",
     "codelyzer": "~2.0.0-beta.4",
+    "electron": "^1.4.15",
+    "electron-packager": "^8.5.1",
     "jasmine": "^2.5.2",
     "jasmine-core": "2.5.2",
     "jasmine-spec-reporter": "3.1.0",

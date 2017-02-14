@@ -33,10 +33,10 @@ export class MoldeojsViewComponent implements OnInit {
       }
     });
 
-    //this.MoldeoCS.Init({ "consoleconfig": "/molrepos/basic/00_Image/00_Image.mol" } );
-    //this.MoldeoCS.Init({ "consoleconfig": "/molrepos/basic/01_Icon/01_Icon.mol" } );
-    //this.MoldeoCS.Init({ "consoleconfig": "/molrepos/basic/02_Plane/02_Plane.mol" } );
-    this.MoldeoCS.Init({ "consoleconfig": "/molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/00_Image/00_Image.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/01_Icon/01_Icon.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/02_Plane/02_Plane.mol" } );
+    this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol" } );
   }
 
   public animate() {

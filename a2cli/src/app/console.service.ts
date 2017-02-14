@@ -22,6 +22,10 @@ export class ConsoleService {
   constructor( private http: Http ) {
     this.m_Console = new moConsole( http  );
     this.m_pIODeviceManager = new moIODeviceManager();
+    window["Moldeo"] = {
+      "Console": this.m_Console,
+      "IODeviceManager": this.m_pIODeviceManager
+    };
    }
 
   Init(options?: any) : boolean {
