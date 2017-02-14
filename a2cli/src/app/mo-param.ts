@@ -51,7 +51,8 @@ export class moParamInterpolation {
 
 export class moParamDefinition extends moAbstract {
   m_Name : moText;
-  m_Type : moParamType;//type of parameter ()
+  m_Type: moParamType;//type of parameter ()
+  m_TypeStr: moText;
   m_Index : MOint;//index of this parameter on moConfig parameters array
 
   m_Property : moText;//published or not
@@ -71,6 +72,7 @@ export class moParamDefinition extends moAbstract {
     super();
     this.m_Name = p_name;
     this.m_Type = this.ParamTypeFromStr(p_type);
+    this.m_TypeStr = moParamTypeToText[this.m_Type];
     this.m_Property = p_property;
     this.m_Group = p_group;
     this.m_OptionsStr = p_optionsstr;

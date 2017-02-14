@@ -38,6 +38,9 @@ import {
 import { moGetDuration } from "./mo-timer";
 import { moEventList } from "./mo-event-list";
 
+/**
+ * Moldeo Object Constants
+ */
 export const MO_INLET_NAME = 0;
 export const MO_INLET_TYPE = 1;
 
@@ -251,11 +254,6 @@ export class moMobDefinition {
 
 
 }
-
-
-
-
-
 
 
 
@@ -808,7 +806,6 @@ export class moMoldeoObject extends moScript {
             ///es una carpeta pero puede tener otros parametros
             ///
             if ( ! (""+valuebase0.Text() == "") ) {
-
                 ///si tenemos un segundo parametro deberia ser el formato del buffer (JPG o PNG)
                 if (p_refresh) {
 
@@ -817,6 +814,7 @@ export class moMoldeoObject extends moScript {
                   valuebase0.Text(),
                   true,
                   "PNG");
+
                 if (idx>-1) {
 
                     var pTextureBuffer : moTextureBuffer = this.m_pResourceManager.GetTextureMan().GetTextureBuffer(idx);

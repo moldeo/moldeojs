@@ -2329,7 +2329,8 @@ export class moEffectParticlesSimple extends MO.moEffect {
               pPar.Force.sub(pPar.Pos3d);
               pPar.Force.multiplyScalar(this.m_Physics.gravitational * pPar.Mass);
               //if (i == 0)
-                //console.log("attractor:",this.m_Physics.m_AttractorVector," force", pPar.Force, "grav:", this.m_Physics.gravitational, " mass:", pPar.Mass );
+                //console.log("attractor:",this.m_Physics.m_AttractorVector," force",
+                // pPar.Force, "grav:", this.m_Physics.gravitational, " mass:", pPar.Mass );
               break;
 
           case ATTYPE.PARTICLES_ATTRACTORTYPE_JET:
@@ -2350,7 +2351,8 @@ export class moEffectParticlesSimple extends MO.moEffect {
             /*
                       case PARTICLES_ATTRACTORTYPE_TRACKER:
                           if (m_pTrackerData) {
-                              pPar.Force = ( moVector3f( 0.5f - m_pTrackerData->GetBarycenter().X(), 0.5f - m_pTrackerData->GetBarycenter().Y(), 0.0 ) - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
+                              pPar.Force = ( moVector3f( 0.5f - m_pTrackerData->GetBarycenter().X(), 0.5f
+                              - m_pTrackerData->GetBarycenter().Y(), 0.0 ) - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
                           }
                           break;
                       case PARTICLES_ATTRACTORTYPE_GRID:
@@ -2358,26 +2360,35 @@ export class moEffectParticlesSimple extends MO.moEffect {
                               case PARTICLES_ATTRACTORMODE_STICK:
                               case PARTICLES_ATTRACTORMODE_ACCELERATION:
 
-                                  pPar.Destination = moVector3f(   ( left + pPar.Pos.X()*pPar.Size.X() + pPar.Size.X()/2.0 )*m_Physics.m_AttractorVector.X() ,
-                                                                  ( top - pPar.Pos.Y()*pPar.Size.Y() - pPar.Size.Y()/2.0 )*m_Physics.m_AttractorVector.Y(),
+                                  pPar.Destination = moVector3f(   ( left + pPar.Pos.X()*pPar.Size.X()
+                                  + pPar.Size.X()/2.0 )*m_Physics.m_AttractorVector.X() ,
+
+                                  ( top - pPar.Pos.Y()*pPar.Size.Y()- pPar.Size.Y()/2.0 )*m_Physics.m_AttractorVector.Y(),
                                                                       m_Physics.m_AttractorVector.Z() );
 
-                                  if (m_Physics.m_AttractorMode==PARTICLES_ATTRACTORMODE_STICK && moVector3f( pPar.Destination - pPar.Pos3d ).length() < 0.1 ) {
+                                  if (m_Physics.m_AttractorMode==PARTICLES_ATTRACTORMODE_STICK
+                                  && moVector3f( pPar.Destination - pPar.Pos3d ).length() < 0.1 ) {
                                       pPar.Pos3d = pPar.Destination;
                                       pPar.Velocity = zero;
                                       pPar.Force = zero;
-                                  } else pPar.Force = ( pPar.Destination - pPar.Pos3d )*(m_Physics.gravitational * pPar.Mass);
+                                  } else pPar.Force = ( pPar.Destination - pPar.Pos3d )*
+                                  (m_Physics.gravitational * pPar.Mass);
                                   break;
                               case PARTICLES_ATTRACTORMODE_LINEAR:
-                                  pPar.Destination = moVector3f(   ( left + pPar.Pos.X()*pPar.Size.X() + pPar.Size.X()/2.0 )*m_Physics.m_AttractorVector.X() ,
-                                                                  ( top - pPar.Pos.Y()*pPar.Size.Y() - pPar.Size.Y()/2.0 )*m_Physics.m_AttractorVector.Y(),
+                                  pPar.Destination = moVector3f(   ( left + pPar.Pos.X()*pPar.Size.X()
+                                  + pPar.Size.X()/2.0 )*m_Physics.m_AttractorVector.X() ,
+                                                                  ( top - pPar.Pos.Y()*pPar.Size.Y()
+                                                                  - pPar.Size.Y()/2.0 )*m_Physics.m_AttractorVector.Y(),
                                                                       m_Physics.m_AttractorVector.Z() );
 
-                                  pPar.Pos3d = pPar.Pos3d + ( pPar.Destination - pPar.Pos3d) * m_Physics.gravitational;
+                                  pPar.Pos3d = pPar.Pos3d + ( pPar.Destination - pPar.Pos3d) *
+                                   m_Physics.gravitational;
 
                                   //atdis =( pPar.Destination - pPar.Pos3d);
                                   //if ( 0.04 < atdis.length()  && atdis.length() < 0.05 )  {
-                                      //MODebug2->Message( moText("Position reached : X:") + FloatToStr(pPar.Pos3d.X()) + moText(" Y:") + FloatToStr(pPar.Pos3d.Y()) );
+                                      //MODebug2->Message( moText("Position reached : X:")
+                                      // + FloatToStr(pPar.Pos3d.X()) + moText(" Y:")
+                                      // + FloatToStr(pPar.Pos3d.Y()) );
                                 // }
                                   break;
 

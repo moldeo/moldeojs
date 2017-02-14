@@ -9,7 +9,7 @@ import {
 } from "./mo-types";
 import { moText } from "./mo-text";
 import { moAbstract } from "./mo-abstract";
-import { moFileManager, moFile, moDirectory } from "./mo-file-manager";
+import { moFileManager, moFile, moFileType, moDirectory } from "./mo-file-manager";
 import { moDataManager } from "./mo-data-manager";
 import { moGLManager } from "./mo-gl-manager";
 import { moResourceManager } from "./mo-resource-manager";
@@ -198,14 +198,83 @@ export class moTextureBuffer extends moTexture {
   }
 
   LoadCompleted() {
-
+    return this.m_bLoadCompleted;
   }
 
-  UpdateImages() {
+  UpdateImages( maxfiles : MOint ) : boolean {
+    /*var pFile : moFile;
 
+    var counter : MOint = 0;
+
+    if (this.m_pDirectory==undefined) return false;
+
+    if (this.m_ActualImage>=this.m_pDirectory.GetFiles().length ) {
+      this.m_bLoadCompleted = true;
+      return true;
+    }
+
+    if (this.m_ActualImage==0)
+      pFile = this.m_pDirectory.FindFirst();
+    else
+      pFile = this.m_pDirectory.Find(this.m_ActualImage);
+
+    if (pFile)
+    do {
+      if ( pFile.GetType()==moFileType.MO_FILETYPE_LOCAL && pFile.Exists()) {
+*/
+      //LOAD AND UNCOMPRESS IMAGE
+      /*
+      FREE_IMAGE_FORMAT fif;
+      fif = FreeImage_GetFileType( pFile->GetCompletePath(), 0);
+
+      if( fif == FIF_UNKNOWN ) {
+        // try to guess the file format from the file extension
+        fif = FreeImage_GetFIFFromFilename(pFile->GetCompletePath());
+      }
+
+      if( (fif != FIF_UNKNOWN) && FreeImage_FIFSupportsReading(fif) ) {
+        //decodificamos el archivo
+        FIBITMAP* pImage;
+        pImage = FreeImage_Load( fif, pFile->GetCompletePath(), 0);
+
+        //ONCE LOADED SAVE ON EVERY VIDEOBUFFER
+        if (pImage) {
+
+                    //MODebug2->Push( moText("moTextureBuffer::UpdateImages > Trying to load image:") +  (moText)pFile->GetCompletePath() );
+                    if ( LoadImage( m_FolderName + moSlash + pFile->GetFileName() , pImage, m_ActualImage ) ) {
+                        m_ImagesProcessed++;
+                        if ( m_ActualImage == (m_pDirectory->GetFiles().Count()-2) ) {
+                            MODebug2->Log( moText(" ####TEXTUREBUFFER LEVEL HISTOGRAM####"));
+                            var barra;
+                            var nivel;
+                            barra = _moText("###################################################################################");
+
+                            for(int k=0; k<100; k++) {
+                                nivel = barra;
+                                nivel.Left( m_pBufferLevels[k][0].Count() );
+                                MODebug2->Log( moText(" level:") + IntToStr(k) + (moText)nivel );
+                            }
+                        }
+                    }
+          FreeImage_Unload(pImage);
+          pImage = NULL;
+
+        }
+  }*//*
+    }
+
+      this.m_ActualImage++;
+      counter++;
+      if (counter==maxfiles && maxfiles!=(-1))
+        break;
+
+    } while ( (pFile = this.m_pDirectory.FindNext()) );
+*/
+	  return true;
   }
 
 };
+
 export type moTextureBuffers = moTextureBuffer[];
 
 export class moTextureAnimated extends moTexture {

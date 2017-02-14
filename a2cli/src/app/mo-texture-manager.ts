@@ -163,14 +163,18 @@ export class moTextureManager extends moResource {
     if (ptexbuffer) {
         if ( ptexbuffer.Init( p_foldername, p_bufferformat, this.m_pResourceManager ) ) {
             this.m_textures_buffers.push( ptexbuffer );
-            //MODebug2->Push( moText("TextureBuffer created:") + (moText)p_foldername + moText(" idx:") +IntToStr((m_textures_buffers.Count() - 1)) );
+            console.log("tbuffer:", ptexbuffer );
+            //MODebug2->Push( moText("TextureBuffer created:")
+            // + (moText)p_foldername + moText(" idx:") +IntToStr((m_textures_buffers.Count() - 1)) );
             return (this.m_textures_buffers.length - 1);
         } else {
-            //MODebug2->Error( moText("moTextureManager::AddTextureBuffer Error: Initializing texturebuffer: ") + (moText)p_foldername );
+            //MODebug2->Error( moText("moTextureManager::AddTextureBuffer Error: Initializing texturebuffer: ")
+            // + (moText)p_foldername );
         }
 
     } else {
-        //MODebug2->Error( moText("moTextureManager::AddTextureBuffer Error: Creating texturebuffer: ") + (moText)p_foldername );
+        //MODebug2->Error( moText("moTextureManager::AddTextureBuffer Error: Creating texturebuffer: ")
+        // + (moText)p_foldername );
     }
     return -1;
   }

@@ -203,6 +203,7 @@ export const moValueTypeArr = [ "NUM", "CHAR", "INT", "LONG", "FLOAT", "DOUBLE",
 export class moValueDefinition {
 
   m_Type : moValueType = moValueType.MO_VALUE_UNDEFINED;
+  m_TypeStr: moText = "";
   m_Index : MOint = -1;
   m_CodeName : moText = "";
   m_Min: MOfloat = -1.0;
@@ -214,7 +215,8 @@ export class moValueDefinition {
   }
 
   SetType( p_type : moValueType ) : void {
-	  this.m_Type = p_type;
+    this.m_Type = p_type;
+    this.m_TypeStr = this.GetTypeStr();
   }
 
   SetIndex( p_index : MOint ) : void {
@@ -439,7 +441,7 @@ export class moValue {
     if (typeof valuebase == "string") {
       var vB: moValueBase = new moValueBase();
 
-      if (type == "TEXT") {
+      if (type == "TEXT" || type=="TXT") {
         vD.SetType(moValueType.MO_VALUE_TXT);
         vB.SetText(valuebase);
       } else if (type == "LNK") {

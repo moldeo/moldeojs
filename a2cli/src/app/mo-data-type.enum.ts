@@ -61,3 +61,31 @@ export const moDataTypeStr = {
   "MESSAGES": moDataType.MO_DATA_MESSAGES
 };
 
+export const moDataTypeToText = [
+  "NUM",
+  "CHAR",
+  "INT",
+  "LONG",
+  "DOUBLE",
+  "FLOAT",
+  "MIDI",
+  "FUNCTION",
+  "DATA",//may be a pointer to struct or to class
+  "VECTOR2I",//array of values
+  "VECTOR3I",//array of values
+  "VECTOR4I",//array of values
+  "VECTOR2F",//array of values
+  "VECTOR3F",//array of values
+  "VECTOR4F",//array of values
+  "IMAGE",//pointer to an imagesample pointer
+  "IMAGESAMPLE",//pointer to an imagesample pointer
+  "IMAGESAMPLE_FILTERED",//pointer to a TextureFilter
+  "IMAGESAMPLE_TEXTUREBUFFER",//pointer to a texturebuffer pointer
+  "SOUND",//pointer to a soundsample pointer
+  "VIDEO",//pointer to a videosample pointer: video buffer
+  "FONT",
+  "3DMODEL",
+  "TXT",//text,
+  "MESSAGE",
+  "MESSAGES"
+];

@@ -101,7 +101,7 @@ export class moFile extends moAbstract {
         this.m_CompletePath = "" + EXEDIR +moSlash+str;
       }
     }
-    console.log("this.m_CompletePath", this.m_CompletePath);
+    //console.log("this.m_CompletePath", this.m_CompletePath);
   /*  console.log("str", str);
     console.log("this.m_CompletePath", this.m_CompletePath);
     this.m_CompletePath = "" + EXEDIR;
@@ -139,7 +139,7 @@ export class moFile extends moAbstract {
       var FileNameA: moTextArray;
       this.m_Protocol = "file:///";
       //this.m_CompletePath = window["__dirname"]+"" + moSlash + this.m_CompletePath;
-      console.log("moFile opening > ", this.m_CompletePath);
+      //console.log("moFile opening > ", this.m_CompletePath);
       //moText m_Drive = m_CompletePath.Scan(":");
       //std::string str;
       //str = bfs::extension( (char*)m_CompletePath );
@@ -174,7 +174,7 @@ export class moFile extends moAbstract {
 
       this.m_CompletePath = "" + this.m_Path + this.m_FileName + this.m_Extension;
 
-      console.log("moFile > ", this.m_CompletePath, this);
+      //console.log("moFile > ", this.m_CompletePath, this);
 
       if (FS == undefined) { this.m_bExists = true; return; }
 
@@ -199,6 +199,10 @@ export class moFile extends moAbstract {
 
   Exists(): boolean {
     return this.m_bExists;
+  }
+
+  GetType() : moFileType {
+    return this.m_FileType;
   }
 
   GetPath() : moText {
