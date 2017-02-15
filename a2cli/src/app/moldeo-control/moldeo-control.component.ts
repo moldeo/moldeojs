@@ -2,7 +2,7 @@ import { Component, ContentChild, ViewChild, ViewChildren, ElementRef, OnInit } 
 import * as ConsoleInterface from './MoldeoObjects';
 import { ControlProjectContent } from './control-project-content/control-project-content.component';
 import { Http, Headers, RequestOptions } from '@angular/http';
-import { Uploader }      from 'angular2-http-file-upload';
+
 //import { MyUploadItem }  from '../mo-file-manager';
 //import {Observable} from 'rxjs/Rx';
 
