@@ -35,7 +35,7 @@ const appRoutes: Routes = [
     HttpModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [Uploader, ConsoleService ],
+  providers: [ConsoleService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
