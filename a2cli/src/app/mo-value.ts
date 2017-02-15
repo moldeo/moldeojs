@@ -149,7 +149,11 @@ export class moData {
       //eval(t);
       if (this.m_pFun) {
         this.m_LastEval = this.m_pFun.Eval();
+      } else {
+        this.m_LastEval = this.m_Number;
       }
+    } else {
+      this.m_LastEval = this.m_Number;
     }
     return this.m_LastEval;
   }

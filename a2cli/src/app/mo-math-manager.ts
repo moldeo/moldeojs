@@ -594,8 +594,10 @@ export class moMathManager extends moResource {
     var idx: MOint = -1;
     var pre_idx_mob: string = "";
 
-    if ( p_expr.length == 0 )
-          return idx;
+    if ( p_expr.length == 0 || p_expr==undefined ) {
+          //return idx;
+      p_expr = "0";//default empty to zero function constants
+    }
 
     if (p_pMOB) pre_idx_mob = "__" + p_pMOB.GetLabelName() + "__";
 

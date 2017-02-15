@@ -70,8 +70,11 @@ export class moTexture extends moAbstract {
   Init(): boolean { return super.Init(); }
 
   BuildFromFile( p_fullfilename: moText, p_textureloader: TextureLoader, p_callback?:any  ): boolean {
-    console.log("moTexture.BuildFromFile>", p_fullfilename);
-    this._texture = p_textureloader.load("" + p_fullfilename );
+    console.log("moTexture.BuildFromFile >", p_fullfilename);
+    this._texture = p_textureloader.load("" + p_fullfilename, (texture) => {
+      this.m_width = texture.image.width;
+      this.m_height = texture.image.height;
+    } );
     if (this._texture) return true;
     return true;
   }
