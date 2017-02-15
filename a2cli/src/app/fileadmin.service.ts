@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 export const fs : any = window["fs"];
 export const http : any = window["http"];
+export const EXEDIR = (window["__dirname"]==undefined)? "" : window["__dirname"];
 
 @Injectable()
 export class FileAdminService {
@@ -8,7 +9,7 @@ export class FileAdminService {
 
  //////////DOWNLOAD FILE/////////
  downloadFile(url, path, name, ext){
-   var file : any = fs.createWriteStream(path+"/"+name+"."+ext);
+   var file : any = fs.createWriteStream(EXEDIR+"/"+path+"/"+name+"."+ext);
    var request = http.get(url, function(res) {
       res.pipe(file);
       file.on('finish', function() {

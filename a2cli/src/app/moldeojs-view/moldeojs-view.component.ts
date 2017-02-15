@@ -20,10 +20,12 @@ export class MoldeojsViewComponent implements OnInit {
   test: number = 0;
   testmax: number = 120;
 
-  jsonRute : string = '../assets/jsonprueba.json';
+  jsonRute : string = 'assets/jsonprueba.json';
   jsonInit : any;
 
-  constructor(el: ElementRef, private MoldeoCS: ConsoleService, private jsonService: JsonService, private fileadminService: FileAdminService) {
+  constructor(el: ElementRef, private MoldeoCS: ConsoleService,
+    private jsonService: JsonService,
+    private fileadminService: FileAdminService) {
     this.hostElement = el;
 
     jsonService.getJson(this.jsonRute).subscribe(val => {
