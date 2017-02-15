@@ -4,17 +4,6 @@ import { moAbstract } from "./mo-abstract";
 import { moText, moText0, moTextArray } from "./mo-text";
 import { NULL, MOlong, MOint, MOulong, MOuint, MOfloat, MOdouble, MOubyte } from "./mo-types";
 import { moResource } from "./mo-resource";
-import { UploadItem } from 'angular2-http-file-upload';
-
-export class MyUploadItem extends UploadItem {
-    constructor(file: any) {
-        super();
-        //this.url = 'https://your.domain.here/your.endpoint';
-        this.url = 'http://localhost:4201/upload';
-        this.headers = { HeaderName: 'Header Value', AnotherHeaderName: 'Another Header Value' };
-        this.file = file;
-    }
-};
 
 export const FS : any = window["fs"];
 export const EXEDIR = (window["__dirname"]==undefined)? "" : window["__dirname"];
@@ -137,7 +126,7 @@ export class moFile extends moAbstract {
       this.m_bExists = false;
     } else {
       var FileNameA: moTextArray;
-      this.m_Protocol = "file:///";
+      this.m_Protocol = "file://";
       //this.m_CompletePath = window["__dirname"]+"" + moSlash + this.m_CompletePath;
       //console.log("moFile opening > ", this.m_CompletePath);
       //moText m_Drive = m_CompletePath.Scan(":");
@@ -179,7 +168,7 @@ export class moFile extends moAbstract {
       if (FS == undefined) { this.m_bExists = true; return; }
 
       var stat = FS.statSync(this.m_CompletePath);
-      console.log("moFile:",stat);
+      //console.log("moFile:",stat);
 
       this.m_bExists = FS.existsSync(this.m_CompletePath);
 
@@ -577,21 +566,21 @@ export class moFileManager extends moResource {
     }
 
     var pDir: moDirectory = new moDirectory(p_Path, this);
-/*
+    console.log("Opened Dir:", pDir);
     if (pDir) {
       if (pDir.GetType() == moFileType.MO_FILETYPE_LOCAL
         && pDir.Exists() == false) {
-        delete pDir;
+        //delete pDir;
         return false;
       }
-      if (bWaitForDownload && pDir.IsRemote()) {
+      /*if (this.bWaitForDownload && pDir.IsRemote()) {
         while (pDir.GetStatus() != moFileStatus.MO_FILESTATUS_READY) {
           pDir.Update();
         }
-      }
+      }*/
       this.m_Directories.push(pDir);
       return true;
-    }*/
+    }
     return false;
   }
 

@@ -6,7 +6,7 @@ import { moIODevicePluginsArray } from "./mo-plugin";
 export { moIODevice, moIODeviceArray, moIODevices } from "./mo-iodevice";
 export class moIODeviceManager extends moAbstract {
 
-  m_Events : moEventList;
+  m_Events : moEventList = new moEventList();
   m_IODevices : moIODevices = [];
   m_Plugins: moIODevicePluginsArray;
 

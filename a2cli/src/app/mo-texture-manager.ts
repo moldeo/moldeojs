@@ -16,6 +16,7 @@ import {
 } from "./mo-texture";
 import { moDataManager } from "./mo-data-manager";
 import { moFile, moFileManager, moDirectory } from "./mo-file-manager";
+import { moEventList } from "./mo-event-list";
 //export { moTexture, moTextureType, moTextureArray, moTextureMemory, moTextureFrames } from "./mo-texture";
 
 
@@ -95,6 +96,7 @@ export class moTextureManager extends moResource {
 
   AddTexture(p_filename: moText, p_width: MOint = -1, p_height: MOint = -1, p_tex_param: moTexParam = MOUndefinedTex ) : MOint {
     //console.log("AddTexture", p_filename, p_width, p_height, p_tex_param );
+
     var DMan: moDataManager = this.m_pResourceManager.MODataMan;
     var name : moText = p_filename;
     var res : boolean = false;
@@ -192,4 +194,27 @@ export class moTextureManager extends moResource {
       return idx;
     }
   }
-};
+
+
+  Update( Events : moEventList) : void
+  {
+    //console.log("update texturemanager", Events, this);
+    if (Events==undefined) return;
+    //if ( GetId() == MO_MOLDEOOBJECT_UNDEFINED_ID ) return;
+
+    /// Texture buffer loading routine, 10 x ,,,,
+    for(var k=0; k<this.m_textures_buffers.length; k++) {
+
+
+      var pTextureBuffer : moTextureBuffer = this.m_textures_buffers[k];
+
+      if (pTextureBuffer && !pTextureBuffer.LoadCompleted()) {
+
+      //MODebug2->Push( pTextureBuffer->GetName() + moText(":") + IntToStr(pTextureBuffer->GetImagesProcessed() ));
+        pTextureBuffer.UpdateImages( 1 );
+      }
+    }
+  }
+
+
+};//END TEXTUREMANAGER

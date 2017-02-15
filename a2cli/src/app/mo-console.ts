@@ -232,6 +232,17 @@ export class moConsole extends moMoldeoObject {
                   });
                 });
 */
+
+                if(this.m_pResourceManager) {
+
+                    for(var i = 0; i<this.m_pResourceManager.Resources().length; i++) {
+                      var mobject : moMoldeoObject = this.m_pResourceManager.GetResource(i);
+                      if (mobject) {
+                        this.m_MoldeoObjects.push( mobject );
+                      }
+                    }
+
+                  }
                 //adding console!
                 this.m_MoldeoObjects.push(this);
 

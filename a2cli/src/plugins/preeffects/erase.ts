@@ -11,7 +11,7 @@ export class moPreEffectErase extends MO.moPreEffect {
 
   Init(callback?:any): boolean {
     this.RMan = this.m_pResourceManager.GetRenderMan();
-    console.log(`moPreEffec${this.GetName()}.Init`);
+    console.log(`moPreEffect${this.GetName()}.Init`);
     if (this.PreInit((res) => {
 
       if (callback) callback(res);

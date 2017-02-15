@@ -14,9 +14,6 @@ let mainWindow
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 1280, height: 720})
-  console.log(`file://${__dirname}/index.html`);
-  console.log(fs.statSync(`${__dirname}/index.html`));
-  console.log(fs.statSync("/home/fabricio/moldeo/moldeoinstaller/moldeojs/a2cli/dist/molrepos/basic/07_ParticlesSimple/erase.cfg"));
 
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/index.html`)

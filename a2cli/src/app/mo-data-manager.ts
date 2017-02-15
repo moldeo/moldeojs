@@ -685,6 +685,9 @@ export class moDataManager extends moResource {
     NameToPath( p_name: moText ): moText {
       var p: string = "" + this.GetDataPath();
       var s: string = "" + p_name;
+      if (p_name.indexOf(p)==0) {
+        return s;
+      }
       return p+s;
     }
 
@@ -696,22 +699,22 @@ export class moDataManager extends moResource {
 
     GetConsoleConfigName(): moText {
       if (this.m_pDataSessionConfig)
-		    return this.m_pDataSessionConfig.GetDataPath();
+		    return this.m_pDataSessionConfig.GetConsoleConfigName();
       return "";
     }
 		GetAppPath(): moText {
       if (this.m_pDataSessionConfig)
-		    return this.m_pDataSessionConfig.GetDataPath();
+		    return this.m_pDataSessionConfig.GetAppPath();
       return "";
     }
 		GetAppDataPath(): moText {
       if (this.m_pDataSessionConfig)
-		    return this.m_pDataSessionConfig.GetDataPath();
+		    return this.m_pDataSessionConfig.GetAppDataPath();
       return "";
     }
 		GetPluginsPath(): moText {
       if (this.m_pDataSessionConfig)
-		    return this.m_pDataSessionConfig.GetDataPath();
+		    return this.m_pDataSessionConfig.GetPluginsPath();
       return "";
     }
 

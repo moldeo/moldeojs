@@ -126,9 +126,9 @@ export class moTextureBuffer extends moTexture {
   pattern_width: MOint;
   pattern_height : MOint;
 
-	m_ImagesProcessed : MOint;
-	m_bLoadCompleted : boolean;
-  m_ActualImage : MOint;
+	m_ImagesProcessed : MOint = 0;
+	m_bLoadCompleted : boolean = false;
+  m_ActualImage : MOint = 0;
 
 
   m_FolderName : moText;
@@ -144,7 +144,7 @@ export class moTextureBuffer extends moTexture {
   min_contrast : MOint;
 
   //size of max_luminance
-  LevelDiagram: MObyte[];
+  LevelDiagram: MObyte[] = [];
 
   constructor() {
     super();
@@ -158,7 +158,7 @@ export class moTextureBuffer extends moTexture {
     this.m_BufferPath = this.m_BufferPath + "" + p_foldername;
 	  this.m_BufferFormat = p_bufferformat;
 
-
+    console.log("texturebuffer.Init", this.m_BufferPath, this);
 	  this.m_pDirectory = this.m_pResourceManager.GetFileMan().GetDirectory( this.m_BufferPath );
 
 	  if (this.m_pDirectory) {} else return false;
@@ -172,21 +172,23 @@ export class moTextureBuffer extends moTexture {
     m_pShaderCopy = SM->GetShader(SM->GetShaderIndex(moText("shaders/Copy.cfg"),true) );
     */
     this.m_Frames = [];
+    this.m_ActualImage = 0;
+    this.m_bLoadCompleted = false;
 
     this.max_luminance = 0;//100
     this.min_luminance = 100;//0
 
     this.max_contrast = 0;
     this.min_contrast = 0;
-
+/*
     for( var L=0; L<100*100*3; L++) {
         this.LevelDiagram[L] = 0;
-    }
+    }*/
 	  return super.Init();
   }
 
   GetImagesProcessed(): number {
-    return 0;
+    return this.m_Frames.length;
   }
 
   GetFrame( index : number ) : moTextureMemory {
@@ -201,9 +203,18 @@ export class moTextureBuffer extends moTexture {
     return this.m_bLoadCompleted;
   }
 
-  UpdateImages( maxfiles : MOint ) : boolean {
-    /*var pFile : moFile;
+  LoadImage( path: moText): boolean {
+    var idx = this.m_pResourceManager.GetTextureMan().GetTextureMOId(path, true);
+    if (idx > -1) {
+      this.m_Frames.push( this.m_pResourceManager.GetTextureMan().GetTexture(idx) );
+      return true;
+    }
+    return false;
+  }
 
+  UpdateImages( maxfiles : MOint ) : boolean {
+
+    var pFile: moFile;
     var counter : MOint = 0;
 
     if (this.m_pDirectory==undefined) return false;
@@ -218,6 +229,37 @@ export class moTextureBuffer extends moTexture {
     else
       pFile = this.m_pDirectory.Find(this.m_ActualImage);
 
+
+    if (pFile) {
+      //while (pFile) {
+        if (this.LoadImage(pFile.GetCompletePath())) {
+          this.m_ImagesProcessed++;
+        }
+        console.log("Image processed:", this.m_ImagesProcessed, pFile );
+        /*if (pFile.GetType() == moFileType.MO_FILETYPE_LOCAL && pFile.Exists()) {
+          */
+          /*
+          if (this.LoadImage( m_FolderName + moSlash + pFile.GetFileName(), pImage, this.m_ActualImage)) {
+            this.m_ImagesProcessed++;
+            if (this.m_ActualImage == (this.m_pDirectory.GetFiles().length - 2)) {
+            }
+          }
+          */
+          /*
+          this.m_ActualImage++;
+          counter++;
+          if (counter == maxfiles && maxfiles != (-1)) {
+            return true;
+          }
+        }
+        */
+      //}
+      this.m_ActualImage++;
+      pFile = this.m_pDirectory.FindNext();
+      //pFile = null;
+    }
+
+/*
     if (pFile)
     do {
       if ( pFile.GetType()==moFileType.MO_FILETYPE_LOCAL && pFile.Exists()) {

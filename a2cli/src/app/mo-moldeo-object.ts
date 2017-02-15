@@ -1009,6 +1009,30 @@ export class moMoldeoObject extends moScript {
 
   }
 
+  GetState() : moMobState {
+    return this.m_MobState;
+  }
+
+  SetState( p_mobstate : moMobState ) {
+    Object.assign( this.m_MobState, p_mobstate );
+  }
+
+  Activate() : void {
+
+      var mobstate : moMobState = this.GetState();
+
+      mobstate.Activate();
+      this.SetState( mobstate );
+  }
+
+  Deactivate() :void {
+
+      var mobstate : moMobState = this.GetState();
+
+      mobstate.Deactivate();
+      this.SetState( mobstate );
+  }
+
   Activated() {
     return this.m_MobState.Activated();
   }

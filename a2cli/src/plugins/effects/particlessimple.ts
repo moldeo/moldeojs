@@ -850,7 +850,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
         this.original_height = 0;
         this.original_proportion = 1.0;
 
-        console.log(`ParticlesSimple ${this.GetLabelName()}`, this );
+        //console.log(`ParticlesSimple ${this.GetLabelName()}`, this );
         if (callback) callback(res);
       }) == false) {
         return false;
@@ -1791,7 +1791,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
                                 moText("samplebuffer: ")+IntToStr((long)samplebuffer));
             }
   */
-  /*
+
             if (pTexBuf) {
 
                 ///cantidad de imagenes en el buffer
@@ -1803,32 +1803,34 @@ export class moEffectParticlesSimple extends MO.moEffect {
                 if (nim>0) {
 
                     ///Tomamos de GetBufferLevels...
-
+/*
                     moTextureFrames& pTextFrames(pTexBuf->GetBufferLevels( lumindex, 0 ) );
+*/
+                    var pTextFrames: moTexture[] = pTexBuf.m_Frames;
+                    var nc = pTextFrames.length;
+                    var irandom = -1;
 
-                    int nc = pTextFrames.Count();
-                    int irandom = -1;
+                    irandom = moMath.UnitRandom() * nc;
 
-                    irandom = (int)(  moMath.UnitRandom() * nc );
-
-                    moTextureMemory* pTexMem = pTextFrames.GetRef( irandom );
+                    var pTexMem : moTextureMemory = pTextFrames[irandom];
 
                     if (pTexMem) {
-                        pPar.GLId = glidori;
-                        pTexMem->GetReference();
-                        pPar.GLId2 = pTexMem->GetGLId();
+                        //pPar.GLId = glidori;
+                        //pTexMem->GetReference();
+                        //pPar.GLId2 = pTexMem->GetGLId();
                         pPar.pTextureMemory = pTexMem;
-                        if (pTexMem->GetHeight()>0) pPar.ImageProportion =
-                             pTexMem->GetWidth() /  pTexMem->GetHeight();
+                        if (pTexMem.GetHeight() > 0)
+                            pPar.ImageProportion =
+                             pTexMem.GetWidth() /  pTexMem.GetHeight();
                     } else {
-                        pPar.GLId = glidori;
+                        /*pPar.GLId = glidori;
                         pPar.GLId2 = pPar.GLId;
                         pPar.Color.x = (lum )/ 255.0;
                         pPar.Color.y = (lum )/ 255.0;
                         pPar.Color.z = (lum )/ 255.0;
                         pPar.Color.x*= pPar.Color.x;
                         pPar.Color.y*= pPar.Color.y;
-                        pPar.Color.z*= pPar.Color.z;
+                        pPar.Color.z*= pPar.Color.z;*/
                     }
                     //this.MODebug2.Push( moText("creating particle: irandom:") + IntToStr(irandom)
                     // + moText(" count:") + IntToStr(pTexBuf->GetImagesProcessed())
@@ -1836,8 +1838,8 @@ export class moEffectParticlesSimple extends MO.moEffect {
 
                 }
 
-            } else this.MODebug2.Error( _moText("particles error creating texture") );
-  */
+            } else this.MODebug2.Error( "particles error creating texture" );
+
         }
 
         pPar.Size = new moVector2f( this.m_Physics.m_EmitterSize.x / p_cols,
@@ -2033,8 +2035,17 @@ export class moEffectParticlesSimple extends MO.moEffect {
                         //this.m_Config[moR(PARTICLES_TEXTURE)].GetData()->GetGLId(&m_EffectState.tempo, 1, NULL );
                         if (pTexBuf) {
                             var nim = pTexBuf.GetImagesProcessed();
-                            //this.MODebug2.Push( "nim: " + IntToStr(nim) );
-
+                            //console.log( "nim: ", nim);
+                            if (pPar.Material == undefined) {
+                              pPar.Material = new MO.moMaterialBasic({
+                                color: 0xffffff,
+                                map: this.m_Config.Texture("texture")._texture,
+                                side: THREE.DoubleSide,
+                                vertexColors: THREE.VertexColors,
+                                transparent: true,
+                                opacity: 1.0
+                              });
+                            }
                             pPar.ImageProportion = 1.0;
 
                             if (nim>0) {
@@ -2054,14 +2065,16 @@ export class moEffectParticlesSimple extends MO.moEffect {
 
                                 LastImageIndex = irandom;
                                 pPar.ImageIndex = LastImageIndex;
-
+                                //console.log("irandom", irandom);
                                 //this.MODebug2.Push( "irandom: " + IntToStr(irandom) + " rand: " + IntToStr(::rand()) );
 
                                 ////pPar.GLId = pTexBuf.GetFrame( irandom );
 
                                 var pTexMem : moTextureMemory = pTexBuf.GetTexture( irandom );
                                 if (pTexMem) {
+                                    //console.log("pTexMem", pTexMem);
                                     pPar.pTextureMemory = pTexMem;
+                                    pPar.Material.map = pPar.pTextureMemory._texture;
                                     if (pTexMem.GetHeight()>0)
                                     pPar.ImageProportion =  pTexMem.GetWidth() /  pTexMem.GetHeight();
                                   }
@@ -2799,16 +2812,17 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                     pPar.Geometry.computeFaceNormals();
                     pPar.Geometry.computeVertexNormals();
                     */
-
-                    pPar.Material = new MO.moMaterialBasic({
-                      /*color: 0xffffff,*/
-                      map: this.m_Config.Texture("texture")._texture,
-                      side: THREE.DoubleSide,
-                      vertexColors: THREE.VertexColors,
-                      transparent: true,
-                      opacity: rgba.a * pPar.Alpha * this.m_EffectState.alpha
-                    });
-                    pPar.Material.color = new moColor(rgba.r, rgba.g, rgba.b);
+                    if (pPar.Material == undefined) {
+                      pPar.Material = new MO.moMaterialBasic({
+                        /*color: 0xffffff,*/
+                        map: this.m_Config.Texture("texture")._texture,
+                        side: THREE.DoubleSide,
+                        vertexColors: THREE.VertexColors,
+                        transparent: true,
+                        opacity: rgba.a * pPar.Alpha * this.m_EffectState.alpha
+                      });
+                      pPar.Material.color = new moColor(rgba.r, rgba.g, rgba.b);
+                    }
                     //if (i == 0 && j == 0) console.log("col", rgba);
                     pPar.Mesh = new MO.moMesh( pPar.Geometry, pPar.Material);
                     pPar.Model = new MO.moGLMatrixf();
@@ -2821,7 +2835,14 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                     rgba.r * this.Mat.color.r,
                     rgba.g * this.Mat.color.g,
                     rgba.b * this.Mat.color.b);
-                  pPar.Material.map = this.m_Config.Texture("texture")._texture;
+                  if (this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_UNIT ) {
+                    pPar.Material.map = this.m_Config.Texture("texture")._texture;
+                  } else if (this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_MANYBYORDER) {
+                      //
+                    if (pPar.pTextureMemory)
+                      pPar.Material.map = pPar.pTextureMemory._texture;
+                  }
+
                   pPar.Material.opacity = rgba.a * pPar.Alpha * this.m_EffectState.alpha*this.Mat.opacity;
                   pPar.Model.Scale(
                     this.m_Config.Eval("scalex_particle"),

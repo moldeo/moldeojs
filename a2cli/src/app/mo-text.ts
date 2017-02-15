@@ -51,3 +51,7 @@ export class moTextHeap {
 }
 
 export type moTextArray = moText[];
+
+String.prototype["capitalizeFirstLetter"] = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}

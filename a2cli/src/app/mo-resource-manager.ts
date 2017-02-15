@@ -84,6 +84,7 @@ export class moResourceManager extends moAbstract {
       if (this.MOMathMan) { }
       else this.MOMathMan = new moMathManager();
       this.MOMathMan.SetResourceManager(this);
+      //this.m_Resources.push(this.MOMathMan);
 
       if (this.MOFileMan) { }
       else this.MOFileMan = new moFileManager(this.http);
@@ -108,6 +109,8 @@ export class moResourceManager extends moAbstract {
       if (this.MOTextureMan) { }
       else this.MOTextureMan = new moTextureManager();
       this.MOTextureMan.SetResourceManager(this);
+      this.m_Resources.push(this.MOTextureMan);
+
 
       if (this.MOTimeMan) { }
       else this.MOTimeMan = new moTimeManager();
@@ -154,6 +157,7 @@ export class moResourceManager extends moAbstract {
 
       this.MOMathMan.Init();
       this.MOTextureMan.Init();
+      this.MOTextureMan.Activate();
       this.MOGLMan.Init();
       this.MOTimeMan.Init();
       this.MOGuiMan.Init();
@@ -198,5 +202,8 @@ export class moResourceManager extends moAbstract {
       return this.m_Resources;
     }
 
+    GetResource( index : number ) : moResource {
+      return this.m_Resources[index];
+    }
 
 }
