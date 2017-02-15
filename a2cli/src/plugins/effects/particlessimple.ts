@@ -1172,15 +1172,15 @@ export class moEffectParticlesSimple extends MO.moEffect {
       //this.MODebug2.Message(moText("Emiper:")+IntToStr(emiperi));
 
       //this.m_Physics.m_MaxAge = this.m_Config.Int( moR(PAR.PARTICLES_MAXAGE) );
-      this.m_Physics.m_MaxAge = this.m_Config.Int( moR(PAR.PARTICLES_MAXAGE) );
+      this.m_Physics.m_MaxAge = this.m_Config.Eval( moR(PAR.PARTICLES_MAXAGE) );
       //emiperi = this.m_Config[moR(PAR.PARTICLES_EMITIONPERIOD)][MO_SELECTED][0].Int() * midi_emitionperiod;
       //this.m_Physics.m_EmitionPeriod = emiperi;
-      this.m_Physics.m_EmitionPeriod = this.m_Config.Int( moR(PAR.PARTICLES_EMITIONPERIOD) );
+      this.m_Physics.m_EmitionPeriod = this.m_Config.Eval( moR(PAR.PARTICLES_EMITIONPERIOD) );
       //this.m_Physics.m_EmitionPeriod = this.m_Config[moR(PAR.PARTICLES_EMITIONPERIOD)][MO_SELECTED][0].Int();
       //this.MODebug2.Message(moText("Emiperiod:")+IntToStr(this.m_Physics.m_EmitionPeriod));
 
       //this.m_Physics.m_EmitionRate = this.m_Config.Int( moR(PAR.PARTICLES_EMITIONRATE) );
-      this.m_Physics.m_EmitionRate = this.m_Config.Int( moR(PAR.PARTICLES_EMITIONRATE) );
+      this.m_Physics.m_EmitionRate = this.m_Config.Eval( moR(PAR.PARTICLES_EMITIONRATE) );
       this.m_Physics.m_DeathPeriod = this.m_Config.Int( moR(PAR.PARTICLES_DEATHPERIOD) );
 
 

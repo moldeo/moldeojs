@@ -786,7 +786,8 @@ export class moMoldeoObject extends moScript {
                                 + VB.Text()
                                 + " object: "+this.GetName()
                                 + " config: " + this.GetConfigName()
-                                + " label:" + this.GetLabelName());
+                                + " label:" + this.GetLabelName()
+                                + " param:" + param.GetParamDefinition().GetName());
             }
         }
     }
