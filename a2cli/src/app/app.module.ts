@@ -5,7 +5,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule, JsonpModule } from '@angular/http';
-import { Uploader }      from 'angular2-http-file-upload';
 
 import { AppComponent } from './app.component';
 import { ThreeviewerComponent } from './threeviewer/threeviewer.component';
