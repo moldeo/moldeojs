@@ -5,6 +5,9 @@ import { moConsole } from '../mo-console';
 import { moConsoleState } from '../mo-console-state';
 import { ConsoleService } from "../console.service";
 
+import { JsonService } from '../json.service';
+import { FileAdminService } from '../fileadmin.service';
+
 @Component({
   selector: 'moldeojs-view',
   templateUrl: './moldeojs-view.component.html',
@@ -17,8 +20,18 @@ export class MoldeojsViewComponent implements OnInit {
   test: number = 0;
   testmax: number = 120;
 
-  constructor(el: ElementRef, private MoldeoCS: ConsoleService) {
+  jsonRute : string = '../assets/jsonprueba.json';
+  jsonInit : any;
+
+  constructor(el: ElementRef, private MoldeoCS: ConsoleService, private jsonService: JsonService, private fileadminService: FileAdminService) {
     this.hostElement = el;
+
+    jsonService.getJson(this.jsonRute).subscribe(val => {
+      this.jsonInit = val;
+      console.log("JSON:", this.jsonInit);
+
+      fileadminService.downloadFile('http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg',"assets", "nombre", "jpg");
+    });
   }
 
   ngOnInit() {

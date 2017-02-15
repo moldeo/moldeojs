@@ -1,0 +1,140 @@
+{
+  "Bienvenida": [
+    {
+      "Seccion": "Reglas",
+      "id": 394,
+      "Detalles": [
+        {
+          "id": 0,
+          "Descripcion": "Texto Descriptivo",
+          "Firma": "Firma"
+        }
+      ]
+    },
+    {
+      "Seccion": "Mapas",
+      "id": 394,
+      "Detalles": [
+        {
+          "id": 0,
+          "Imagen": "url/imagen",
+          "Titulo": "Titulo Imagen",
+          "Descripcion": "Descripción Imagen"
+        },
+        {
+          "id": 1,
+          "Imagen": "url/imagen",
+          "Titulo": "Titulo Imagen",
+          "Descripcion": "Descripción Imagen"
+        },
+        {
+          "id": 2,
+          "Imagen": "url/imagen",
+          "Titulo": "Titulo Imagen",
+          "Descripcion": "Descripción Imagen"
+        }
+      ]
+    },
+    {
+      "Seccion": "Objetos",
+      "id": 396,
+      "Detalles": [
+        {
+          "id": 0,
+          "Imagen": "url/imagen",
+          "Titulo": "Titulo Imagen",
+          "Descripcion": "Descripción Imagen"
+        },
+        {
+          "id": 1,
+          "Imagen": "url/imagen",
+          "Titulo": "Titulo Imagen",
+          "Descripcion": "Descripción Imagen"
+        },
+        {
+          "id": 2,
+          "Imagen": "url/imagen",
+          "Titulo": "Titulo Imagen",
+          "Descripcion": "Descripción Imagen"
+        }
+      ]
+    },
+    {
+      "Seccion": "Juegos",
+      "id": 397,
+      "Subsecciones": [
+        {
+          "Seccion": "Trivia",
+          "id": 0,
+          "Contenidos": [
+            {
+              "id": 0,
+              "Titulo": "Pregunta 1",
+              "Resumen": "<ol><li>Respuesta1</li><li>Respuesta2</li><li>Respuesta3</li></ol>",
+              "Descripcion": "2",
+              "Detalles": [
+                {
+                  "id": 0,
+                  "Nombre": "TAXON_TIPO_CAMPO",
+                  "Detalle": "Preguntas y Respuesta"
+                }
+              ]
+            },
+            {
+              "id": 0,
+              "Titulo": "Pregunta 2",
+              "Resumen": "<ol><li>Respuesta1</li><li>Respuesta2</li><li>Respuesta3</li></ol>",
+              "Descripcion": "2",
+              "Detalles": [
+                {
+                  "id": 0,
+                  "Nombre": "TAXON_TIPO_CAMPO",
+                  "Detalle": "Preguntas y Respuesta"
+                }
+              ]
+            },
+            {
+              "id": 0,
+              "Titulo": "Pregunta 3",
+              "Resumen": "<ol><li>Respuesta1</li><li>Respuesta2</li><li>Respuesta3</li></ol>",
+              "Descripcion": "2",
+              "Detalles": [
+                {
+                  "id": 0,
+                  "Nombre": "TAXON_TIPO_CAMPO",
+                  "Detalle": "Preguntas y Respuesta"
+                }
+              ]
+            },
+            {
+              "id": 0,
+              "Titulo": "Pregunta 4",
+              "Resumen": "<ol><li>Respuesta1</li><li>Respuesta2</li><li>Respuesta3</li></ol>",
+              "Descripcion": "2",
+              "Detalles": [
+                {
+                  "id": 0,
+                  "Nombre": "TAXON_TIPO_CAMPO",
+                  "Detalle": "Preguntas y Respuesta"
+                }
+              ]
+            },
+            {
+              "id": 0,
+              "Titulo": "Pregunta 5",
+              "Resumen": "<ol><li>Respuesta1</li><li>Respuesta2</li><li>Respuesta3</li></ol>",
+              "Descripcion": "2",
+              "Detalles": [
+                {
+                  "id": 0,
+                  "Nombre": "TAXON_TIPO_CAMPO",
+                  "Detalle": "Preguntas y Respuesta"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

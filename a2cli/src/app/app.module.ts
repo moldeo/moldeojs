@@ -1,6 +1,3 @@
-
-
-
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -15,7 +12,8 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { ConsoleService } from "./console.service";
 
-
+import { JsonService } from './json.service';
+import { FileAdminService } from './fileadmin.service';
 
 const appRoutes: Routes = [
   //{ path: 'about', component: AboutComponent },
@@ -35,7 +33,7 @@ const appRoutes: Routes = [
     HttpModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [ConsoleService ],
+  providers: [ConsoleService, JsonService, FileAdminService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,5 +1,6 @@
 const electron = require('electron')
 const fs = require('fs')
+const http = require('http')
 
 // Module to control application life.
 const app = electron.app
