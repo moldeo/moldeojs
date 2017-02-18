@@ -571,6 +571,10 @@ export type TMapDepthToParticleSimple = {};
 
 export class moEffectParticlesSimple extends MO.moEffect {
 
+  mouse : moVector2f;
+  raycaster: THREE.Raycaster;
+  intersects : any;
+
   RM: MO.moRenderManager;
   GL: MO.moGLManager;
 
@@ -699,6 +703,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
       if (this.m_pParticleTime) {
         this.m_pParticleTime.Init( "particletime", this.m_Inlets.length, "DOUBLE" );
         this.m_Inlets.push( this.m_pParticleTime );
+        this.m_pParticleTime.GetData().SetDouble(0.0);
       }
 
       this.m_pParticleIndex = new moInlet();
@@ -706,6 +711,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
       if (this.m_pParticleIndex) {
         this.m_pParticleIndex.Init( "particleindex", this.m_Inlets.length, "LONG" );
         this.m_Inlets.push( this.m_pParticleIndex );
+        this.m_pParticleIndex.GetData().SetLong(0);
       }
 
 
@@ -894,6 +900,8 @@ export class moEffectParticlesSimple extends MO.moEffect {
   }
 
   ReInit(): void {
+
+
     /*
       MODebug2.Message("moEffectParticlesSimple::ReInit Face construction activated!!!!");
 
@@ -1846,6 +1854,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
                                     this.m_Physics.m_EmitterSize.y / p_rows );
         pPar.Force = new moVector3f( 0.0, 0.0, 0.0 );
 
+        this.m_pParticleIndex.GetData().SetLong(i+j*this.m_rows);
         this.SetParticlePosition( pPar );
 
 
@@ -2631,18 +2640,18 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                       //glBindTexture( GL_TEXTURE_2D, pPar.GLId2 );
                     }
                   }
-                  /*
-                                      if (this.IsInitialized()) {
-                                          if (this.ScriptHasFunction("RunParticle")) {
-                                              this.SelectScriptFunction("RunParticle");
-                                              this.AddFunctionParam( (int) ( i + j*m_cols ) );
-                                              this.AddFunctionParam( dt );
-                                              if (!this.RunSelectedFunction(1)) {
-                                                  this.MODebug2.Error( moText("RunParticle function not executed") );
-                                              }
-                                          }
-                                      }
-                                      */
+
+                if (this.IsInitialized()) {
+                    if (this.ScriptHasFunction("RunParticle")) {
+                        this.SelectScriptFunction("RunParticle");
+                        this.AddFunctionParam( i + j*this.m_cols);
+                        this.AddFunctionParam( this.dt );
+                        if (!this.RunSelectedFunction(1)) {
+                            //this.MODebug2.Error( moText("RunParticle function not executed") );
+                        }
+                    }
+                }
+
 
                   sizexd2 = (pPar.Size.x * pPar.ImageProportion) / 2.0;
                   sizeyd2 = pPar.Size.y / 2.0;
@@ -2824,13 +2833,19 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                       pPar.Material.color = new moColor(rgba.r, rgba.g, rgba.b);
                     }
                     //if (i == 0 && j == 0) console.log("col", rgba);
-                    pPar.Mesh = new MO.moMesh( pPar.Geometry, pPar.Material);
+                    pPar.Mesh = new MO.moMesh(pPar.Geometry, pPar.Material);
+                    pPar.Mesh["userData"]["Particle"] = pPar;
                     pPar.Model = new MO.moGLMatrixf();
                     pPar.Mesh.SetModelMatrix( pPar.Model );
                     this.GroupedParticles.add( pPar.Mesh );
                     //console.log("Added Mesh:", pPar.Mesh, pPar);
+                  } else {
+                    //pPar.Mesh.geometry = new MO.moPlaneGeometry( pPar.Size.x*pPar.ImageProportion, pPar.Size.y, 1, 1);
+                    //Object.assign(pPar.Geometry, Geometry);
+
                   }
 
+                  pPar["selected"] = false;
                   pPar.Material.color = new moColor(
                     rgba.r * this.Mat.color.r,
                     rgba.g * this.Mat.color.g,
@@ -3155,7 +3170,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
       this.Mesh = new MO.moMesh( this.Plane, this.Mat );
     }
     if (this.Mesh && this.Model) {
-      this.Mesh.SetModelMatrix(this.Model);
+      //this.Mesh.SetModelMatrix(this.Model);
     }
 
     if (this.SceneParticles == undefined) {
@@ -3177,7 +3192,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
     ///CAMERA PERSPECTIVE
     //if (this.Camera == undefined) {
       //this.Camera = new MO.moCamera3D();
-      this.Camera = new THREE.PerspectiveCamera(60, 1.0, 0.01, 1000.0);
+      this.Camera = new THREE.PerspectiveCamera(60, this.RM.ScreenProportion(), 0.01, 1000.0);
     //}
 
     this.Camera.translateX(this.m_Physics.m_EyeVector.x);
@@ -3216,13 +3231,86 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 
     this.DrawParticlesSimple(p_tempo, this.m_EffectState /*, parentstate*/);
 
-    ///RENDERING
-    this.RM.Render( this.SceneParticles, this.Camera);
     //console.log("moEffectImage.Draw", this.Scene, this.Camera, this.Mat.map );
+    //if (this.raycaster == undefined)
 
+    if (this.mouse) {
+      var dir: moVector3f;
+      /*
+      var U: moVector3f;
+      var V: moVector3f;
+      var W: moVector3f;
 
+      //U = C - E
+      U = new moVector3f(0.0, 0.0, 0.0);
+      U.add( this.m_Physics.m_TargetViewVector );
+      U.sub( this.m_Physics.m_EyeVector );
+      U.normalize();
+
+      // W = m_UpViewVector
+      W = new moVector3f(0.0, 0.0, 0.0);
+      W.add( this.m_Physics.m_UpViewVector ).normalize();
+
+      // V = UxW
+      V = new moVector3f(0.0, 0.0, 0.0);
+      V.crossVectors(U, W).multiplyScalar(-1).normalize();
+
+      // C' = C + (V*mouse.x + W*mouse.y)
+      V.multiplyScalar( this.mouse.x );
+      W.multiplyScalar( this.mouse.y );
+
+      dir = new moVector3f(0.0, 0.0, 0.0);
+      dir.add( this.m_Physics.m_TargetViewVector );
+      dir.add( V );
+      dir.add( W );
+
+      // dir = C' - E
+      dir.sub( this.m_Physics.m_EyeVector ).normalize();
+*/
+
+      /*
+          var vector = new THREE.Vector3(
+            (event.clientX / window.innerWidth) * 2 - 1,
+            -(event.clientY / window.innerHeight) * 2 + 1,
+            0.5);
+          projector.unprojectVector(vector, camera);
+
+          var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
+      */
+      //2.0 > -0.9
+      //1.28 > -1.35
+      // 1.0033 > -1.73
+      // 1.5 > -1.35 + (this.RM.ScreenProportion()-1.0)*0.45
+      //var ff = -1.73 + (this.RM.ScreenProportion() - 1.0033) * (1.73 - 1.35) / (1.28 - 1.0033);
+      //dir = new moVector3f(this.mouse.x, this.mouse.y * 1.0 / this.RM.ScreenProportion(), ff).normalize();
+      /*
+      dir = new moVector3f(this.mouse.x, this.mouse.y, 0.5);
+      this.Camera.matrixWorldNeedsUpdate = true;
+      //this.raycaster = new THREE.Raycaster(this.Camera.position, dir);*/
+      if (this.raycaster == undefined)
+        this.raycaster = new THREE.Raycaster();
+/*
+      this.raycaster.ray.origin.set( this.Camera.position.x, this.Camera.position.y, this.Camera.position.z);
+			this.raycaster.ray.direction.set( this.mouse.x, this.mouse.y, 0.5 ).unproject( this.Camera ).sub( this.raycaster.ray.origin ).normalize();
+      */
+      this.raycaster.setFromCamera( { x: this.mouse.x, y: this.mouse.y }, this.Camera);
+
+      this.intersects = this.raycaster.intersectObjects(this.SceneParticles.children, true /*recursive*/);
+      for (var i = 0; i < this.intersects.length; i++) {
+        this.intersects[i].object.material.color = new THREE.Color(2.0, 2.0, 2.0);
+        this.intersects[i].object["userData"]["selected"] = true;
+        this.intersects[i].object["userData"]["Particle"]["selected"] = true;
+      }
+      if (this.intersects.length)
+        console.log("this.intersects[i].object:", this.intersects.length, this.intersects);
+      //console.log(`intersecting (${this.intersects.length})`, this.raycaster.ray, this.intersects, this.Camera.position, U, V, W, dir );
+    }
     //this.RM.m_Renderer.setClearColor( ccolor, 1.0);
     //this.RM.m_Renderer.clear(true, true, false);
+
+    ///RENDERING
+    //this.RM.Render( this.Scene, this.Camera);
+    this.RM.Render( this.SceneParticles, this.Camera);
 
     this.EndDraw();
 
@@ -3231,14 +3319,38 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
   Update( p_Event: MO.moEventList ) : void {
     super.Update(p_Event);
 
+    if (p_Event.m_Array.length > 0) {
+      var mevent = p_Event.m_Array[0];
+      if (mevent["type"] == "mousedown" || mevent["type"] == "mousemove") {
+        this.mouse = new THREE.Vector2();
+        this.mouse.x = mevent["clientX"]*2-1.0;
+        this.mouse.y = -1*mevent["clientY"]*2+1.0;
+      }
+      //console.log("moParticlesSimple.Update() > ", this.mouse );
+    } else {
+      this.mouse = null;
+    }
   }
 
   GetDefinition(): MO.moConfigDefinition {
     var p_cdef = super.GetDefinition();
 
-    p_cdef.Add("particlecolor", moParamType.MO_PARAM_COLOR, PAR.PARTICLES_PARTICLECOLOR);
+    //p_cdef.Add("particlecolor", moParamType.MO_PARAM_COLOR, PAR.PARTICLES_PARTICLECOLOR);
 
     return this.m_Config.GetConfigDefinition();
   }
+
+
+
+  ///SCRIPT
+  //
+  //
+  GetParticle( i : number) : moParticlesSimple {
+    if (i>=0 && i < this.m_ParticlesSimpleArray.length) {
+      return this.m_ParticlesSimpleArray[i];
+    }
+    return null;
+  }
+
 
 }

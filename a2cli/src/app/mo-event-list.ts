@@ -123,7 +123,7 @@ export class moEventList extends moAbstract {
 	//moLock	m_lock;
 	First : moEvent = null;
 	Last : moEvent = null;
-
+  m_Array : moEvent[] = [];
   constructor() {
     super();
   }

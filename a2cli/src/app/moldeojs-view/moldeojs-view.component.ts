@@ -20,7 +20,7 @@ export class MoldeojsViewComponent implements OnInit {
   test: number = 0;
   testmax: number = 120;
 
-  jsonRute : string = 'assets/jsonprueba.json';
+  jsonRute : string = 'http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_tema_=Mosaico&output=json';
   jsonInit : any;
 
   constructor(el: ElementRef, private MoldeoCS: ConsoleService,
@@ -53,6 +53,8 @@ export class MoldeojsViewComponent implements OnInit {
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/02_Plane/02_Plane.mol" } );
     this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/museo/mural/mural_partis.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "molrepos/moldeoorg/dante/pajarosdefuego/pajaros_de_fuegoX.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsferaX.mol" } );
   }
 
   public animate() {

@@ -23,9 +23,8 @@ import {
   moParamDefinition, moParamTypeStrs,
   moParamIndex, moParamIndexes, moParamDefinitions
 } from "./mo-param";
+import { moFile, moSlash, moFileManager } from "./mo-file-manager";
 import { moConfig, moConfigDefinition, MO_CONFIG_OK } from "./mo-config";
-import { moSlash } from "./mo-file-manager";
-import { moFileManager } from "./mo-file-manager";
 import { moResourceManager } from "./mo-resource-manager";
 import { moTextureManager } from "./mo-texture-manager";
 import { moTexture, moTextureType, moTextureArray, moTextureBuffer } from "./mo-texture";
@@ -276,7 +275,6 @@ export class moMoldeoObject extends moScript {
 
   /// Puntero al administrador de recursos
   m_pResourceManager : moResourceManager;
-  m_pFileManager: moFileManager;//para leer archivos de configuracion locales y remotos
 
   /// Conectores de salida, Arreglo de moOutlet's
   m_Outlets : moOutlets = [];
@@ -988,13 +986,80 @@ export class moMoldeoObject extends moScript {
 
   /// Corre la funcion de script Run o Compila el nuevo script
   ScriptExeInit() : void {
-
+    if (super.IsInitialized()) {
+        this.ScriptExeUpdate();
+        if (this.ScriptHasFunction("Init")) {
+            this.SelectScriptFunction("Init");
+            this.RunSelectedFunction();
+        }
+    }
   }
   ScriptExeRun(): void {
-
+    if (super.IsInitialized()) {
+        if (this.ScriptHasFunction("Update")) {
+            this.SelectScriptFunction("Update");
+            this.RunSelectedFunction();
+        }
+    }
   }
 
   ScriptExeUpdate(): void {
+     var cs : moText;
+     //cs = this.m_Config.Text( this.__iscript );
+     cs = this.m_Config.Text( "script" );
+     //console.log("ScriptExeUpdate", cs);
+  ///Reinicializamos el script en caso de haber cambiado
+	if ( this.m_Script!=cs && super.IsInitialized()) {
+
+        this.m_Script = cs;
+        var path_fullscript : moText = ""+this.m_pResourceManager.GetDataMan().NameToPath( ""+this.m_Script );
+        var f: moFile;// = new moFile( path_fullscript );
+/*        if (f.Exists()) {
+*/
+          //MODebug2->Message( GetLabelName() +  moText(" script loading : ") + (moText)fullscript );
+
+        if (this.CompileFile(path_fullscript, (res) => {
+            this.SelectScriptFunction("Init");
+            this.RunSelectedFunction();
+          } ) ) {
+
+              //MODebug2->Message( GetLabelName() + moText(" script loaded : ") + (moText)fullscript );
+
+              ///Reinicializamos el script
+
+            //this.SelectScriptFunction("Init");
+
+              /**TODO: revisar uso de offset, para multipantallas
+              moText toffset=moText("");
+
+              toffset = m_Config[moR(CONSOLE_SCRIPT)][MO_SELECTED][1].Text();
+              if (toffset!=moText("")) {
+                  m_ScriptTimecodeOffset = atoi( toffset );
+              } else {
+                  m_ScriptTimecodeOffset = 0;
+              }
+              AddFunctionParam( (int)m_ScriptTimecodeOffset );
+              */
+
+              //this.RunSelectedFunction();
+
+          }// else MODebug2->Error( moText("Couldn't compile lua script ")
+          //+ (moText)fullscript + " config:" + GetConfigName() + " label: " + GetLabelName() );
+/*
+        }
+        //else MODebug2 ->Message("Script file not present. " + (moText)fullscript
+        // + " config: " + GetConfigName() + " label:" + GetLabelName());
+ */
+	}
+
+
+  ///Si tenemos un script inicializado... corremos la funcion Run()
+    if (super.IsInitialized()) {
+        if (this.ScriptHasFunction("Run")) {
+            this.SelectScriptFunction("Run");
+            this.RunSelectedFunction();
+        }
+    }
 
   }
 

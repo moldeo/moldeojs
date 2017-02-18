@@ -12,8 +12,6 @@ import { moIODeviceManager } from './mo-iodevice-manager';
 @Injectable()
 export class ConsoleService {
 
-  //m_ResourceManager: moResourceManager;
-  m_pIODeviceManager: moIODeviceManager;
   m_Console: moConsole;
 
   private updated = new BehaviorSubject(false);
@@ -21,10 +19,8 @@ export class ConsoleService {
 
   constructor( private http: Http ) {
     this.m_Console = new moConsole( http  );
-    this.m_pIODeviceManager = new moIODeviceManager();
     window["Moldeo"] = {
-      "Console": this.m_Console,
-      "IODeviceManager": this.m_pIODeviceManager
+      "Console": this.m_Console
     };
    }
 

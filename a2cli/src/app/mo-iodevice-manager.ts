@@ -6,6 +6,7 @@ import { moIODevicePluginsArray } from "./mo-plugin";
 export { moIODevice, moIODeviceArray, moIODevices } from "./mo-iodevice";
 export class moIODeviceManager extends moAbstract {
 
+  m_MouseEvents: any = [];
   m_Events : moEventList = new moEventList();
   m_IODevices : moIODevices = [];
   m_Plugins: moIODevicePluginsArray;
@@ -38,14 +39,34 @@ export class moIODeviceManager extends moAbstract {
         /**
          * constructor genérico de la clase.
          */
-        Update() : void {
-
-        }
+  Update(): void {
+    this.PollEvents();
+    //console.log(`IO:Update (${this.m_Events.m_Array.length})`);
+    for(var i = 0; i < this.m_IODevices.length; i++) {
+      var piodevice : moIODevice = this.m_IODevices[i];
+      if(piodevice) {
+        if (piodevice.Activated())
+          piodevice.Update(this.m_Events);
+      }
+    }
+  }
 
         /**
          * TODO:
          */
         Init() : boolean {
+
+          window.addEventListener('mousemove', (event) => { this.ProcessEvent(event) }, false);
+          window.addEventListener('mouseclick', (event) => { this.ProcessEvent(event) }, false);
+          window.addEventListener('mouseover', (event) => { this.ProcessEvent(event) }, false);
+          window.addEventListener('mouseenter', (event) => { this.ProcessEvent(event) }, false);
+          window.addEventListener('mouseout', (event) => { this.ProcessEvent(event) }, false);
+          window.addEventListener('mousedown', (event) => { this.ProcessEvent(event) }, false);
+          window.addEventListener('mouseup', (event) => { this.ProcessEvent(event) }, false);
+
+          window.addEventListener('mousewheel', (event) => { this.ProcessEvent(event) }, false);
+
+
           return super.Init();
         }
 
@@ -82,10 +103,33 @@ export class moIODeviceManager extends moAbstract {
          * moMessage en cambio tiene un emisor y un destinatario
          */
         PurgeEvents() : void {
-
+          this.m_Events.m_Array = [];
         }
-
-    PollEvents() : void {
+        ProcessEvent( event : any ) : void {
+          if (event) {
+            //console.log("ProcessEvent:", event, event.type, typeof event);
+            if ( event.type.indexOf("mouse")==0 ) {
+              //console.log("is mouse move!");
+              var mevent = {
+                "type": event.type,
+                "clientX": event.clientX / window.innerWidth,
+                "clientY": event.clientY / window.innerHeight,
+              };
+              this.m_MouseEvents.push( mevent );
+              //console.log("is mouse move!", this.m_MouseEvent);
+            }
+              //console.log("Processed MouseEvent:", this.m_MouseEvent);
+            //}
+          }
+        }
+        PollEvents() : void {
+          //console.log("pollevent>post mouse event", this.m_MouseEvent);
+          if (this.m_MouseEvents.length) {
+            for (var i = 0; i < this.m_MouseEvents.length; i++) {
+              this.m_Events.m_Array.push(this.m_MouseEvents[i]);
+            }
+            this.m_MouseEvents = [];
+          }
 
     }
 }

@@ -760,8 +760,10 @@ export class moConsole extends moMoldeoObject {
 			if (pMOB) {
         if (pMOB.GetType() != moMoldeoObjectType.MO_OBJECT_IODEVICE)
                 ///MO_OBJECT_IODEVICE WERE ALREADY UPDATED VIA m_pIODeviceManager->Update()
-                    if (pMOB.Activated())
+                    if (pMOB.Activated()) {
+                      //console.log("updating obj",pMOB,this.m_pIODeviceManager.GetEvents());
                       pMOB.Update( this.m_pIODeviceManager.GetEvents());
+                    }
 			}
 			RenderMan.EndUpdateObject();
 		}
@@ -843,6 +845,17 @@ export class moConsole extends moMoldeoObject {
   }
 
   Interaction() : boolean {
+    if (this.m_pResourceManager == undefined) return;
+    var RenderMan: moRenderManager = this.m_pResourceManager.GetRenderMan();
+
+    RenderMan.BeginUpdate();
+    if (this.m_pIODeviceManager) {
+  		RenderMan.BeginUpdateDevice();
+      this.m_pIODeviceManager.Update();
+      //TODO: check special keyboard keys...ESC..F12 (reload-change presentation mode)
+      RenderMan.EndUpdateDevice();
+    }
+    RenderMan.EndUpdate();
     return true;
   }
 

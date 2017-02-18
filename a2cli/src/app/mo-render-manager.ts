@@ -88,7 +88,7 @@ export class moRenderManager extends moResource {
     super();
     this.SetName("_rendermanager_");
     this.m_Renderer = new THREE.WebGLRenderer({ alpha: true});
-    this.m_Renderer.setSize( 500, 500);
+    this.m_Renderer.setSize( window.innerWidth, window.innerHeight);
     this.m_Renderer.setClearColor(0xFF000000, 1);
     this.m_Renderer.autoClear = false;
     //console.log("moRenderManager::constructor",  this.renderer);
