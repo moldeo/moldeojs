@@ -584,7 +584,6 @@ export class moEffectParticlesSimple extends MO.moEffect {
   Model: MO.moGLMatrixf;
   Mesh: MO.moMesh;
   Scene: MO.moSceneNode;
-  SceneParticles: MO.moSceneNode;
   GroupedParticles: MO.moGroup;
 
   m_pParticleTime : moInlet;
@@ -1330,18 +1329,18 @@ export class moEffectParticlesSimple extends MO.moEffect {
       //position
       var rpos : number = this.m_Physics.m_RandomPosition;
       var posV : moVector3f = this.m_Physics.m_PositionVector;
-      var posVx: moVector3f = new moVector3f(); posVx.copy(posV);
+      var posV2: moVector3f = new moVector3f(); posV2.copy(posV);
       //velocity
       var rvel : number = this.m_Physics.m_RandomVelocity;
       var velV : moVector3f = this.m_Physics.m_VelocityVector;
-      var velVx: moVector3f = new moVector3f(); velVx.copy(velV);
+      var velV2: moVector3f = new moVector3f(); velV2.copy(velV);
 
-      var randompos: moVector3f = (moMath.fabs(rpos) > 0.0) ? posVx.multiplyScalar(rpos*(0.5-moMath.UnitRandom())): posVx;
+      var randompos: moVector3f = (moMath.fabs(rpos) > 0.0) ? posV2.multiplyScalar(rpos*(0.5-moMath.UnitRandom())): posV2;
       randomposx = randompos.x;
       randomposy = randompos.y;
       randomposz = randompos.z;
 
-      var randomvel: moVector3f = (moMath.fabs(rvel) > 0.0) ? velVx.multiplyScalar(rvel * moMath.UnitRandom()) : velVx;
+      var randomvel: moVector3f = (moMath.fabs(rvel) > 0.0) ? velV2.multiplyScalar(rvel * moMath.UnitRandom()) : velV2;
       randomvelx = randomvel.x;
       randomvely = randomvel.y;
       randomvelz = randomvel.z;
@@ -1875,12 +1874,15 @@ export class moEffectParticlesSimple extends MO.moEffect {
 
         this.m_ParticlesSimpleArray[ i + j*p_cols ] = pPar;
 
-        var pParTmp : moParticlesSimple = new moParticlesSimple();
-        pParTmp.Pos3d = pPar.Pos3d;
-        pParTmp.Velocity = pPar.Velocity;
-        pParTmp.Mass = pPar.Mass;
+
+        var pParTmp: moParticlesSimple = new moParticlesSimple();
+        //Object.assign(pParTmp, pPar);
+        pParTmp.Pos3d.copy( pPar.Pos3d );
+        pParTmp.Velocity.copy( pPar.Velocity );
+        pParTmp.Mass = pPar.Mass ;
         pParTmp.Force = pPar.Force;
         pParTmp.Fixed = pPar.Fixed;
+
         this.m_ParticlesSimpleArrayTmp[ i + j*p_cols]= pParTmp;
 
       }
@@ -2258,6 +2260,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
         break;
       case 1:
         /* Midpoint */
+        /*
         this.Regenerate();
         this.CalculateForces();
         this.CalculateDerivatives(false,dt);
@@ -2291,6 +2294,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
                   pPar.Velocity.add(dv);
               }
         }
+        */
         break;
     }
   }
@@ -2471,19 +2475,19 @@ export class moEffectParticlesSimple extends MO.moEffect {
   CalculateDerivatives( tmparray : boolean, dt : MOdouble ) : void {
     if (tmparray) {
       for ( var i=0; i<this.m_ParticlesSimpleArrayTmp.length; i++) {
-          if (dt>0) this.m_ParticlesSimpleArrayTmp[i].dpdt = this.m_ParticlesSimpleArrayTmp[i].Velocity;
+          if (dt>0) this.m_ParticlesSimpleArrayTmp[i].dpdt.copy(this.m_ParticlesSimpleArrayTmp[i].Velocity);
           if (dt > 0) {
-            this.m_ParticlesSimpleArrayTmp[i].dvdt = this.m_ParticlesSimpleArrayTmp[i].Force;
+            this.m_ParticlesSimpleArrayTmp[i].dvdt.copy( this.m_ParticlesSimpleArrayTmp[i].Force );
             this.m_ParticlesSimpleArrayTmp[i].dvdt.multiplyScalar( 1.0 / this.m_ParticlesSimpleArrayTmp[i].Mass);
           }
 
       }
     } else {
       for ( var i=0; i<this.m_ParticlesSimpleArray.length; i++) {
-        if (dt>0) this.m_ParticlesSimpleArray[i].dpdt = this.m_ParticlesSimpleArray[i].Velocity;
+        if (dt>0) this.m_ParticlesSimpleArray[i].dpdt.copy( this.m_ParticlesSimpleArray[i].Velocity);
 
         if (dt > 0) {
-          this.m_ParticlesSimpleArray[i].dvdt = this.m_ParticlesSimpleArray[i].Force;
+          this.m_ParticlesSimpleArray[i].dvdt.copy( this.m_ParticlesSimpleArray[i].Force );
           this.m_ParticlesSimpleArray[i].dvdt.multiplyScalar( 1.0 / this.m_ParticlesSimpleArray[i].Mass);
         }
 
@@ -2826,6 +2830,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                         /*color: 0xffffff,*/
                         map: this.m_Config.Texture("texture")._texture,
                         side: THREE.DoubleSide,
+                        depthTest: false,
                         vertexColors: THREE.VertexColors,
                         transparent: true,
                         opacity: rgba.a * pPar.Alpha * this.m_EffectState.alpha
@@ -2860,9 +2865,9 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 
                   pPar.Material.opacity = rgba.a * pPar.Alpha * this.m_EffectState.alpha*this.Mat.opacity;
                   pPar.Model.Scale(
-                    this.m_Config.Eval("scalex_particle"),
-                    this.m_Config.Eval("scaley_particle"),
-                    this.m_Config.Eval("scalez_particle"));
+                  this.m_Config.Eval("scalex_particle")*pPar.Scale,
+                    this.m_Config.Eval("scaley_particle")*pPar.Scale,
+                    this.m_Config.Eval("scalez_particle")*pPar.Scale);
                   pPar.Model.Rotate(this.m_Config.Eval("rotatez_particle") * MO.DEG_TO_RAD,
                       0.0, 0.0, 1.0);
                   pPar.Model.Rotate(this.m_Config.Eval("rotatey_particle") * MO.DEG_TO_RAD,
@@ -3101,6 +3106,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
     //console.log("ccolor:", rgb.r,rgb.g,rgb.b);
     //console.log("emittertype:",this.m_Config.Int("emittertype"));
     ///MESH MATERIAL
+
     if (this.Mat==undefined) {
       this.Mat = new MO.moMaterialBasic();
     }
@@ -3121,6 +3127,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
     //Mat2.m_vLight.normalize();
 
     ///MESH GEOMETRY
+    /*
     if (this.Plane == undefined) {
       this.Plane = new MO.moPlaneGeometry(
         1.0,//this.m_Config.Eval("width"),
@@ -3128,19 +3135,10 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
         1, 1);
     }
     if (this.Plane) {
-      /*
-      if (this.Plane.m_Width != this.m_Config.Eval("width")
-        || this.Plane.m_Height != this.m_Config.Eval("height")) {
-        Object.assign(this.Plane, new MO.moPlaneGeometry(
-        1.0,//this.m_Config.Eval("width"),
-        1.0,//this.m_Config.Eval("height"),
-        1, 1));
-      }
-*/
       this.Plane.colors = [ccolor, ccolor, ccolor, ccolor];
       this.Plane.colorsNeedUpdate = true;
     }
-
+*/
     ///MESH MODEL
     if (this.Model==undefined)
       this.Model = new MO.moGLMatrixf().MakeIdentity();
@@ -3152,20 +3150,31 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
         this.m_Config.Eval("scaley"),
         this.m_Config.Eval("scalez"));
 
-      this.Model.Rotate(this.m_Config.Eval("rotatez") * MO.DEG_TO_RAD,
+      this.Model.Rotate(-this.m_Config.Eval("rotatez") * MO.DEG_TO_RAD,
         0.0, 0.0, 1.0);
-      this.Model.Rotate(this.m_Config.Eval("rotatey") * MO.DEG_TO_RAD,
+      this.Model.Rotate(-this.m_Config.Eval("rotatey") * MO.DEG_TO_RAD,
         0.0, 1.0, 0.0);
-      this.Model.Rotate(this.m_Config.Eval("rotatex") * MO.DEG_TO_RAD,
+      this.Model.Rotate(-this.m_Config.Eval("rotatex") * MO.DEG_TO_RAD,
         1.0, 0.0, 0.0);
-
+      // WORLD RELATIVE TO CAMERA...camera must be at 0,0,0
       this.Model.Translate(
-          this.m_Config.Eval("translatex"),
-          this.m_Config.Eval("translatey"),
-          this.m_Config.Eval("translatez"));
+          this.m_Config.Eval("translatex")-this.m_Config.Eval("eyex"),
+          this.m_Config.Eval("translatey")-this.m_Config.Eval("eyey"),
+          this.m_Config.Eval("translatez")-this.m_Config.Eval("eyez"));
 
     }
 
+    if (this.Scene == undefined) {
+        this.Scene = new MO.moSceneNode();
+    }
+    if (this.GroupedParticles == undefined) {
+      this.GroupedParticles = new MO.moGroup();
+      this.Scene.add(this.GroupedParticles);
+    } else {
+      this.GroupedParticles.SetModelMatrix(this.Model);
+    }
+
+/* TODO: add guidelines / axes ?
     if (this.Mesh==undefined) {
       this.Mesh = new MO.moMesh( this.Plane, this.Mat );
     }
@@ -3173,144 +3182,57 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
       //this.Mesh.SetModelMatrix(this.Model);
     }
 
-    if (this.SceneParticles == undefined) {
-        this.SceneParticles = new MO.moSceneNode();
-    }
-    if (this.GroupedParticles == undefined) {
-      this.GroupedParticles = new MO.moGroup();
-      this.SceneParticles.add(this.GroupedParticles);
-    } else {
-      this.GroupedParticles.SetModelMatrix(this.Model);
-    }
-
     if (this.Scene==undefined) {
       this.Scene = new MO.moSceneNode();
       this.Scene.add(this.Mesh);
     }
-
+*/
 
     ///CAMERA PERSPECTIVE
-    //if (this.Camera == undefined) {
+    if (this.Camera == undefined) {
       //this.Camera = new MO.moCamera3D();
       this.Camera = new THREE.PerspectiveCamera(60, this.RM.ScreenProportion(), 0.01, 1000.0);
-    //}
-
-    this.Camera.translateX(this.m_Physics.m_EyeVector.x);
-    this.Camera.translateY(this.m_Physics.m_EyeVector.y);
-    this.Camera.translateZ(this.m_Physics.m_EyeVector.z);
-    this.Camera.lookAt(this.m_Physics.m_TargetViewVector as THREE.Vector3);
-
-    //}
-
-
+      var lookat: moVector3f = new moVector3f();
+      lookat.copy(this.m_Physics.m_TargetViewVector)
+        .sub(this.m_Physics.m_EyeVector)
+        .normalize();
+      this.Camera.translateX(0);
+      this.Camera.translateY(0);
+      this.Camera.translateZ(0);
+      this.Camera.lookAt(lookat);
       this.Camera.frustumCulled = true;
       this.Camera.castShadow = false;
 
-    this.GL.SetDefaultPerspectiveView(
+/* TODO: fix lookat function to imitate THREE.Camera quaternions, and World Direction
+      this.GL.SetDefaultPerspectiveView(
       this.RM.m_Renderer.getSize().width,
       this.RM.m_Renderer.getSize().height);
-      /*
-    this.GL.LookAt(   this.m_Physics.m_EyeVector.x,
-                      this.m_Physics.m_EyeVector.y,
-                      this.m_Physics.m_EyeVector.z,
-                      this.m_Physics.m_TargetViewVector.x,
-                      this.m_Physics.m_TargetViewVector.y,
-                      this.m_Physics.m_TargetViewVector.z,
-                      this.m_Physics.m_UpViewVector.x,
-                      this.m_Physics.m_UpViewVector.y,
-                      this.m_Physics.m_UpViewVector.z );
-                      */
-    //this.Camera.position = this.m_Physics.m_EyeVector;
-    //this.Camera.projectionMatrix = this.GL.GetProjectionMatrix();
-    //this.Camera = this.m_Physics.m_TargetViewVector as THREE.Vector3;
-
-    //console.log("this.Camera:", this.Camera, this.m_Physics.m_EyeVector,
-    //  this.m_Physics.m_TargetViewVector, this.m_Physics.m_UpViewVector);
-
-    //this.RM.Render(this.Scene, this.Camera);
+      this.GL.LookAt( 0.0, 0.0, 0.0,
+                      lookat.x, lookat.y, lookat.z,
+                      0.0, 1.0, 0.0);
+      console.log("Camera", this.Camera, " GL:", this.GL.m_ProjectionMatrix);
+      */
+    }
 
     this.DrawParticlesSimple(p_tempo, this.m_EffectState /*, parentstate*/);
 
-    //console.log("moEffectImage.Draw", this.Scene, this.Camera, this.Mat.map );
-    //if (this.raycaster == undefined)
-
     if (this.mouse) {
-      var dir: moVector3f;
-      /*
-      var U: moVector3f;
-      var V: moVector3f;
-      var W: moVector3f;
-
-      //U = C - E
-      U = new moVector3f(0.0, 0.0, 0.0);
-      U.add( this.m_Physics.m_TargetViewVector );
-      U.sub( this.m_Physics.m_EyeVector );
-      U.normalize();
-
-      // W = m_UpViewVector
-      W = new moVector3f(0.0, 0.0, 0.0);
-      W.add( this.m_Physics.m_UpViewVector ).normalize();
-
-      // V = UxW
-      V = new moVector3f(0.0, 0.0, 0.0);
-      V.crossVectors(U, W).multiplyScalar(-1).normalize();
-
-      // C' = C + (V*mouse.x + W*mouse.y)
-      V.multiplyScalar( this.mouse.x );
-      W.multiplyScalar( this.mouse.y );
-
-      dir = new moVector3f(0.0, 0.0, 0.0);
-      dir.add( this.m_Physics.m_TargetViewVector );
-      dir.add( V );
-      dir.add( W );
-
-      // dir = C' - E
-      dir.sub( this.m_Physics.m_EyeVector ).normalize();
-*/
-
-      /*
-          var vector = new THREE.Vector3(
-            (event.clientX / window.innerWidth) * 2 - 1,
-            -(event.clientY / window.innerHeight) * 2 + 1,
-            0.5);
-          projector.unprojectVector(vector, camera);
-
-          var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
-      */
-      //2.0 > -0.9
-      //1.28 > -1.35
-      // 1.0033 > -1.73
-      // 1.5 > -1.35 + (this.RM.ScreenProportion()-1.0)*0.45
-      //var ff = -1.73 + (this.RM.ScreenProportion() - 1.0033) * (1.73 - 1.35) / (1.28 - 1.0033);
-      //dir = new moVector3f(this.mouse.x, this.mouse.y * 1.0 / this.RM.ScreenProportion(), ff).normalize();
-      /*
-      dir = new moVector3f(this.mouse.x, this.mouse.y, 0.5);
-      this.Camera.matrixWorldNeedsUpdate = true;
-      //this.raycaster = new THREE.Raycaster(this.Camera.position, dir);*/
       if (this.raycaster == undefined)
         this.raycaster = new THREE.Raycaster();
-/*
-      this.raycaster.ray.origin.set( this.Camera.position.x, this.Camera.position.y, this.Camera.position.z);
-			this.raycaster.ray.direction.set( this.mouse.x, this.mouse.y, 0.5 ).unproject( this.Camera ).sub( this.raycaster.ray.origin ).normalize();
-      */
-      this.raycaster.setFromCamera( { x: this.mouse.x, y: this.mouse.y }, this.Camera);
 
-      this.intersects = this.raycaster.intersectObjects(this.SceneParticles.children, true /*recursive*/);
+      this.raycaster.setFromCamera({ x: this.mouse.x, y: this.mouse.y }, this.Camera);
+      this.intersects = this.raycaster.intersectObjects(this.Scene.children, true /*recursive*/);
       for (var i = 0; i < this.intersects.length; i++) {
         this.intersects[i].object.material.color = new THREE.Color(2.0, 2.0, 2.0);
         this.intersects[i].object["userData"]["selected"] = true;
         this.intersects[i].object["userData"]["Particle"]["selected"] = true;
       }
-      if (this.intersects.length)
-        console.log("this.intersects[i].object:", this.intersects.length, this.intersects);
-      //console.log(`intersecting (${this.intersects.length})`, this.raycaster.ray, this.intersects, this.Camera.position, U, V, W, dir );
+      //if (this.intersects.length)
+        //console.log("this.intersects[i].object:", this.intersects.length, this.intersects);
     }
-    //this.RM.m_Renderer.setClearColor( ccolor, 1.0);
-    //this.RM.m_Renderer.clear(true, true, false);
 
     ///RENDERING
-    //this.RM.Render( this.Scene, this.Camera);
-    this.RM.Render( this.SceneParticles, this.Camera);
+    this.RM.Render( this.Scene, this.Camera);
 
     this.EndDraw();
 

@@ -87,7 +87,7 @@ export class moEffectIcon extends MO.moEffect {
       1.0);
 
       this.Model.Rotate(
-          this.m_Config.Eval("rotate"),
+          -this.m_Config.Eval("rotate")*MO.moMath.DEG_TO_RAD,
           0.0,
           0.0,
           1.0);

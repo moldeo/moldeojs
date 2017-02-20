@@ -118,6 +118,12 @@ export class moEffectManager extends moAbstract {
       //m_pMoldeoObjects->Add( (moMoldeoObject*) peffect );
       peffect.SetResourceManager( this.m_pResourceManager );
 
+      if (moMoldeoObjectType.MO_OBJECT_EFFECT <= MDef.GetType()
+        && MDef.GetType() <= moMoldeoObjectType.MO_OBJECT_MASTEREFFECT) {
+        if (p_activate) (peffect as moEffect).Activate();
+        else (peffect as moEffect).Deactivate();
+      }
+
       if (peffect.GetName()+"" == "scene"
         || peffect.GetName()+"" == "sequence") {
         peffect.Set( this.m_pEffectManager);

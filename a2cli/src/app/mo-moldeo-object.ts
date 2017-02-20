@@ -319,25 +319,29 @@ export class moMoldeoObject extends moScript {
     this.InletScreenWidth = new moInlet();
     if (this.InletScreenWidth) {
       this.InletScreenWidth.Init( "screen_width", this.m_Inlets.length, "DOUBLE" );
-      this.m_Inlets.push( this.InletScreenWidth );
+      this.m_Inlets.push(this.InletScreenWidth);
+      this.m_InletsStr["screen_width"] = this.InletScreenWidth;
     }
 
     this.InletScreenHeight = new moInlet();
     if (this.InletScreenHeight) {
       this.InletScreenHeight.Init( "screen_height", this.m_Inlets.length, "DOUBLE" );
       this.m_Inlets.push( this.InletScreenHeight );
+      this.m_InletsStr["screen_height"] = this.InletScreenHeight;
     }
 
     this.InletTimeabs = new moInlet();
     if (this.InletTimeabs) {
       this.InletTimeabs.Init( "timeabs", this.m_Inlets.length, "DOUBLE" );
       this.m_Inlets.push(this.InletTimeabs);
+      this.m_InletsStr["timeabs"] = this.InletTimeabs;
     }
 
     this.InletPreconfig = new moInlet();
     if (this.InletPreconfig) {
       this.InletPreconfig.Init( "preconfig", this.m_Inlets.length, "INT" );
       this.m_Inlets.push(this.InletPreconfig);
+      this.m_InletsStr["preconfig"] = this.InletPreconfig;
     }
 
     var confignamecompleto : moText = "";
@@ -1085,18 +1089,20 @@ export class moMoldeoObject extends moScript {
 
   Activate() : void {
 
-      var mobstate : moMobState = this.GetState();
+      //var mobstate : moMobState = this.GetState();
 
-      mobstate.Activate();
-      this.SetState( mobstate );
+      //mobstate.Activate();
+      //this.SetState( mobstate );
+    this.GetState().Activate();
   }
 
   Deactivate() :void {
 
-      var mobstate : moMobState = this.GetState();
+      //var mobstate : moMobState = this.GetState();
 
-      mobstate.Deactivate();
-      this.SetState( mobstate );
+     // mobstate.Deactivate();
+      //this.SetState( mobstate );
+      this.GetState().Deactivate();
   }
 
   Activated() {

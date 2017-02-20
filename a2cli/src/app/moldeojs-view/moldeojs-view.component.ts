@@ -27,13 +27,13 @@ export class MoldeojsViewComponent implements OnInit {
     private jsonService: JsonService,
     private fileadminService: FileAdminService) {
     this.hostElement = el;
-
+/*
     jsonService.getJson(this.jsonRute).subscribe(val => {
       this.jsonInit = val;
       console.log("JSON:", this.jsonInit);
 
       fileadminService.downloadFile('http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg',"assets", "nombre", "jpg");
-    });
+    });*/
   }
 
   ngOnInit() {
@@ -51,10 +51,12 @@ export class MoldeojsViewComponent implements OnInit {
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/00_Image/00_Image.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/01_Icon/01_Icon.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/02_Plane/02_Plane.mol" } );
-    this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol" } );
-    //this.MoldeoCS.Init({ "consoleconfig": "molrepos/museo/mural/mural_partis.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol" } );
+    this.MoldeoCS.Init({ "consoleconfig": "molrepos/museo/mural/mural_partis.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/moldeoorg/dante/pajarosdefuego/pajaros_de_fuegoX.mol" } );
-    //this.MoldeoCS.Init({ "consoleconfig": "molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsferaX.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsfera.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "molrepos/samples/SimpleProject/simple_projectX.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "molrepos/samples/CicloDelAgua/CicloDelAguaX.mol" } );
   }
 
   public animate() {

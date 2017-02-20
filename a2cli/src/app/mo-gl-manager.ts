@@ -150,7 +150,12 @@ export class moGLManager extends moResource {
     if (aspect == 0.0) {
       aspect = this.m_Viewport.GetProportion();
     }
+    /*
     this.m_ProjectionMatrix.MakePerspective(fovy, aspect, znear, zfar);
+    var Cam: THREE.Camera = new THREE.PerspectiveCamera(fovy, aspect, znear, zfar);
+    */
+    //check for errors
+    //console.log("SetPerspectiveView: ",this.m_ProjectionMatrix, "THREE.PerspectiveCamera:",Cam.projectionMatrix);
   }
 
   SetDefaultPerspectiveView(p_width: MOint, p_height: MOint): void {

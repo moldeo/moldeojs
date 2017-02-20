@@ -38,60 +38,69 @@ export const PluginsDefinitionsMap = {};
 
 /// PreEffect Erase ====================================================================
 import { moPreEffectErase } from "../plugins/preeffects/erase";
-PluginsDefinitions[0] = new moPluginDefinition(
+PluginsDefinitions.push( new moPluginDefinition(
   "erase",
   "/plugins/preeffects/erase.ts",
   moMoldeoObjectType.MO_OBJECT_PREEFFECT,
-  moPreEffectErase );
+moPreEffectErase ) );
+
+/// PreEffect MirrorG ====================================================================
+import { moPreEffectMirrorG } from "../plugins/preeffects/mirrorg";
+PluginsDefinitions.push( new moPluginDefinition(
+  "mirrorg",
+  "/plugins/preeffects/mirrorg.ts",
+  moMoldeoObjectType.MO_OBJECT_PREEFFECT,
+moPreEffectMirrorG ));
 
 /// Effect Image ====================================================================
 import { moEffectImage } from "../plugins/effects/image";
-PluginsDefinitions[1] = new moPluginDefinition(
+PluginsDefinitions.push( new moPluginDefinition(
   "image",
   "/plugins/effects/image.ts",
   moMoldeoObjectType.MO_OBJECT_EFFECT,
-  moEffectImage );
+moEffectImage ));
 
 /// Effect Icon ====================================================================
 import { moEffectIcon } from "../plugins/effects/icon";
-PluginsDefinitions[2] = new moPluginDefinition(
+PluginsDefinitions.push( new moPluginDefinition(
   "icon",
   "/plugins/effects/icon.ts",
   moMoldeoObjectType.MO_OBJECT_EFFECT,
-  moEffectIcon );
+moEffectIcon ));
 
 /// Effect Plane ====================================================================
 import { moEffectPlane } from "../plugins/effects/plane";
-PluginsDefinitions[3] = new moPluginDefinition(
+PluginsDefinitions.push( new moPluginDefinition(
   "plane",
   "/plugins/effects/plane.ts",
   moMoldeoObjectType.MO_OBJECT_EFFECT,
-  moEffectPlane );
+moEffectPlane ) );
 
 /// Effect Particles Simple ====================================================================
 import { moEffectParticlesSimple } from "../plugins/effects/particlessimple";
-PluginsDefinitions[4] = new moPluginDefinition(
+PluginsDefinitions.push( new moPluginDefinition(
   "particlessimple",
   "/plugins/effects/particlessimple.ts",
   moMoldeoObjectType.MO_OBJECT_EFFECT,
-  moEffectParticlesSimple );
-
+moEffectParticlesSimple ) );
+/*
 export const PluginsTree = {
   "preeffects": {
-    "erase": PluginsDefinitions[0]
+    "erase": PluginsDefinitions[0],
+    "mirrorg": PluginsDefinitions[1]
   },
   "effects": {
-    "image": PluginsDefinitions[1],
-    "icon": PluginsDefinitions[2],
-    "plane": PluginsDefinitions[3],
-    "particlessimple": PluginsDefinitions[4]
+    "image": PluginsDefinitions[2],
+    "icon": PluginsDefinitions[3],
+    "plane": PluginsDefinitions[4],
+    "particlessimple": PluginsDefinitions[5]
   },
   "posteffects": {},
   "mastereffects": {},
   "iodevices": {},
   "resources": {}
 };
-
+*/
 
 
 export class moPlugin {

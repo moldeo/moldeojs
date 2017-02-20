@@ -1,7 +1,11 @@
 
 import { moEffectState } from "./mo-effect-state";
 export { moEffectState } from "./mo-effect-state";
-import { moConfig, moConfigDefinition } from "./mo-config";
+import {
+  moConfig, moConfigDefinition,
+  MO_PARAM_NOT_FOUND, MO_PARAM_NOT_SEL, MO_SELECTED,
+  MO_CONFIG_OK, MO_CONFIGFILE_NOT_FOUND
+} from "./mo-config";
 import { moMoldeoObject, moMobState } from "./mo-moldeo-object";
 import { moMoldeoObjectType } from "./mo-moldeo-object-type.enum";
 import { moEffectManager } from "./mo-effect-manager";
@@ -11,10 +15,12 @@ import { moParamType, moParamTypeStrs, moParamTypeToText } from "./mo-param";
 import { moDataType, moData, moValue, moDataTypeStr } from "./mo-value";
 import {
   MO_DEACTIVATED, MO_ACTIVATED,
-  MO_ON, MO_OFF, MO_ERROR, MO_TRUE, MO_FALSE
+  MO_ON, MO_OFF, MO_ERROR, MO_TRUE, MO_FALSE,
+  MOint, MOdouble
 } from "./mo-types";
 import { moInlet, moOutlet, moConnector, moConnections } from "./mo-connectors";
 import * as moMath from "./mo-math";
+import { moMathFunction } from "./mo-math-manager";
 import { moTimerState, moTimer } from "./mo-timer";
 
 export class moEffect extends moMoldeoObject {
@@ -29,6 +35,9 @@ export class moEffect extends moMoldeoObject {
   InletMilliseconds: moInlet;
   InletSeconds : moInlet;
 
+  isyncro: MOint = -1;
+  iphase: MOint = -1;
+
   constructor() {
     super();
     this.m_EffectState = new moEffectState();
@@ -37,18 +46,23 @@ export class moEffect extends moMoldeoObject {
 
   PreInit(callback?:any): boolean {
     this.m_EffectState.Init();
-    if (this.m_pResourceManager==undefined) return false;
+    if (this.m_pResourceManager == undefined) {
+      console.error("no resource manager");
+      return false;
+    }
 
     this.InletTimems = new moInlet();
     if (this.InletTimems) {
       this.InletTimems.Init( "timems", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
       this.m_Inlets.push(this.InletTimems);
+      this.m_InletsStr["timems"] = this.InletTimems;
     }
 
     this.InletTimes = new moInlet();
     if (this.InletTimes) {
       this.InletTimes.Init( "times", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
       this.m_Inlets.push(this.InletTimes);
+      this.m_InletsStr["times"] = this.InletTimes;
     }
 
     /** Crea INLETS INTERNOS, es decir que no tienen un parametro asociado... (especificamente para su uso generico*/
@@ -57,6 +71,7 @@ export class moEffect extends moMoldeoObject {
       //moDataType.MO_DATA_NUMBER_DOUBLE
       this.InletTime.Init( "time", this.m_Inlets.length, "DOUBLE"  );
       this.m_Inlets.push(this.InletTime);
+      this.m_InletsStr["time"] = this.InletTime;
     }
 
     this.InletTempo = new moInlet();
@@ -65,12 +80,14 @@ export class moEffect extends moMoldeoObject {
       //param.SetExternData( Inlet->GetData() );
       this.InletTempo.Init( "tempo", this.m_Inlets.length, "DOUBLE" );
       this.m_Inlets.push(this.InletTempo);
+      this.m_InletsStr["tempo"] = this.InletTempo;
     }
 
     this.InletT = new moInlet();
     if (this.InletT) {
       this.InletT.Init( "t", this.m_Inlets.length, "DOUBLE" );
       this.m_Inlets.push(this.InletT);
+      this.m_InletsStr["t"] = this.InletT;
     }
 
 
@@ -78,46 +95,52 @@ export class moEffect extends moMoldeoObject {
     if (this.InletMilliseconds) {
       this.InletMilliseconds.Init( "milliseconds", this.m_Inlets.length, "DOUBLE" );
       this.m_Inlets.push(this.InletMilliseconds);
+      this.m_InletsStr["milliseconds"] = this.InletMilliseconds;
     }
 
     this.InletSeconds = new moInlet();
     if (this.InletSeconds) {
       this.InletSeconds.Init( "seconds", this.m_Inlets.length, "DOUBLE" );
       this.m_Inlets.push(this.InletSeconds);
+      this.m_InletsStr["seconds"] = this.InletSeconds;
     }
 
     if (super.Init((res) => {
+
+      ///Al fin luego de levantar todas las configuraciones,
+      // creamos los conectores (Inlets <NO INTERNOS> y Outlets)
+      // resolvemos los valores de cada parametros del config
+      this.isyncro = this.m_Config.GetParamIndex("syncro");
+      this.iphase = this.m_Config.GetParamIndex("phase");
       this.CreateConnectors();
-      //console.log( `moEffect.PreInit OK! ${this.GetLabelName()}`, this);
+      console.log( `moEffect.PreInit OK! ${this.GetLabelName()}:(${this.m_Config.m_Params.length})<-I[${this.m_Inlets.length}]->O[${this.m_Outlets.length}]]`, this);
       if (callback) callback(res);
     } )) {
-      ///Al fin luego de levantar todas las configuraciones, creamos los conectores (Inlets <NO INTERNOS> y Outlets)
-
+      // esta función es asincrónica ahora
     } else return false;
 
     return true;
   }
 
   BeginDraw(p_tempo: moTempo, parentstate : moEffectState = null ): void {
-/*
-    MOdouble syncrotmp;
 
-    if(isyncro != MO_PARAM_NOT_FOUND) {
-      moData *sync = m_Config.GetParam(isyncro).GetData();
+    var syncrotmp : MOdouble;
+
+    if(this.isyncro != MO_PARAM_NOT_FOUND) {
+      var sync : moData = this.m_Config.GetParam(this.isyncro).GetData();
       if (sync) {
-        moMathFunction* pFun = sync->Fun();
-        if (sync->Type()==MO_DATA_FUNCTION && pFun) {
-          //m_EffectState.tempo.syncro = pFun->Eval(m_EffectState.tempo.ang);
-          m_EffectState.tempo.syncro = pFun->Eval();
+        var pFun : moMathFunction = sync.Fun();
+        if (sync.Type()==moDataType.MO_DATA_FUNCTION && pFun) {
+          this.m_EffectState.tempo.syncro = pFun.Eval();
         }
-        else m_EffectState.tempo.syncro = sync->Double();
+        else this.m_EffectState.tempo.syncro = sync.Double();
       }
 
       //código alternativo
       //m_EffectState.tempo.syncro = m_Config.Fun(isyncro).Eval( m_EffectState.tempo.ang );
     }
-*/
-      if(this.m_EffectState.synchronized==MO_DEACTIVATED)
+
+    if (this.m_EffectState.synchronized == MO_DEACTIVATED)
       {
           //m_EffectState.tempo.ticks = moGetTicks();
           ///Clock independiente
@@ -132,20 +155,20 @@ export class moEffect extends moMoldeoObject {
           this.m_EffectState.tempo.getTempo();
           //if(m_EffectState.fulldebug==MO_ACTIVATED) MODebug2->Push("SYNCRO: " + FloatToStr(m_EffectState.tempo.syncro,3));
       }
-/*
-    if(iphase != MO_PARAM_NOT_FOUND) {
-      moData *phase = m_Config.GetParam(iphase).GetData();
+
+    if(this.iphase != MO_PARAM_NOT_FOUND) {
+      var phase : moData = this.m_Config.GetParam(this.iphase).GetData();
       if (phase) {
-        moMathFunction* pFun = phase->Fun();
-            if (phase->Type()==MO_DATA_FUNCTION && pFun) {
+        var pFun : moMathFunction = phase.Fun();
+            if (phase.Type()==moDataType.MO_DATA_FUNCTION && pFun) {
               //m_EffectState.tempo.ang+= pFun->Eval(m_EffectState.tempo.ang);
-              m_EffectState.tempo.ang+= pFun->Eval();
+              this.m_EffectState.tempo.ang+= pFun.Eval();
             }
-            else m_EffectState.tempo.ang+= phase->Double();
+            else this.m_EffectState.tempo.ang+= phase.Double();
           }
     }
-*/
-    if(parentstate!=null) {
+
+    if(parentstate) {
       //asginar parametros del state del padre al state del hijo
       Object.assign(this.m_EffectState, parentstate);
     }
@@ -181,6 +204,9 @@ export class moEffect extends moMoldeoObject {
         this.InletTempo.GetData().SetDouble( moMath.FMod( this.m_EffectState.tempo.ang, moMath.TWO_PI));
     }
 
+    this.m_pResourceManager.GetRenderMan().m_Renderer.clearDepth();
+    //this.m_pResourceManager.GetRenderMan().m_Renderer.clear(false, true, false);
+
     this.ScriptExeRun();
   }
 
@@ -198,7 +224,7 @@ export class moEffect extends moMoldeoObject {
   ScriptExeDraw(): void {
 
   }
-
+/*
   GetState() : moMobState {
       return this.m_MobState;
   }
@@ -208,7 +234,8 @@ export class moEffect extends moMoldeoObject {
       this.m_MobState = p_MobState;
       return true;
   }
-
+*/
+/*
   Activate() : void {
       var mobstate : moMobState = this.GetState();
       mobstate.Activate();
@@ -224,7 +251,7 @@ export class moEffect extends moMoldeoObject {
   Activated() : boolean {
       return this.GetState().Activated();
   }
-
+*/
   Select() {
       var mobstate : moMobState = this.GetState();
       mobstate.Select();
@@ -254,10 +281,12 @@ export class moEffect extends moMoldeoObject {
 
   Enable() : void {
     this.m_EffectState.enabled = MO_ON;
+    //this.Activate();
   }
 
   Disable() : void {
     this.m_EffectState.enabled = MO_OFF;
+    //this.Deactivate();
   }
 
   SwitchOn() : void {

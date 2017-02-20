@@ -6,7 +6,7 @@
  */
 import { MOfloat, MOdouble, MOlong, MOulong, MOint, MOuint, moNumber, moTextFilterParam } from "./mo-types"
 import { moText } from "./mo-text"
-import { moDataType, moDataTypeStr } from "./mo-data-type.enum"
+import { moDataType, moDataTypeStr, moDataTypeToText } from "./mo-data-type.enum"
 export * from "./mo-data-type.enum";
 import {
   moGetTicks, moGetTicksAbsolute, moGetTicksAbsoluteStep,
@@ -17,11 +17,11 @@ import { moTexture, moTextureBuffer } from "./mo-texture";
 
 export class moData {
 
-  m_DataType : moDataType;
-  m_Number : moNumber;
-  m_Text : moText;
-  m_DataSize : MOulong;
-
+  m_DataType : moDataType = moDataType.MO_DATA_UNDEFINED;
+  m_Number : moNumber = 0;
+  m_Text : moText = "";
+  m_DataSize : MOulong = 0;
+  m_DataTypeStr : moText = "UNDEFINED";
 
   m_bFilteredAlpha : boolean;
   m_bFilteredParams : boolean;
@@ -37,13 +37,13 @@ export class moData {
   constructor(type?: any) {
     if (typeof type == "string") {
       if (type in moDataTypeStr)
-        this.SetType( moDataTypeStr[type] );
+        this.SetDataType( moDataTypeStr[type] );
     }
     if (typeof type == "object") {
       if (type.constructor) {
         if (type.constructor.name) {
           if (type.constructor.name == "moDataType") {
-            this.SetType( type );
+            this.SetDataType( type );
           }
 
           if (type.constructor.name == "moData") {
@@ -54,8 +54,13 @@ export class moData {
     }
   }
 
-  SetType( p_type: moDataType ) {
+  SetDataType( p_type: moDataType ) {
     this.m_DataType = p_type;
+    this.m_DataTypeStr = moDataTypeToText[p_type];
+  }
+
+  Type(): moDataType {
+    return this.m_DataType;
   }
 
   GetData() : moData {
@@ -63,48 +68,51 @@ export class moData {
   }
 
   SetText(p_text: any) {
-    this.m_DataType = moDataType.MO_DATA_TEXT;
+    this.SetDataType( moDataType.MO_DATA_TEXT );
     this.m_Text = ""+p_text;
   }
   SetChar(p_number: any) {
-    this.m_DataType = moDataType.MO_DATA_NUMBER_CHAR;
+    this.SetDataType( moDataType.MO_DATA_NUMBER_CHAR );
     this.m_Number = Number(p_number);
   }
   SetInt(p_number: any) {
-    this.m_DataType = moDataType.MO_DATA_NUMBER_INT;
+    this.SetDataType(moDataType.MO_DATA_NUMBER_INT);
     this.m_Number = Number(p_number);
   }
   SetLong(p_number: any) {
-    this.m_DataType = moDataType.MO_DATA_NUMBER_LONG;
+    this.SetDataType(moDataType.MO_DATA_NUMBER_LONG);
     this.m_Number = Number(p_number);
   }
   SetFloat(p_float: any) {
-    this.m_DataType = moDataType.MO_DATA_NUMBER_FLOAT;
+    this.SetDataType(moDataType.MO_DATA_NUMBER_FLOAT);
     this.m_Number =  Number(p_float);
   }
   SetDouble(p_float: any) {
-    this.m_DataType = moDataType.MO_DATA_NUMBER_DOUBLE;
+    this.SetDataType(moDataType.MO_DATA_NUMBER_DOUBLE);
     this.m_Number = Number(p_float);
   }
   //SetColor( p_color: moText);
   SetTexture(p_texture: any /**moTexture*/) {
-    this.m_DataType = moDataType.MO_DATA_IMAGESAMPLE;
+    this.SetDataType(moDataType.MO_DATA_IMAGESAMPLE);
     this.m_pTexture = p_texture;
   }
 
   SetTextureBuffer(p_texture_buffer: any /**moTextureBuffer*/) {
-    this.m_DataType = moDataType.MO_DATA_IMAGESAMPLE_TEXTUREBUFFER;
+    this.SetDataType(moDataType.MO_DATA_IMAGESAMPLE_TEXTUREBUFFER);
     this.m_pTextureBuffer = p_texture_buffer;
   }
 
   SetTextureFiltered(p_texture: any /**moTexture*/) {
-    this.m_DataType = moDataType.MO_DATA_IMAGESAMPLE_FILTERED;
+    this.SetDataType(moDataType.MO_DATA_IMAGESAMPLE_FILTERED);
     this.m_pTexture = p_texture;
   }
 
   m_pFun: moMathFunction;
+  Fun(): moMathFunction {
+    return this.m_pFun;
+  }
   SetFun(p_function: any) {
-    this.m_DataType = moDataType.MO_DATA_FUNCTION;
+    this.SetDataType(moDataType.MO_DATA_FUNCTION);
     if (typeof p_function == "string")
       this.m_Text = p_function;
     if (typeof p_function == "object") {
@@ -149,6 +157,7 @@ export class moData {
       //eval(t);
       if (this.m_pFun) {
         this.m_LastEval = this.m_pFun.Eval();
+        this.m_Number = this.m_LastEval;
       } else {
         this.m_LastEval = this.m_Number;
       }

@@ -60,7 +60,7 @@ export class moConnector extends moAbstract {
   * @param p_datatype tipo de dato manejado por este conector
   *                   [ moDataType | moText | moParam | ]
   */
-  Init(p_ConnectorLabelName ?: moText, ConnectorId ?: MOint, t_datatype ?: any): boolean {
+  Init(p_ConnectorLabelName ?: moText, ConnectorId ?: MOint, t_datatype ?: any, t_def?:any): boolean {
     this.m_ConnectorLabelName = p_ConnectorLabelName;
     this.m_ConnectorId = ConnectorId;
 

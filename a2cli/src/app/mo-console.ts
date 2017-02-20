@@ -385,15 +385,14 @@ export class moConsole extends moMoldeoObject {
       var p_effect = this.m_EffectManager.m_AllEffects[i];
       if (p_effect) {
         p_effect.Init();
-        p_effect.Activate();
+        //p_effect.Activate();
         /*
         pre = m_Config.GetParam( paramindex ).GetValue( valueindex ).GetSubValue(MO_CFG_EFFECT_PRE).Int();
-                        on = m_Config.GetParam( paramindex ).GetValue( valueindex ).GetSubValue(MO_CFG_EFFECT_ON).Int();
-
-                        if (pre>=0) p_effect->GetConfig()->SetCurrentPreConf(pre);
-                        if (on>0) p_effect->Activate();
-                        else p_effect->Deactivate();
+        on = m_Config.GetParam( paramindex ).GetValue( valueindex ).GetSubValue(MO_CFG_EFFECT_ON).Int();
         */
+        //if (pre>=0) p_effect.GetConfig().SetCurrentPreConf(pre);
+        //if (on>0) p_effect.Activate();
+        //else p_effect.Deactivate();
       }
     }
 /*

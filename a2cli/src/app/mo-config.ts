@@ -16,7 +16,7 @@ import {
   moParam, moParamType, moParamTypeToText, moParamIndex,
   moParams, moParamIndexes, moParamDefinition, moParamDefinitions
 } from "./mo-param";
-import { moPreconfig, moPreConfigs } from "./mo-pre-config";
+import { moPreconfig, moPreConfigs, moPreconfigParamIndex } from "./mo-pre-config";
 import { moFile } from "./mo-file-manager";
 import { moColor, moColor4fArray, moColorRGBA, moColorRGB, moColorArray } from "./mo-gui-manager";
 import { moTexture, moTextureBuffer } from "./mo-texture";
@@ -236,67 +236,117 @@ export class moConfig extends moAbstract {
         //console.log("moConfig::LoadConfig > Full text", configname);
         //parse XML:
         xml2js.parseString( configtext, (err, result) => {
-          //console.log(result);
+          //console.log( configtext, result);
           //console.log('Parsing done');
           this.m_ParamsByName = {};
-
+          if (typeof result == "object")
           if ("MOCONFIG" in result) {
+            if (result["MOCONFIG"]["$"]) {
+              this.m_MajorVersion = result["MOCONFIG"]["$"]["majorversion"];
+              this.m_MinorVersion = result["MOCONFIG"]["$"]["minorversion"];
+            }
+            if ("DEFINITION" in result["MOCONFIG"]) {
+              var fxname = result["MOCONFIG"]["DEFINITION"]["name"];
+              var objecttype = result["MOCONFIG"]["DEFINITION"]["class"];
+              this.Set(fxname, objecttype);
+            }
             if ("CONFIGPARAMS" in result["MOCONFIG"]) {
-              var CFGPARAMS = result["MOCONFIG"]["CONFIGPARAMS"][0]["PARAM"];
-              this.m_Params = [];
-              for (var PARAM_I in CFGPARAMS) {
-                var PARAM = CFGPARAMS[PARAM_I];
-                //console.log("Adding Param:", PARAM);
-                var p_param_def = new moParamDefinition(
-                  PARAM["$"]["name"],
-                  PARAM["$"]["type"],
-                  PARAM["$"]["property"],
-                  PARAM["$"]["group"],
-                  PARAM["$"]["interpolation"],
-                  PARAM["$"]["duration"],
-                  PARAM["$"]["options"]
-                );
-                var p_param = new moParam( p_param_def );
-                this.m_Params.push(p_param);
-                this.m_ParamsByName[""+p_param.m_ParamDefinition.m_Name] = p_param;
-                var PARAMVALS = PARAM["VAL"];
-                for (var PARAMVAL_I in PARAMVALS) {
-                  var VAL = PARAMVALS[PARAMVAL_I];
-                  var newValue: moValue = new moValue();
-                  var VALSUBS = VAL["D"];
-                  for (var SUBVAL_I in VALSUBS) {
-                    var SUBVAL = VALSUBS[SUBVAL_I];
-                    //console.log(" <D> Subvalue:", SUBVAL);
-                    var vbd: moValueDefinition = new moValueDefinition();
+              if (result["MOCONFIG"]["CONFIGPARAMS"].length > 0) {
+                var CFGPARAMS = result["MOCONFIG"]["CONFIGPARAMS"][0];
+                if ("PARAM" in CFGPARAMS) {
+                  var PARAMS = CFGPARAMS["PARAM"];
+                  this.m_Params = [];
+                  if (PARAMS.length > 0) {
+                    for (var PARAM_I in PARAMS) {
+                      var PARAM = PARAMS[PARAM_I];
+                      //console.log("Adding Param:", PARAM);
+                      var p_param_def = new moParamDefinition(
+                        PARAM["$"]["name"],
+                        PARAM["$"]["type"],
+                        PARAM["$"]["property"],
+                        PARAM["$"]["group"],
+                        PARAM["$"]["interpolation"],
+                        PARAM["$"]["duration"],
+                        PARAM["$"]["options"]
+                      );
+                      var p_param = new moParam(p_param_def);
+                      this.m_Params.push(p_param);
+                      this.m_ParamsByName["" + p_param.m_ParamDefinition.m_Name] = p_param;
+                      var PARAMVALS = [];
+                      if ("VAL" in PARAM) PARAMVALS = PARAM["VAL"];
+                      if (PARAMVALS.length > 0) {
+                        for (var PARAMVAL_I in PARAMVALS) {
+                          var VAL = PARAMVALS[PARAMVAL_I];
+                          var newValue: moValue = new moValue();
+                          var VALSUBS = VAL["D"];
+                          if (VALSUBS.length > 0) {
+                            for (var SUBVAL_I in VALSUBS) {
+                              var SUBVAL = VALSUBS[SUBVAL_I];
+                              //console.log(" <D> Subvalue:", SUBVAL);
+                              var vbd: moValueDefinition = new moValueDefinition();
 
-                    var subvalue: moText = SUBVAL["_"];
-                    var subvaluetype: moText = SUBVAL["$"]["type"];
+                              var subvalue: moText = SUBVAL["_"];
+                              var subvaluetype: moText = SUBVAL["$"]["type"];
 
-                    newValue.AddSubValue( subvalue, subvaluetype );
-                    //console.log("newValue:", newValue);
-                    //var subvaluedata: moText = SUBVAL[0];
-                    if (newValue.m_List.length) {
-                      if (SUBVAL["$"]["code"])
-                        newValue.m_List[newValue.m_List.length - 1].SetCodeName(SUBVAL["$"]["code"]);
-                      if (SUBVAL["$"]["attribute"])
-                        newValue.m_List[newValue.m_List.length - 1].SetAttribute(SUBVAL["$"]["attribute"]);
-                      if (SUBVAL["$"]["min"])
-                        newValue.m_List[newValue.m_List.length - 1].SetRange(
-                          SUBVAL["$"]["min"],
-                          SUBVAL["$"]["max"]);
+                              newValue.AddSubValue(subvalue, subvaluetype);
+                              //console.log("newValue:", newValue);
+                              //var subvaluedata: moText = SUBVAL[0];
+                              if (newValue.m_List.length) {
+                                if (SUBVAL["$"]["code"])
+                                  newValue.m_List[newValue.m_List.length - 1].SetCodeName(SUBVAL["$"]["code"]);
+                                if (SUBVAL["$"]["attribute"])
+                                  newValue.m_List[newValue.m_List.length - 1].SetAttribute(SUBVAL["$"]["attribute"]);
+                                if (SUBVAL["$"]["min"])
+                                  newValue.m_List[newValue.m_List.length - 1].SetRange(
+                                    SUBVAL["$"]["min"],
+                                    SUBVAL["$"]["max"]);
+                              }
+                            }
+                          }//VALSUBS > 0
+                          p_param.AddValue(newValue);
+                          p_param.m_ParamDefinition.m_Index = this.m_Params.length - 1;
+                        }
+                      }//hay params
                     }
-                  }
-                  p_param.AddValue(newValue);
-                  p_param.m_ParamDefinition.m_Index = this.m_Params.length - 1;
-                }
-              }
-              //console.log("Added params:", this.m_Params);
-
+                  }//for...
+                }//hay params
+                //console.log("Added params:", this.m_Params);
+              }//hay configparams >
             }
           }//fin "CONFIGPARAMS"
 
           if ("PRECONFIGS" in result["MOCONFIG"]) {
-
+            //console.log(result["MOCONFIG"]);
+            if (result["MOCONFIG"]["PRECONFIGS"].length > 0) {
+              var PRECONFIGS = result["MOCONFIG"]["PRECONFIGS"][0];
+              this.m_PreConfigs = [];
+              //console.log(PRECONFIGS);
+              if (typeof PRECONFIGS == "object")
+              if ("PRE" in PRECONFIGS) {
+                var PRES = PRECONFIGS["PRE"];
+                if (PRES.length>0) {
+                  for (var PRE_I in PRES) {
+                    var PRECONF = PRES[PRE_I];
+                    var preconf_name = "preconf_" + PRE_I;
+                    if (PRECONF["$"]) preconf_name = PRECONF["$"]["name"];
+                    if (typeof PRECONF == "object") {
+                      var PREPARAMS = PRECONF["P"];
+                      var Pcfg: moPreconfig = new moPreconfig();
+                      //console.log(PREPARAMS);
+                      if (PREPARAMS.length > 0) {
+                        for (var P_I in PREPARAMS) {
+                          var P = PREPARAMS[P_I];
+                          var name = "" + P_I;
+                          if (P["$"]) if (P["$"]["name"]) name = P["$"]["name"];
+                          var value = P["_"];
+                          //console.log(name, value);
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }//fin "PRECONFIGS"
           this.m_ConfigLoaded = true;
           if (callback) callback(MO_CONFIG_OK);
@@ -363,6 +413,10 @@ export class moConfig extends moAbstract {
 
   GetCurrentValueIndex(p_paramindex: MOint) {
     return this.m_Params[p_paramindex].GetIndexValue();
+  }
+
+  SetCurrentValueIndex( p_paramindex : MOint, p_valueindex : MOint ) {
+	  this.m_Params[p_paramindex].SetIndexValue( p_valueindex );
   }
 
   GetCurrentValue() : moValue {
@@ -445,10 +499,42 @@ export class moConfig extends moAbstract {
   }
 
 
-  GetCurrentPreConf(): MOint {
-    // TODO:
-    return 0;
+
+  GetPreConfCount() : MOint {
+	  return this.m_PreConfigs.length;
   }
+
+  GetCurrentPreConf() : MOint {
+	  return this.m_PreconfActual;
+  }
+
+  SetCurrentPreConf( p_actual : MOint ) : void {
+    if(0<=p_actual && p_actual<this.m_PreConfigs.length )
+    {
+		  for( var i=0; i<this.m_PreConfigs[p_actual].m_PreconfIndexes.length; i++) {
+			  var Val : moPreconfigParamIndex = this.m_PreConfigs[p_actual][i];
+        this.SetCurrentValueIndex( Val.m_ParamIndex, Val.m_ValueIndex);
+		  }
+      this.m_PreconfActual = p_actual;
+    }
+  }
+
+  PreConfFirst() {
+    if(this.m_PreConfigs.length>0)
+      this.SetCurrentPreConf( 0 );
+  }
+
+  PreConfNext() {
+    if ( this.m_PreconfActual > -1
+      && (this.m_PreconfActual < this.m_PreConfigs.length - 1) )
+      this.SetCurrentPreConf( this.m_PreconfActual+1 );
+  }
+
+  PreConfPrev() {
+    if(this.m_PreconfActual>0)
+      this.SetCurrentPreConf( this.m_PreconfActual-1 );
+  }
+
 
 
   Text(param_id: any) : moText {

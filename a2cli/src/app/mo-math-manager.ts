@@ -136,13 +136,22 @@ export class moMathVariable {
 	 */
   GetValue(): MOdouble {
     if (this.m_pParam) {
-        var pData : moData = this.m_pParam.GetData();
-        if (pData)
-            this.m_value = pData.Double();
+      var pData: moData = this.m_pParam.GetData();
+      if (pData) {
+        this.m_value = pData.Double();
+      } else {
+        console.error("moMathVariable: no data?", this, this.m_pParam);
+      }
     } else if (this.m_pInlet) {
-        var pData : moData = this.m_pInlet.GetData();
-        if (pData)
-            this.m_value = pData.Double();
+      //console.log("moMathVariable GetValue", this.m_pInlet);
+      var pData: moData = this.m_pInlet.GetData();
+      //console.log("moMathVariable GetValue data", pData);
+      if (pData) {
+        //console.log("moMathVariable GetValue data.Double()", pData.Double());
+        this.m_value = pData.Double();
+      } else {
+        console.error("moMathVariable: no data?", this, this.m_pInlet);
+      }
     }
 
     return this.m_value;
@@ -219,7 +228,7 @@ export class moMathVariableFactory extends moAbstract
     // and others...
 
     var filtered = p_Node.filter(function (node) {
-      node.isSymbolNode && node.name == 'x';
+      //node.isSymbolNode && node.name == 'x';
       if (node.isSymbolNode) {
         return true;
       }
@@ -250,6 +259,7 @@ export class moMathVariableFactory extends moAbstract
 
 export class moMathFunction extends moAbstract {
 
+  m_VarFactory: moMathVariableFactory;
   m_Expression : moText = "";
   m_isNumber: boolean = false;
   m_EmptyName: moText = "";
@@ -315,8 +325,8 @@ export class moParserFunction extends moMathFunction {
     if (this.m_pMOB) this.m_pConfig = this.m_pMOB.GetConfig();
     //this.m_Parser = new math.parser();
 
-
-    var pVarFactory: moMathVariableFactory =
+    if (this.m_VarFactory==undefined)
+      this.m_VarFactory =
         new moMathVariableFactory( this.m_Parameters, this.m_Variables, this.m_Variables_Map);
 /*
     if (pParser) {
@@ -339,7 +349,7 @@ export class moParserFunction extends moMathFunction {
       //Parser.compile();
       this.m_ParserNode = math.parse("" + this.m_Expression);
       //console.log("m_ParserNode:", this.m_ParserNode);
-      pVarFactory.CreateVariables( this.m_ParserNode );
+      this.m_VarFactory.CreateVariables( this.m_ParserNode );
       this.m_ParserCode = this.m_ParserNode.compile();
     }
     catch (msgerror) {
@@ -405,13 +415,17 @@ export class moParserFunction extends moMathFunction {
 
             }
 
+            if (pVariable.m_pInlet == undefined && pVariable.m_pParam == undefined) {
+              console.log("Error with variable:", pVariable, this );
+            }
+
         }
 
     }
 
-    this.m_Scope = pVarFactory.ToScope();
+    this.m_Scope = this.m_VarFactory.ToScope();
 
-    //console.log("Variables", this.m_Variables_Map, this.m_Scope );
+//    console.log("Init Variables: ", this.m_Variables, this.m_Variables_Map, this.m_VarFactory, this.m_Scope );
 	  return this.CheckVariables();
   }
 
@@ -504,15 +518,13 @@ export class moParserFunction extends moMathFunction {
     //var time = moGetTicks() / 1000.0;
     if (this.m_ParserCode) {
       try {
-        var pVarFactory: moMathVariableFactory =
-        new moMathVariableFactory( this.m_Parameters, this.m_Variables, this.m_Variables_Map);
-        this.m_Scope = pVarFactory.ToScope();
+        this.m_Scope = this.m_VarFactory.ToScope();
         //console.log("Eval Parser with variables", this.m_Expression, this.m_Variables_Map, this.m_Scope );
 
         this.m_LastEval = this.m_ParserCode.eval(this.m_Scope);
         return this.m_LastEval;
       } catch (err) {
-        console.error("parser error", err, this.m_Scope);
+        console.error("parser error", err, this.m_Scope, this);
         return err;
       }
     }
