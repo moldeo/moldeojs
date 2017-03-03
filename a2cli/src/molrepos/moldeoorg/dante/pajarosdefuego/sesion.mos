@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<MOCONFIG majorversion="0" minorversion="1779494536">
+    <DEFINITION name="session" class="moDataSession" />
+    <UPDATE />
+    <CONFIGPARAMS>
+        <PARAM name="project" type="TEXT">
+            <VAL>
+                <D type="TXT">D:\0_DESARROLLO\0_MOLDEO\0_desarrollo\Talleres\Curso Virtual Conectar\CURSO VIRTUAL\VisualArt\VisualArt.mol</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="resolution" type="TEXT">
+            <VAL>
+                <D type="TXT">1024x768</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="render_folder" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="length" type="NUM">
+            <VAL>
+                <D type="NUM">0</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="keys" type="TEXT" />
+        <PARAM name="eventkeys" type="TEXT">
+            <VAL>
+                <D type="XML">
+                    <moDataSessionEventKey />
+                </D>
+            </VAL>
+        </PARAM>
+    </CONFIGPARAMS>
+    <PRECONFIGS />
+</MOCONFIG>

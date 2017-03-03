@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<MOCONFIG majorversion="192" minorversion="2">
+    <DEFINITION name="__console__" class="moConsole" />
+    <UPDATE />
+    <CONFIGPARAMS>
+        <PARAM name="inlet" type="INLET" />
+        <PARAM name="outlet" type="OUTLET" />
+        <PARAM name="devices" type="TEXT" />
+        <PARAM name="preeffect" type="TEXT">
+            <VAL>
+                <D type="TXT">erase</D>
+                <D type="TXT">erase</D>
+                <D type="TXT">erase</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="effect" type="TEXT">
+            <VAL>
+                <D type="TXT">particlessimple</D>
+                <D type="TXT">carrusel</D>
+                <D type="TXT">CARRUSEL</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">S</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="posteffect" type="TEXT">
+        </PARAM>
+        <PARAM name="mastereffect" type="TEXT" />
+        <PARAM name="resources" type="MOLDEOOBJECT" />
+        <PARAM name="mastereffects_on" type="NUM" options="off,on">
+            <VAL>
+                <D type="NUM">0</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="fulldebug" type="NUM">
+            <VAL>
+                <D type="NUM">0</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="consolescript" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="outputmode" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="outputresolution" type="TEXT">
+            <VAL>
+                <D type="TXT">1280</D>
+                <D type="TXT">800</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="rendermode" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="renderresolution" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="clip1" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="clip2" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="clip3" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="script" type="SCRIPT">
+            <VAL>
+                <D type="TXT">consola.js</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="screenshots" type="NUM">
+            <VAL>
+                <D type="NUM">0</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="videoshots" type="NUM">
+            <VAL>
+                <D type="NUM">0</D>
+            </VAL>
+        </PARAM>
+    </CONFIGPARAMS>
+    <PRECONFIGS />
+</MOCONFIG>
