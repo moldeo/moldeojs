@@ -594,6 +594,10 @@ export class moFileManager extends moResource {
     }
   }
 
+  GetFile(p_filename: moText): moFile {
+    return new moFile(p_filename);
+  }
+
 
 
 }

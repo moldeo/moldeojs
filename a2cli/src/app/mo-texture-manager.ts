@@ -89,6 +89,9 @@ export class moTextureManager extends moResource {
 
   CreateTexture( p_type: MOuint, p_name: moText): moTexture {
     var Tex: moTexture = new moTexture();
+    Tex.m_pResourceManager = this.m_pResourceManager;
+    Tex.m_pFileMan = this.m_pResourceManager.GetFileMan();
+    Tex.m_pDataMan = this.m_pResourceManager.GetDataMan();
     Tex.m_name = p_name;
     return Tex;
     //return null;

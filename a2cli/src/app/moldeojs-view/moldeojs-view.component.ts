@@ -1,4 +1,7 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import {
+  Component, OnInit, ElementRef,
+  ContentChild, ViewChild, ViewChildren
+} from '@angular/core';
 
 
 import { moConsole } from '../mo-console';
@@ -20,21 +23,72 @@ export class MoldeojsViewComponent implements OnInit {
   test: number = 0;
   testmax: number = 120;
 
-  jsonRute : string = 'http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_tema_=Mosaico&output=json';
+  //jsonRute : string = 'http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_tema_=Mosaico&output=json';
+  jsonRute: string = "http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_temaid_=423&output=json";
   jsonInit : any;
+  @ViewChild('webview_contenidos') contenidos: ElementRef;
+  @ViewChild('webview_titulo') titulo: ElementRef;
+  @ViewChild('webview_descripcion') descripcion: ElementRef;
+  mititulo: string = "Completar titulo";
+  midescripcion : string = "Completar descripcion";
 
   constructor(el: ElementRef, private MoldeoCS: ConsoleService,
     private jsonService: JsonService,
     private fileadminService: FileAdminService) {
     this.hostElement = el;
-/*
+
     jsonService.getJson(this.jsonRute).subscribe(val => {
       this.jsonInit = val;
       console.log("JSON:", this.jsonInit);
+      window["Moldeo"]["db"] = {
+        "json": this.jsonInit,
+        "Libros": this.jsonInit["Imágenes"][0],
+        "Documentos": this.jsonInit["Imágenes"][1],
+        "Objetos": this.jsonInit["Imágenes"][2],
+        "Index": {}
+      }
+      var CCLibros = window["Moldeo"]["db"]["Libros"]["Contenidos"];
+      var CCObjetos = window["Moldeo"]["db"]["Objetos"]["Contenidos"];
+      var CCIndex = window["Moldeo"]["db"]["Index"];
 
-      fileadminService.downloadFile('http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg',"assets", "nombre", "jpg");
-    });*/
+      for (var idx in CCLibros) {
+        var Obj = CCLibros[idx];
+        CCIndex["idc_" + Obj.id] = Obj;
+        if (Obj["Detalles"].length) {
+          for (var im = 0; im < Obj["Detalles"].length; im++) {
+            var Detalle = Obj["Detalles"][im];
+            if (Detalle["Imagen"]) {
+              //fileadminService.downloadFile( Detalle["Imagen"],"molrepos/museo/mural/imagenes", "idc_"+Obj.id, "jpg");
+
+            }
+          }
+        }
+        console.log("objeto ", Obj);
+      }
+
+
+      for (var idx in CCObjetos) {
+        var Obj = CCObjetos[idx];
+        CCIndex["idc_" + Obj.id] = Obj;
+        if (Obj["Detalles"].length) {
+          for (var im = 0; im < Obj["Detalles"].length; im++) {
+            var Detalle = Obj["Detalles"][im];
+            if (Detalle["Imagen"]) {
+              //fileadminService.downloadFile(Detalle["Imagen"], "molrepos/museo/mural/imagenes", "idc_" + Obj.id, "jpg");
+
+            }
+          }
+        }
+        console.log("objeto ", Obj);
+      }
+
+      console.log("CCIndex ", CCIndex);
+      //fileadminService.downloadFile('http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg',"assets", "nombre", "jpg");
+    });
+
+
   }
+
 
   ngOnInit() {
     this.MoldeoCS.updated$.subscribe((result) => {
@@ -57,6 +111,7 @@ export class MoldeojsViewComponent implements OnInit {
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsfera.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/samples/SimpleProject/simple_projectX.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/samples/CicloDelAgua/CicloDelAguaX.mol" } );
+    window["MoldeoJSView"] = this;
   }
 
   public animate() {
@@ -78,5 +133,23 @@ export class MoldeojsViewComponent implements OnInit {
       }
     }
   }
+
+  SetTitulo(titulo: any) {
+    this.mititulo = titulo;
+  }
+
+  SetDescripcion(descripcion: any) {
+    //this.midescripcion = descripcion;
+    this.descripcion.nativeElement.innerHTML = descripcion;
+  }
+
+  ShowOver() {
+    this.contenidos.nativeElement.setAttribute("class", "contenido_over");
+  }
+
+  HideOver() {
+    this.contenidos.nativeElement.setAttribute("class", "contenido_over_hide");
+  }
+
 
 }

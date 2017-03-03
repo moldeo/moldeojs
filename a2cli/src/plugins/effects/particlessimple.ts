@@ -1917,7 +1917,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
               var pPar : moParticlesSimple = this.m_ParticlesSimpleArray[i+j*this.m_cols];
               //if (i == 0 && j == 0)
                 //console.log(`par: ${this.m_Rate} D: ${pPar.Age.Duration()} V: ${pPar.Visible}`);
-              pPar.pTextureMemory = NULL;
+              //pPar.pTextureMemory = NULL;
 
               // Reset/Kill out-of-timeline particle....
               // Make particle die if particle Age is out of sync with moGetTicks absolute time (kind of reset the particles)
@@ -3222,10 +3222,14 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 
       this.raycaster.setFromCamera({ x: this.mouse.x, y: this.mouse.y }, this.Camera);
       this.intersects = this.raycaster.intersectObjects(this.Scene.children, true /*recursive*/);
-      for (var i = 0; i < this.intersects.length; i++) {
-        this.intersects[i].object.material.color = new THREE.Color(2.0, 2.0, 2.0);
-        this.intersects[i].object["userData"]["selected"] = true;
-        this.intersects[i].object["userData"]["Particle"]["selected"] = true;
+      if (this.intersects.length) {
+        //for (var i = 0; i < this.intersects.length; i++) {
+          var i = 0;
+          this.intersects[i].object.material.color = new THREE.Color(2.0, 2.0, 2.0);
+          //this.intersects[i].object["userData"]["selected"] = true;
+          if (this.intersects[i].object["userData"]["Particle"])
+            this.intersects[i].object["userData"]["Particle"]["selected"] = true;
+        //}
       }
       //if (this.intersects.length)
         //console.log("this.intersects[i].object:", this.intersects.length, this.intersects);
@@ -3243,7 +3247,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 
     if (p_Event.m_Array.length > 0) {
       var mevent = p_Event.m_Array[0];
-      if (mevent["type"] == "mousedown" || mevent["type"] == "mousemove") {
+      if (mevent["type"] == "mousedown" /*|| mevent["type"] == "mousemove"*/) {
         this.mouse = new THREE.Vector2();
         this.mouse.x = mevent["clientX"]*2-1.0;
         this.mouse.y = -1*mevent["clientY"]*2+1.0;
@@ -3272,6 +3276,10 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
       return this.m_ParticlesSimpleArray[i];
     }
     return null;
+  }
+
+  GetParticleCount(): number {
+    return this.m_ParticlesSimpleArray.length;
   }
 
 

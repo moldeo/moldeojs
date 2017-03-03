@@ -47,6 +47,7 @@ export class moTexture extends moAbstract {
     m_gl : moGLManager;
     m_pResourceManager : moResourceManager;
 
+    m_File: moFile;
 /*
     moFile*			m_pFile;
 
@@ -74,6 +75,7 @@ export class moTexture extends moAbstract {
     this._texture = p_textureloader.load("" + p_fullfilename, (texture) => {
       this.m_width = texture.image.width;
       this.m_height = texture.image.height;
+      if (this.m_pFileMan) this.m_File = this.m_pFileMan.GetFile(p_fullfilename);
     } );
     if (this._texture) return true;
     return true;
