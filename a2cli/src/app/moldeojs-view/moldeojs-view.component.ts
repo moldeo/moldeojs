@@ -24,8 +24,8 @@ export class MoldeojsViewComponent implements OnInit {
   testmax: number = 120;
 
   //jsonRute : string = 'http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_tema_=Mosaico&output=json';
-  jsonRute: string = "http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_temaid_=423&output=json";
-  jsonInit : any;
+  //jsonRute: string = "http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_temaid_=423&output=json";
+  //jsonInit : any;
   @ViewChild('webview_contenidos') contenidos: ElementRef;
   @ViewChild('webview_titulo') titulo: ElementRef;
   @ViewChild('webview_descripcion') descripcion: ElementRef;
@@ -37,7 +37,7 @@ export class MoldeojsViewComponent implements OnInit {
     private fileadminService: FileAdminService) {
     this.hostElement = el;
 
-    jsonService.getJson(this.jsonRute).subscribe(val => {
+    /*jsonService.getJson(this.jsonRute).subscribe(val => {
       this.jsonInit = val;
       console.log("JSON:", this.jsonInit);
       window["Moldeo"]["db"] = {
@@ -84,7 +84,7 @@ export class MoldeojsViewComponent implements OnInit {
 
       console.log("CCIndex ", CCIndex);
       //fileadminService.downloadFile('http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg',"assets", "nombre", "jpg");
-    });
+    });*/
 
 
   }
@@ -105,8 +105,9 @@ export class MoldeojsViewComponent implements OnInit {
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/00_Image/00_Image.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/01_Icon/01_Icon.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/02_Plane/02_Plane.mol" } );
+    this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/08_Camera/08_Camera.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol" } );
-    this.MoldeoCS.Init({ "consoleconfig": "molrepos/museo/mural/mural_partis.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "molrepos/museo/mural/mural_partis.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/moldeoorg/dante/pajarosdefuego/pajaros_de_fuegoX.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsfera.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/samples/SimpleProject/simple_projectX.mol" } );
@@ -150,6 +151,5 @@ export class MoldeojsViewComponent implements OnInit {
   HideOver() {
     this.contenidos.nativeElement.setAttribute("class", "contenido_over_hide");
   }
-
 
 }

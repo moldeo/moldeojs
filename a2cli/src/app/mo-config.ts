@@ -279,7 +279,8 @@ export class moConfig extends moAbstract {
                           var VAL = PARAMVALS[PARAMVAL_I];
                           var newValue: moValue = new moValue();
                           var VALSUBS = VAL["D"];
-                          if (VALSUBS.length > 0) {
+
+                          if (VALSUBS !== undefined && VALSUBS.length > 0) {
                             for (var SUBVAL_I in VALSUBS) {
                               var SUBVAL = VALSUBS[SUBVAL_I];
                               //console.log(" <D> Subvalue:", SUBVAL);
@@ -633,8 +634,3 @@ export class moConfig extends moAbstract {
     return rgba;
   }
 }
-
-
-
-
-

@@ -32,6 +32,7 @@
     "@angular/platform-browser": "2.4.2",
     "@angular/platform-browser-dynamic": "2.4.2",
     "@angular/router": "3.4.2",
+    "@types/webrtc": "0.0.22",
     "bootstrap": "^3.3.7",
     "core-js": "^2.4.1",
     "hammerjs": "^2.0.8",

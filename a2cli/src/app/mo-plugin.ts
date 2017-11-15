@@ -60,6 +60,14 @@ PluginsDefinitions.push( new moPluginDefinition(
   moMoldeoObjectType.MO_OBJECT_EFFECT,
 moEffectImage ));
 
+/// Effect Camera ====================================================================
+import { moEffectCamera } from "../plugins/effects/camera";
+PluginsDefinitions.push( new moPluginDefinition(
+  "camera",
+  "/plugins/effects/camera.ts",
+  moMoldeoObjectType.MO_OBJECT_EFFECT,
+moEffectCamera ));
+
 /// Effect Icon ====================================================================
 import { moEffectIcon } from "../plugins/effects/icon";
 PluginsDefinitions.push( new moPluginDefinition(
