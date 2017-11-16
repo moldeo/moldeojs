@@ -48,9 +48,34 @@ export class moEffectCamera extends MO.moEffect {
         }
       };
 
+      if (n.mediaDevices === undefined) { //For Old Browsers
+        n.mediaDevices = {};
+      } //END mediaDevices for old browsers
+
+      if (n.mediaDevices.getUserMedia === undefined) {  //Check the existence of getUserMedia
+        n.mediaDevices.getUserMedia = function(constraints) {
+
+          var getUserMedia = n.webkitGetUserMedia || n.mozGetUserMedia;
+
+          if (!getUserMedia) {
+            return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+          }
+
+          return new Promise(function(resolve, reject) {
+            getUserMedia.call(navigator, constraints, resolve, reject);
+          });
+        }
+      }//END check for getUserMedia
+
       n.mediaDevices.getUserMedia(constraints).then(function(stream) {
-          video.src = window.URL.createObjectURL(stream);
+        if ("srcObject" in video) {
+          video.srcObject = stream;
+        } else {
+          video.src = window.URL.createObjectURL(stream);//video.src just for older implementations
+        }
+        video.onloadedmetadata = function(e) {
           video.play();
+        };
       });
 
       this.canvas = document.getElementById('moCanvasVideo');
@@ -76,10 +101,13 @@ export class moEffectCamera extends MO.moEffect {
       this.Mat = new MO.moMaterialBasic();
     }
     if (this.Mat) {
+      //Texture of WebCam
       this.context.drawImage(document.querySelector('video'), 0, 0, this.canvas.width, this.canvas.height);
       let texture = new MO.three.Texture(this.canvas);
-      texture.needsUpdate = true;
+      texture.minFilter = MO.three.LinearFilter;
+      texture.needsUpdate = true;//Important for update
       this.Mat.map = texture;
+      //Params
       this.Mat.transparent = true;
       this.Mat.color = ccolor;
       this.Mat.opacity = this.m_Config.Eval("alpha");
