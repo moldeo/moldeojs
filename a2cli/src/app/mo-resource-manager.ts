@@ -9,7 +9,7 @@ import { moConfig } from "./mo-config";
 import { moResource, moResources } from "./mo-resource";
 
 import { moFileManager } from "./mo-file-manager";
-//import { moVideoManager } from "./mo-video-manager";
+import { moVideoManager } from "./mo-video-manager";
 
 //import { moFilterManager } from "./mo-filter-manager";
 
@@ -55,7 +55,7 @@ export
 } from "./mo-resource";
 export class moResourceManager extends moAbstract {
     MOFileMan : moFileManager;
-		//MOVideoMan : moVideoManager;
+		MOVideoMan : moVideoManager;
 		//MOFilterMan : moFilterManager;
 		//MONetMan : moNetManager;
 		MOTimeMan : moTimeManager;
@@ -111,6 +111,10 @@ export class moResourceManager extends moAbstract {
       this.MOTextureMan.SetResourceManager(this);
       this.m_Resources.push(this.MOTextureMan);
 
+      if (this.MOVideoMan) { }
+      else this.MOVideoMan = new moVideoManager();
+      this.MOVideoMan.SetResourceManager(this);
+      this.m_Resources.push(this.MOVideoMan);
 
       if (this.MOTimeMan) { }
       else this.MOTimeMan = new moTimeManager();
@@ -158,6 +162,7 @@ export class moResourceManager extends moAbstract {
       this.MOMathMan.Init();
       this.MOTextureMan.Init();
       this.MOTextureMan.Activate();
+      this.MOVideoMan.Init();
       this.MOGLMan.Init();
       this.MOTimeMan.Init();
       this.MOGuiMan.Init();
@@ -192,6 +197,10 @@ export class moResourceManager extends moAbstract {
 
     GetTextureMan(): moTextureManager {
       return this.MOTextureMan;
+    }
+
+    GetVideoMan(): moVideoManager {
+      return this.MOVideoMan;
     }
 
     GetTimeMan(): moTimeManager {

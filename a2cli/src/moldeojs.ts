@@ -48,6 +48,7 @@ export * from "./app/mo-effect-manager";
 * RMA() is the (ResourceManager), and grants access to all of the resources (multimedia files and devices)
 */////
 export * from "./app/mo-texture-manager";
+export * from "./app/mo-video-manager";
 //export * from "./app/mo-shader-manager";
 export * from "./app/mo-math-manager";
 export * from "./app/mo-script-manager";
@@ -75,5 +76,3 @@ export * from "./app/mo-resource-manager";
 */////
 export * from "./app/mo-console-state";
 export * from "./app/mo-console";
-
-

@@ -4,6 +4,7 @@ export class moEffectCamera extends MO.moEffect {
 
   RM: MO.moRenderManager;
   GL: MO.moGLManager;
+  VMan: MO.moVideoManager;
 
   Plane: MO.moPlaneGeometry;
   Mat: MO.moMaterialBasic;
@@ -14,78 +15,83 @@ export class moEffectCamera extends MO.moEffect {
 
   canvas: any;
   context: any;
+  texture: any;
+
+  m_DeviceName : MO.moText;
+  m_pCamera : MO.moLiveSystem;
+  m_pCameraTexture : MO.moTexture;
+  m_CaptureDevice : MO.moCaptureDevice;
 
   constructor() {
     super();
     this.SetName("camera");
-    /////////////////////////////
-    let vid = document.createElement("VIDEO");
-    vid.setAttribute("style", "display:none;");
-    document.body.appendChild(vid);
-    let can = document.createElement("CANVAS");
-    can.setAttribute("id", "moCanvasVideo");
-    can.setAttribute("style", "display:none;");
-    document.body.appendChild(can);
+
   }
 
   Init(callback?:any): boolean {
     this.RM = this.m_pResourceManager.GetRenderMan();
     this.GL = this.m_pResourceManager.GetGLMan();
+    this.VMan = this.m_pResourceManager.GetVideoMan();
 
-    let video = document.querySelector('video');
-    let n = <any>navigator;
-
-    n.getUserMedia = ( n.getUserMedia || n.webkitGetUserMedia || n.mozGetUserMedia  || n.msGetUserMedia );
 
     console.log(`moEffect${this.GetName()}.Init ${this.GetName()}`);
     if (this.PreInit((res) => {
 
-      let constraints:any = {
-        audio: false,
-        video: {
-          width: {ideal:this.m_Config.Int("width")},
-          height: {ideal:this.m_Config.Int("height")}
-        }
-      };
+      this.InitDevice("default");
 
-      if (n.mediaDevices === undefined) { //For Old Browsers
-        n.mediaDevices = {};
-      } //END mediaDevices for old browsers
 
-      if (n.mediaDevices.getUserMedia === undefined) {  //Check the existence of getUserMedia
-        n.mediaDevices.getUserMedia = function(constraints) {
-
-          var getUserMedia = n.webkitGetUserMedia || n.mozGetUserMedia;
-
-          if (!getUserMedia) {
-            return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
-          }
-
-          return new Promise(function(resolve, reject) {
-            getUserMedia.call(navigator, constraints, resolve, reject);
-          });
-        }
-      }//END check for getUserMedia
-
-      n.mediaDevices.getUserMedia(constraints).then(function(stream) {
-        if ("srcObject" in video) {
-          video.srcObject = stream;
-        } else {
-          video.src = window.URL.createObjectURL(stream);//video.src just for older implementations
-        }
-        video.onloadedmetadata = function(e) {
-          video.play();
-        };
-      });
-
-      this.canvas = document.getElementById('moCanvasVideo');
-      this.context = this.canvas.getContext('2d');
 
       if (callback) callback(res);
     }) == false) {
       return false;
     }
     return true;
+  }
+
+  InitDevice( camera : MO.moText ) : void {
+    console.log("InitDevice",camera);
+    if (this.CheckIfDeviceNameExists(camera)) {
+      this.m_DeviceName = camera;
+      this.m_pCamera = this.VMan.GetCameraByName( this.m_DeviceName, true /*CREATE!!!*/, this.m_CaptureDevice );
+      if (this.m_pCamera) {
+        this.m_pCameraTexture = this.m_pCamera.GetTexture();
+      }
+    }
+  }
+
+  CheckIfDeviceNameExists( camera : MO.moText ) : boolean {
+    var c:number = 0;
+    console.log("CheckIfDeviceNameExists",camera);
+
+    var CapDevs : MO.moCaptureDevices = this.VMan.GetCaptureDevices(true);
+
+    for( c=0; c<this.VMan.GetCameraCount(); c++ ) {
+      var Cam : MO.moLiveSystem = this.VMan.GetCamera(c);
+      if (Cam) {
+        if (Cam.GetCaptureDevice().GetName()==camera
+      || Cam.GetCaptureDevice().GetLabelName()==camera ) {
+          console.log("CheckIfDeviceNameExists: founded",camera);
+          return true;
+        }
+      }
+    }
+
+    if (camera=="default" && this.VMan.GetCameraCount()>0) {
+      return true;
+    }
+
+    if (camera=="default" && CapDevs.length>0 ) {
+    var Cap : MO.moCaptureDevice = CapDevs[0];
+    if (Cap.IsPresent()) {
+      this.MODebug2.Message("moEffectCamera::CheckIfDeviceNameExists > default selected, at least one camera device is available. Cap. Label Name: "
+                    + Cap.GetLabelName()+" WxH:" + MO.IntToStr(Cap.GetSourceWidth())+"x"+ MO.IntToStr(Cap.GetSourceHeight()) );
+    } else {
+      this.MODebug2.Message("moEffectCamera::CheckIfDeviceNameExists > default selected, available but not present?");
+    }
+    return true;
+  }
+    console.log("CheckIfDeviceNameExists: NOTHING, camera count:",this.VMan.GetCameraCount());
+    return false;
   }
 
   Draw( p_tempo : MO.moTempo, p_parentstate : MO.moEffectState = null ) : void {
@@ -102,11 +108,17 @@ export class moEffectCamera extends MO.moEffect {
     }
     if (this.Mat) {
       //Texture of WebCam
+      /*
       this.context.drawImage(document.querySelector('video'), 0, 0, this.canvas.width, this.canvas.height);
-      let texture = new MO.three.Texture(this.canvas);
-      texture.minFilter = MO.three.LinearFilter;
-      texture.needsUpdate = true;//Important for update
-      this.Mat.map = texture;
+      if (this.texture) {
+        this.texture.needsUpdate = true;//Important for update
+        this.Mat.map = this.texture;
+      }
+      */
+      if (this.m_pCamera) {
+        this.m_pCamera.Update();
+        this.Mat.map = this.m_pCameraTexture._texture;
+      }
       //Params
       this.Mat.transparent = true;
       this.Mat.color = ccolor;

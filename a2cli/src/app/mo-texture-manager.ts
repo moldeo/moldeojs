@@ -97,20 +97,37 @@ export class moTextureManager extends moResource {
     //return null;
   }
 
-  AddTexture(p_filename: moText, p_width: MOint = -1, p_height: MOint = -1, p_tex_param: moTexParam = MOUndefinedTex ) : MOint {
+  AddTexture( p_type: moTextureType, p_name : moText, p_width?: number, p_height?:number) : MOint;
+  AddTexture( p_filename: moText, p_width?: MOint, p_height?: MOint, p_tex_param?: moTexParam ) : MOint;
+  AddTexture( arg1: any, arg2?: any, arg3?: any, arg4?: any ) : MOint {
     //console.log("AddTexture", p_filename, p_width, p_height, p_tex_param );
-
     var DMan: moDataManager = this.m_pResourceManager.MODataMan;
-    var name : moText = p_filename;
+    var name : moText;
     var res : boolean = false;
     var type: moTextureType;
-    var ptex : moTexture = this.CreateTexture(type, name);
+    var ptex : moTexture;
+
+    var p_width : number;
+
+    if (typeof arg1 == "number" && typeof arg2 == "string") {
+      console.log("AddTexture Number");
+      type = arg1;
+      name = arg2;
+    } else {
+      name = arg1;
+      if (arg2) {
+        p_width = arg2;
+      } else p_width = -1; 
+      type = moTextureType.MO_TYPE_TEXTURE;
+    }
+    ptex = this.CreateTexture(type, name);
+
 
     if (ptex != null) {
       res = true;
       if (p_width == -1) {
-        var fullfilename = DMan.NameToPath(p_filename);
-        type = this.GetTypeForFile(p_filename);
+        var fullfilename = DMan.NameToPath(name);
+        type = this.GetTypeForFile(name);
         //TexFileName : moFile = new moFile( p_filename );
         //p_filename = TexFileName.GetAbsolutePath();
         if (type == moTextureType.MO_TYPE_TEXTURE) {
@@ -134,7 +151,7 @@ export class moTextureManager extends moResource {
       return ptex.GetMOId();
 
     }	else {
-      this.MODebug2.Error("moTextureManager::AddTexture > filename: " + p_filename + " failed BuildFromFile()/LoadMovieFile()");
+      this.MODebug2.Error("moTextureManager::AddTexture > filename: " + name + " failed BuildFromFile()/LoadMovieFile()");
       //this.DeleteTexture(ptex.GetMOId());
       return -1;
     }
