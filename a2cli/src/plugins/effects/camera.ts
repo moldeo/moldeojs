@@ -37,6 +37,11 @@ export class moEffectCamera extends MO.moEffect {
     console.log(`moEffect${this.GetName()}.Init ${this.GetName()}`);
     if (this.PreInit((res) => {
 
+      this.m_CaptureDevice = new MO.moCaptureDevice();
+      this.m_CaptureDevice.m_Name = "default";
+      this.m_CaptureDevice.m_LabelName = "LIVEIN0";
+      this.m_CaptureDevice.m_SourceWidth = this.m_Config.Int("width");
+      this.m_CaptureDevice.m_SourceHeight = this.m_Config.Int("height");
       this.InitDevice("default");
 
 
