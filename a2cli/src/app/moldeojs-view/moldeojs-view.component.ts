@@ -106,7 +106,7 @@ export class MoldeojsViewComponent implements OnInit {
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/01_Icon/01_Icon.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/02_Plane/02_Plane.mol" } );
 
-    this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/08_Camera/08_Camera.mol" } );
+    this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/08_Camera/08_Camera.mol" } );
 
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "molrepos/museo/mural/mural_partis.mol" } );

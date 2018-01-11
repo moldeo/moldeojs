@@ -21,11 +21,11 @@
         "styles.css"
       ],
       "scripts": [],
-      "environments": {
-        "source": "environments/environment.ts",
-        "dev": "environments/environment.ts",
-        "prod": "environments/environment.prod.ts"
-      }
+      "environmentSource": "environments/environment.ts",
+	"environments": {
+	  "dev": "environments/environment.ts",
+	  "prod": "environments/environment.prod.ts"
+	}
     }
   ],
   "addons": [],
@@ -54,6 +54,9 @@
       "module": false,
       "pipe": true,
       "service": true
+    },
+    "build": {
+      "showCircularDependencies": false
     }
   }
 }
