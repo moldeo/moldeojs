@@ -41,7 +41,6 @@
     "rxjs": "5.4.3",
     "three": "^0.83.0",
     "ts-helpers": "^1.1.2",
-    "typescript": "^2.6.2",
     "xml2js": "^0.4.17",
     "zone.js": "^0.7.4"
   },
@@ -66,7 +65,7 @@
     "protractor": "~5.1.0",
     "ts-node": "~2.0.0",
     "tslint": "~4.5.0",
-    "typescript": "~2.2.0",
+    "typescript": "2.5.3",
     "webdriver-manager": "11.1.1"
   }
 }
