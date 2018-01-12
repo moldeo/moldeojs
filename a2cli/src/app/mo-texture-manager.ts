@@ -48,15 +48,15 @@ export class moTextureManager extends moResource {
   Init(): boolean {
     this.default_id = this.AddTexture("default",512,512);
     this.DefaultTexture = this.GetTexture(this.default_id);
-    this.DefaultTexture._texture = this.m_TextureLoader.load("data/icons/moldeologo.png");
+    this.DefaultTexture._texture = this.m_TextureLoader.load("./assets/data/icons/moldeologo.png");
 
     this.default_flip_id = this.AddTexture("defaultflip",512,512);
     this.DefaultTextureFlip = this.GetTexture(this.default_flip_id);
-    this.DefaultTextureFlip._texture = this.m_TextureLoader.load("data/icons/moldeologo_flip.png");
+    this.DefaultTextureFlip._texture = this.m_TextureLoader.load("./assets/data/icons/moldeologo_flip.png");
 
     this.moldeotrans_id = this.AddTexture("moldeotrans",512,512);
     this.MoldeotransTexture = this.GetTexture(this.moldeotrans_id);
-    this.MoldeotransTexture._texture = this.m_TextureLoader.load("data/icons/moldeotrans2.png");
+    this.MoldeotransTexture._texture = this.m_TextureLoader.load("./assets/data/icons/moldeotrans2.png");
 
     return super.Init();
   }
@@ -117,7 +117,7 @@ export class moTextureManager extends moResource {
       name = arg1;
       if (arg2) {
         p_width = arg2;
-      } else p_width = -1; 
+      } else p_width = -1;
       type = moTextureType.MO_TYPE_TEXTURE;
     }
     ptex = this.CreateTexture(type, name);
