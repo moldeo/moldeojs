@@ -2814,6 +2814,29 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 
                   if (pPar.Geometry == undefined) {
                     pPar.Geometry = new MO.moPlaneGeometry( pPar.Size.x*pPar.ImageProportion, pPar.Size.y, 1, 1);
+                    //geometry.faceVertexUvs[0]
+                    if (pPar.Geometry) {
+                      if (this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_PATCH) {
+                        console.log("pPar.Geometry:",pPar.Geometry);
+                        //geometry.faceVertexUvs[0].push( THREE.Vector2(pPar.TCoord.x,pPar.TCoord.y),  );
+
+                        pPar.Geometry.faceVertexUvs[0][0][0].x = pPar.TCoord.x;
+                        pPar.Geometry.faceVertexUvs[0][0][0].y = 1.0-(pPar.TCoord.y-pPar.TSize.y);
+                        pPar.Geometry.faceVertexUvs[0][0][1].x = pPar.TCoord.x;
+                        pPar.Geometry.faceVertexUvs[0][0][1].y = 1.0-pPar.TCoord.y;
+                        pPar.Geometry.faceVertexUvs[0][0][2].x = (pPar.TCoord.x+pPar.TSize.x);
+                        pPar.Geometry.faceVertexUvs[0][0][2].y = 1.0-(pPar.TCoord.y-pPar.TSize.y);
+
+                        pPar.Geometry.faceVertexUvs[0][1][0].x = pPar.TCoord.x;
+                        pPar.Geometry.faceVertexUvs[0][1][0].y = 1.0-pPar.TCoord.y;
+                        pPar.Geometry.faceVertexUvs[0][1][1].x = pPar.TCoord.x+pPar.TSize.x;
+                        pPar.Geometry.faceVertexUvs[0][1][1].y = 1.0-pPar.TCoord.y;
+                        pPar.Geometry.faceVertexUvs[0][1][2].x = pPar.TCoord.x+pPar.TSize.x;
+                        pPar.Geometry.faceVertexUvs[0][1][2].y = 1.0-(pPar.TCoord.y-pPar.TSize.y);
+
+                        pPar.Geometry.uvsNeedUpdate = true;
+                      }
+                    }
                     /*
                     pPar.Geometry = new THREE.Geometry();
                     pPar.Geometry.vertices.push(new THREE.Vector3(A.x, A.y, A.z));
@@ -2855,7 +2878,8 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                     rgba.r * this.Mat.color.r,
                     rgba.g * this.Mat.color.g,
                     rgba.b * this.Mat.color.b);
-                  if (this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_UNIT ) {
+                  if (this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_UNIT ||
+                      this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_PATCH) {
                     pPar.Material.map = this.m_Config.Texture("texture")._texture;
                   } else if (this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_MANYBYORDER) {
                       //

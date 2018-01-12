@@ -173,6 +173,28 @@ export class moLiveSystem extends moAbstract {
 
   }
 
+	/**
+	* https://www.w3.org/TR/mediacapture-streams/#dom-mediatracksupportedconstraints
+	*
+	* dictionary MediaTrackSupportedConstraints {
+    boolean width = true;
+    boolean height = true;
+    boolean aspectRatio = true;
+    boolean frameRate = true;
+    boolean facingMode = true;
+    boolean volume = true;
+    boolean sampleRate = true;
+    boolean sampleSize = true;
+    boolean echoCancellation = true;
+    boolean autoGainControl = true;
+    boolean noiseSuppression = true;
+    boolean latency = true;
+    boolean channelCount = true;
+    boolean deviceId = true;
+    boolean groupId = true;
+};
+	*/
+
   Init() : boolean {
     var _self = this;
     this.m_VideoGraph = new moUserMediaVideoGraph();
