@@ -1,0 +1,8 @@
+Error! moConfig::LoadConfig > Error /sesion.mos doesn't exists.
+Error! XML ERROR:/sesion.mos XML error:Failed to open file
+Error! moDataSessionConfig > Not Loaded /sesion.mos
+Error! moConfig::LoadConfig > Error /sesion.mos doesn't exists.
+Error! XML ERROR:/sesion.mos XML error:Failed to open file
+Error! moDataSessionConfig > Not Loaded /sesion.mos
+Warning! Extra parameters must be defined at the end of config file. "__console__"
+Warning! <moConsole>[__console__]::Init()_moDefineParamIndex > Config parameter "videoshots"  warning. Bad indexation could cause errors.

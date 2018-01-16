@@ -107,7 +107,8 @@ export class MoldeojsViewComponent implements OnInit {
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/02_Plane/02_Plane.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/08_Camera/08_Camera.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol" } );
-    this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/08p_CameraParticles/08p_CameraParticles.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/08p_CameraParticles/08p_CameraParticles.mol" } );
+    this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/08f_CameraFeat/08f_CameraFeat.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/moldeoorg/dante/pajarosdefuego/pajaros_de_fuegoX.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsfera.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/samples/SimpleProject/simple_projectX.mol" } );

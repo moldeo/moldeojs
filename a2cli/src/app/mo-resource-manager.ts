@@ -47,7 +47,9 @@ import { moDebugManager } from "./mo-debug-manager";
 
 import { moScriptManager } from "./mo-script-manager";
 
+import * as JSFEAT from 'jsfeat'; //JSFeat
 
+export var jsfeat = JSFEAT;
 
 export
 {

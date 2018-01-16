@@ -68,6 +68,14 @@ PluginsDefinitions.push( new moPluginDefinition(
   moMoldeoObjectType.MO_OBJECT_EFFECT,
 moEffectCamera ));
 
+/// Effect Jsfeat ====================================================================
+import { moEffectJsfeat } from "../plugins/effects/jsfeat";
+PluginsDefinitions.push( new moPluginDefinition(
+  "jsfeat",
+  "/plugins/effects/jsfeat.ts",
+  moMoldeoObjectType.MO_OBJECT_EFFECT,
+moEffectJsfeat ));
+
 /// Effect Icon ====================================================================
 import { moEffectIcon } from "../plugins/effects/icon";
 PluginsDefinitions.push( new moPluginDefinition(
