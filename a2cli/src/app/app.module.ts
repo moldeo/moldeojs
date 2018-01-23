@@ -8,7 +8,10 @@ import { ThreeviewerComponent } from './threeviewer/threeviewer.component';
 import { MoldeojsViewComponent } from './moldeojs-view/moldeojs-view.component';
 import { RouterModule, Routes } from '@angular/router';
 
+import { AppBoostrapModule } from './app-boostrap/app-boostrap.module';
+
 import { ConsoleService } from "./console.service";
+import { ViewService } from "./view.service";
 
 import { JsonService } from './json.service';
 import { FileAdminService } from './fileadmin.service';
@@ -25,11 +28,13 @@ const appRoutes: Routes = [
   ],
   imports: [
     BrowserModule,
+    AppBoostrapModule,
     FormsModule,
     HttpModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [ConsoleService, JsonService, FileAdminService ],
+  providers: [ViewService,ConsoleService, JsonService, FileAdminService ],
+  entryComponents: [MoldeojsViewComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

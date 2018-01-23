@@ -1,5 +1,72 @@
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed"
+          (click)="isCollapsed = !isCollapsed"
+          [ngClass]="{'collapsed': isCollapsed}"
+          aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+            <a class="navbar-brand">
+              <img src="assets/data/icons/M@_moldeo.svg" class="logo">
+            </a>
+            <span class="navbar-brand">Moldeo JS</span>
+        </div>
+        <div class="collapse navbar-collapse"
+            (collapsed)="collapsed($event)"
+            (expanded)="expanded($event)"
+            [collapse]="isCollapsed"
+            >
+          <ul class="nav navbar-nav">
+              <li class="active"><a href="http://www.moldeo.org" target="_blank">
+                www.moldeo.org
+              </a></li>
+              <li><a href="http://www.moldeo.org/forum/how-to" target="_blank">Moldeo JS API</a></li>
+              <li class="dropdown" dropdown> <!-- {1} -->
+                  <a dropdownToggle role="button"> <!-- {2} -->
+                    Samples <span class="caret"></span></a>
+                  <ul *dropdownMenu class="dropdown-menu"> <!-- {3} -->
+                      <li><a href="#" (click)="loadsample($event,0)">Ejemplo 1</a></li>
+                      <li><a href="#" (click)="loadsample($event,1)">Ejemplo 2</a></li>
+                      <li><a href="#" (click)="loadsample($event,2)">Ejemplo 3</a></li>
+                      <li role="separator" class="divider"></li>
+                      <li><a href="#" (click)="loadsample($event,3)">Ejemplos 4</a></li>
+                      <li role="separator" class="divider"></li>
+                      <li><a href="#" (click)="loadsample($event,4)">Ejemplos 5</a></li>
+                  </ul>
+              </li>
+          </ul>
+        </div>
+    </div>
+</nav>
+<!--
+<button type="button" class="btn btn-primary"
+        tooltip="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">
+Button with tooltip
+</button>
+
+<button type="button" class="btn btn-info"
+        (click)="openModal(template)">Create template modal</button>
+
+<ng-template #template>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">Modal</h4>
+        <button type="button" class="close pull-right"
+                aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body">
+        This is a modal.
+    </div>
+</ng-template>
+-->
 <!--<app-threeviewer></app-threeviewer>-->
 <!--<moldeocontrol></moldeocontrol>-->
-<moldeojs-view></moldeojs-view>
+<!--<ng-template #dynamic></ng-template>-->
+<moldeojs-view [mol]="this.sample"></moldeojs-view>
 <!--router-outlet></router-outlet-->
 <!--touch-component></touch-component-->

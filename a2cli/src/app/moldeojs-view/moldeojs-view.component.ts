@@ -1,5 +1,6 @@
 import {
-  Component, OnInit, ElementRef,
+  Component, OnInit, OnChanges, ElementRef, Input,
+  SimpleChange, SimpleChanges,
   ContentChild, ViewChild, ViewChildren
 } from '@angular/core';
 
@@ -20,8 +21,10 @@ export class MoldeojsViewComponent implements OnInit {
 
   message: string = "- no project -";
   hostElement: ElementRef;
+  rendererElement : HTMLCanvasElement;
   test: number = 0;
   testmax: number = 120;
+  @Input() mol: string;
 
   //jsonRute : string = 'http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_tema_=Mosaico&output=json';
   //jsonRute: string = "http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_temaid_=423&output=json";
@@ -90,24 +93,65 @@ export class MoldeojsViewComponent implements OnInit {
   }
 
 
+  ngOnChanges(changes: SimpleChanges) {
+
+      console.log("MoldeojsViewComponent::ngOnChanges > changes:", changes);
+      if (changes["mol"]) {
+        const mol : SimpleChange = changes.mol;
+        console.log('prev value: ', mol.previousValue);
+        console.log('got name: ', mol.currentValue);
+
+        if (mol.firstChange) {
+          this.MoldeoCS.Init({ "consoleconfig": "./assets/"+mol.currentValue } );
+        }
+
+        if (!mol.firstChange && mol.previousValue!=mol.currentValue) {
+          console.log("Change view please!");
+          if (this.MoldeoCS.m_Console.Initialized()) {
+            this.MoldeoCS.Finish();
+            this.MoldeoCS.Init({ "consoleconfig": "./assets/"+mol.currentValue } );
+          } else {
+            this.MoldeoCS.Init({ "consoleconfig": "./assets/"+mol.currentValue } );
+          }
+        }
+      }
+
+
+      //console.log('prev value: ', name.previousValue);
+      //console.log('got name: ', name.currentValue);
+      //this._name = name.currentValue.toUpperCase();
+  }
+
   ngOnInit() {
+
+    console.log("MoldeojsViewComponent::ngOnInit", this);
     this.MoldeoCS.updated$.subscribe((result) => {
+      //called when ConsoleService has created the Renderer Element
       if (result == true) {
-        //console.log("MoldeojsView > Console Service OK! Associate renderer to HTML Element", this.MoldeoCS.m_Console);
-        var RMan = this.MoldeoCS.m_Console.m_pResourceManager.MORenderMan;
-        this.hostElement.nativeElement.appendChild( RMan.m_Renderer.domElement );
-        RMan.m_Renderer.clear();
-        this.test = 0;
-        this.animate();
+        console.log("MoldeojsView > Console Service OK! Associate renderer to HTML Element", this.MoldeoCS.m_Console);
+        var RM = this.MoldeoCS.m_Console.GetResourceManager();
+        if (RM) {
+          var RenderMan = RM.GetRenderMan();
+          if (RenderMan) {
+            if (this.rendererElement) this.rendererElement.remove();
+            this.rendererElement = RenderMan.m_Renderer.domElement;
+            this.hostElement.nativeElement.appendChild( this.rendererElement );
+            RenderMan.m_Renderer.clear();
+            this.test = 0;
+            this.animate();
+          }
+        }
       }
     });
+
+
 
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/00_Image/00_Image.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/01_Icon/01_Icon.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/02_Plane/02_Plane.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/08_Camera/08_Camera.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol" } );
-    this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/08p_CameraParticles/08p_CameraParticles.mol" } );
+    //this.MoldeoCS.Init({ "consoleconfig": "./assets/"+this.mol } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/moldeoorg/dante/pajarosdefuego/pajaros_de_fuegoX.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsfera.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/samples/SimpleProject/simple_projectX.mol" } );

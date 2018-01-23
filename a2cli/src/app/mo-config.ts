@@ -1,4 +1,5 @@
 import * as xml2js from "xml2js";
+import * as xmljs from "xml-js";
 
 import {
   MOint, MOuint, MOboolean, MOfloat, MOdouble, MOlong, MOulong,
@@ -235,6 +236,8 @@ export class moConfig extends moAbstract {
     if ( configtext && typeof configtext == "string" ) {
         //console.log("moConfig::LoadConfig > Full text", configname);
         //parse XML:
+        console.log( xmljs.xml2json( configtext, {compact: true, spaces: 4}) );
+
         xml2js.parseString( configtext, (err, result) => {
           //console.log( configtext, result);
           //console.log('Parsing done');

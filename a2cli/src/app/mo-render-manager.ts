@@ -65,6 +65,8 @@ export class moDisplay extends moAbstract {
     this.m_DisplayResolution = new moResolution(w,h);
   }
 
+  
+
     Resolution() : moResolution {
       return this.m_DisplayResolution;
     }

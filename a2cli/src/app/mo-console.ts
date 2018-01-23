@@ -1039,4 +1039,14 @@ export class moConsole extends moMoldeoObject {
 
   }
 
+  Finish() : boolean {
+    this.m_ConsoleState = null;
+    this.m_ConsoleState = new moConsoleState();
+    this.m_EffectManager = null;
+    this.m_EffectManager = new moEffectManager();
+    this.m_MoldeoObjects = [];
+    this.m_MoldeoSceneObjects = [];
+    return super.Finish();
+  }
+
 };
