@@ -358,9 +358,8 @@ export class moConfig extends moAbstract {
         }//fin "PRECONFIGS"
         this.m_ConfigLoaded = true;
         if (callback) callback(MO_CONFIG_OK);
-        return MO_CONFIG_OK;
 
-      return MO_CONFIG_OK;//MUST BE MO_CONFIG_LOADING
+        return MO_CONFIG_OK;      
     }
     this.m_ConfigLoaded = false;
     return MO_CONFIGFILE_NOT_FOUND;
