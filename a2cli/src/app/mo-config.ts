@@ -236,130 +236,148 @@ export class moConfig extends moAbstract {
     if ( configtext && typeof configtext == "string" ) {
         //console.log("moConfig::LoadConfig > Full text", configname);
         //parse XML:
-        console.log( xmljs.xml2json( configtext, {compact: true, spaces: 4}) );
+        var result : any = xmljs.xml2js( configtext, {alwaysArray: true,compact: true,ignoreComment: true, alwaysChildren: false});
+        //{compact: true, spaces: 4}
+        console.log( "xmljs",result );
+        var attr_sym = "_attributes";
+        var xml_text_value = "_text";
 
-        xml2js.parseString( configtext, (err, result) => {
-          //console.log( configtext, result);
-          //console.log('Parsing done');
-          this.m_ParamsByName = {};
-          if (typeof result == "object")
-          if ("MOCONFIG" in result) {
-            if (result["MOCONFIG"]["$"]) {
-              this.m_MajorVersion = result["MOCONFIG"]["$"]["majorversion"];
-              this.m_MinorVersion = result["MOCONFIG"]["$"]["minorversion"];
-            }
-            if ("DEFINITION" in result["MOCONFIG"]) {
-              var fxname = result["MOCONFIG"]["DEFINITION"]["name"];
-              var objecttype = result["MOCONFIG"]["DEFINITION"]["class"];
-              this.Set(fxname, objecttype);
-            }
-            if ("CONFIGPARAMS" in result["MOCONFIG"]) {
-              if (result["MOCONFIG"]["CONFIGPARAMS"].length > 0) {
-                var CFGPARAMS = result["MOCONFIG"]["CONFIGPARAMS"][0];
-                if ("PARAM" in CFGPARAMS) {
-                  var PARAMS = CFGPARAMS["PARAM"];
-                  this.m_Params = [];
-                  if (PARAMS.length > 0) {
-                    for (var PARAM_I in PARAMS) {
-                      var PARAM = PARAMS[PARAM_I];
-                      //console.log("Adding Param:", PARAM);
-                      var p_param_def = new moParamDefinition(
-                        PARAM["$"]["name"],
-                        PARAM["$"]["type"],
-                        PARAM["$"]["property"],
-                        PARAM["$"]["group"],
-                        PARAM["$"]["interpolation"],
-                        PARAM["$"]["duration"],
-                        PARAM["$"]["options"]
-                      );
-                      var p_param = new moParam(p_param_def);
-                      this.m_Params.push(p_param);
-                      this.m_ParamsByName["" + p_param.m_ParamDefinition.m_Name] = p_param;
-                      var PARAMVALS = [];
-                      if ("VAL" in PARAM) PARAMVALS = PARAM["VAL"];
-                      if (PARAMVALS.length > 0) {
-                        for (var PARAMVAL_I in PARAMVALS) {
-                          var VAL = PARAMVALS[PARAMVAL_I];
-                          var newValue: moValue = new moValue();
-                          var VALSUBS = VAL["D"];
+        this.m_ParamsByName = {};
+        if (typeof result == "object")
+        if ("MOCONFIG" in result) {
+          if (result["MOCONFIG"][0][attr_sym]) {
+            this.m_MajorVersion = result["MOCONFIG"][0][attr_sym]["majorversion"];
+            this.m_MinorVersion = result["MOCONFIG"][0][attr_sym]["minorversion"];
+          }
+          if ("DEFINITION" in result["MOCONFIG"][0]) {
+            var fxname = result["MOCONFIG"][0]["DEFINITION"]["name"];
+            var objecttype = result["MOCONFIG"][0]["DEFINITION"]["class"];
+            this.Set(fxname, objecttype);
+          }
+          if ("CONFIGPARAMS" in result["MOCONFIG"][0]) {
+            if (result["MOCONFIG"][0]["CONFIGPARAMS"].length > 0) {
+              var CFGPARAMS = result["MOCONFIG"][0]["CONFIGPARAMS"][0];
+              if ("PARAM" in CFGPARAMS) {
+                var PARAMS = CFGPARAMS["PARAM"];
+                this.m_Params = [];
+                if (PARAMS.length > 0) {
+                  for (var PARAM_I in PARAMS) {
+                    var PARAM = PARAMS[PARAM_I];
+                    //console.log("Adding Param:", PARAM);
+                    var p_param_def = new moParamDefinition(
+                      PARAM[attr_sym]["name"],
+                      PARAM[attr_sym]["type"],
+                      PARAM[attr_sym]["property"],
+                      PARAM[attr_sym]["group"],
+                      PARAM[attr_sym]["interpolation"],
+                      PARAM[attr_sym]["duration"],
+                      PARAM[attr_sym]["options"]
+                    );
+                    var p_param = new moParam(p_param_def);
+                    this.m_Params.push(p_param);
+                    this.m_ParamsByName["" + p_param.m_ParamDefinition.m_Name] = p_param;
+                    var PARAMVALS = [];
+                    if ("VAL" in PARAM) PARAMVALS = PARAM["VAL"];
+                    if (PARAMVALS.length > 0) {
+                      for (var PARAMVAL_I in PARAMVALS) {
+                        var VAL = PARAMVALS[PARAMVAL_I];
+                        var newValue: moValue = new moValue();
+                        var VALSUBS = VAL["D"];
 
-                          if (VALSUBS !== undefined && VALSUBS.length > 0) {
-                            for (var SUBVAL_I in VALSUBS) {
-                              var SUBVAL = VALSUBS[SUBVAL_I];
-                              //console.log(" <D> Subvalue:", SUBVAL);
-                              var vbd: moValueDefinition = new moValueDefinition();
+                        if (VALSUBS !== undefined && VALSUBS.length > 0) {
+                          for (var SUBVAL_I in VALSUBS) {
+                            var SUBVAL = VALSUBS[SUBVAL_I];
+                            //console.log(" <D> Subvalue:", SUBVAL);
+                            var vbd: moValueDefinition = new moValueDefinition();
 
-                              var subvalue: moText = SUBVAL["_"];
-                              var subvaluetype: moText = SUBVAL["$"]["type"];
-
-                              newValue.AddSubValue(subvalue, subvaluetype);
-                              //console.log("newValue:", newValue);
-                              //var subvaluedata: moText = SUBVAL[0];
-                              if (newValue.m_List.length) {
-                                if (SUBVAL["$"]["code"])
-                                  newValue.m_List[newValue.m_List.length - 1].SetCodeName(SUBVAL["$"]["code"]);
-                                if (SUBVAL["$"]["attribute"])
-                                  newValue.m_List[newValue.m_List.length - 1].SetAttribute(SUBVAL["$"]["attribute"]);
-                                if (SUBVAL["$"]["min"])
-                                  newValue.m_List[newValue.m_List.length - 1].SetRange(
-                                    SUBVAL["$"]["min"],
-                                    SUBVAL["$"]["max"]);
-                              }
+                            var subvalue: moText = "";
+                            if (SUBVAL[xml_text_value]) {
+                              subvalue = SUBVAL[xml_text_value][0];
                             }
-                          }//VALSUBS > 0
-                          p_param.AddValue(newValue);
-                          p_param.m_ParamDefinition.m_Index = this.m_Params.length - 1;
-                        }
-                      }//hay params
-                    }
-                  }//for...
-                }//hay params
-                //console.log("Added params:", this.m_Params);
-              }//hay configparams >
-            }
-          }//fin "CONFIGPARAMS"
+                            var subvaluetype: moText = SUBVAL[attr_sym]["type"];
 
-          if ("PRECONFIGS" in result["MOCONFIG"]) {
-            //console.log(result["MOCONFIG"]);
-            if (result["MOCONFIG"]["PRECONFIGS"].length > 0) {
-              var PRECONFIGS = result["MOCONFIG"]["PRECONFIGS"][0];
-              this.m_PreConfigs = [];
-              //console.log(PRECONFIGS);
-              if (typeof PRECONFIGS == "object")
-              if ("PRE" in PRECONFIGS) {
-                var PRES = PRECONFIGS["PRE"];
-                if (PRES.length>0) {
-                  for (var PRE_I in PRES) {
-                    var PRECONF = PRES[PRE_I];
-                    var preconf_name = "preconf_" + PRE_I;
-                    if (PRECONF["$"]) preconf_name = PRECONF["$"]["name"];
-                    if (typeof PRECONF == "object") {
-                      var PREPARAMS = PRECONF["P"];
-                      var Pcfg: moPreconfig = new moPreconfig();
-                      //console.log(PREPARAMS);
-                      if (PREPARAMS.length > 0) {
-                        for (var P_I in PREPARAMS) {
-                          var P = PREPARAMS[P_I];
-                          var name = "" + P_I;
-                          if (P["$"]) if (P["$"]["name"]) name = P["$"]["name"];
-                          var value = P["_"];
-                          //console.log(name, value);
-                        }
+                            newValue.AddSubValue(subvalue, subvaluetype);
+                            //console.log("newValue:", newValue);
+                            //var subvaluedata: moText = SUBVAL[0];
+                            if (newValue.m_List.length) {
+                              if (SUBVAL[attr_sym]["code"])
+                                newValue.m_List[newValue.m_List.length - 1].SetCodeName(SUBVAL[attr_sym]["code"]);
+                              if (SUBVAL[attr_sym]["attribute"])
+                                newValue.m_List[newValue.m_List.length - 1].SetAttribute(SUBVAL[attr_sym]["attribute"]);
+                              if (SUBVAL[attr_sym]["min"])
+                                newValue.m_List[newValue.m_List.length - 1].SetRange(
+                                  SUBVAL[attr_sym]["min"],
+                                  SUBVAL[attr_sym]["max"]);
+                            }
+                          }
+                        }//VALSUBS > 0
+                        p_param.AddValue(newValue);
+                        p_param.m_ParamDefinition.m_Index = this.m_Params.length - 1;
+                      }
+                    }//hay params
+                  }
+                }//for...
+              }//hay params
+              //console.log("Added params:", this.m_Params);
+            }//hay configparams >
+          }
+        }//fin "CONFIGPARAMS"
+
+        if ("PRECONFIGS" in result["MOCONFIG"][0]) {
+          //console.log(result["MOCONFIG"]);
+          if (result["MOCONFIG"][0]["PRECONFIGS"].length > 0) {
+            var PRECONFIGS = result["MOCONFIG"][0]["PRECONFIGS"][0];
+            this.m_PreConfigs = [];
+            //console.log(PRECONFIGS);
+            if (typeof PRECONFIGS == "object")
+            if ("PRE" in PRECONFIGS) {
+              var PRES = PRECONFIGS["PRE"];
+              if (PRES.length>0) {
+                for (var PRE_I in PRES) {
+                  var PRECONF = PRES[PRE_I];
+                  var preconf_name = "preconf_" + PRE_I;
+                  if (PRECONF[attr_sym]) preconf_name = PRECONF["$"]["name"];
+                  if (typeof PRECONF == "object") {
+                    var PREPARAMS = PRECONF["P"];
+                    var Pcfg: moPreconfig = new moPreconfig();
+                    //console.log(PREPARAMS);
+                    if (PREPARAMS.length > 0) {
+                      for (var P_I in PREPARAMS) {
+                        var P = PREPARAMS[P_I];
+                        var name = "" + P_I;
+                        if (P[attr_sym]) if (P[attr_sym]["name"]) name = P[attr_sym]["name"];
+                        var value = P[xml_text_value][0];
+                        //console.log(name, value);
                       }
                     }
                   }
                 }
               }
             }
-          }//fin "PRECONFIGS"
-          this.m_ConfigLoaded = true;
-          if (callback) callback(MO_CONFIG_OK);
-          return MO_CONFIG_OK;
-        });
+          }
+        }//fin "PRECONFIGS"
+        this.m_ConfigLoaded = true;
+        if (callback) callback(MO_CONFIG_OK);
+        return MO_CONFIG_OK;
+
       return MO_CONFIG_OK;//MUST BE MO_CONFIG_LOADING
     }
     this.m_ConfigLoaded = false;
     return MO_CONFIGFILE_NOT_FOUND;
+  }
+
+  SaveConfig( p_filename? : moText ) : MOint  {
+    var resultjs : Object = {};
+
+    //this.m_MajorVersion;
+    //this.m_MinorVersion;
+
+    return MO_CONFIG_OK;
+  }
+
+  SaveConfigAs( p_filename? : moText ) : MOint  {
+
+    return MO_CONFIG_OK;
   }
 
   GetParams() : moParams {

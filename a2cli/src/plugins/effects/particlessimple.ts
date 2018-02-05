@@ -2817,7 +2817,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                     //geometry.faceVertexUvs[0]
                     if (pPar.Geometry) {
                       if (this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_PATCH) {
-                        console.log("pPar.Geometry:",pPar.Geometry);
+                        //console.log("pPar.Geometry:",pPar.Geometry);
                         //geometry.faceVertexUvs[0].push( THREE.Vector2(pPar.TCoord.x,pPar.TCoord.y),  );
 
                         pPar.Geometry.faceVertexUvs[0][0][0].x = pPar.TCoord.x;
