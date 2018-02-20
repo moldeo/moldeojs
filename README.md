@@ -50,9 +50,9 @@ Plugins are applied in chronological order, in three stages inside the drawing c
 
 
 # Contact:
-info@moldeo.org
-[Moldeo's Community on Facebook](https://www.facebook.com/comunidadmoldeo?3e71y) 
-www.moldeo.org
+- info@moldeo.org
+- [Moldeo's Community on Facebook](https://www.facebook.com/comunidadmoldeo?3e71y) 
+- www.moldeo.org
 
 # Demo
 https://moldeojs.moldeo.org/a2cli/dist/
