@@ -25,19 +25,7 @@ Instalá las dependencias y proyecto MoldeoJS ingresando en consola
 $ npm install  
 ```
 
-# Creá un nuevo proyecto
-1) En la consola ingresá 
-```sh
-$ npm start
-```
-2) Abrí una pestaá nueva en el browser como localhost:4200
-3) Hacé click en el botón 'Nuevo Proyecto'  
-(Captura de pantalla)
-4) Agregá nuevos objetos
-5) Visualizalos
-
-
-# ... O Utilizá un proyecto existente
+# Abrir un proyecto existente para empezar a utilizar la Plataforma
 Podés utilizar los proyectos existentes (samples) de la comunidad de Moldeo que se encuentran en la carpeta que descargaste  “moldeojs/a2cli/src/assets/molrepos”  y visualizarlos en el menú de Samples. 
 También podés escargar proyectos de la comunidad en  http://proyectos.moldeo.org/proyecto#head
 
