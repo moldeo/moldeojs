@@ -14,7 +14,7 @@ Moldeo is an Open Source platform for making interactive projects. MoldeoJS is i
 3) Install [Angular-CLI](https://angular.io/guide/quickstart)  desde tu terminal usando el comando: 
 
 ```sh
-$npm install -g @angular/cli
+$ npm install -g @angular/cli
 ```
 
 #  Execute MoldeoJS
