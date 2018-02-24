@@ -8,12 +8,12 @@
     }
   ],
   "scripts": {
-    "start": "ng serve",
+    "start": "ng serve -p 18080",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "ng test",
     "pree2e": "webdriver-manager update",
     "e2e": "protractor",
-    "build": "ng build && cp -R src/molrepos dist/molrepos && cp -R src/data dist/data",
+    "build": "ng build && cp -R src/assets/molrepos dist/molrepos && cp -R src/assets/data dist/data",
     "prepare": "cp -a electron/. dist/",
     "electron": "npm run prepare && electron ./dist",
     "package": "npm run build && npm run prepare && ./node_modules/electron-packager/cli.js dist App --platform=linux --arch=all --out=dist-app --overwrite",
