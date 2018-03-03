@@ -15,7 +15,7 @@ app.get('*', function(req, res, next) {
 var server = http.createServer(
   {
                   key: fs.readFileSync('privkey.pem'),
-                  cert: fs.readFileSync('fullchain.pem')
+                  cert: fs.readFileSync('cert.pem')
                },
   app);
 var io = require('socket.io')(server);
