@@ -12,7 +12,12 @@ app.get('*', function(req, res, next) {
 });
 
 
-var server = http.createServer(app);
+var server = http.createServer(
+  {
+                  key: fs.readFileSync('privkey.pem'),
+                  cert: fs.readFileSync('fullchain.pem')
+               },
+  app);
 var io = require('socket.io')(server);
 io.on('connection', function (socket) {
     console.log("One user is connected: ",socket.client.conn.id);
