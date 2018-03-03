@@ -2,3 +2,25 @@
 .logo {
   max-height: 32px;
 }
+
+.chat_online {
+
+  display: block;
+  position: fixed;
+  top: 40px;
+  right: 0px;
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 10px;
+  border: solid 1px #FFF;
+  padding: 10px;
+  font-size: 11px;
+  font-family: Arial;
+  color: #AAA;
+  margin: 5px;
+
+
+}
+
+#menu {
+  margin-bottom: 0px !important;
+}

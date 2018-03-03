@@ -3271,11 +3271,14 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 
     if (p_Event.m_Array.length > 0) {
       var mevent = p_Event.m_Array[0];
-      if (mevent["type"] == "mousedown" /*|| mevent["type"] == "mousemove"*/) {
+      if (mevent["type"] == "mousedown"
+    || mevent["type"] == "mousemove"
+      ) {
         this.mouse = new THREE.Vector2();
         this.mouse.x = mevent["clientX"]*2-1.0;
         this.mouse.y = -1*mevent["clientY"]*2+1.0;
       }
+
       //console.log("moParticlesSimple.Update() > ", this.mouse );
     } else {
       this.mouse = null;

@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default">
+<nav id="menu" class="navbar navbar-default">
     <div class="container-fluid">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed"
@@ -13,7 +13,7 @@
             <a class="navbar-brand">
               <img src="assets/data/icons/M@_moldeo.svg" class="logo">
             </a>
-            <span class="navbar-brand">Moldeo JS</span>
+            <span class="navbar-brand">Speak CCK Online (#{{clients}}) <input type="color"></span>
         </div>
         <div class="collapse navbar-collapse"
             (collapsed)="collapsed($event)"
@@ -21,14 +21,20 @@
             [collapse]="isCollapsed"
             >
           <ul class="nav navbar-nav">
+            <li class="active"><a href="http://www.moldeo.org" target="_blank">
+              www.moldeo.org
+            </a></li>
+
+            <!--<li class="active">fullscreen</li>-->
+            <!--
               <li class="active"><a href="http://www.moldeo.org" target="_blank">
                 www.moldeo.org
               </a></li>
               <li><a href="http://www.moldeo.org/forum/how-to" target="_blank">Moldeo JS API</a></li>
-              <li class="dropdown" dropdown> <!-- {1} -->
-                  <a dropdownToggle role="button"> <!-- {2} -->
+              <li class="dropdown" dropdown>
+                  <a dropdownToggle role="button">
                     Samples <span class="caret"></span></a>
-                  <ul *dropdownMenu class="dropdown-menu"> <!-- {3} -->
+                  <ul *dropdownMenu class="dropdown-menu">
                       <li><a href="#" (click)="loadsample($event,0)">Ejemplo 1</a></li>
                       <li><a href="#" (click)="loadsample($event,1)">Ejemplo 2</a></li>
                       <li><a href="#" (click)="loadsample($event,2)">Ejemplo 3</a></li>
@@ -38,10 +44,21 @@
                       <li><a href="#" (click)="loadsample($event,4)">Ejemplos 5</a></li>
                   </ul>
               </li>
+            -->
           </ul>
         </div>
+
     </div>
 </nav>
+<!--
+<div>
+    <input type="text" #msgInput name="" value="">
+    <button (click)="sendMsg(msgInput.value)">Send</button>
+    <br>
+    <p>msg:{{msg}}  </p>
+</div>
+-->
+<div class="chat_online">{{msg}}</div>
 <!--
 <button type="button" class="btn btn-primary"
         tooltip="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">
@@ -67,6 +84,6 @@ Button with tooltip
 <!--<app-threeviewer></app-threeviewer>-->
 <!--<moldeocontrol></moldeocontrol>-->
 <!--<ng-template #dynamic></ng-template>-->
-<moldeojs-view [mol]="this.sample"></moldeojs-view>
+<moldeojs-view #moldeojsview [mol]="this.sample" (window:resize)="onResize($event)"></moldeojs-view>
 <!--router-outlet></router-outlet-->
 <!--touch-component></touch-component-->

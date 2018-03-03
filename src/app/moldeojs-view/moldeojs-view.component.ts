@@ -197,4 +197,9 @@ export class MoldeojsViewComponent implements OnInit {
     this.contenidos.nativeElement.setAttribute("class", "contenido_over_hide");
   }
 
+  onResize( event: any ) : void {
+    //console.log("moldeojsview resize:",event, event.target.innerWidth);
+
+  }
+
 }

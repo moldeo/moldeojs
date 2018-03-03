@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, Injectable } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule, JsonpModule } from '@angular/http';
 
@@ -16,9 +16,16 @@ import { ViewService } from "./view.service";
 import { JsonService } from './json.service';
 import { FileAdminService } from './fileadmin.service';
 
+import {CollaborativeService} from './collaborative.service';
+
 const appRoutes: Routes = [
   //{ path: 'about', component: AboutComponent },
 ];
+
+import { SocketIoModule, SocketIoConfig} from 'ng-socket-io';
+
+
+const config: SocketIoConfig = { url: 'http://localhost:8988', options: {} };
 
 @NgModule({
   declarations: [
@@ -31,9 +38,10 @@ const appRoutes: Routes = [
     AppBoostrapModule,
     FormsModule,
     HttpModule,
+    SocketIoModule.forRoot(config),
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [ViewService,ConsoleService, JsonService, FileAdminService ],
+  providers: [ViewService,ConsoleService, JsonService, FileAdminService, CollaborativeService ],
   entryComponents: [MoldeojsViewComponent],
   bootstrap: [AppComponent]
 })

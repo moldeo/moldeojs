@@ -10,6 +10,24 @@
   background-color: rgba(255,255,255,0.2);
 }
 
+.running {
+
+  display: block;
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 10px;
+  border: solid 1px #FFF;
+  padding: 10px;
+  font-size: 11px;
+  font-family: Arial;
+  color: #AAA;
+  margin: 5px;
+
+
+}
+
 
 
 .contenido_over {

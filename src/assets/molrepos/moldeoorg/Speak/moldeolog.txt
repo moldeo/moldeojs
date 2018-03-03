@@ -1,0 +1,646 @@
+moGLManager::Init > GL VERSION: 4.4.0 NVIDIA 340.96
+moGLManager::Init > GL_MAJOR_VERSION: 4
+moGLManager::Init > GL_MINOR_VERSION: 4
+moGLManager::Init > GPU VENDOR STRING is NVIDIA Corporation
+moGLManager::Init > GPU RENDERER STRING is GeForce GT 640M/PCIe/SSE2
+moResourceManager::Init > Initializing Embedded Resources.
+moResourceManager::Init > Initializing Debug Man Resource.
+moResourceManager::Init > Initializing Net Man Resource.
+moResourceManager::Init > Initializing File Man Resource.
+moResourceManager::Init > Initializing Data Man Resource.
+ moDataSessionConfig() > m_AppPath empty, setting to Work Path: /home/fabricio/moldeo2/moldeoinstaller/moldeosamples/basic/08_Camera p_Port: 0 p_Address: 0
+ moDataSessionConfig() > m_AppPath: /home/fabricio/moldeo2/moldeoinstaller/moldeosamples/basic/08_Camera
+ moDataSessionConfig() > m_ConsoleConfigName: 
+ moDataSessionConfig() > m_ConsoleConfigName fixed to: /
+ moDataSessionConfig() > m_SessionFileName fixed to: /sesion.mos
+Error! moConfig::LoadConfig > Error /sesion.mos doesn't exists.
+Error! XML ERROR:/sesion.mos XML error:Failed to open file
+Error! moDataSessionConfig > Not Loaded /sesion.mos
+ moDataSessionConfig() > m_DataPath set to: /home/fabricio/moldeo2/moldeoinstaller/moldeosamples/basic/08_Camera
+File founded
+libmoldeo_erase
+libmoldeo_mirror
+libmoldeo_mirrorg
+File founded
+libmoldeo_camera
+libmoldeo_cubemap
+libmoldeo_grid
+libmoldeo_icon
+libmoldeo_icon3d
+libmoldeo_image
+libmoldeo_imageflow
+libmoldeo_imageflow3d
+libmoldeo_livedrawing2
+libmoldeo_movie
+libmoldeo_particlesfractal
+libmoldeo_particlessimple
+libmoldeo_plane
+libmoldeo_regularsolid
+libmoldeo_sound
+libmoldeo_sound3d
+libmoldeo_text
+libmoldeo_text3d
+libmoldeo_tunel
+File founded
+libmoldeo_calibrationgrid
+libmoldeo_debug
+libmoldeo_deformationgrid
+libmoldeo_postprocess2d
+libmoldeo_videowall
+libmoldeo_videowallmorphing
+File founded
+libmoldeo_channel
+libmoldeo_ligia
+libmoldeo_masterchannel
+libmoldeo_panel
+libmoldeo_presetpanel
+File founded
+libmoldeo_opencv
+libmoldeo_trackerklt
+File founded
+libmoldeo_keyboard
+libmoldeo_midi
+libmoldeo_mixer
+libmoldeo_mouse
+libmoldeo_netoscin
+libmoldeo_netoscout
+libmoldeo_nettuioin
+libmoldeo_ola
+libmoldeo_serial
+moResourceManager::Init > Initializing Filter Man Resource.
+moResourceManager::Init > Initializing Time Man Resource.
+moResourceManager::Init > Initializing GL Man Resource.
+moGLManager::Init > GL VERSION: 4.4.0 NVIDIA 340.96
+moGLManager::Init > GL_MAJOR_VERSION: 4
+moGLManager::Init > GL_MINOR_VERSION: 4
+moGLManager::Init > GPU VENDOR STRING is NVIDIA Corporation
+moGLManager::Init > GPU RENDERER STRING is GeForce GT 640M/PCIe/SSE2
+moResourceManager::Init > Initializing FrameBuffer Man Resource.
+moResourceManager::Init > Initializing Texture Man Resource.
+ moTexture::CalculateSize  of texture: preview_texture from 1024x1024 to 1024x1024
+ moTexture::CalculateSize  of texture: default from 256x256 to 256x256
+moTextureManager::Init > loading default file:/usr/share/moldeo/data/icons/moldeologo.png
+default bpp: 32 colortype:4 image_type:1 pitch:1024 > blue_mask: 255 green_mask:65280 red_mask:16711680
+ moTexture::CalculateSize  of texture: default from 256x256 to 256x256
+ moTexture::CalculateSize  of texture: moldeonegro from 1800x600 to 2048x1024
+moTextureManager::Init > loading logo file:/usr/share/moldeo/data/icons/moldeonegro.png
+ moTexture::CalculateSize  of texture: moldeotrans from 1800x600 to 2048x1024
+moTextureManager::Init > loading logo file:/usr/share/moldeo/data/icons/moldeotrans.png
+moldeotrans bpp: 32 colortype:4 image_type:1 pitch:8192 > blue_mask: 255 green_mask:65280 red_mask:16711680
+ moTexture::CalculateSize  of texture: moldeotrans from 2048x1024 to 2048x1024
+moResourceManager::Init > Initializing Decoder Manager Resource.
+moResourceManager::Init > Initializing Render Man Resource.
+moRenderManager::Init > Setting Render Manager Mode to:0
+moRenderManager::Init > Setting Render Manager for Render: 320x240 for Screen: 640x480
+moRenderManager::Init > Initializing glew.
+moRenderManager::Init > glew initialized succesfully!
+moRenderManager::Init > Using GLEW 1.13.0
+moRenderManager::Init >       glActiveTextureARB: 140014604395168
+moRenderManager::Init >       glMultiTexCoord2fARB: 140014604395936
+moRenderManager::Init >       GLEW_ARB_texture_non_power_of_two: 1
+moRenderManager::Init >       GLEW_ARB_color_buffer_float: 1
+moRenderManager::Init >       GLEW_ARB_multitexture: 1
+moRenderManager::Init >       GL_EXT_gpu_shader4: 1
+moRenderManager::Init >       GLEW_EXT_geometry_shader4: 1
+moRenderManager::Init >       GLEW_ARB_imaging: 1
+moRenderManager::Init >       GLEW_ARB_shading_language_100: 1
+moRenderManager::Init >       GLEW_EXT_framebuffer_object: 1
+moRenderManager::Init >       GL_MAX_FRAGMENT_UNIFORM_COMPONENTS_ARB: 35657
+moRenderManager::Init >       GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB: 35661
+moRenderManager::Init >       Max Texture Size: 16384
+moRenderManager::Init >       Max Texture Rectangle Size: 16384
+moRenderManager::Init >       Max Texture Buffer Size: 134217728
+moRenderManager::Init > Using framebuffer_object: creating one fbo per predefined textures (4). 
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moResourceManager::Init > Initializing Shader Man Resource.
+No shadermanager configuration file defined. Continue.
+moShaderManager::Init > Creating basic Render Shader...
+Vertex Shader compile log:()
+
+
+moShaderManager::Init > m_RenderShader Attrib IDs, position:0 normal:4 color:1 opacity:3 t_coord:3 t_coordedge:-1
+moShaderManager::Init > m_RenderShader Uniform IDs, projmatrix:4 wireframe_width:6 wseg:7 hseg:2 a_light:0 t_image:5
+moResourceManager::Init > Initializing Math Man Resource.
+moResourceManager::Init > Initializing Font Man Resource.
+moResourceManager::Init > Initializing GUI Man Resource.
+moResourceManager::Init > Initializing Sound Man Resource.
+No soundmanager configuration file defined. Continue.
+moResourceManager::Init > Initializing Video Man Resource.
+No videomanager configuration file defined. Continue.
+moResourceManager::Init > Initializing Model Man Resource.
+moResourceManager::Init > Initializing Script Man Resource.
+moLuaResourceManager constructor > L: 43630848
+moResourceManager:: Embedded Resources Ready.
+moConsole:: Initializing IODevice's Manager.
+moConsole::Init > Initializing Effects Manager.
+*****Initializing __console__ *****
+RegisterFunction > m_iMethodBase: 1for: PushDebugString
+RegisterFunction > m_iMethodBase: 37for: Play
+*****moMoldeoObject::Init > for plugin: __console__ config: 08_Camera.mol label: __console__ is OK!
+moConsole::Init > mol project opening....success 
+moConsole::Init > Initializing Resource Manager.  app path: /home/fabricio/moldeo2/moldeoinstaller/moldeosamples/basic/08_Camera data path:  config: 08_Camera.mol render mode: 0 screen size: 640x480 render size: 640x480
+moResourceManager::Init > Initializing Embedded Resources.
+moResourceManager::Init > Initializing Debug Man Resource.
+moResourceManager::Init > Initializing Net Man Resource.
+moResourceManager::Init > Initializing File Man Resource.
+moResourceManager::Init > Initializing Data Man Resource.
+ moDataSessionConfig() > m_AppPath: /home/fabricio/moldeo2/moldeoinstaller/moldeosamples/basic/08_Camera
+ moDataSessionConfig() > m_ConsoleConfigName: 08_Camera.mol
+ moDataSessionConfig() > m_ConsoleConfigName fixed to: /08_Camera.mol
+ moDataSessionConfig() > m_SessionFileName fixed to: /sesion.mos
+Error! moConfig::LoadConfig > Error /sesion.mos doesn't exists.
+Error! XML ERROR:/sesion.mos XML error:Failed to open file
+Error! moDataSessionConfig > Not Loaded /sesion.mos
+ moDataSessionConfig() > m_DataPath set to: /home/fabricio/moldeo2/moldeoinstaller/moldeosamples/basic/08_Camera
+File founded
+libmoldeo_erase
+libmoldeo_mirror
+libmoldeo_mirrorg
+File founded
+libmoldeo_camera
+libmoldeo_cubemap
+libmoldeo_grid
+libmoldeo_icon
+libmoldeo_icon3d
+libmoldeo_image
+libmoldeo_imageflow
+libmoldeo_imageflow3d
+libmoldeo_livedrawing2
+libmoldeo_movie
+libmoldeo_particlesfractal
+libmoldeo_particlessimple
+libmoldeo_plane
+libmoldeo_regularsolid
+libmoldeo_sound
+libmoldeo_sound3d
+libmoldeo_text
+libmoldeo_text3d
+libmoldeo_tunel
+File founded
+libmoldeo_calibrationgrid
+libmoldeo_debug
+libmoldeo_deformationgrid
+libmoldeo_postprocess2d
+libmoldeo_videowall
+libmoldeo_videowallmorphing
+File founded
+libmoldeo_channel
+libmoldeo_ligia
+libmoldeo_masterchannel
+libmoldeo_panel
+libmoldeo_presetpanel
+File founded
+libmoldeo_opencv
+libmoldeo_trackerklt
+File founded
+libmoldeo_keyboard
+libmoldeo_midi
+libmoldeo_mixer
+libmoldeo_mouse
+libmoldeo_netoscin
+libmoldeo_netoscout
+libmoldeo_nettuioin
+libmoldeo_ola
+libmoldeo_serial
+moResourceManager::Init > Initializing Filter Man Resource.
+moResourceManager::Init > Initializing Time Man Resource.
+moResourceManager::Init > Initializing GL Man Resource.
+moGLManager::Init > GL VERSION: 4.4.0 NVIDIA 340.96
+moGLManager::Init > GL_MAJOR_VERSION: 4
+moGLManager::Init > GL_MINOR_VERSION: 4
+moGLManager::Init > GPU VENDOR STRING is NVIDIA Corporation
+moGLManager::Init > GPU RENDERER STRING is GeForce GT 640M/PCIe/SSE2
+moResourceManager::Init > Initializing FrameBuffer Man Resource.
+moResourceManager::Init > Initializing Texture Man Resource.
+moTextureManager::Init > loading default file:/usr/share/moldeo/data/icons/moldeologo.png
+default bpp: 32 colortype:4 image_type:1 pitch:1024 > blue_mask: 255 green_mask:65280 red_mask:16711680
+moTextureManager::Init > loading logo file:/usr/share/moldeo/data/icons/moldeonegro.png
+moTextureManager::Init > loading logo file:/usr/share/moldeo/data/icons/moldeotrans.png
+moldeotrans bpp: 32 colortype:4 image_type:1 pitch:7200 > blue_mask: 255 green_mask:65280 red_mask:16711680
+moResourceManager::Init > Initializing Decoder Manager Resource.
+moResourceManager::Init > Initializing Render Man Resource.
+moRenderManager::Init > Setting Render Manager Mode to:0
+moRenderManager::Init > Setting Render Manager for Render: 640x480 for Screen: 640x480
+moRenderManager::Init > Initializing glew.
+moRenderManager::Init > glew initialized succesfully!
+moRenderManager::Init > Using GLEW 1.13.0
+moRenderManager::Init >       glActiveTextureARB: 140014604395168
+moRenderManager::Init >       glMultiTexCoord2fARB: 140014604395936
+moRenderManager::Init >       GLEW_ARB_texture_non_power_of_two: 1
+moRenderManager::Init >       GLEW_ARB_color_buffer_float: 1
+moRenderManager::Init >       GLEW_ARB_multitexture: 1
+moRenderManager::Init >       GL_EXT_gpu_shader4: 1
+moRenderManager::Init >       GLEW_EXT_geometry_shader4: 1
+moRenderManager::Init >       GLEW_ARB_imaging: 1
+moRenderManager::Init >       GLEW_ARB_shading_language_100: 1
+moRenderManager::Init >       GLEW_EXT_framebuffer_object: 1
+moRenderManager::Init >       GL_MAX_FRAGMENT_UNIFORM_COMPONENTS_ARB: 35657
+moRenderManager::Init >       GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB: 35661
+moRenderManager::Init >       Max Texture Size: 16384
+moRenderManager::Init >       Max Texture Rectangle Size: 16384
+moRenderManager::Init >       Max Texture Buffer Size: 134217728
+moRenderManager::Init > Using framebuffer_object: creating one fbo per predefined textures (4). 
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moResourceManager::Init > Initializing Shader Man Resource.
+No shadermanager configuration file defined. Continue.
+moShaderManager::Init > Creating basic Render Shader...
+Vertex Shader compile log:()
+
+
+moShaderManager::Init > m_RenderShader Attrib IDs, position:0 normal:4 color:1 opacity:3 t_coord:3 t_coordedge:-1
+moShaderManager::Init > m_RenderShader Uniform IDs, projmatrix:4 wireframe_width:6 wseg:7 hseg:2 a_light:0 t_image:5
+moResourceManager::Init > Initializing Math Man Resource.
+moResourceManager::Init > Initializing Font Man Resource.
+moResourceManager::Init > Initializing GUI Man Resource.
+moResourceManager::Init > Initializing Sound Man Resource.
+No soundmanager configuration file defined. Continue.
+moResourceManager::Init > Initializing Video Man Resource.
+No videomanager configuration file defined. Continue.
+moResourceManager::Init > Initializing Model Man Resource.
+moResourceManager::Init > Initializing Script Man Resource.
+moLuaResourceManager constructor > L: 43630848
+moResourceManager:: Embedded Resources Ready.
+moMoldeoObject::CreateConnectors > Calling once. object: __console__ config: 08_Camera.mol label:__console__
+moMoldeoObject::CreateConnectors > Init param type INLET name: inlet
+moMoldeoObject::CreateConnectors > Init param type OUTLET name: outlet
+moMoldeoObject::CreateConnectors > Init param type SCRIPT name: script
+moMoldeoObject::CreateConnectors > Init param type MOLDEOOBJECT name: devices
+moMoldeoObject::CreateConnectors > Init param type MOLDEOOBJECT name: preeffect
+moMoldeoObject::CreateConnectors > Init param type MOLDEOOBJECT name: effect
+moMoldeoObject::CreateConnectors > Init param type MOLDEOOBJECT name: posteffect
+moMoldeoObject::CreateConnectors > Init param type MOLDEOOBJECT name: mastereffect
+moMoldeoObject::CreateConnectors > Init param type MOLDEOOBJECT name: resources
+moMoldeoObject::CreateConnectors > Init param type NUM name: mastereffects_on
+moMoldeoObject::CreateConnectors > Init param type NUM name: fulldebug
+moMoldeoObject::CreateConnectors > Init param type TEXT name: outputmode
+moMoldeoObject::CreateConnectors > Init param type TEXT name: outputresolution
+moMoldeoObject::CreateConnectors > Init param type TEXT name: rendermode
+moMoldeoObject::CreateConnectors > Init param type TEXT name: renderresolution
+moMoldeoObject::CreateConnectors > Init param type TEXT name: clip1
+moMoldeoObject::CreateConnectors > Init param type TEXT name: clip2
+moMoldeoObject::CreateConnectors > Init param type TEXT name: clip3
+moMoldeoObject::CreateConnectors > Init param type NUM name: screenshots
+moMoldeoObject::CreateConnectors > Init param type NUM name: videoshots
+moMoldeoObject::CreateConnectors > loaded params & values for Object: __console__ config:08_Camera.mol label:__console__
+moMoldeoObject::CreateConnectors > OK! Object: __console__ config:08_Camera.mol label: __console__
+Warning! Extra parameters must be defined at the end of config file. "__console__"
+{'objectname': '__console__','objectclass': 'moConsole'}
+Warning! <moConsole>[__console__]::Init()_moDefineParamIndex > Config parameter "videoshots"  warning. Bad indexation could cause errors.
+moConsole::LoadIODevices > IODevices loaded.
+*****Initializing netoscin *****
+RegisterFunction > m_iMethodBase: 1for: PushDebugString
+*****moMoldeoObject::Init > for plugin: netoscin config: moldeoapioscin label: moldeoapioscin is OK!
+moMoldeoObject::CreateConnectors > Calling once. object: netoscin config: moldeoapioscin label:moldeoapioscin
+moMoldeoObject::CreateConnectors > Init param type INLET name: inlet
+moMoldeoObject::CreateConnectors > Init param type OUTLET name: outlet
+moMoldeoObject::CreateConnectors > Init param type SCRIPT name: script
+moMoldeoObject::CreateConnectors > Init param type TEXT name: hosts
+moMoldeoObject::CreateConnectors > Init param type NUM name: port
+moMoldeoObject::CreateConnectors > Init param type NUM name: receive_events
+moMoldeoObject::CreateConnectors > Init param type NUM name: debug
+moMoldeoObject::CreateConnectors > Init param type NUM name: process_moldeo_api
+moMoldeoObject::CreateConnectors > loaded params & values for Object: netoscin config:moldeoapioscin label:moldeoapioscin
+moMoldeoObject::CreateConnectors > moldeoapioscin Init > creating outlet not as param.
+moMoldeoObject::CreateConnectors > OK! Object: netoscin config:moldeoapioscin label: moldeoapioscin
+*****Initializing netoscin *****
+RegisterFunction > m_iMethodBase: 37for: PushDebugString
+*****moMoldeoObject::Init > for plugin: netoscin config: moldeoapioscin label: moldeoapioscin is OK!
+ NETOSCIN hosts: HOST NAME:127.0.0.1 PORT:0
+ NETOSCIN port 0: trying default port parameter PORT:3334
+Set listener
+NetOSCIn listening to OSC messages on UDP port 
+*****Initializing netoscout *****
+RegisterFunction > m_iMethodBase: 1for: PushDebugString
+*****moMoldeoObject::Init > for plugin: netoscout config: moldeoapioscout label: moldeoapioscout is OK!
+moMoldeoObject::CreateConnectors > Calling once. object: netoscout config: moldeoapioscout label:moldeoapioscout
+moMoldeoObject::CreateConnectors > Init param type INLET name: inlet
+moMoldeoObject::CreateConnectors > Init param type OUTLET name: outlet
+moMoldeoObject::CreateConnectors > Init param type SCRIPT name: script
+moMoldeoObject::CreateConnectors > Init param type TEXT name: hosts
+moMoldeoObject::CreateConnectors > Init param type NUM name: port
+moMoldeoObject::CreateConnectors > Init param type TEXT name: devices
+moMoldeoObject::CreateConnectors > Init param type NUM name: latency
+moMoldeoObject::CreateConnectors > Init param type NUM name: max_events
+moMoldeoObject::CreateConnectors > Init param type NUM name: send_events
+moMoldeoObject::CreateConnectors > Init param type NUM name: delete_events
+moMoldeoObject::CreateConnectors > Init param type NUM name: send_moldeo_api
+moMoldeoObject::CreateConnectors > Init param type NUM name: debug
+moMoldeoObject::CreateConnectors > loaded params & values for Object: netoscout config:moldeoapioscout label:moldeoapioscout
+moMoldeoObject::CreateConnectors > moldeoapioscout Init > creating outlet not as param.
+moMoldeoObject::CreateConnectors > OK! Object: netoscout config:moldeoapioscout label: moldeoapioscout
+NetOSCOut UdptransmitSocket Created at127.0.0.1:3335
+moConsole::LoadResources > Resources Plugin loaded !
+moConsole::LoadPreEffects > Loading PreEffects configs...
+moConsole::LoadPreEffects > Pre-Effects number: 1
+*****Initializing erase *****
+RegisterFunction > m_iMethodBase: 1for: PushDebugString
+RegisterFunction > m_iMethodBase: 37for: Play
+*****moMoldeoObject::Init > for plugin: erase config: erase label: erase is OK!
+moMoldeoObject::CreateConnectors > Calling once. object: erase config: erase label:erase
+moMoldeoObject::CreateConnectors > Init param type INLET name: inlet
+moMoldeoObject::CreateConnectors > Init param type OUTLET name: outlet
+moMoldeoObject::CreateConnectors > Init param type SCRIPT name: script
+moMoldeoObject::CreateConnectors > Init param type ALPHA name: alpha
+moMoldeoObject::CreateConnectors > Init param type COLOR name: color
+moMoldeoObject::CreateConnectors > Init param type SYNC name: syncro
+moMoldeoObject::CreateConnectors > Init param type PHASE name: phase
+moMoldeoObject::CreateConnectors > loaded params & values for Object: erase config:erase label:erase
+moMoldeoObject::CreateConnectors > OK! Object: erase config:erase label: erase
+moEffect::PreInit > OK! for object: erase config: erase label: erase
+moConsole::LoadPreEffects > Erase initialized
+moConsole::LoadPreEffects > Pre-Effects loaded !
+moConsole::LoadPostEffects > Loading PostEffects configs...
+moConsole::LoadPostEffects > Post Effects number: 0
+moConsole::LoadPostEffects > Post Effects loaded !
+moConsole::LoadEffects > Loading Effects configs...
+moConsole::LoadEffects > Effects number: 1
+moConsole::LoadingEffect > /home/fabricio/moldeo2/moldeoinstaller/moldeosamples/basic/08_Camera/camera.cfg
+moConsole::LoadEffects > Effects loaded !
+moConsole::LoadMasterEffects > Loading MasterEffects configs...
+moConsole::LoadMasterEffects > Master Effects number: 0
+moConsole::LoadMasterEffects > Master-Effects loaded.
+moConsole::Init > calling VideoManager update function.
+moConsole::Init > InitializeAllEffects.
+*****Initializing camera *****
+RegisterFunction > m_iMethodBase: 1for: PushDebugString
+RegisterFunction > m_iMethodBase: 37for: Play
+*****moMoldeoObject::Init > for plugin: camera config: camera label: camera is OK!
+moMoldeoObject::CreateConnectors > Calling once. object: camera config: camera label:camera
+moMoldeoObject::CreateConnectors > Init param type INLET name: inlet
+moMoldeoObject::CreateConnectors > Init param type OUTLET name: outlet
+moMoldeoObject::CreateConnectors > Init param type SCRIPT name: script
+moMoldeoObject::CreateConnectors > Init param type ALPHA name: alpha
+moMoldeoObject::CreateConnectors > Init param type COLOR name: color
+moMoldeoObject::CreateConnectors > Init param type SYNC name: syncro
+moMoldeoObject::CreateConnectors > Init param type PHASE name: phase
+moMoldeoObject::CreateConnectors > Init param type TEXT name: camera
+moMoldeoObject::CreateConnectors > Init param type NUM name: color_format
+moMoldeoObject::CreateConnectors > Init param type NUM name: width
+moMoldeoObject::CreateConnectors > Init param type NUM name: height
+moMoldeoObject::CreateConnectors > Init param type NUM name: color_bits
+moMoldeoObject::CreateConnectors > Init param type NUM name: scale_width
+moMoldeoObject::CreateConnectors > Init param type NUM name: scale_height
+moMoldeoObject::CreateConnectors > Init param type NUM name: flip_horizontal
+moMoldeoObject::CreateConnectors > Init param type NUM name: flip_vertical
+moMoldeoObject::CreateConnectors > Init param type TEXTURE name: texture
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: position
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: speed
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: volume
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: balance
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: brightness
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: contrast
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: saturation
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: hue
+moMoldeoObject::CreateConnectors > Init param type NUM name: cameramode
+moMoldeoObject::CreateConnectors > Init param type BLENDING name: blending
+moMoldeoObject::CreateConnectors > Init param type NUM name: startplaying
+moMoldeoObject::CreateConnectors > Init param type NUM name: loop
+moMoldeoObject::CreateConnectors > Init param type NUM name: interpolation
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: pos_text_x
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: pos_text_y
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: anc_text_x
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: alt_text_y
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: pos_cuad_x
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: pos_cuad_y
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: anc_cuad_x
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: alt_cuad_y
+moMoldeoObject::CreateConnectors > Init param type NUM name: showcameradata
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: display_x
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: display_y
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: display_width
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: display_height
+moMoldeoObject::CreateConnectors > Init param type NUM name: guides
+moMoldeoObject::CreateConnectors > loaded params & values for Object: camera config:camera label:camera
+moMoldeoObject::CreateConnectors > OK! Object: camera config:camera label: camera
+moEffect::PreInit > OK! for object: camera config: camera label: camera
+moEffectCamera::CheckIfDeviceNameExists...
+moEffectCamera::CheckIfDeviceNameExists > ...GetCaptureDevices(true) 
+moGsFramework::LoadCaptureDevices running...
+Added capture device:default
+moGsFramework::LoadCaptureDevices > Added preferred device: LIVEIN0
+LoadCaptureDevice > name: Monitor of Built-in Audio Analog Stereocaps: audio/x-raw, format=(string){ S16LE, S16BE, F32LE, F32BE, S32LE, S32BE, S24LE, S24BE, S24_32LE, S24_32BE, U8 }, layout=(string)interleaved, rate=(int)[ 1, 2147483647 ], channels=(int)[ 1, 32 ];
+LoadCaptureDevice > name: Monitor of Built-in Audio Analog Stereocaps: audio/x-alaw, rate=(int)[ 1, 2147483647 ], channels=(int)[ 1, 32 ];
+LoadCaptureDevice > name: Monitor of Built-in Audio Analog Stereocaps: audio/x-mulaw, rate=(int)[ 1, 2147483647 ], channels=(int)[ 1, 32 ];
+LoadCaptureDevice > name: Built-in Audio Analog Stereocaps: audio/x-raw, format=(string){ S16LE, S16BE, F32LE, F32BE, S32LE, S32BE, S24LE, S24BE, S24_32LE, S24_32BE, U8 }, layout=(string)interleaved, rate=(int)[ 1, 2147483647 ], channels=(int)[ 1, 32 ];
+LoadCaptureDevice > name: Built-in Audio Analog Stereocaps: audio/x-alaw, rate=(int)[ 1, 2147483647 ], channels=(int)[ 1, 32 ];
+LoadCaptureDevice > name: Built-in Audio Analog Stereocaps: audio/x-mulaw, rate=(int)[ 1, 2147483647 ], channels=(int)[ 1, 32 ];
+LoadCaptureDevice > name: HD Pro Webcam C920 Analog Stereocaps: audio/x-raw, format=(string){ S16LE, S16BE, F32LE, F32BE, S32LE, S32BE, S24LE, S24BE, S24_32LE, S24_32BE, U8 }, layout=(string)interleaved, rate=(int)[ 1, 2147483647 ], channels=(int)[ 1, 32 ];
+LoadCaptureDevice > name: HD Pro Webcam C920 Analog Stereocaps: audio/x-alaw, rate=(int)[ 1, 2147483647 ], channels=(int)[ 1, 32 ];
+LoadCaptureDevice > name: HD Pro Webcam C920 Analog Stereocaps: audio/x-mulaw, rate=(int)[ 1, 2147483647 ], channels=(int)[ 1, 32 ];
+LoadCaptureDevice > name: Built-in Audio Analog Stereocaps: audio/x-raw, format=(string){ S16LE, S16BE, F32LE, F32BE, S32LE, S32BE, S24LE, S24BE, S24_32LE, S24_32BE, U8 }, layout=(string)interleaved, rate=(int)[ 1, 2147483647 ], channels=(int)[ 1, 32 ];
+LoadCaptureDevice > name: Built-in Audio Analog Stereocaps: audio/x-alaw, rate=(int)[ 1, 2147483647 ], channels=(int)[ 1, 32 ];
+LoadCaptureDevice > name: Built-in Audio Analog Stereocaps: audio/x-mulaw, rate=(int)[ 1, 2147483647 ], channels=(int)[ 1, 32 ];
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)2304, height=(int)1536, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction)2/1;
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)2304, height=(int)1296, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction)2/1;
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)1920, height=(int)1080, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction)5/1;
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)1600, height=(int)896, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)960, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)1024, height=(int)576, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)800, height=(int)600, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)864, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)800, height=(int)448, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)640, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)640, height=(int)360, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)432, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)352, height=(int)288, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)320, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)320, height=(int)180, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)176, height=(int)144, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)160, height=(int)120, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YUY2, width=(int)160, height=(int)90, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)1920, height=(int)1080, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)1600, height=(int)896, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)960, height=(int)720, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)1024, height=(int)576, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)800, height=(int)600, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)864, height=(int)480, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)800, height=(int)448, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)640, height=(int)480, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)640, height=(int)360, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)432, height=(int)240, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)352, height=(int)288, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)320, height=(int)240, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)320, height=(int)180, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)176, height=(int)144, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)160, height=(int)120, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: image/jpeg, width=(int)160, height=(int)90, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)2304, height=(int)1536, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction)2/1;
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)2304, height=(int)1296, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction)2/1;
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)1920, height=(int)1080, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)1600, height=(int)896, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)960, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)1024, height=(int)576, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)800, height=(int)600, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)864, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)800, height=(int)448, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)640, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)640, height=(int)360, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)432, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)352, height=(int)288, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)320, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)320, height=(int)180, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)176, height=(int)144, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)160, height=(int)120, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)I420, width=(int)160, height=(int)90, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)2304, height=(int)1536, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction)2/1;
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)2304, height=(int)1296, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction)2/1;
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)1920, height=(int)1080, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)1600, height=(int)896, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)960, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)1024, height=(int)576, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)800, height=(int)600, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)864, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)800, height=(int)448, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)640, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)640, height=(int)360, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)432, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)352, height=(int)288, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)320, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)320, height=(int)180, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)176, height=(int)144, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)160, height=(int)120, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)YV12, width=(int)160, height=(int)90, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)2304, height=(int)1536, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction)2/1;
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)2304, height=(int)1296, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction)2/1;
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)1920, height=(int)1080, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)1600, height=(int)896, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)960, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)1024, height=(int)576, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)800, height=(int)600, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)864, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)800, height=(int)448, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)640, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)640, height=(int)360, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)432, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)352, height=(int)288, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)320, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)320, height=(int)180, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)176, height=(int)144, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)160, height=(int)120, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)BGR, width=(int)160, height=(int)90, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)2304, height=(int)1536, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction)2/1;
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)2304, height=(int)1296, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction)2/1;
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)1920, height=(int)1080, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)1600, height=(int)896, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)960, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)1024, height=(int)576, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)800, height=(int)600, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)864, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)800, height=(int)448, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)640, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)640, height=(int)360, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)432, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)352, height=(int)288, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)320, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)320, height=(int)180, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)176, height=(int)144, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)160, height=(int)120, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-raw, format=(string)RGB, width=(int)160, height=(int)90, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)1920, height=(int)1080, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)1600, height=(int)896, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)960, height=(int)720, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)1024, height=(int)576, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)800, height=(int)600, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)864, height=(int)480, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)800, height=(int)448, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)640, height=(int)480, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)640, height=(int)360, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)432, height=(int)240, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)352, height=(int)288, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)320, height=(int)240, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)320, height=(int)180, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)176, height=(int)144, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)160, height=(int)120, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: HD Pro Webcam C920caps: video/x-h264, stream-format=(string)byte-stream, alignment=(string)au, width=(int)160, height=(int)90, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 24/1, 20/1, 15/1, 10/1, 15/2, 5/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YUY2, width=(int)1280, height=(int)1024, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction)9/1;
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YUY2, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 10/1, 15/2 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YUY2, width=(int)640, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YUY2, width=(int)352, height=(int)288, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YUY2, width=(int)320, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YUY2, width=(int)176, height=(int)144, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YUY2, width=(int)160, height=(int)120, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: image/jpeg, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, colorimetry=(string)2:4:7:1, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)I420, width=(int)1280, height=(int)1024, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction)9/1;
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)I420, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)I420, width=(int)640, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)I420, width=(int)352, height=(int)288, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)I420, width=(int)320, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)I420, width=(int)176, height=(int)144, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)I420, width=(int)160, height=(int)120, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YV12, width=(int)1280, height=(int)1024, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction)9/1;
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YV12, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YV12, width=(int)640, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YV12, width=(int)352, height=(int)288, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YV12, width=(int)320, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YV12, width=(int)176, height=(int)144, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)YV12, width=(int)160, height=(int)120, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)BGR, width=(int)1280, height=(int)1024, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction)9/1;
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)BGR, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)BGR, width=(int)640, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)BGR, width=(int)352, height=(int)288, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)BGR, width=(int)320, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)BGR, width=(int)176, height=(int)144, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)BGR, width=(int)160, height=(int)120, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)RGB, width=(int)1280, height=(int)1024, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction)9/1;
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)RGB, width=(int)1280, height=(int)720, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)RGB, width=(int)640, height=(int)480, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)RGB, width=(int)352, height=(int)288, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)RGB, width=(int)320, height=(int)240, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)RGB, width=(int)176, height=(int)144, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+LoadCaptureDevice > name: Laptop_Integrated_Webcam_1.3Mcaps: video/x-raw, format=(string)RGB, width=(int)160, height=(int)120, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive, framerate=(fraction){ 30/1, 15/1 };
+moEffectCamera::CheckIfDeviceNameExists > CapDevs:2
+moEffectCamera::CheckIfDeviceNameExists > default selected, at least one camera device is available. Cap. Label Name: LIVEIN0 WxH:0x0
+moEffectCamera::InitDevice > camera found: default
+moVideoManager::GetCameraByName > customCD: WxH:640x480
+moVideoManager::CreateCamera > LIVEIN0 for device:default (Width)x(Height):640x480
+Initializing GStreamer
+creating pipeline
+creating bus interface
+moGsGraph::Init result:success
+filesrc created! > devicename: default
+filesrc src pad: checking caps: src
+image/jpeg; video/mpeg, mpegversion=(int)4, systemstream=(boolean)false; video/mpeg, mpegversion=(int)2; video/mpegts, systemstream=(boolean)true; video/x-bayer, format=(string){ bggr, gbrg, grbg, rggb }, width=(int)[ 1, 32768 ], height=(int)[ 1, 32768 ], framerate=(fraction)[ 0/1, 2147483647/1 ]; video/x-dv, systemstream=(boolean)true; video/x-h263, variant=(string)itu; video/x-h264, stream-format=(string){ byte-stream, avc }, alignment=(string)au; video/x-pwc1, width=(int)[ 1, 32768 ], height=(int)[ 1, 32768 ], framerate=(fraction)[ 0/1, 2147483647/1 ]; video/x-pwc2, width=(int)[ 1, 32768 ], height=(int)[ 1, 32768 ], framerate=(fraction)[ 0/1, 2147483647/1 ]; video/x-raw, format=(string){ RGB16, BGR, RGB, GRAY8, GRAY16_LE, GRAY16_BE, YVU9, YV12, YUY2, YVYU, UYVY, Y42B, Y41B, YUV9, NV12_64Z32, NV24, NV61, NV16, NV21, NV12, I420, BGRA, BGRx, ARGB, xRGB, BGR15, RGB15 }, width=(int)[ 1, 32768 ], height=(int)[ 1, 32768 ], framerate=(fraction)[ 0/1, 2147483647/1 ]; video/x-sonix, width=(int)[ 1, 32768 ], height=(int)[ 1, 32768 ], framerate=(fraction)[ 0/1, 2147483647/1 ]; video/x-vp8; video/x-wmv, wmvversion=(int)3, format=(string)WVC1
+moGsGraph:: sourceselect: 640X480 bpp:24
+moGsGraph::BuildLiveWebcamGraph > p_sourcewidth:video/x-raw,RGB
+moGsGraph:: added capsfilter source!
+moGsGraph:: created videoconvert for final color!
+moGsGraph:: created last capsfilter!
+moGsGraph:: created decoder bin! decodebin
+moGsGraph:: added signal to Decoder Bin, "pad-added": 8
+moGsGraph:: created FakeSink! 
+moGsGraph:: Try linkage!! sourceselect?: 1
+moGsGraph:: Source linkage ok! 
+moGsGraph::BuildLiveWebcamGraph > play pipeline
+moGsGraph::cb_newpad: video pad created
+moGsGraph::BuildLiveWebcamGraph > GST_STATE_PLAYING > OK
+moGsGraph::BuildLiveWebcamGraph > gst_app_sink_pull_preroll for appsink
+SetVideoFormat: we have a format!!640 X 480 m_BitCount: 1812037712 m_BufferSize: 921600 buffer duration: 33333333 m_FrameRate: 3000 m_RedMask: 0 m_GreenMask: 1812037712 m_BlueMask: 83963352
+moGsGraph::BuildLiveWebcamGraph > graph builded
+moVideoManager::CreateCamera > Capture Device default initialized
+moVideoManager::CreateCamera > texture added ok: LIVEIN0
+Added LiveSystem: Label Name: LIVEIN0 Device Name:default
+moEffectCamera::InitDevice > Camera: default
+moConsole::Init > StartMasterEffects.
+moConsole::Init > LoadConnections.
+moConsole::Init > ScriptExeInit.
