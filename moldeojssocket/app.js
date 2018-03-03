@@ -13,14 +13,18 @@ app.get('*', function(req, res, next) {
   res.sendFile(__dirname+"/public/dist/index.html");
 });
 
-
+var key = fs.readFileSync('privkey.pem');
+console.log(key);
 var server = https.createServer(
   {
                   key: fs.readFileSync('privkey.pem'),
-                  cert: fs.readFileSync('cert.pem')
+                  cert: fs.readFileSync('cert.pem'),
+                  requestCert: false,
+                  rejectUnauthorized: false
                },
   app);
 var io = require('socket.io')(server);
+io.set("transports", ["xhr-polling","websocket","polling", "htmlfile"]);
 io.on('connection', function (socket) {
     console.log("One user is connected: ",socket.client.conn.id);
     console.log("Clients:",socket.server.engine.clientsCount);
