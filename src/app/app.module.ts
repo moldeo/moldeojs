@@ -25,7 +25,7 @@ const appRoutes: Routes = [
 import { SocketIoModule, SocketIoConfig} from 'ng-socket-io';
 
 
-const config: SocketIoConfig = { url: 'http://localhost:8988', options: {} };
+const config: SocketIoConfig = { url: 'http://speak.moldeo.org:8988', options: {} };
 
 @NgModule({
   declarations: [
