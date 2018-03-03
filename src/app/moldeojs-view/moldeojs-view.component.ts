@@ -144,8 +144,6 @@ export class MoldeojsViewComponent implements OnInit {
       }
     });
 
-
-
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/00_Image/00_Image.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/01_Icon/01_Icon.mol" } );
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/02_Plane/02_Plane.mol" } );
@@ -158,6 +156,10 @@ export class MoldeojsViewComponent implements OnInit {
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/samples/CicloDelAgua/CicloDelAguaX.mol" } );
 
     window["MoldeoJSView"] = this;
+  }
+
+  GetConsole() : moConsole {
+    return this.MoldeoCS.m_Console;
   }
 
   public animate() {

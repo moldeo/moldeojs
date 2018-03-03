@@ -1,9 +1,11 @@
-import { OnInit, Component, TemplateRef, ViewContainerRef, Inject, ViewChild } from '@angular/core';
+import { OnInit, Component, TemplateRef, ViewContainerRef, Inject, ViewChild, ElementRef } from '@angular/core';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
 import { ViewService } from "./view.service";
 
 import { CollaborativeService } from './collaborative.service';
+
+import {MoldeojsViewComponent} from "./moldeojs-view/moldeojs-view.component";
 
 @Component({
   selector: 'app-root',
@@ -19,7 +21,7 @@ export class AppComponent implements OnInit {
   collaborativeService : CollaborativeService;
   msg : string;
   clients: number;
-  @ViewChild('moldeojsview') moldeojsview: ElementRef;
+  @ViewChild('moldeojsview') moldeojsview: MoldeojsViewComponent;
 
   public modalRef: BsModalRef; // {1}
 /*
@@ -92,7 +94,7 @@ export class AppComponent implements OnInit {
   onResize( event: any ) : void {
     //console.log("moldeojs app resize:",event, event.target.innerWidth);
     //console.log("must resize:",this.moldeojsview);
-    var renderer : any = this.moldeojsview.MoldeoCS.m_Console.m_pResourceManager.GetRenderMan().m_Renderer;
+    var renderer : any = this.moldeojsview.GetConsole().m_pResourceManager.GetRenderMan().m_Renderer;
     if(renderer) {
       console.log("resizing rednerer",renderer,event.target.innerWidth,event.target.innerHeight);
       renderer.setSize(event.target.innerWidth,event.target.innerHeight);
