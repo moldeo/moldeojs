@@ -1,4 +1,5 @@
 var http = require('http');
+var https = require('https');
 var path = require('path');
 var express = require('express');
 var app = express();
@@ -13,7 +14,7 @@ app.get('*', function(req, res, next) {
 });
 
 
-var server = http.createServer(
+var server = https.createServer(
   {
                   key: fs.readFileSync('privkey.pem'),
                   cert: fs.readFileSync('cert.pem')
