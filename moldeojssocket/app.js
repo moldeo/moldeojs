@@ -34,7 +34,7 @@ var server = https.createServer(
   app);
 var io = require('socket.io')(server);
 //io.set("transports", ["xhr-polling","websocket","polling", "htmlfile"]);
-io.set( 'origins', '*localhost:18080' );
+io.set( 'origins', '*:*' );
 io.on('connection', function (socket) {
     console.log("One user is connected: ",socket.client.conn.id);
     console.log("Clients:",socket.server.engine.clientsCount);
