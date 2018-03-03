@@ -15,6 +15,7 @@ app.get('*', function(req, res, next) {
 
 var key = fs.readFileSync('privkey.pem');
 console.log(key);
+
 var server = https.createServer(
   {
                   key: fs.readFileSync('privkey.pem'),
@@ -24,7 +25,8 @@ var server = https.createServer(
                },
   app);
 var io = require('socket.io')(server);
-io.set("transports", ["xhr-polling","websocket","polling", "htmlfile"]);
+//io.set("transports", ["xhr-polling","websocket","polling", "htmlfile"]);
+io.set( 'origins', '*localhost:18080' );
 io.on('connection', function (socket) {
     console.log("One user is connected: ",socket.client.conn.id);
     console.log("Clients:",socket.server.engine.clientsCount);
