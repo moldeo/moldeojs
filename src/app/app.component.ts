@@ -7,6 +7,8 @@ import { CollaborativeService } from './collaborative.service';
 
 import {MoldeojsViewComponent} from "./moldeojs-view/moldeojs-view.component";
 
+import { Title }  from '@angular/platform-browser';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -30,6 +32,7 @@ export class AppComponent implements OnInit {
   }) viewContainerRef: ViewContainerRef;*/
 
   constructor(private modalService: BsModalService,
+    private titleService: Title,
     @Inject(ViewService) service,
   @Inject(ViewContainerRef) viewContainerRef,
 @Inject(CollaborativeService) coservice ) {
@@ -51,7 +54,7 @@ export class AppComponent implements OnInit {
       this.collaborativeService
         .getMessage()
         .subscribe(msg => {
-          this.msg = "1st "+msg;
+          this.msg = "Hola";
         });
 
         this.collaborativeService
@@ -61,6 +64,10 @@ export class AppComponent implements OnInit {
           });
 
       this.sample = this.samples[0];
+      var a = this.sample.lastIndexOf("/");
+      var b = this.sample.lastIndexOf(".");
+      var projectname = this.sample.substr(a+1, b-a-1);
+      this.setTitle( projectname + " - MoldeoJS" );
   }
 
   sendMsg(msg){
@@ -91,12 +98,16 @@ export class AppComponent implements OnInit {
     console.log(event);
   }
 
+  setTitle( title : string ) : void {
+    this.titleService.setTitle(title);
+  }
+
   onResize( event: any ) : void {
     //console.log("moldeojs app resize:",event, event.target.innerWidth);
     //console.log("must resize:",this.moldeojsview);
     var renderer : any = this.moldeojsview.GetConsole().m_pResourceManager.GetRenderMan().m_Renderer;
     if(renderer) {
-      console.log("resizing rednerer",renderer,event.target.innerWidth,event.target.innerHeight);
+      //console.log("resizing renderer",renderer,event.target.innerWidth,event.target.innerHeight);
       renderer.setSize(event.target.innerWidth,event.target.innerHeight);
     }
   }

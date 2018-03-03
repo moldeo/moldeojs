@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, Title } from '@angular/platform-browser';
 import { NgModule, Injectable } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule, JsonpModule } from '@angular/http';
@@ -41,7 +41,7 @@ const config: SocketIoConfig = { url: 'http://localhost:8988', options: {} };
     SocketIoModule.forRoot(config),
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [ViewService,ConsoleService, JsonService, FileAdminService, CollaborativeService ],
+  providers: [Title,ViewService,ConsoleService, JsonService, FileAdminService, CollaborativeService ],
   entryComponents: [MoldeojsViewComponent],
   bootstrap: [AppComponent]
 })
