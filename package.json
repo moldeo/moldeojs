@@ -17,7 +17,8 @@
     "prepare": "cp -a electron/. dist/",
     "electron": "npm run prepare && electron ./dist",
     "package": "npm run build && npm run prepare && ./node_modules/electron-packager/cli.js dist App --platform=linux --arch=all --out=dist-app --overwrite",
-    "buildelectron": "npm run build && npm run electron"
+    "buildelectron": "npm run build && npm run electron",
+    "buildsite": "ng build -prod --build-optimizer --base-href . && cp -R src/assets/molrepos dist/molrepos && cp -R src/assets/data dist/data"
   },
   "private": true,
   "dependencies": {
