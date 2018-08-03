@@ -36,12 +36,12 @@ const appRoutes: Routes = [
     RouterModule.forRoot(appRoutes)
   ],
   providers: [ViewService,ConsoleService, JsonService, FileAdminService ],
-  entryComponents: [AppComponent, MoldeojsViewComponent],
+  entryComponents: [MoldeojsViewComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule {
   constructor(private injector: Injector) {
-    const el = createCustomElement(AppComponent, { injector });
+    const el = createCustomElement(MoldeojsViewComponent, { injector });
     customElements.define('moldeojs-viewer', el);
   }
   ngDoBootstrap() {}

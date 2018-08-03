@@ -24,7 +24,7 @@ export class MoldeojsViewComponent implements OnInit {
   rendererElement : HTMLCanvasElement;
   test: number = 0;
   testmax: number = 120;
-  @Input() mol: string;
+  @Input() src: string;
 
   //jsonRute : string = 'http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_tema_=Mosaico&output=json';
   //jsonRute: string = "http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_temaid_=423&output=json";
@@ -96,22 +96,22 @@ export class MoldeojsViewComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges) {
 
       console.log("MoldeojsViewComponent::ngOnChanges > changes:", changes);
-      if (changes["mol"]) {
-        const mol : SimpleChange = changes.mol;
-        console.log('prev value: ', mol.previousValue);
-        console.log('got name: ', mol.currentValue);
+      if (changes["src"]) {
+        const src : SimpleChange = changes.src;
+        console.log('prev value: ', src.previousValue);
+        console.log('got name: ', src.currentValue);
 
-        if (mol.firstChange) {
-          this.MoldeoCS.Init({ "consoleconfig": "./assets/"+mol.currentValue } );
+        if (src.firstChange) {
+          this.MoldeoCS.Init({ "consoleconfig": "./assets/"+src.currentValue } );
         }
 
-        if (!mol.firstChange && mol.previousValue!=mol.currentValue) {
+        if (!src.firstChange && src.previousValue!=src.currentValue) {
           console.log("Change view please!");
           if (this.MoldeoCS.m_Console.Initialized()) {
             this.MoldeoCS.Finish();
-            this.MoldeoCS.Init({ "consoleconfig": "./assets/"+mol.currentValue } );
+            this.MoldeoCS.Init({ "consoleconfig": "./assets/"+src.currentValue } );
           } else {
-            this.MoldeoCS.Init({ "consoleconfig": "./assets/"+mol.currentValue } );
+            this.MoldeoCS.Init({ "consoleconfig": "./assets/"+src.currentValue } );
           }
         }
       }
