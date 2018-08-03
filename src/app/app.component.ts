@@ -1,12 +1,12 @@
-import { OnInit, Component, TemplateRef, ViewContainerRef, Inject, ViewChild } from '@angular/core';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { OnInit, Component, TemplateRef, ViewContainerRef, Inject, ViewChild, ViewEncapsulation } from '@angular/core';
 
 import { ViewService } from "./view.service";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  encapsulation: ViewEncapsulation.Native
 })
 export class AppComponent implements OnInit {
   title = 'app';
@@ -15,33 +15,23 @@ export class AppComponent implements OnInit {
   samples: string[] = [];
   viewservice : ViewService;
 
-  public modalRef: BsModalRef; // {1}
 /*
   @ViewChild('dynamic', {
     read: ViewContainerRef
   }) viewContainerRef: ViewContainerRef;*/
 
-  constructor(private modalService: BsModalService,
+  constructor(
     @Inject(ViewService) service,
-  @Inject(ViewContainerRef) viewContainerRef) {
+    @Inject(ViewContainerRef) viewContainerRef) {
     this.samples.push("molrepos/basic/00_Image/00_Image.mol");
     this.samples.push("molrepos/basic/01_Icon/01_Icon.mol");
     this.samples.push("molrepos/basic/08p_CameraParticles/08p_CameraParticles.mol");
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/01_Icon/01_Icon.mol" } );"
     this.viewservice = service;
     this.viewservice.setRootViewContainerRef(viewContainerRef);
-
-  } // {2}
-
-  ngOnInit() {
-      //this.service.setRootViewContainerRef(this.viewContainerRef)
-      //this.service.addDynamicComponent()
-      //this.viewservice.addMoldeojsViewComponent(this.sample);
   }
 
-  public openModal(template: TemplateRef<any>) {
-    this.modalRef = this.modalService.show(template); // {3}
-  }
+  ngOnInit() {}
 
   toggleCollapse(): void {
     this.isCollapsed = !this.isCollapsed;

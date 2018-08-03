@@ -7,7 +7,6 @@ import { ModalModule } from 'ngx-bootstrap';
 import { BsDatepickerModule } from 'ngx-bootstrap';
 import { CollapseModule } from 'ngx-bootstrap';
 
-
 @NgModule({
   imports: [
     CommonModule,
