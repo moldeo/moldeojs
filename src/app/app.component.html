@@ -11,7 +11,7 @@
             <span class="icon-bar"></span>
           </button>
             <a class="navbar-brand">
-              <img src="assets/data/icons/M@_moldeo.svg" class="logo">
+              <img src="/assets/data/icons/M@_moldeo.svg" class="logo">
             </a>
             <span class="navbar-brand">Moldeo JS</span>
         </div>
@@ -21,10 +21,11 @@
             [collapse]="isCollapsed"
             >
           <ul class="nav navbar-nav">
-              <li class="active"><a href="http://www.moldeo.org" target="_blank">
+              <li class="active"><a href="https://www.moldeo.org" target="_blank">
                 www.moldeo.org
               </a></li>
-              <li><a href="http://www.moldeo.org/forum/how-to" target="_blank">Moldeo JS API</a></li>
+              <li><a routerLink="/moldeojs" routerLinkActive="active">base</a></li>
+              <li><a href="https://www.moldeo.org/forum/how-to" target="_blank">Moldeo JS API</a></li>
               <li class="dropdown" dropdown> <!-- {1} -->
                   <a dropdownToggle role="button"> <!-- {2} -->
                     Samples <span class="caret"></span></a>
@@ -70,3 +71,4 @@ Button with tooltip
 <moldeojs-view [mol]="this.sample"></moldeojs-view>
 <!--router-outlet></router-outlet-->
 <!--touch-component></touch-component-->
+<router-outlet></router-outlet>

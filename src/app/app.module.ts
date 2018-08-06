@@ -15,9 +15,12 @@ import { ViewService } from "./view.service";
 
 import { JsonService } from './json.service';
 import { FileAdminService } from './fileadmin.service';
+import { PageNotFoundComponent } from './page-not-found.component';
 
 const appRoutes: Routes = [
-  //{ path: 'about', component: AboutComponent },
+  /*{ path: '', component: AppComponent, pathMatch: 'full' },*/
+  { path: 'moldeojs', component: PageNotFoundComponent },
+  { path: '**', component: PageNotFoundComponent},
 ];
 
 @NgModule({
@@ -25,6 +28,7 @@ const appRoutes: Routes = [
     AppComponent,
     ThreeviewerComponent,
     MoldeojsViewComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +38,7 @@ const appRoutes: Routes = [
     RouterModule.forRoot(appRoutes)
   ],
   providers: [ViewService,ConsoleService, JsonService, FileAdminService ],
-  entryComponents: [MoldeojsViewComponent],
+  entryComponents: [MoldeojsViewComponent,PageNotFoundComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

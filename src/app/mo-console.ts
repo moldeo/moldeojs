@@ -205,7 +205,7 @@ export class moConsole extends moMoldeoObject {
     //RUNNING MOLDEO OBJECT INIT for loading base
     super.Init((result) => {
       var File : moFile = new moFile(this.GetConfigName());
-      //console.log("Config Loaded!", this.m_Config, result, File);
+      console.log("Config Loaded!", this.m_Config, File);
 
       var res_ok = this.InitResources({
         "apppath": EXEDIR,

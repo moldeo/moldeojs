@@ -34,6 +34,10 @@ export class MoldeojsViewComponent implements OnInit {
   @ViewChild('webview_descripcion') descripcion: ElementRef;
   mititulo: string = "Completar titulo";
   midescripcion : string = "Completar descripcion";
+  //baseref : string = "https://www.moldeo.org/assets/";
+  //baseref : string = "https://localhost:4200/assets/";
+  baseref : string = "./assets/";
+  //baseref : string = "https://localhost:4200/assets/";
 
   constructor(el: ElementRef, private MoldeoCS: ConsoleService,
     private jsonService: JsonService,
@@ -102,16 +106,16 @@ export class MoldeojsViewComponent implements OnInit {
         console.log('got name: ', mol.currentValue);
 
         if (mol.firstChange) {
-          this.MoldeoCS.Init({ "consoleconfig": "./assets/"+mol.currentValue } );
+          this.MoldeoCS.Init({ "consoleconfig": this.baseref+mol.currentValue } );
         }
 
         if (!mol.firstChange && mol.previousValue!=mol.currentValue) {
           console.log("Change view please!");
           if (this.MoldeoCS.m_Console.Initialized()) {
             this.MoldeoCS.Finish();
-            this.MoldeoCS.Init({ "consoleconfig": "./assets/"+mol.currentValue } );
+            this.MoldeoCS.Init({ "consoleconfig": this.baseref+mol.currentValue } );
           } else {
-            this.MoldeoCS.Init({ "consoleconfig": "./assets/"+mol.currentValue } );
+            this.MoldeoCS.Init({ "consoleconfig": this.baseref+mol.currentValue } );
           }
         }
       }
