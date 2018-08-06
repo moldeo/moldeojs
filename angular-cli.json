@@ -56,6 +56,10 @@
       "pipe": true,
       "service": true
     },
+    "serve": {
+      "sslKey": "sslcert/server.key",
+      "sslCert": "sslcert/server.crt"
+    },
     "build": {
       "showCircularDependencies": false
     }

@@ -1,4 +1,5 @@
-import { Http } from "@angular/http";
+import { Http, RequestOptions, Request, Headers } from "@angular/http";
+import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 
 import { moAbstract } from "./mo-abstract";
 import { moText, moText0, moTextArray } from "./mo-text";
@@ -119,6 +120,32 @@ export class moFile extends moAbstract {
       this.m_FileType = moFileType.MO_FILETYPE_HTTPS;
       this.m_bRemote = true;
       this.m_bExists = false;
+			this.m_Extension = this.m_CompletePath.substring(this.m_CompletePath.lastIndexOf("."), this.m_CompletePath.length);
+			this.m_Path = "";
+      var pathStart: moText = this.m_CompletePath;
+      pathStart = pathStart.substr(0, 1);
+      //cout << "pathStart:" << pathStart << " slash:" << moSlash << endl;
+      var T0: moText0 = new moText0(this.m_CompletePath.substring( 8, this.m_CompletePath.length ));
+      this.m_Dirs = T0.Explode("/");
+      this.m_Path = this.m_Protocol;
+
+      if (this.m_Dirs.length > 0) {
+        this.m_Drive = this.m_Dirs[0];
+        this.m_FileName = this.m_Dirs[this.m_Dirs.length - 1];
+        FileNameA = new moText0(this.m_FileName).Explode(".");
+        this.m_FileName = FileNameA[0];
+        //this.m_Dirs.Remove(m_Dirs.Count()-1);
+        this.m_Dirs.pop();
+      }
+			var slash : moText = "";
+      for (var d = 0; d < this.m_Dirs.length; d++) {
+        if ("" + this.m_Dirs[d] != "" && "" + this.m_Dirs[d] != "/" && "" + this.m_Dirs[d] != ".")// && m_Dirs[d]!="..")
+				{
+          this.m_Path = "" + this.m_Path + slash + this.m_Dirs[d];
+					slash = moSlash;
+				}
+      }
+			this.m_Path = ""+this.m_Path + slash;
     } else if (this.m_CompletePath.indexOf("ftp://") == 0) {
       this.m_Protocol = "ftp://";
       this.m_FileType = moFileType.MO_FILETYPE_FTP;
@@ -187,7 +214,7 @@ export class moFile extends moAbstract {
   }
 
   Exists(): boolean {
-    return this.m_bExists;
+    return this.m_bExists || this.m_bRemote;
   }
 
   GetType() : moFileType {
@@ -539,6 +566,10 @@ Update() {
 }
 export type moDirectoryArray = moDirectory[];
 
+const httpOptions = {
+  headers: new HttpHeaders({
+    'Access-Control-Allow-Origin':'*',
+}
 export class moFileManager extends moResource {
   m_Files : moFileArray = [];
   m_Directories : moDirectoryArray = [];
@@ -550,7 +581,16 @@ export class moFileManager extends moResource {
   }
 
   Load( p_FileName : moText , bWaitForDownload : boolean=true, callback?:any ) {
-    this.http.get(""+p_FileName).subscribe(res => {
+		console.log("window.location.protocol",window.location.protocol);
+		console.log("window.location.host",window.location.host);
+		console.log("p_FileName",p_FileName);
+		var fullget : string = window.location.protocol+"//"+window.location.host;
+		var fullpath : string = ""+p_FileName;
+		fullpath = fullpath.substring(1,fullpath.length);
+		console.log("fullget",fullget);
+		console.log("fullpath",fullpath);
+		fullget = fullget + fullpath;
+    this.http.get(  fullget ).subscribe(res => {
       //console.log("moFileManager > Load > name: ", p_FileName );
       //this.m_pData = res.json():
       if (callback) callback(res);
