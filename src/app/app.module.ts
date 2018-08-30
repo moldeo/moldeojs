@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule, JsonpModule } from '@angular/http';
+import {HttpClientModule} from '@angular/common/http';
 import { Injector } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 
@@ -33,11 +34,12 @@ const appRoutes: Routes = [
     AppBoostrapModule,
     FormsModule,
     HttpModule,
+    HttpClientModule,
     RouterModule.forRoot(appRoutes)
   ],
   providers: [ViewService,ConsoleService, JsonService, FileAdminService ],
   entryComponents: [MoldeojsViewComponent],
-  bootstrap: [AppComponent]
+  bootstrap: []
 })
 export class AppModule {
   constructor(private injector: Injector) {

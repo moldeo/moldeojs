@@ -1,4 +1,5 @@
 import { Http } from "@angular/http";
+import {HttpClient} from '@angular/common/http';
 
 
 import { MOlong } from "./mo-types";
@@ -75,7 +76,7 @@ export class moResourceManager extends moAbstract {
 		//MODecoderMan : moDecoderManager;
     m_Resources: moResources = [];
 
-    constructor(private http: Http) {
+    constructor(private http: HttpClient) {
       super();
     }
 

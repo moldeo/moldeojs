@@ -3,6 +3,7 @@ import { Injectable,  Inject} from '@angular/core';
 import { Subject }    from 'rxjs/Subject';
 import {  BehaviorSubject }    from 'rxjs/BehaviorSubject';
 import { Http } from "@angular/http";
+import {HttpClient} from '@angular/common/http';
 
 import { moConsole } from './mo-console';
 import { moResourceManager } from './mo-resource-manager';
@@ -17,7 +18,7 @@ export class ConsoleService {
   private updated = new BehaviorSubject(false);
   updated$ = this.updated.asObservable();
 
-  constructor( private http: Http ) {
+  constructor( private http: HttpClient ) {
     this.m_Console = new moConsole( http  );
     window["Moldeo"] = {
       "Console": this.m_Console

@@ -1,4 +1,5 @@
 import { Http } from "@angular/http";
+import { HttpEventType,HttpHeaders,HttpClient } from '@angular/common/http';
 
 import { moAbstract } from "./mo-abstract";
 import { moText, moText0, moTextArray } from "./mo-text";
@@ -539,21 +540,74 @@ Update() {
 }
 export type moDirectoryArray = moDirectory[];
 
+
+const httpOptions = {
+  headers: new HttpHeaders({
+    'Content-Type':  'application/json',
+    'Authorization': 'my-auth-token'
+  })
+};
+
 export class moFileManager extends moResource {
   m_Files : moFileArray = [];
   m_Directories : moDirectoryArray = [];
+	xmlhttp: any;
 
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
     super();
     this.SetName("_filemanager_");
     console.log("dirname:",window["__dirname"]);
   }
 
   Load( p_FileName : moText , bWaitForDownload : boolean=true, callback?:any ) {
-    this.http.get(""+p_FileName).subscribe(res => {
-      //console.log("moFileManager > Load > name: ", p_FileName );
+		console.log("window.location.protocol",window.location.protocol);
+		console.log("window.location.host",window.location.host);
+		console.log("p_FileName",p_FileName);
+		var fullget : string = window.location.protocol+"//"+window.location.host;
+		var fullpath : string = ""+p_FileName;
+		if (fullpath.indexOf("./")==0) {
+			fullpath = fullpath.substring(1,fullpath.length);
+		} else fullpath = "/" + fullpath;
+		fullget = fullget + fullpath;
+		console.log("fullget",fullget);
+		console.log("fullpath",fullpath);
+
+		if (XMLHttpRequest) {
+		    // code for modern browsers
+				var xmlhttp: any;
+		    xmlhttp = new XMLHttpRequest();
+				xmlhttp.onreadystatechange = function() {
+					    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					      //document.getElementById("demo").innerHTML = this.responseText;
+								console.log("xmlhttp responseText:", xmlhttp.responseText);
+					    }
+							console.log("xmlhttp: this: ",xmlhttp);
+			  };
+			  xmlhttp.open("GET", fullget, true);
+			  xmlhttp.send();
+		 }
+
+		this.http.get(""+fullget, {
+			observe: 'events',
+			responseType: 'text',
+			reportProgress: true
+		})
+    .subscribe(event=>{
+			if (event.type === HttpEventType.DownloadProgress) {
+        console.log(event.loaded); //downloaded bytes
+        console.log(event.total); //total bytes to download
+      }
+      if (event.type === HttpEventType.UploadProgress) {
+        console.log(event.loaded); //uploaded bytes
+        console.log(event.total); //total bytes to upload
+      }
+      if (event.type === HttpEventType.Response) {
+        console.log(event.body);
+				if (callback) callback( {"_body": event.body });
+      }
+      console.log("moFileManager::Load > StartLoading > name: ", p_FileName, " Event:", event);
       //this.m_pData = res.json():
-      if (callback) callback(res);
+
     });
   }
 

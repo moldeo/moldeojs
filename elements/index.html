@@ -1,22 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Angular Elements</title>
     <base href="./">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div id="moldeojsviewer">
+    </div>
+
     <script>
-	    var fs = undefined;
-	    var http = undefined;
-	    if (window["require"]) {
-	       fs = require("fs");
-	       http = require("http");
-	    }
+
+    function getParameterByName(name) {
+			name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+			var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+				results = regex.exec(location.search);
+			return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+		}
+
+    setTimeout( function() {
+        var el = document.getElementById("moldeojsviewer");
+        var mjsel = document.createElement("moldeojs-viewer");
+        var mjsel_src = getParameterByName("mol");
+
+        (mjsel_src) ? mjsel.setAttribute("src",mjsel_src) : mjsel.setAttribute("src","molrepos/basic/01_Icon/01_Icon.mol");
+
+        el.appendChild(mjsel);
+      }, 1000 );
     </script>
-    <moldeojs-viewer src="molrepos/basic/01_Icon/01_Icon.mol"></moldeojs-viewer>
     <script type="text/javascript" src="moldeojs-element.js"></script>
 </body>
 </html>
