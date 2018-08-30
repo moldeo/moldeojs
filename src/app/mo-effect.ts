@@ -37,6 +37,7 @@ export class moEffect extends moMoldeoObject {
 
   isyncro: MOint = -1;
   iphase: MOint = -1;
+  drawOptions : any = {};
 
   constructor() {
     super();
@@ -204,7 +205,9 @@ export class moEffect extends moMoldeoObject {
         this.InletTempo.GetData().SetDouble( moMath.FMod( this.m_EffectState.tempo.ang, moMath.TWO_PI));
     }
 
-    this.m_pResourceManager.GetRenderMan().m_Renderer.clearDepth();
+    if (this.drawOptions["clear_depth"]) {
+      this.m_pResourceManager.GetRenderMan().m_Renderer.clearDepth();
+    }
     //this.m_pResourceManager.GetRenderMan().m_Renderer.clear(false, true, false);
 
     this.ScriptExeRun();

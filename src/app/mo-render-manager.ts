@@ -65,7 +65,7 @@ export class moDisplay extends moAbstract {
     this.m_DisplayResolution = new moResolution(w,h);
   }
 
-  
+
 
     Resolution() : moResolution {
       return this.m_DisplayResolution;
@@ -85,14 +85,22 @@ export class moDisplay extends moAbstract {
 export class moRenderManager extends moResource {
 
   m_Renderer: THREE.WebGLRenderer;
+  m_FullScene: THREE.Scene;
+  m_FullCamera: THREE.Camera;
 
   constructor() {
     super();
     this.SetName("_rendermanager_");
-    this.m_Renderer = new THREE.WebGLRenderer({ alpha: true});
+    this.m_Renderer = new THREE.WebGLRenderer({ alpha: true });
+    this.m_Renderer.autoClear =  false;
+    this.m_FullScene = new THREE.Scene();
+    /*
+      autoClearColor: false,
+      autoClearDepth: false,*/
+      /*preserveDrawingBuffer: true,*/
+    //});
     this.m_Renderer.setSize( window.innerWidth, window.innerHeight);
-    this.m_Renderer.setClearColor(0xFF000000, 1);
-    this.m_Renderer.autoClear = false;
+    //this.m_Renderer.setClearColor(0xFF000000, 1);
     //console.log("moRenderManager::constructor",  this.renderer);
   }
 
@@ -131,7 +139,7 @@ export class moRenderManager extends moResource {
 
 
   BeginDraw() : void {
-
+    this.m_FullScene = new THREE.Scene();
   }
 
   BeginDrawEffect(): void {
@@ -139,11 +147,13 @@ export class moRenderManager extends moResource {
   }
 
   Render( p_pObj : moSceneNode, p_pCamera : moCamera3D  ) : void {
-    this.m_Renderer.render( p_pObj, p_pCamera );
+    this.m_FullScene.add(p_pObj);
+    this.m_FullCamera = p_pCamera;
   }
 
   EndDraw() : void {
-
+    //this.m_Renderer.render( this.m_FullSCene, p_pCamera );
+    this.m_Renderer.render( this.m_FullScene, this.m_FullCamera );
   }
 
   EndDrawEffect(): void {

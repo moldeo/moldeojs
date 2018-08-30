@@ -21,9 +21,20 @@ export class AppComponent implements OnInit {
   samples: string[] = [];
   viewservice : ViewService;
   collaborativeService : CollaborativeService;
-  msg : string;
-  clients: number;
+  msg : string = "";
+  clients: number = 0;
+  last_data: any = false;
+  sent_message: string = "";
+  recv_message: string = "";
+  m_ListClients : any = {};
+  m_ConnectedId : any = false;
+  m_ConnectedColor : any = false;
+  m_Console : any = false;
   @ViewChild('moldeojsview') moldeojsview: MoldeojsViewComponent;
+  @ViewChild('message2send') message2send: ElementRef;
+  @ViewChild('message2recv') message2recv: ElementRef;
+  @ViewChild('clientcolor') clientcolor: ElementRef;
+
 
   public modalRef: BsModalRef; // {1}
 /*
@@ -51,28 +62,201 @@ export class AppComponent implements OnInit {
       //this.service.setRootViewContainerRef(this.viewContainerRef)
       //this.service.addDynamicComponent()
       //this.viewservice.addMoldeojsViewComponent(this.sample);
-      this.collaborativeService
-        .getMessage()
-        .subscribe(msg => {
-          this.msg = "Hola";
-        });
-
-        this.collaborativeService
-          .getClients()
-          .subscribe(clients=> {
-            this.clients = clients;
-          });
-
+      this.collaborativeService.getMessage().subscribe( data => { this.recMsg(data); } );
+      this.collaborativeService.getClients().subscribe(clients=> {this.clients = clients;});
+      this.collaborativeService.getListClients().subscribe(data=>{ this.ListClients(data); });
+      this.collaborativeService.Connected().subscribe(data=>{ this.Connected(data); });
+      this.collaborativeService.Disconnected().subscribe(data=>{ this.Disconnected(data); });
+      this.collaborativeService.updateClient().subscribe(data=>{this.updateClient(data);})
       this.sample = this.samples[0];
       var a = this.sample.lastIndexOf("/");
       var b = this.sample.lastIndexOf(".");
       var projectname = this.sample.substr(a+1, b-a-1);
       this.setTitle( projectname + " - MoldeoJS" );
+      this.m_Console = this.moldeojsview.GetConsole();
+      //this.m_Console.AppComponent = this;
   }
 
-  sendMsg(msg){
-    console.log("sendMsg:",msg);
-     this.collaborativeService.sendMessage(msg);
+  /*
+    Receive a message from the server.
+    data structure:
+    {
+      msg: "message string",
+      options: {
+        source_id: id of client sending message,
+        color: color just chosen by the sender,
+        number: index order [cardinal] of the sender, "#0", "#1", "#23456", "_speak_"
+        : index order of the sender
+      }
+    }
+  */
+  recMsg(data) {
+      var isMyMessage : string = "";
+      var userCardinal : string = "";
+      var cardNumber : string;
+      var userStyle : string = "";
+      var userColor : string = "#AAA";
+      console.log("recMsg:",data);
+      this.recv_message = data.msg;
+      //clase >
+      var source_id = data.options.source_id;
+
+      if (data.options.number) {
+        cardNumber = "@"+data.options.number;
+      } else {
+        cardNumber = "@_speak_";
+      }
+
+      //OWN MESSAGE (FEEDBACK)
+      if (source_id && source_id==this.m_ConnectedId) {
+        isMyMessage = "my_message";
+        cardNumber = "m_> "+cardNumber;
+        userCardinal = ' ';
+        if (this.m_ConnectedColor) {
+          userColor = this.m_ConnectedColor;
+        }
+        var obj : any = {
+          id: source_id,
+          number: data.options.number,
+
+        };
+        if (this.m_ListClients[source_id]) {
+          obj = this.m_ListClients[source_id];
+        }
+        obj.color = this.m_ConnectedColor;
+        this.m_ListClients[source_id] = obj;
+      } else if (source_id) {
+        //tabulacion:
+        isMyMessage = "their_message";
+        cardNumber = "<< "+cardNumber;
+        var mleft : number = 5*Number(data.options.number);
+        userCardinal = ' margin-left: '+ mleft + 'px;';
+
+        var obj : any = {};
+
+        if (this.m_ListClients[source_id]) {
+          obj = this.m_ListClients[source_id];
+        } else {
+          obj = {
+            id: source_id,
+            state: "connected",
+            number: data.options.number,
+            avatar: false,
+          }
+        }
+
+        if (data.options.color) {
+          obj.color = data.options.color;
+        }
+
+        userColor = obj.color;
+
+        this.m_ListClients[source_id] = obj;
+      }
+
+      //preparing styles
+      userStyle = ' style="color: '+userColor+';'+userCardinal+'" ';
+      //preparing new message:
+      var newMsg : any = '<div '
+                            +'class="message '+isMyMessage+'" '
+                            +userStyle
+                            +'>'
+                              +cardNumber+': '+this.recv_message
+                        +'</div>';
+      this.message2recv.nativeElement.innerHTML = newMsg+this.message2recv.nativeElement.innerHTML;
+      console.log(newMsg,"ListClients:",this.m_ListClients);
+  }
+
+  sendMsg(data) {
+    console.log("sendMsg:",data);
+    this.collaborativeService.sendMessage(data);
+  }
+
+  ListClients(data) {
+    console.log("ListClients received:",data);
+    this.clients = data.clients;
+    for( var d in data.list) {
+      this.m_ListClients[data.list[d].id] = data.list[d];
+    }
+    console.log("ListClients updated:",this.m_ListClients);
+  }
+
+  updateClient(data) {
+    console.log("updating other client data:",data);
+    if (data.id) {
+      if (this.m_ListClients[data.id]) {
+        for(var k in data) {
+          this.m_ListClients[data.id][k] = data[k];
+        }
+      } else {
+        this.m_ListClients[data.id] = data;
+      }
+    }
+    console.log("updated!! other client data:",this.m_ListClients[data.id]);
+    this.m_Console.m_ListClients = this.m_ListClients;
+  }
+
+  Connected(data) {
+    console.log("Connected!",data);
+    if (data.state) {
+      if (data.state=="connected") {
+
+        var clientData : any  = {};
+
+        //chech our client data
+        if (this.m_ListClients[this.m_ConnectedId]) {
+          clientData = this.m_ListClients[this.m_ConnectedId];
+          clientData.id = data.id;
+          this.collaborativeService.sendClient(clientData);
+        }
+
+        //new id, new data mixed with old one
+        this.m_ConnectedId = data.id;
+        for( var key in data) {
+          clientData[key]= data[key];
+        }
+        this.m_ListClients[this.m_ConnectedId] = clientData;
+
+        if (this.m_ListClients[data.id]) {
+          this.m_ListClients[data.id] = clientData;
+        }
+
+      } else if (data.state=="user connected") {
+        //added a new chat buddy
+        this.m_ListClients[data.id] = data;
+      }
+    }
+
+    this.m_Console.m_pResourceManager.m_ListClients = this.m_ListClients;
+    this.collaborativeService.fetchClients();
+  }
+
+  Disconnected(data) {
+    if (data.state) {
+      if (data.state=="disconnected") {
+        this.m_ConnectedId = data.id;
+      } else if (data.state=="user disconnected") {
+        //siempre borrar la informacion de los otros...
+        // para que vuelva actualizada
+        if (this.m_ListClients[data.id]) {
+          this.m_ListClients[data.id] = null;
+        }
+      }
+    }
+  }
+
+  clientColor(event) {
+    this.m_ConnectedColor = this.clientcolor.nativeElement.value;
+
+    var data = {
+      msg: "color",
+      options: {
+        color: this.m_ConnectedColor
+      }
+    };
+
+    console.log("clientColor",data);
+    this.sendMsg(data);
   }
 
   public openModal(template: TemplateRef<any>) {
@@ -88,6 +272,17 @@ export class AppComponent implements OnInit {
     console.log(event);
     console.log("Loading:",this.samples[index]);
     this.sample = this.samples[index];
+  }
+
+  compose_message(event:any) {
+    //debugger;
+    this.last_data = {}
+    var msg2snd = this.message2send.nativeElement.value;
+    this.sent_message = msg2snd;
+    this.last_data = { msg: this.sent_message, options: {}}
+    this.sendMsg(this.last_data);
+    this.message2send.nativeElement.value = "";
+    this.message2send.nativeElement.focus();
   }
 
   collapsed(event: any): void {

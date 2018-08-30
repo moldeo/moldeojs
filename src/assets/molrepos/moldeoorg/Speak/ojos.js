@@ -1,7 +1,7 @@
-console.log("Compiling script particlessimples.js ...", this);
+console.log("Compiling script ojos.js ...", this);
 
 this.Script.Init = function() {
-    console.log("Init from script particlessimples.js",this);
+    console.log("Init from script ojos.js",this);
 }
 
 
@@ -18,7 +18,7 @@ this.Script.RunParticle = function( i, dt ) {
             //console.log("RunParticle Selected!", i, dt, par );
             //console.log("this:",this);
             //console.log("Console:");
-            console.log("Console Par:",par,this);
+            console.log("Ojos Console Par:",par,this);
             //par.Color.r = 1.0;
             //par.Color.g = 0.0;
             //par.Color.b = 0.0;

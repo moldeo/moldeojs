@@ -428,13 +428,13 @@ export class moMoldeoObject extends moScript {
     return false;
   }
 */
-  if (this.m_bConnectorsLoaded) {
-    this.MODebug2.Error("moMoldeoObject::CreateConnectors > Calling twice."
-      + " Can't continue. Sorry for object: "
-      + this.GetName()
-      + " config: " + this.GetConfigName() + " label:" + this.GetLabelName());
-    return false;
-  }
+    if (this.m_bConnectorsLoaded) {
+      this.MODebug2.Error("moMoldeoObject::CreateConnectors > Calling twice."
+        + " Can't continue. Sorry for object: " + this.GetName()
+        + " config: " + this.GetConfigName()
+        + " label:" + this.GetLabelName());
+      return false;
+    }
 /*
   MODebug2->Message("moMoldeoObject::CreateConnectors > Calling once. object: "
   +GetName()+ " config: " + GetConfigName() + " label:" + GetLabelName() );
@@ -442,53 +442,53 @@ export class moMoldeoObject extends moScript {
 
 	///crea los Inlets adicionales a los parámetros: definidos en el parámetro "inlet"
 
-  var pinlets : moParam = this.m_Config.GetParam("inlet");
+    var pinlets : moParam = this.m_Config.GetParam("inlet");
 
-  for (let i = 0; i < pinlets.GetValuesCount(); i++) {
-    let InletName = pinlets.GetValue(i).GetSubValue(MO_INLET_NAME).Text();
-    let InletType = pinlets.GetValue(i).GetSubValue(MO_INLET_TYPE).Text();
-    if ( this.GetInletIndex( InletName )==-1 ) {
-      var Inlet : moInlet = new moInlet();
-      if (Inlet) {
-        Inlet.SetMoldeoLabelName( this.GetLabelName() );
-        ///lo creamos si y solo si no existe como parámetro....
-        if (this.m_Config.GetParamIndex(InletName) == -1) {
-          Inlet.Init( InletName, this.m_Inlets.length, ""+InletType );
-          this.m_Inlets.push( Inlet );
+    for (let i = 0; i < pinlets.GetValuesCount(); i++) {
+      let InletName = pinlets.GetValue(i).GetSubValue(MO_INLET_NAME).Text();
+      let InletType = pinlets.GetValue(i).GetSubValue(MO_INLET_TYPE).Text();
+      if ( this.GetInletIndex( InletName )==-1 ) {
+        var Inlet : moInlet = new moInlet();
+        if (Inlet) {
+          Inlet.SetMoldeoLabelName( this.GetLabelName() );
+          ///lo creamos si y solo si no existe como parámetro....
+          if (this.m_Config.GetParamIndex(InletName) == -1) {
+            Inlet.Init( InletName, this.m_Inlets.length, ""+InletType );
+            this.m_Inlets.push( Inlet );
+          }
         }
       }
-    }
-	}
+  	}
 
-	///Inicializa las funciones matemáticas del config
-	///así como los inlets y outlets por cada parámetro
-	///así como las texturas
-	for( var p=0;p<this.m_Config.GetParamsCount();p++) {
+    ///Inicializa las funciones matemáticas del config
+    ///así como los inlets y outlets por cada parámetro
+    ///así como las texturas
+    for( var p=0;p<this.m_Config.GetParamsCount();p++) {
 
-    var param: moParam = this.m_Config.GetParam(p);
-/*
-		this.MODebug2.Log( moText("moMoldeoObject::CreateConnectors > Init param type ")
-    + param.GetParamDefinition().GetTypeStr() + moText(" name: ")
-    + param.GetParamDefinition().GetName() );
-*/
+      var param: moParam = this.m_Config.GetParam(p);
+    /*
+    	this.MODebug2.Log( moText("moMoldeoObject::CreateConnectors > Init param type ")
+      + param.GetParamDefinition().GetTypeStr() + moText(" name: ")
+      + param.GetParamDefinition().GetName() );
+    */
 
-    ///CREAMOS UN INLET POR CADA PARAMETRO
-    var inletidx : MOint = this.GetInletIndex(param.GetParamDefinition().GetName());
-    if (inletidx==-1) {
-      var Inlet : moInlet = new moInlet();
-      if (Inlet) {
-        var iname = param.GetParamDefinition().GetName();
-        Inlet.Init( iname, this.m_Inlets.length, param );
-        this.m_Inlets.push(Inlet);
-        this.m_InletsStr[""+iname] = Inlet;
+      ///CREAMOS UN INLET POR CADA PARAMETRO
+      var inletidx : MOint = this.GetInletIndex(param.GetParamDefinition().GetName());
+      if (inletidx==-1) {
+        var Inlet : moInlet = new moInlet();
+        if (Inlet) {
+          var iname = param.GetParamDefinition().GetName();
+          Inlet.Init( iname, this.m_Inlets.length, param );
+          this.m_Inlets.push(Inlet);
+          this.m_InletsStr[""+iname] = Inlet;
+        }
       }
+
+    	for( var v=0;v<param.GetValuesCount();v++) {
+        this.ResolveValue( param, v );
+
+    	}
     }
-
-		for( var v=0;v<param.GetValuesCount();v++) {
-      this.ResolveValue( param, v );
-
-		}
-	}
 /*
   MODebug2->Message("moMoldeoObject::CreateConnectors > loaded params & values for Object: "
   + GetName() + " config:" + GetConfigName() + " label:" + GetLabelName() );
@@ -537,17 +537,17 @@ export class moMoldeoObject extends moScript {
     }
 	}
 */
-  this.m_bConnectorsLoaded = true;
+    this.m_bConnectorsLoaded = true;
 
-  ///Una vez establecidos los conectores, podemos inicializar el script a su vez....
-	//moMoldeoObject::ScriptExeInit();
-	this.ScriptExeInit();
-/*
-  MODebug2->Message("moMoldeoObject::CreateConnectors > OK! Object: "
-  + GetName() + " config:" + GetConfigName() + " label: " + GetLabelName() );
+    ///Una vez establecidos los conectores, podemos inicializar el script a su vez....
+    //moMoldeoObject::ScriptExeInit();
+    this.ScriptExeInit();
+    /*
+    MODebug2->Message("moMoldeoObject::CreateConnectors > OK! Object: "
+    + GetName() + " config:" + GetConfigName() + " label: " + GetLabelName() );
 
-  */
-  	return this.m_bConnectorsLoaded;
+    */
+    return this.m_bConnectorsLoaded;
   }
 
   Update( p_Event : moEventList ): void {

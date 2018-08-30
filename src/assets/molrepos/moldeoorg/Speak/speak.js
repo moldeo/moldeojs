@@ -1,7 +1,7 @@
-console.log("Compiling script speak.js ...", this);
+console.log("Compiling __console__ script speak.js ...", this);
 
 this.Script.Init = function() {
-    console.log("Init __console__ script: speak.js");
+    console.log("Init __console__ script: speak.js",this);
 }
 
 
@@ -13,4 +13,5 @@ this.Script.Update = function() {
 //    if (this.mouse) {
 //        console.log("Update from script mouse:", this.mouse );
 //    }
+  //console.log("Update from script __console__");
 }

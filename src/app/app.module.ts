@@ -25,7 +25,8 @@ const appRoutes: Routes = [
 import { SocketIoModule, SocketIoConfig} from 'ng-socket-io';
 
 
-const config: SocketIoConfig = { url: 'https://collaborative.moldeo.org:8988', options: {rejectUnauthorized: false} };
+//const config: SocketIoConfig = { url: 'https://collaborative.moldeo.org:8988', options: {rejectUnauthorized: false} };
+const config: SocketIoConfig = { url: 'http://localhost:8988', options: {rejectUnauthorized: false} };
 
 @NgModule({
   declarations: [

@@ -43,6 +43,22 @@
                 <D type="NUM">1</D>
                 <D type="TXT">W</D>
             </VAL>
+            <VAL>
+                <D type="TXT">particlessimple</D>
+                <D type="TXT">textaforming</D>
+                <D type="TXT">textaforming</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">J</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">particlessimple</D>
+                <D type="TXT">ojos</D>
+                <D type="TXT">ojos</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">K</D>
+            </VAL>
         </PARAM>
         <PARAM name="posteffect" type="MOLDEOOBJECT" />
         <PARAM name="mastereffect" type="MOLDEOOBJECT" />

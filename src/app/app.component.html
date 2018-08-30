@@ -13,7 +13,10 @@
             <a class="navbar-brand">
               <img src="assets/data/icons/M@_moldeo.svg" class="logo">
             </a>
-            <span class="navbar-brand">Speak CCK Online (#{{clients}}) <input type="color"></span>
+            <span class="navbar-brand">Speak Online (#{{clients}})
+              <input #clientcolor (change)="clientColor($event)" type="color">
+              <span class="last_received_message">{{recv_message}}</span>
+            </span>
         </div>
         <div class="collapse navbar-collapse"
             (collapsed)="collapsed($event)"
@@ -58,7 +61,21 @@
     <p>msg:{{msg}}  </p>
 </div>
 -->
-<div class="chat_online">{{msg}}</div>
+<div class="chat_online">
+
+  <div class="chat_msg_snd">
+    <label>{{m_ConnectedId}}</label>
+    <input #message2send type="text" placeholder="Escribe aquí..." value=""/>
+    <button class="btn btn-primary"
+    (click)="compose_message($event)">
+      <span class="glyphicon glyphicon-play">&nbsp;</span> Send
+    </button>
+  </div>
+
+  <div class="chat_msg_rec" #message2recv>
+    <div class="message">{{msg}}</div>
+  </div>
+</div>
 <!--
 <button type="button" class="btn btn-primary"
         tooltip="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">

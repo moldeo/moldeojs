@@ -5,3 +5,36 @@ body, html {
   margin:0;
   padding:0;
 }
+
+.message {
+  text-align: right;
+  float: right;
+  display: block;
+  clear: both;
+  width: auto;
+  font-weight: bold;
+}
+
+.my_message {
+  text-align: right;
+  float: right;
+  display: block;
+  clear: both;
+  width: auto;
+  font-weight: bold;
+}
+
+.their_message {
+  text-align: left;
+  float: left;
+  display: block;
+  clear: both;
+  width: auto;
+}
+
+
+.my_message:before {
+  content: "mi:";
+  font-weight: bold;
+  font-size: 8px;
+}

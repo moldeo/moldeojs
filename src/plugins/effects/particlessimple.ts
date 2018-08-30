@@ -227,108 +227,109 @@ export enum moParticlesSimpleParamIndex {
   PARTICLES_INLET=0,
   PARTICLES_OUTLET,
   PARTICLES_SCRIPT,
-	PARTICLES_ALPHA,
-	PARTICLES_COLOR,
-	PARTICLES_SYNC,
-	PARTICLES_PHASE,
-	PARTICLES_PARTICLECOLOR,
-	PARTICLES_FONT,
-	PARTICLES_TEXT,
-	PARTICLES_ORTHO,
+  PARTICLES_ALPHA,
+  PARTICLES_COLOR,
+  PARTICLES_SYNC,
+  PARTICLES_PHASE,
+  PARTICLES_PARTICLECOLOR,
+  PARTICLES_FONT,
+  PARTICLES_TEXT,
+  PARTICLES_ORTHO,
 
-	PARTICLES_TEXTURE,
-	PARTICLES_FOLDERS,
-	PARTICLES_TEXTUREMODE,
-	PARTICLES_BLENDING,
+  PARTICLES_TEXTURE,
+  PARTICLES_FOLDERS,
+  PARTICLES_TEXTUREMODE,
+  PARTICLES_BLENDING,
 
-	PARTICLES_WIDTH,
-	PARTICLES_HEIGHT,
-	PARTICLES_SIZEX,
-	PARTICLES_SIZEY,
-	PARTICLES_SIZEZ,
+  PARTICLES_WIDTH,
+  PARTICLES_HEIGHT,
+  PARTICLES_SIZEX,
+  PARTICLES_SIZEY,
+  PARTICLES_SIZEZ,
 
-	PARTICLES_GRAVITY,
-	PARTICLES_VISCOSITY,
+  PARTICLES_GRAVITY,
+  PARTICLES_VISCOSITY,
 
-	PARTICLES_MAXAGE,
-	PARTICLES_EMITIONPERIOD,
-	PARTICLES_EMITIONRATE,
-	PARTICLES_DEATHPERIOD,
+  PARTICLES_MAXAGE,
+  PARTICLES_EMITIONPERIOD,
+  PARTICLES_EMITIONRATE,
+  PARTICLES_DEATHPERIOD,
   PARTICLES_SCRIPT2,
 
-	PARTICLES_FADEIN,
-	PARTICLES_FADEOUT,
-	PARTICLES_SIZEIN,
-	PARTICLES_SIZEOUT,
+  PARTICLES_FADEIN,
+  PARTICLES_FADEOUT,
+  PARTICLES_SIZEIN,
+  PARTICLES_SIZEOUT,
 
-	PARTICLES_RANDOMMETHOD,
-	PARTICLES_CREATIONMETHOD,
-	PARTICLES_ORIENTATIONMODE,
+  PARTICLES_RANDOMMETHOD,
+  PARTICLES_CREATIONMETHOD,
+  PARTICLES_ORIENTATIONMODE,
 
-	PARTICLES_RANDOMPOSITION,
-	PARTICLES_RANDOMPOSITION_X,
-	PARTICLES_RANDOMPOSITION_Y,
-	PARTICLES_RANDOMPOSITION_Z,
+  PARTICLES_RANDOMPOSITION,
+  PARTICLES_RANDOMPOSITION_X,
+  PARTICLES_RANDOMPOSITION_Y,
+  PARTICLES_RANDOMPOSITION_Z,
 
-	PARTICLES_RANDOMVELOCITY,
-	PARTICLES_RANDOMVELOCITY_X,
-	PARTICLES_RANDOMVELOCITY_Y,
-	PARTICLES_RANDOMVELOCITY_Z,
+  PARTICLES_RANDOMVELOCITY,
+  PARTICLES_RANDOMVELOCITY_X,
+  PARTICLES_RANDOMVELOCITY_Y,
+  PARTICLES_RANDOMVELOCITY_Z,
 
-	PARTICLES_RANDOMMOTION,
-	PARTICLES_RANDOMMOTION_X,
-	PARTICLES_RANDOMMOTION_Y,
-	PARTICLES_RANDOMMOTION_Z,
+  PARTICLES_RANDOMMOTION,
+  PARTICLES_RANDOMMOTION_X,
+  PARTICLES_RANDOMMOTION_Y,
+  PARTICLES_RANDOMMOTION_Z,
 
 
-	PARTICLES_EMITTERTYPE,
-	PARTICLES_EMITTERVECTOR_X,
-	PARTICLES_EMITTERVECTOR_Y,
-	PARTICLES_EMITTERVECTOR_Z,
+  PARTICLES_EMITTERTYPE,
+  PARTICLES_EMITTERVECTOR_X,
+  PARTICLES_EMITTERVECTOR_Y,
+  PARTICLES_EMITTERVECTOR_Z,
 
-	PARTICLES_ATTRACTORTYPE,
-	PARTICLES_ATTRACTORMODE,
-	PARTICLES_ATTRACTORVECTOR_X,
-	PARTICLES_ATTRACTORVECTOR_Y,
-	PARTICLES_ATTRACTORVECTOR_Z,
+  PARTICLES_ATTRACTORTYPE,
+  PARTICLES_ATTRACTORMODE,
+  PARTICLES_ATTRACTORVECTOR_X,
+  PARTICLES_ATTRACTORVECTOR_Y,
+  PARTICLES_ATTRACTORVECTOR_Z,
 
-	PARTICLES_ROTATEX_PARTICLE,
-	PARTICLES_ROTATEY_PARTICLE,
-	PARTICLES_ROTATEZ_PARTICLE,
+  PARTICLES_ROTATEX_PARTICLE,
+  PARTICLES_ROTATEY_PARTICLE,
+  PARTICLES_ROTATEZ_PARTICLE,
   PARTICLES_SCALEX_PARTICLE,
-	PARTICLES_SCALEY_PARTICLE,
-	PARTICLES_SCALEZ_PARTICLE,
+  PARTICLES_SCALEY_PARTICLE,
+  PARTICLES_SCALEZ_PARTICLE,
 
-	PARTICLES_TIMETOREVELATION,
-	PARTICLES_TIMEOFREVELATION,
-	PARTICLES_TIMETORESTORATION,
-	PARTICLES_TIMEOFRESTORATION,
-	PARTICLES_DRAWINGFEATURES,
+  PARTICLES_TIMETOREVELATION,
+  PARTICLES_TIMEOFREVELATION,
+  PARTICLES_TIMETORESTORATION,
+  PARTICLES_TIMEOFRESTORATION,
+  PARTICLES_DRAWINGFEATURES,
 
-	PARTICLES_TRANSLATEX,
-	PARTICLES_TRANSLATEY,
-	PARTICLES_TRANSLATEZ,
+  PARTICLES_TRANSLATEX,
+  PARTICLES_TRANSLATEY,
+  PARTICLES_TRANSLATEZ,
   PARTICLES_SCALEX,
-	PARTICLES_SCALEY,
-	PARTICLES_SCALEZ,
-	PARTICLES_ROTATEX,
-	PARTICLES_ROTATEY,
-	PARTICLES_ROTATEZ,
-	PARTICLES_EYEX,
-	PARTICLES_EYEY,
-	PARTICLES_EYEZ,
-	PARTICLES_VIEWX,
-	PARTICLES_VIEWY,
-	PARTICLES_VIEWZ,
-	PARTICLES_UPVIEWX,
-	PARTICLES_UPVIEWY,
-	PARTICLES_UPVIEWZ,
+  PARTICLES_SCALEY,
+  PARTICLES_SCALEZ,
+  PARTICLES_ROTATEX,
+  PARTICLES_ROTATEY,
+  PARTICLES_ROTATEZ,
+  PARTICLES_EYEX,
+  PARTICLES_EYEY,
+  PARTICLES_EYEZ,
+  PARTICLES_VIEWX,
+  PARTICLES_VIEWY,
+  PARTICLES_VIEWZ,
+  PARTICLES_UPVIEWX,
+  PARTICLES_UPVIEWY,
+  PARTICLES_UPVIEWZ,
   PARTICLES_ORDERING_MODE,
   PARTICLES_LIGHTMODE,
   PARTICLES_LIGHTX,
   PARTICLES_LIGHTY,
   PARTICLES_LIGHTZ
 };
+
 export var PAR = moParticlesSimpleParamIndex;
 export var PARS = { "inlet": 0, "outlet": 1 };
 export var PARA = { "0": "inlet", "1": "outlet" };
@@ -578,6 +579,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
   RM: MO.moRenderManager;
   GL: MO.moGLManager;
 
+  CamProportion : MOfloat;
   Plane: MO.moPlaneGeometry;
   Mat: MO.moMaterialBasic;
   Camera: MO.moCamera3D;
@@ -600,12 +602,12 @@ export class moEffectParticlesSimple extends MO.moEffect {
   m_bTrackerInit : boolean;
   //m_pTrackerData : moTrackerSystemData;
   m_InletTrackerSystemIndex : MOint;
-/*
-        #ifdef USE_TUIO
-        moTUIOSystemData*       m_pTUIOData;
-        MOint                   m_InletTuioSystemIndex;
-        #endif
-*/
+  /*
+          #ifdef USE_TUIO
+          moTUIOSystemData*       m_pTUIOData;
+          MOint                   m_InletTuioSystemIndex;
+          #endif
+  */
 
   m_TrackerBarycenter : moVector2f;
 
@@ -625,7 +627,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
 
   ortho : boolean;
 
-///internal
+  ///internal
   MotionTimer : moTimer = new moTimer();
 
   TimerFullRevelation : moTimer = new moTimer(); ///begins on first motion activity!!!!
@@ -659,14 +661,14 @@ export class moEffectParticlesSimple extends MO.moEffect {
   emiper : MOlong;
   emiperi : MOlong;
 
-  /*
-    midi_red, midi_green, midi_blue;
-    midi_maxage; //in millis
-    midi_emitionperiod;//in millisec
-    midi_emitionrate; // n per emitionperiod
-    midi_randomvelocity; //inicial vel
-    midi_randommotion; //motion dynamic
-  */
+    /**
+      midi_red, midi_green, midi_blue;
+      midi_maxage; //in millis
+      midi_emitionperiod;//in millisec
+      midi_emitionrate; // n per emitionperiod
+      midi_randomvelocity; //inicial vel
+      midi_randommotion; //motion dynamic
+    */
     tx: MOdouble;
     ty: MOdouble;
     tz: MOdouble;
@@ -1732,12 +1734,13 @@ export class moEffectParticlesSimple extends MO.moEffect {
         pPar.ViewDepth = 0.0;
         pPar.Pos = new moVector2f( i, j);
         pPar.ImageProportion = 1.0;
-        //pPar.Color = new moVector3f(1.0,1.0,1.0);
-        var fullcolor = this.m_Config.EvalColor( moR(PAR.PARTICLES_PARTICLECOLOR));
+        pPar.Color = new moColor(1.0,1.0,1.0);
+        /*var fullcolor = this.m_Config.EvalColor( moR(PAR.PARTICLES_PARTICLECOLOR));
         pPar.Color = new moColor(
                                   fullcolor.r,
                                   fullcolor.g,
                                   fullcolor.b );
+        */
         pPar.GLId2 = 0;
 
         if (this.texture_mode==TEXMODE.PARTICLES_TEXTUREMODE_UNIT) {
@@ -2856,8 +2859,8 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                         depthTest: false,
                         vertexColors: THREE.VertexColors,
                         transparent: true,
-                        opacity: rgba.a * pPar.Alpha * this.m_EffectState.alpha
                       });
+                      pPar.Material.opacity = rgba.a * pPar.Alpha * this.m_EffectState.alpha;
                       pPar.Material.color = new moColor(rgba.r, rgba.g, rgba.b);
                     }
                     //if (i == 0 && j == 0) console.log("col", rgba);
@@ -2875,9 +2878,9 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 
                   pPar["selected"] = false;
                   pPar.Material.color = new moColor(
-                    rgba.r * this.Mat.color.r,
-                    rgba.g * this.Mat.color.g,
-                    rgba.b * this.Mat.color.b);
+                    rgba.r * this.Mat.color.r * pPar.Color.r,
+                    rgba.g * this.Mat.color.g * pPar.Color.g,
+                    rgba.b * this.Mat.color.b * pPar.Color.b);
                   if (this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_UNIT ||
                       this.texture_mode == TEXMODE.PARTICLES_TEXTUREMODE_PATCH) {
                     pPar.Material.map = this.m_Config.Texture("texture")._texture;
@@ -3190,6 +3193,8 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 
     if (this.Scene == undefined) {
         this.Scene = new MO.moSceneNode();
+        var fogColor : any = new THREE.Color(0x0000ff);
+        this.Scene.fog = new THREE.Fog( fogColor, 0.01, 20);
     }
     if (this.GroupedParticles == undefined) {
       this.GroupedParticles = new MO.moGroup();
@@ -3213,9 +3218,10 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 */
 
     ///CAMERA PERSPECTIVE
-    if (this.Camera == undefined) {
+    if (this.Camera == undefined || this.CamProportion!=this.RM.ScreenProportion()) {
       //this.Camera = new MO.moCamera3D();
-      this.Camera = new THREE.PerspectiveCamera(60, this.RM.ScreenProportion(), 0.01, 1000.0);
+      this.CamProportion = this.RM.ScreenProportion();
+      this.Camera = new THREE.PerspectiveCamera(60, this.RM.ScreenProportion(), 0.01, 100.0);
       var lookat: moVector3f = new moVector3f();
       lookat.copy(this.m_Physics.m_TargetViewVector)
         .sub(this.m_Physics.m_EyeVector)
@@ -3226,6 +3232,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
       this.Camera.lookAt(lookat);
       this.Camera.frustumCulled = true;
       this.Camera.castShadow = false;
+
 
 /* TODO: fix lookat function to imitate THREE.Camera quaternions, and World Direction
       this.GL.SetDefaultPerspectiveView(
@@ -3241,19 +3248,21 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
     this.DrawParticlesSimple(p_tempo, this.m_EffectState /*, parentstate*/);
 
     if (this.mouse) {
-      if (this.raycaster == undefined)
-        this.raycaster = new THREE.Raycaster();
+      if (this.drawOptions["StartRaycaster"]) {
+        if (this.raycaster == undefined)
+          this.raycaster = new THREE.Raycaster();
 
-      this.raycaster.setFromCamera({ x: this.mouse.x, y: this.mouse.y }, this.Camera);
-      this.intersects = this.raycaster.intersectObjects(this.Scene.children, true /*recursive*/);
-      if (this.intersects.length) {
-        //for (var i = 0; i < this.intersects.length; i++) {
-          var i = 0;
-          this.intersects[i].object.material.color = new THREE.Color(2.0, 2.0, 2.0);
-          //this.intersects[i].object["userData"]["selected"] = true;
-          if (this.intersects[i].object["userData"]["Particle"])
-            this.intersects[i].object["userData"]["Particle"]["selected"] = true;
-        //}
+        this.raycaster.setFromCamera({ x: this.mouse.x, y: this.mouse.y }, this.Camera);
+        this.intersects = this.raycaster.intersectObjects(this.Scene.children, true /*recursive*/);
+        if (this.intersects.length) {
+          //for (var i = 0; i < this.intersects.length; i++) {
+            var i = 0;
+            this.intersects[i].object.material.color = new THREE.Color(2.0, 2.0, 2.0);
+            //this.intersects[i].object["userData"]["selected"] = true;
+            if (this.intersects[i].object["userData"]["Particle"])
+              this.intersects[i].object["userData"]["Particle"]["selected"] = true;
+          //}
+        }
       }
       //if (this.intersects.length)
         //console.log("this.intersects[i].object:", this.intersects.length, this.intersects);

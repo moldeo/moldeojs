@@ -251,6 +251,9 @@ export class moConsole extends moMoldeoObject {
 
                 this.InitializeAllEffects();
                 if (options["effects_started"]) options["effects_started"](this);
+
+                this.CreateConnectors();
+                console.log( `moConsole.Init OK! ${this.GetLabelName()}:(${this.m_Config.m_Params.length})<-I[${this.m_Inlets.length}]->O[${this.m_Outlets.length}]]`, this);
               });
             });
           });

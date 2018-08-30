@@ -13,13 +13,18 @@
   border-radius: 10px;
   border: solid 1px #FFF;
   padding: 10px;
-  font-size: 11px;
+  font-size: 13px;
   font-family: Arial;
-  color: #BBB;
+  color: #FFF;
   margin: 5px;
 
 
 }
+
+.chat_online input {
+  color: #000 !important;
+}
+
 
 #menu {
   margin-bottom: 0px !important;
