@@ -63,6 +63,7 @@ export class moCamera3D extends THREE.Camera {
     m_Position : moPosition;
     m_Center: moPosition;
 */
+  
 };
 
 export enum moGeometryType {

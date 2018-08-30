@@ -578,6 +578,8 @@ export class moEffectParticlesSimple extends MO.moEffect {
   RM: MO.moRenderManager;
   GL: MO.moGLManager;
 
+  CamProportion : MOfloat;
+
   Plane: MO.moPlaneGeometry;
   Mat: MO.moMaterialBasic;
   Camera: MO.moCamera3D;
@@ -3213,8 +3215,9 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 */
 
     ///CAMERA PERSPECTIVE
-    if (this.Camera == undefined) {
+    if (this.Camera == undefined || this.CamProportion != this.RM.ScreenProportion()) {
       //this.Camera = new MO.moCamera3D();
+      this.CamProportion = this.RM.ScreenProportion();
       this.Camera = new THREE.PerspectiveCamera(60, this.RM.ScreenProportion(), 0.01, 1000.0);
       var lookat: moVector3f = new moVector3f();
       lookat.copy(this.m_Physics.m_TargetViewVector)

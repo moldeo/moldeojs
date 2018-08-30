@@ -39,6 +39,15 @@ export class MoldeojsViewComponent implements OnInit {
     private jsonService: JsonService,
     private fileadminService: FileAdminService) {
     this.hostElement = el;
+    var self = this;
+    window.addEventListener("resize", function(event:any) {
+      console.log("window resize>resize event",event);
+      console.log("this",this,self);
+      if (self.onResize) {
+        self.onResize(event);
+      }
+      //this.onResize(event);
+    });
 
     /*jsonService.getJson(this.jsonRute).subscribe(val => {
       this.jsonInit = val;
@@ -160,6 +169,10 @@ export class MoldeojsViewComponent implements OnInit {
     window["MoldeoJSView"] = this;
   }
 
+  GetConsole() : moConsole {
+    return this.MoldeoCS.m_Console;
+  }
+
   public animate() {
     //console.log("animate");
     window.requestAnimationFrame(_=>this.animate() );
@@ -195,6 +208,18 @@ export class MoldeojsViewComponent implements OnInit {
 
   HideOver() {
     this.contenidos.nativeElement.setAttribute("class", "contenido_over_hide");
+  }
+
+  onResize( event: any ) : void {
+    console.log("moldeojs-view window resize:",event, event.target.innerWidth);
+    var renderer : any = this.GetConsole().m_pResourceManager.GetRenderMan().m_Renderer;
+    if(renderer) {
+      console.log("resizing renderer",renderer,event.target.innerWidth,event.target.innerHeight);
+      //var ref_element = this.hostElement.nativeElement.parentNode || event.target;
+      var ref_element = event.target;
+      console.log("ref_element",ref_element);
+      renderer.setSize(ref_element.innerWidth || ref_element.clientWidth,ref_element.innerHeight || ref_element.clientHeight);
+    }
   }
 
 }

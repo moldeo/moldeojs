@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="moldeojsviewer">
+    <div id="moldeojsviewer" style="width:100%;height:100%;">
     </div>
 
     <script>
@@ -27,9 +27,8 @@
         var mjsel_src = getParameterByName("mol");
 
         (mjsel_src) ? mjsel.setAttribute("src",mjsel_src) : mjsel.setAttribute("src","molrepos/basic/01_Icon/01_Icon.mol");
-
         el.appendChild(mjsel);
-      }, 1000 );
+      }, 100 );
     </script>
     <script type="text/javascript" src="moldeojs-element.js"></script>
 </body>

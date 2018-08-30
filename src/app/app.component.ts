@@ -2,6 +2,9 @@ import { OnInit, Component, TemplateRef, ViewContainerRef, Inject, ViewChild, Vi
 
 import { ViewService } from "./view.service";
 
+import {MoldeojsViewComponent} from "./moldeojs-view/moldeojs-view.component";
+
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -14,6 +17,8 @@ export class AppComponent implements OnInit {
   sample: string = "molrepos/basic/08p_CameraParticles/08p_CameraParticles.mol";
   samples: string[] = [];
   viewservice : ViewService;
+
+  @ViewChild('moldeojsview') moldeojsview: MoldeojsViewComponent;
 
 /*
   @ViewChild('dynamic', {
@@ -50,6 +55,16 @@ export class AppComponent implements OnInit {
 
   expanded(event: any): void {
     console.log(event);
+  }
+
+  onResize( event: any ) : void {
+    //console.log("moldeojs app resize:",event, event.target.innerWidth);
+    //console.log("must resize:",this.moldeojsview);
+    var renderer : any = this.moldeojsview.GetConsole().m_pResourceManager.GetRenderMan().m_Renderer;
+    if(renderer) {
+      //console.log("resizing renderer",renderer,event.target.innerWidth,event.target.innerHeight);
+      renderer.setSize(event.target.innerWidth,event.target.innerHeight);
+    }
   }
 
 }
