@@ -92,7 +92,7 @@ export class moRenderManager extends moResource {
     super();
     this.SetName("_rendermanager_");
     this.m_Renderer = new THREE.WebGLRenderer({ alpha: true });
-    this.m_Renderer.autoClear =  false;
+    this.m_Renderer.autoClear =  true;
     this.m_FullScene = new THREE.Scene();
     /*
       autoClearColor: false,

@@ -29,7 +29,7 @@ export class moPreEffectErase extends MO.moPreEffect {
 
     var rgb: any = this.m_Config.EvalColor("color");
     var ccolor: MO.moColor = new MO.moColor( rgb.r, rgb.g, rgb.b);
-
+    
 
     this.RMan.m_Renderer.setClearColor( ccolor, 1.0);
     this.RMan.m_Renderer.clear(true, true, false);

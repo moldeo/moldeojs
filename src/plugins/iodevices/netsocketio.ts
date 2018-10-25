@@ -36,7 +36,7 @@ export class moNetSocketIo extends MO.moIODevice {
   }
 
   GetDefinition(): MO.moConfigDefinition {
-    console.log("moNetSocketIo.GetDefinition Erase");
+    console.log("moNetSocketIo.GetDefinition");
     super.GetDefinition();
 
     return this.m_Config.GetConfigDefinition();

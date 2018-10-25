@@ -219,41 +219,45 @@ export class moConsole extends moMoldeoObject {
         this.m_EffectManager.m_pResourceManager = this.GetResourceManager();
         this.m_EffectManager.Init();
 
+        this.m_pIODeviceManager.m_pResourceManager = this.GetResourceManager();
+
         this.m_ConsoleState.Init();
 
-        this.LoadObjects(moMoldeoObjectType.MO_OBJECT_PREEFFECT, (pre) => {
-          this.LoadObjects(moMoldeoObjectType.MO_OBJECT_EFFECT, (efe) => {
-            this.LoadObjects(moMoldeoObjectType.MO_OBJECT_POSTEFFECT, (pos) => {
-              this.LoadObjects(moMoldeoObjectType.MO_OBJECT_MASTEREFFECT, (mas) => {
-/*
-                this.InitObjects(moMoldeoObjectType.MO_OBJECT_PREEFFECT, (initpre) => {
-                  this.InitObjects(moMoldeoObjectType.MO_OBJECT_EFFECT, (initefe) => {
-                    if (options["effects_started"]) options["effects_started"](initefe);
+        this.LoadObjects(moMoldeoObjectType.MO_OBJECT_IODEVICE, (io) => {
+          this.LoadObjects(moMoldeoObjectType.MO_OBJECT_PREEFFECT, (pre) => {
+            this.LoadObjects(moMoldeoObjectType.MO_OBJECT_EFFECT, (efe) => {
+              this.LoadObjects(moMoldeoObjectType.MO_OBJECT_POSTEFFECT, (pos) => {
+                this.LoadObjects(moMoldeoObjectType.MO_OBJECT_MASTEREFFECT, (mas) => {
+  /*
+                  this.InitObjects(moMoldeoObjectType.MO_OBJECT_PREEFFECT, (initpre) => {
+                    this.InitObjects(moMoldeoObjectType.MO_OBJECT_EFFECT, (initefe) => {
+                      if (options["effects_started"]) options["effects_started"](initefe);
+                    });
                   });
-                });
-*/
+  */
 
-                if(this.m_pResourceManager) {
+                  if(this.m_pResourceManager) {
 
-                    for(var i = 0; i<this.m_pResourceManager.Resources().length; i++) {
-                      var mobject : moMoldeoObject = this.m_pResourceManager.GetResource(i);
-                      if (mobject) {
-                        this.m_MoldeoObjects.push( mobject );
+                      for(var i = 0; i<this.m_pResourceManager.Resources().length; i++) {
+                        var mobject : moMoldeoObject = this.m_pResourceManager.GetResource(i);
+                        if (mobject) {
+                          this.m_MoldeoObjects.push( mobject );
+                        }
                       }
+
                     }
+                  //adding console!
+                  this.m_MoldeoObjects.push(this);
 
-                  }
-                //adding console!
-                this.m_MoldeoObjects.push(this);
+                  this.UpdateMoldeoIds();
+                  if (options["effects_loaded"]) options["effects_loaded"](this);
 
-                this.UpdateMoldeoIds();
-                if (options["effects_loaded"]) options["effects_loaded"](this);
+                  this.InitializeAllEffects();
+                  if (options["effects_started"]) options["effects_started"](this);
 
-                this.InitializeAllEffects();
-                if (options["effects_started"]) options["effects_started"](this);
-
-                this.CreateConnectors();
-                console.log( `moConsole.Init OK! ${this.GetLabelName()}:(${this.m_Config.m_Params.length})<-I[${this.m_Inlets.length}]->O[${this.m_Outlets.length}]]`, this);
+                  this.CreateConnectors();
+                  console.log( `moConsole.Init OK! ${this.GetLabelName()}:(${this.m_Config.m_Params.length})<-I[${this.m_Inlets.length}]->O[${this.m_Outlets.length}]]`, this);
+                });
               });
             });
           });
@@ -479,6 +483,41 @@ export class moConsole extends moMoldeoObject {
 
   }
 
+  NewObject(p_resname: moText,
+      p_configname: moText,
+      p_labelname: moText,
+      p_keyname: moText, p_type: moMoldeoObjectType,
+      p_paramindex: MOint, p_valueindex: MOint,
+      p_activate: boolean) : moMoldeoObject {
+
+      var pobject : moMoldeoObject;
+      var peffect : moEffect;
+      var pdevice : moIODevice;
+
+      switch(p_type) {
+        case moMoldeoObjectType.MO_OBJECT_IODEVICE:
+          pdevice = this.m_pIODeviceManager.NewIODevice(p_resname, p_configname, p_labelname,
+                                                    p_keyname, p_type,
+                                                    p_paramindex, p_valueindex,
+                                                    p_activate);
+          if (pdevice) pobject = pdevice;
+          break;
+        case moMoldeoObjectType.MO_OBJECT_EFFECT:
+          peffect = this.m_EffectManager.NewEffect( p_resname, p_configname, p_labelname,
+                                                    p_keyname, p_type,
+                                                    p_paramindex, p_valueindex,
+                                                    p_activate);
+          if (peffect) pobject = peffect;
+          break;
+        default:
+
+          break;
+      }
+
+
+      return pobject;
+  }
+
   LoadObjects( fx_type : moMoldeoObjectType, callback?: any ): void {
 
     if (fx_type == moMoldeoObjectType.MO_OBJECT_UNDEFINED) {
@@ -501,6 +540,7 @@ export class moConsole extends moMoldeoObject {
     var N : MOint;
     var activate : boolean = true;
     var peffect : moEffect;
+    var pobject : moMoldeoObject;
 
     var fx_string: moText = this.m_MobDefinition.GetTypeToName(fx_type);
 
@@ -530,10 +570,24 @@ export class moConsole extends moMoldeoObject {
 
       var completecfname : moText = "" + this.m_pResourceManager.GetDataMan().GetDataPath() + moSlash + cfname+ ".cfg";
       var FullCF : moFile = new moFile(completecfname);
+      console.log("completecfname:",completecfname);
 
       if ( FullCF.Exists() ) {
                 if ( fxname  != "nil" ) {
 
+                  pobject = this.NewObject(fxname, cfname, lblname,
+                    keyname, fx_type, efx, i, activate);
+
+                    if (pobject) {
+                      this.m_MoldeoObjects.push( pobject );
+                      console.log("MoldeoObject loaded:",pobject);
+                      if (fx_type==moMoldeoObjectType.MO_OBJECT_IODEVICE) {
+                          console.log("MoldeoObject IODevice:",pobject);
+                          var pdevice : moIODevice = pobject as moIODevice;
+                          pdevice.Init();
+                      }
+                    }
+/**
                   peffect = this.m_EffectManager.NewEffect(fxname, cfname, lblname,
                     keyname, fx_type, efx, i, activate);
 
@@ -544,7 +598,7 @@ export class moConsole extends moMoldeoObject {
                     if (this.MODebug2) {
                       //this.MODebug2.Message( "moConsole::LoadObjects > " + completecfname );
                     }
-
+*/
                 } else {
                   /*
                     peffect = null;

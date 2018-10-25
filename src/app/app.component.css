@@ -4,25 +4,49 @@
 }
 
 .chat_online {
-
   display: block;
   position: fixed;
-  top: 50px;
-  right: 0px;
-  background-color: rgba(0,0,0,0.5);
+  bottom: 15%;
+  left: 50%;
+  width: 50%;
+  margin-left: -25%;
+  background-color: rgba(0,0,0,0.25);
   border-radius: 10px;
-  border: solid 1px #FFF;
+  border: solid 2px #555;
   padding: 10px;
-  font-size: 13px;
-  font-family: Arial;
+  font-size: 2em;
+  font-family:  Courier;
   color: #FFF;
-  margin: 5px;
-
-
 }
 
-.chat_online input {
-  color: #000 !important;
+input.input_text {
+  color: #0F0 !important;
+  background-color: transparent;
+  font-family: Courier;
+  border: solid 1px #555;
+  padding: 5px;
+}
+
+.chat_msg_snd>label {
+  display: none;
+}
+
+button.btn {
+  background-color: transparent;
+  border: solid 1px #555;
+  margin: 8px;
+  padding: 8px;
+  color: #777;
+  font-family:  Courier;
+  font-size: 2em;
+}
+
+input.input_color {
+  height: 25px;
+  width: 25px;
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
 }
 
 

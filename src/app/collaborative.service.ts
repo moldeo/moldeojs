@@ -1,14 +1,15 @@
+
+import {map} from 'rxjs/operators';
 import { Injectable,  Inject} from '@angular/core';
 
-import { Subject }    from 'rxjs/Subject';
-import {  BehaviorSubject }    from 'rxjs/BehaviorSubject';
+import { Subject ,   BehaviorSubject }    from 'rxjs';
 import { Http } from "@angular/http";
 
 import { moConsole } from './mo-console';
 import { moResourceManager } from './mo-resource-manager';
 import { moIODeviceManager } from './mo-iodevice-manager';
 
-import { Socket } from 'ng-socket-io';
+import { Socket } from 'ngx-socket-io';
 
 export class CollaborativeData {
   msg: string;
@@ -32,60 +33,60 @@ export class CollaborativeService {
 
 
     sendMessage(data) {
-        console.log("CService > sendMessage() emitting message",data);
+        //console.log("CService > sendMessage() emitting message",data);
         var data : any = { msg: data.msg, options: data.options }
         this.socket.emit("message", data );
     }
 
     getMessage() {
-        console.log("CService > getMessage() receiving message");
+        //console.log("CService > getMessage() receiving message");
         return this.socket
-            .fromEvent<any>("message")
-            .map(data => data );
+            .fromEvent<any>("message").pipe(
+            map(data => data ));
     }
 
     updateClient() {
       return this.socket
-          .fromEvent<any>("update_client")
-          .map(data => data );
+          .fromEvent<any>("update_client").pipe(
+          map(data => data ));
     }
 
     fetchClients() {
-      console.log("fetch clients");
+      //console.log("fetch clients");
       this.socket.emit("list_clients" );
     }
 
     sendClient( data : any ) {
-      console.log("Send client data",data);
+      //console.log("Send client data",data);
       this.socket.emit("client_data", data );
     }
 
     getClients() {
-        console.log("getting clients count");
+        //console.log("getting clients count");
         return this.socket
-            .fromEvent<any>("clients")
-            .map(data => data.clients );
+            .fromEvent<any>("clients").pipe(
+            map(data => data.clients ));
     }
 
     getListClients() {
-        console.log("Listing clients");
+        //console.log("Listing clients");
         return this.socket
-            .fromEvent<any>("list_clients")
-            .map(data => data );
+            .fromEvent<any>("list_clients").pipe(
+            map(data => data ));
     }
 
     Connected() {
-        console.log("Connected");
+        //console.log("Connected");
         return this.socket
-            .fromEvent<any>("connected")
-            .map(data => data );
+            .fromEvent<any>("connected").pipe(
+            map(data => data ));
     }
 
     Disconnected() {
-        console.log("Disconnected");
+        //console.log("Disconnected");
         return this.socket
-            .fromEvent<any>("disconnected")
-            .map(data => data );
+            .fromEvent<any>("disconnected").pipe(
+            map(data => data ));
     }
 
     close() {

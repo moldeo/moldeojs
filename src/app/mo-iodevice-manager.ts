@@ -1,7 +1,10 @@
 import { moAbstract } from "./mo-abstract";
 import { moEventList, moEvent, moMessage } from "./mo-event-list";
 import { moIODevice, moIODeviceArray, moIODevices } from "./mo-iodevice";
-import { moIODevicePluginsArray } from "./mo-plugin";
+import { moIODevicePluginsArray, moNewIODevice, moPluginsArray } from "./mo-plugin";
+import { moMoldeoObjectType } from './mo-moldeo-object-type.enum';
+import { moMobDefinition } from './mo-moldeo-object';
+import {moResourceManager} from './mo-resource-manager';
 
 export { moIODevice, moIODeviceArray, moIODevices } from "./mo-iodevice";
 export class moIODeviceManager extends moAbstract {
@@ -9,7 +12,9 @@ export class moIODeviceManager extends moAbstract {
   m_MouseEvents: any = [];
   m_Events : moEventList = new moEventList();
   m_IODevices : moIODevices = [];
-  m_Plugins: moIODevicePluginsArray;
+  //m_Plugins: moIODevicePluginsArray;
+  m_Plugins : moPluginsArray = [];
+  m_pResourceManager: moResourceManager;
 
   constructor() {
     super();
@@ -18,10 +23,50 @@ export class moIODeviceManager extends moAbstract {
 /**
          * constructor genérico de la clase.
          */
-		//moIODevice*		NewIODevice( const moText& p_devname,
-    // const moText& p_configname, const moText& p_labelname,
-    // const moText& p_keyname,  moMoldeoObjectType p_type,
-    // int paramindex = -1, int valueindex = -1, bool p_activate=true );
+	NewIODevice( p_devname : any,
+               p_configname : any,
+               p_labelname : any,
+               p_keyname : any,
+               p_type : moMoldeoObjectType,
+              p_paramindex : any,
+              p_valueindex : any,
+              p_activate : boolean ) : moIODevice {
+                var pdevice : moIODevice;
+                switch (p_type) {
+                		case moMoldeoObjectType.MO_OBJECT_IODEVICE:
+                			pdevice = moNewIODevice( p_devname, this.m_Plugins );
+                			if (pdevice) this.m_IODevices.push( pdevice );
+                			break;
+                		default:
+                			break;
+                	}
+
+                	if (pdevice) {
+                      /*moMobDefinition MDef = pdevice->GetMobDefinition();
+
+                	    MDef.SetConsoleParamIndex(paramindex);
+                	    MDef.SetConsoleValueIndex(valueindex);
+                      MDef.SetConfigName( p_configname );
+                      MDef.SetLabelName( p_labelname );
+                      MDef.SetKeyName( p_keyname );
+                      MDef.SetActivate(p_activate);
+
+                      pdevice->SetMobDefinition(MDef);*/
+                      var MDef : moMobDefinition = pdevice.GetMobDefinition();
+                      MDef.SetConfigName( p_configname );
+                      MDef.SetLabelName( p_labelname );
+                      MDef.SetKeyName( p_keyname );
+
+                      MDef.SetConsoleParamIndex(p_paramindex);
+                      MDef.SetConsoleValueIndex(p_valueindex);
+                      MDef.SetActivate(p_activate);
+
+                      pdevice.SetMobDefinition( MDef );
+                      //m_pMoldeoObjects->Add( (moMoldeoObject*) peffect );
+                      pdevice.SetResourceManager( this.m_pResourceManager );
+                	}
+                  return pdevice;
+              }
 
         /**
          * constructor genérico de la clase.

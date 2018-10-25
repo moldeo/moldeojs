@@ -9,6 +9,8 @@ import {MoldeojsViewComponent} from "./moldeojs-view/moldeojs-view.component";
 
 import { Title }  from '@angular/platform-browser';
 
+import { ElectronService } from './providers/electron.service';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -44,9 +46,19 @@ export class AppComponent implements OnInit {
 
   constructor(private modalService: BsModalService,
     private titleService: Title,
+    public electronService: ElectronService,
     @Inject(ViewService) service,
   @Inject(ViewContainerRef) viewContainerRef,
 @Inject(CollaborativeService) coservice ) {
+
+    if (electronService.isElectron()) {
+      console.log('Mode electron');
+      console.log('Electron ipcRenderer', electronService.ipcRenderer);
+      console.log('NodeJS childProcess', electronService.childProcess);
+    } else {
+      console.log('Mode web');
+    }
+
     this.samples.push("molrepos/moldeoorg/Speak/Speak.mol");
     //this.samples.push("molrepos/basic/00_Image/00_Image.mol");
     //this.samples.push("molrepos/basic/01_Icon/01_Icon.mol");
@@ -62,6 +74,7 @@ export class AppComponent implements OnInit {
       //this.service.setRootViewContainerRef(this.viewContainerRef)
       //this.service.addDynamicComponent()
       //this.viewservice.addMoldeojsViewComponent(this.sample);
+
       this.collaborativeService.getMessage().subscribe( data => { this.recMsg(data); } );
       this.collaborativeService.getClients().subscribe(clients=> {this.clients = clients;});
       this.collaborativeService.getListClients().subscribe(data=>{ this.ListClients(data); });
@@ -74,6 +87,20 @@ export class AppComponent implements OnInit {
       var projectname = this.sample.substr(a+1, b-a-1);
       this.setTitle( projectname + " - MoldeoJS" );
       this.m_Console = this.moldeojsview.GetConsole();
+
+      if (this.electronService.isElectron()) {
+        var self = this;
+        var oscs = new this.electronService.osc.Server(9991, '0.0.0.0');
+        if (oscs)
+          oscs.on("message", function (msg, rinfo) {
+                //console.log("TUIO message:");
+                if (msg[1]>0) {
+                  //console.log(JSON.stringify(msg));
+                  self.oscData(msg);
+                }
+
+          });
+      }
       //this.m_Console.AppComponent = this;
   }
 
@@ -96,7 +123,7 @@ export class AppComponent implements OnInit {
       var cardNumber : string;
       var userStyle : string = "";
       var userColor : string = "#AAA";
-      console.log("recMsg:",data);
+      //console.log("recMsg:",data);
       this.recv_message = data.msg;
       //clase >
       var source_id = data.options.source_id;
@@ -164,25 +191,25 @@ export class AppComponent implements OnInit {
                               +cardNumber+': '+this.recv_message
                         +'</div>';
       this.message2recv.nativeElement.innerHTML = newMsg+this.message2recv.nativeElement.innerHTML;
-      console.log(newMsg,"ListClients:",this.m_ListClients);
+      //console.log(newMsg,"ListClients:",this.m_ListClients);
   }
 
   sendMsg(data) {
-    console.log("sendMsg:",data);
+    //console.log("sendMsg:",data);
     this.collaborativeService.sendMessage(data);
   }
 
   ListClients(data) {
-    console.log("ListClients received:",data);
+    //console.log("ListClients received:",data);
     this.clients = data.clients;
     for( var d in data.list) {
       this.m_ListClients[data.list[d].id] = data.list[d];
     }
-    console.log("ListClients updated:",this.m_ListClients);
+    //console.log("ListClients updated:",this.m_ListClients);
   }
 
   updateClient(data) {
-    console.log("updating other client data:",data);
+    //console.log("updating other client data:",data);
     if (data.id) {
       if (this.m_ListClients[data.id]) {
         for(var k in data) {
@@ -192,12 +219,12 @@ export class AppComponent implements OnInit {
         this.m_ListClients[data.id] = data;
       }
     }
-    console.log("updated!! other client data:",this.m_ListClients[data.id]);
+    //console.log("updated!! other client data:",this.m_ListClients[data.id]);
     this.m_Console.m_ListClients = this.m_ListClients;
   }
 
   Connected(data) {
-    console.log("Connected!",data);
+    //console.log("Connected!",data);
     if (data.state) {
       if (data.state=="connected") {
 
@@ -245,6 +272,19 @@ export class AppComponent implements OnInit {
     }
   }
 
+  oscData(oscmsg) {
+    /*
+    var data = {
+      msg: "osc "+oscmsg[1],
+      options: {
+        oscmsg: oscmsg
+      }
+    };
+
+    this.sendMsg(data);*/
+
+  }
+
   clientColor(event) {
     this.m_ConnectedColor = this.clientcolor.nativeElement.value;
 
@@ -255,7 +295,7 @@ export class AppComponent implements OnInit {
       }
     };
 
-    console.log("clientColor",data);
+    //console.log("clientColor",data);
     this.sendMsg(data);
   }
 
@@ -272,6 +312,12 @@ export class AppComponent implements OnInit {
     console.log(event);
     console.log("Loading:",this.samples[index]);
     this.sample = this.samples[index];
+  }
+  keyup(event:any) {
+      console.log(event);
+      if (event.keyCode==13) {
+        this.compose_message(event);
+      }
   }
 
   compose_message(event:any) {

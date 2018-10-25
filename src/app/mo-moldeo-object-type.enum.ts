@@ -25,7 +25,7 @@ export const moMoldeoObjectTypeToText = [
   "preeffect",//1
   "posteffect",//2
   "mastereffect",//3
-  "iodevice",//4
+  "devices",//4 "iodevice"
   "resource",//5
   "console"//6
 ];

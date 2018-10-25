@@ -353,6 +353,7 @@ export class moMoldeoObject extends moScript {
     } else if (
       this.GetType() == moMoldeoObjectType.MO_OBJECT_PREEFFECT
       || this.GetType() == moMoldeoObjectType.MO_OBJECT_EFFECT
+      || this.GetType() == moMoldeoObjectType.MO_OBJECT_IODEVICE
       /*|| this.GetType() == moMoldeoObjectType.MO_OBJECT_POSTEFFECT
       || this.GetType() == moMoldeoObjectType.MO_OBJECT_MASTEREFFECT
       || this.GetType() == moMoldeoObjectType.MO_OBJECT_RESOURCE
@@ -363,7 +364,6 @@ export class moMoldeoObject extends moScript {
       confignamecompleto = `${datap}${this.GetConfigName()}.cfg`;
 
     }
-
     /*else {
 
       if (this.m_pResourceManager) {

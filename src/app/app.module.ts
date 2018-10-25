@@ -16,17 +16,19 @@ import { ViewService } from "./view.service";
 import { JsonService } from './json.service';
 import { FileAdminService } from './fileadmin.service';
 
+import { ElectronService } from './providers/electron.service';
+
 import {CollaborativeService} from './collaborative.service';
 
 const appRoutes: Routes = [
   //{ path: 'about', component: AboutComponent },
 ];
 
-import { SocketIoModule, SocketIoConfig} from 'ng-socket-io';
+import { SocketIoModule, SocketIoConfig} from 'ngx-socket-io';
 
 
-//const config: SocketIoConfig = { url: 'https://speak.moldeo.org:8989', options: {rejectUnauthorized: false} };
-const config: SocketIoConfig = { url: 'http://localhost:8988', options: {rejectUnauthorized: false} };
+const config: SocketIoConfig = { url: 'https://speak.moldeo.org:8989', options: {rejectUnauthorized: false} };
+//const config: SocketIoConfig = { url: 'http://localhost:8988', options: {rejectUnauthorized: false} };
 
 @NgModule({
   declarations: [
@@ -42,7 +44,7 @@ const config: SocketIoConfig = { url: 'http://localhost:8988', options: {rejectU
     SocketIoModule.forRoot(config),
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [Title,ViewService,ConsoleService, JsonService, FileAdminService, CollaborativeService ],
+  providers: [Title,ViewService,ConsoleService, JsonService, FileAdminService, CollaborativeService, ElectronService ],
   entryComponents: [MoldeojsViewComponent],
   bootstrap: [AppComponent]
 })

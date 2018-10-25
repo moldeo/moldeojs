@@ -1,11 +1,15 @@
 import { TestBed, async } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { ElectronService } from './providers/electron.service';
 
 describe('AppComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
         AppComponent
+      ],
+      providers: [
+        ElectronService
       ],
     });
     TestBed.compileComponents();

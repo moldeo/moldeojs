@@ -4,8 +4,7 @@ import { Injectable,
   ReflectiveInjector,
   ViewContainerRef } from '@angular/core';
 
-import { Subject }    from 'rxjs/Subject';
-import {  BehaviorSubject }    from 'rxjs/BehaviorSubject';
+import { Subject ,   BehaviorSubject }    from 'rxjs';
 import { Http } from "@angular/http";
 
 import { MoldeojsViewComponent } from './moldeojs-view/moldeojs-view.component';

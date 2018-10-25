@@ -15,16 +15,33 @@
                 <D type="TXT">speak.js</D>
             </VAL>
         </PARAM>
-        <PARAM name="devices" type="MOLDEOOBJECT" />
+        <PARAM name="devices" type="MOLDEOOBJECT">
+          <VAL>
+              <D type="TXT">netoscout</D>
+              <D type="TXT">netoscout</D>
+              <D type="TXT">netoscout</D>
+              <D type="NUM">0</D>
+              <D type="NUM">1</D>
+              <D type="TXT">M</D>
+          </VAL>
+          <VAL>
+              <D type="TXT">netoscin</D>
+              <D type="TXT">netoscin</D>
+              <D type="TXT">netoscin</D>
+              <D type="NUM">0</D>
+              <D type="NUM">1</D>
+              <D type="TXT">N</D>
+          </VAL>
+        </PARAM>
         <PARAM name="preeffect" type="MOLDEOOBJECT">
-            <VAL>
-                <D type="TXT">erase</D>
-                <D type="TXT">erase</D>
-                <D type="TXT">erase</D>
-                <D type="NUM">0</D>
-                <D type="NUM">1</D>
-                <D type="TXT">S</D>
-            </VAL>
+          <VAL>
+              <D type="TXT">erase</D>
+              <D type="TXT">erase</D>
+              <D type="TXT">erase</D>
+              <D type="NUM">0</D>
+              <D type="NUM">1</D>
+              <D type="TXT">S</D>
+          </VAL>
         </PARAM>
         <PARAM name="effect" type="MOLDEOOBJECT">
             <VAL>

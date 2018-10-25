@@ -36,6 +36,22 @@ export type moPluginDefinitions = moPluginDefinition[];
 export const PluginsDefinitions: moPluginDefinitions = [];
 export const PluginsDefinitionsMap = {};
 
+/// IODevice NetOscIn ====================================================================
+import { moNetOscIn } from "../plugins/iodevices/netoscin";
+PluginsDefinitions.push( new moPluginDefinition(
+  "netoscin",
+  "/plugins/iodevices/netoscin.ts",
+  moMoldeoObjectType.MO_OBJECT_IODEVICE,
+moNetOscIn ) );
+
+/// IODevice NetOscOut ====================================================================
+import { moNetOscOut } from "../plugins/iodevices/netoscout";
+PluginsDefinitions.push( new moPluginDefinition(
+  "netoscout",
+  "/plugins/iodevices/netoscout.ts",
+  moMoldeoObjectType.MO_OBJECT_IODEVICE,
+moNetOscOut ) );
+
 /// PreEffect Erase ====================================================================
 import { moPreEffectErase } from "../plugins/preeffects/erase";
 PluginsDefinitions.push( new moPluginDefinition(

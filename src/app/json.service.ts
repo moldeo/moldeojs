@@ -1,3 +1,5 @@
+
+import {map} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Http, Response } from "@angular/http";
 import 'rxjs/Rx';
@@ -8,7 +10,7 @@ export class JsonService {
 
  //////////GET JSON CONTENT//////////
  getJson(url) {
-  return this.http.get(url).map((res:Response) => res.json());
+  return this.http.get(url).pipe(map((res:Response) => res.json()));
  }
 
  //////////GET OBJECTS FILTER BY KEY & VALUE//////////
