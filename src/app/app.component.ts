@@ -308,7 +308,7 @@ export class AppComponent implements OnInit {
     } else {
       if ( (this.canvas_x+metrics.width) > (this.canvas_x_max) ) {
         print_x = 0;
-        this.canvas_x = metrics.width;
+        this.canvas_x = metrics.width+4;
         this.canvas_y+= this.chat_line_height;
         print_y = this.canvas_y;
       } else {
@@ -318,7 +318,7 @@ export class AppComponent implements OnInit {
       }
       if (this.canvas_y>this.canvas_y_max) {
         print_x = 0;
-        this.canvas_x = metrics.width;
+        this.canvas_x = metrics.width+4;
         this.canvas_y = this.canvas_y_top;
         print_y = this.canvas_y;
         this.ctx_chat_canvas.fillStyle = "#000";
