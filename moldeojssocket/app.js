@@ -89,7 +89,7 @@ io.on('connection', function (socket) {
     */
     //Send to the connected a welcome message .
     socket.emit('message', {
-          msg: 'Bienvenido al Chatapp de Speak!',
+          msg: 'Speak Imaginación Colectiva',
           options: {
             id: socket.client.conn.id,
             state: "welcome"
