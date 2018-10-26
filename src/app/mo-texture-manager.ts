@@ -39,6 +39,9 @@ export class moTextureManager extends moResource {
   moldeotrans_id: MOint = -1;
   MoldeotransTexture: moTexture;
 
+  moldeochat_id: MOint = -1;
+  MoldeoChatTexture : moTexture;
+
   constructor() {
     super();
     this.SetName("_texturemanager_");
@@ -57,6 +60,9 @@ export class moTextureManager extends moResource {
     this.moldeotrans_id = this.AddTexture("moldeotrans",512,512);
     this.MoldeotransTexture = this.GetTexture(this.moldeotrans_id);
     this.MoldeotransTexture._texture = this.m_TextureLoader.load("./assets/data/icons/moldeotrans2.png");
+
+    this.moldeochat_id = this.AddTexture("full_chat_canvas",1024,1024);
+    this.MoldeoChatTexture = this.GetTexture(this.moldeochat_id);
 
     return super.Init();
   }

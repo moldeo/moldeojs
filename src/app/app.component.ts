@@ -11,6 +11,10 @@ import { Title }  from '@angular/platform-browser';
 
 import { ElectronService } from './providers/electron.service';
 
+import { moTexture, moTextureAnimated, moTextureType } from "./mo-texture";
+import * as THREE from 'three';
+
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -32,11 +36,24 @@ export class AppComponent implements OnInit {
   m_ConnectedId : any = false;
   m_ConnectedColor : any = false;
   m_Console : any = false;
+
+  canvas_x : any = 0;
+  canvas_y : any = 0;
+  canvas_x_max : any = 1024;
+  canvas_y_max : any = 1024;
+  column : any = 0;
+  column_width : any = 140;
+
+  m_ChatTexture : moTexture;
+
+
   @ViewChild('moldeojsview') moldeojsview: MoldeojsViewComponent;
   @ViewChild('message2send') message2send: ElementRef;
   @ViewChild('message2recv') message2recv: ElementRef;
   @ViewChild('clientcolor') clientcolor: ElementRef;
 
+  public chat_canvas: HTMLCanvasElement;
+  public ctx_chat_canvas: CanvasRenderingContext2D;
 
   public modalRef: BsModalRef; // {1}
 /*
@@ -68,6 +85,9 @@ export class AppComponent implements OnInit {
     this.viewservice.setRootViewContainerRef(viewContainerRef);
     this.collaborativeService = coservice;
     this.clients = 0;
+    this.canvas_x = 0;
+    this.canvas_y = 0;
+    this.m_ChatTexture = undefined;
   } // {2}
 
   ngOnInit() {
@@ -88,6 +108,12 @@ export class AppComponent implements OnInit {
       this.setTitle( projectname + " - MoldeoJS" );
       this.m_Console = this.moldeojsview.GetConsole();
 
+
+      //this.m_Console.AppComponent = this;
+      this.chat_canvas = <HTMLCanvasElement> document.getElementById("full_chat_canvas");
+      this.ctx_chat_canvas = this.chat_canvas.getContext("2d");
+      this.ctx_chat_canvas.fillRect(0, 0, this.chat_canvas.width, this.chat_canvas.height);
+
       if (this.electronService.isElectron()) {
         var self = this;
         var oscs = new this.electronService.osc.Server(9991, '0.0.0.0');
@@ -101,7 +127,24 @@ export class AppComponent implements OnInit {
 
           });
       }
-      //this.m_Console.AppComponent = this;
+  }
+
+  createChatTexture() {
+    console.log(this.m_Console);
+    var resid : number = -1;
+    console.log(this.m_Console);
+    if (this.m_ChatTexture==undefined && resid==-1) {
+      resid = this.m_Console.GetResourceManager().GetTextureMan().GetTextureMOId("full_chat_canvas", false);
+
+      if (resid==-1) resid = this.m_Console.GetResourceManager().GetTextureMan().AddTexture( moTextureType.MO_TYPE_TEXTURE, "full_chat_canvas" );
+      if (resid>-1) {
+        this.m_ChatTexture = this.m_Console.GetResourceManager().GetTextureMan().GetTexture(resid);
+        this.m_ChatTexture._texture = new THREE.Texture(this.chat_canvas);
+        this.m_ChatTexture._texture.minFilter = THREE.LinearFilter;
+        this.m_ChatTexture._texture.needsUpdate = true;//Important for update
+      }
+    }
+
   }
 
   /*
@@ -190,8 +233,40 @@ export class AppComponent implements OnInit {
                             +'>'
                               +cardNumber+': '+this.recv_message
                         +'</div>';
-      this.message2recv.nativeElement.innerHTML = newMsg+this.message2recv.nativeElement.innerHTML;
+      //this.message2recv.nativeElement.innerHTML = newMsg+this.message2recv.nativeElement.innerHTML;
+      this.printMsg( {
+                        'msg': cardNumber+': '+this.recv_message,
+                        'color': userColor,
+                        'mine':isMyMessage,
+                        'cardinal': userCardinal
+                      });
       //console.log(newMsg,"ListClients:",this.m_ListClients);
+  }
+
+  printMsg(filterdata) {
+    this.ctx_chat_canvas.font = "13px Courier";
+    this.ctx_chat_canvas.fillStyle = filterdata.color;
+    if (this.canvas_y>this.canvas_y_max) {
+      this.column++;
+      this.canvas_y = 0;
+      if (this.column_width*this.column>this.canvas_x_max) {
+        this.column = 0;
+      }
+    }
+    this.canvas_x = this.column_width*this.column;
+    this.canvas_y+= 16;
+    this.ctx_chat_canvas.fillText( filterdata.msg, this.canvas_x, this.canvas_y );
+
+    //this.ctx_chat_canvas.drawImage( this.video, 0, 0, this.canvas.width, this.canvas.height);
+    if (this.column>=0) {
+      console.log(this.column);
+      this.createChatTexture();
+      if (this.m_ChatTexture) {
+        if (this.m_ChatTexture._texture) {
+          this.m_ChatTexture._texture.needsUpdate = true;//Important for update
+        }
+      }
+    }
   }
 
   sendMsg(data) {
@@ -329,6 +404,7 @@ export class AppComponent implements OnInit {
     this.sendMsg(this.last_data);
     this.message2send.nativeElement.value = "";
     this.message2send.nativeElement.focus();
+
   }
 
   collapsed(event: any): void {

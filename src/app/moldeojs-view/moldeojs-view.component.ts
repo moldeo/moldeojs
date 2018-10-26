@@ -135,6 +135,7 @@ export class MoldeojsViewComponent implements OnInit {
           if (RenderMan) {
             if (this.rendererElement) this.rendererElement.remove();
             this.rendererElement = RenderMan.m_Renderer.domElement;
+            this.rendererElement.setAttribute("class","moldeojscanvas");
             this.hostElement.nativeElement.appendChild( this.rendererElement );
             RenderMan.m_Renderer.clear();
             this.test = 0;
