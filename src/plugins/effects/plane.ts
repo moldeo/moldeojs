@@ -52,7 +52,7 @@ export class moEffectPlane extends MO.moEffect {
     ///MESH MATERIAL
     if (this.Mat==undefined) {
       this.Mat = new MO.moMaterialBasic();
-      this.MatB = new MO.moMaterialBasic();
+      /*this.MatB = new MO.moMaterialBasic();*/
     }
     if (this.Mat) {
       this.Mat.transparent = true;
@@ -64,14 +64,14 @@ export class moEffectPlane extends MO.moEffect {
       this.Mat.side = MO.three.DoubleSide;
       this.Mat.opacity = this.m_Config.Eval("alpha");
       this.Mat.map = this.m_Config.Texture("texture")._texture;
-
+/*
       this.MatB.transparent = true;
       this.MatB.color = ccolorflip;
       this.MatB.vertexColors = MO.three.VertexColors;
       this.MatB.needsUpdate = true;
       this.MatB.side = MO.three.FrontSide;
       this.MatB.opacity = this.m_Config.Eval("alpha");
-      this.MatB.map = this.m_Config.Texture("textureflip")._texture;
+      this.MatB.map = this.m_Config.Texture("textureflip")._texture;*/
       //console.log("this.m_Config.Texture(textureflip)", this.Mat,this.MatB,this.GetResourceManager().GetTextureMan());
 
     }
@@ -87,10 +87,10 @@ export class moEffectPlane extends MO.moEffect {
         this.m_Config.Eval("width"),
         this.m_Config.Eval("height"),
         1, 1);
-      this.PlaneB = new MO.moPlaneGeometry(
+    /*  this.PlaneB = new MO.moPlaneGeometry(
         this.m_Config.Eval("width"),
         this.m_Config.Eval("height"),
-        1, 1);
+        1, 1);*/
     }
     if (this.Plane) {
 
@@ -104,7 +104,7 @@ export class moEffectPlane extends MO.moEffect {
       this.Plane.colors = [ccolor, ccolor, ccolor, ccolor];
       this.Plane.colorsNeedUpdate = true;
 
-
+/*
       if (this.PlaneB.m_Width != this.m_Config.Eval("width")
         || this.PlaneB.m_Height != this.m_Config.Eval("height")) {
         Object.assign(this.PlaneB, new MO.moPlaneGeometry(
@@ -113,14 +113,14 @@ export class moEffectPlane extends MO.moEffect {
         1, 1));
       }
       this.PlaneB.colors = [ccolorflip, ccolorflip, ccolorflip, ccolorflip];
-      this.PlaneB.colorsNeedUpdate = true;
+      this.PlaneB.colorsNeedUpdate = true;*/
 
     }
 
     ///MESH MODEL
     if (this.Model == undefined) {
       this.Model = new MO.moGLMatrixf().MakeIdentity();
-      this.ModelB = new MO.moGLMatrixf().MakeIdentity();
+      /*this.ModelB = new MO.moGLMatrixf().MakeIdentity();*/
     }
 
     if (this.Model) {
@@ -141,7 +141,7 @@ export class moEffectPlane extends MO.moEffect {
           this.m_Config.Eval("translatez"));
 
       /// === MODEL B ====
-
+/*
       this.ModelB.Scale(
           this.m_Config.Eval("scalex"),
           this.m_Config.Eval("scaley"),
@@ -157,19 +157,19 @@ export class moEffectPlane extends MO.moEffect {
           this.m_Config.Eval("translatey"),
           this.m_Config.Eval("translatez"));
 
-
+*/
 
     }
 
     if (this.Mesh==undefined) {
       this.Mesh = new MO.moMesh(this.Plane, this.Mat);
-      this.Mesh.add(new MO.three.AxisHelper());
+      /*this.Mesh.add(new MO.three.AxisHelper());
       this.MeshB = new MO.moMesh( this.PlaneB, this.MatB );
-      this.MeshB.add(new MO.three.AxisHelper());
+      this.MeshB.add(new MO.three.AxisHelper());*/
     }
     if (this.Mesh && this.Model) {
       this.Mesh.SetModelMatrix(this.Model);
-      this.MeshB.SetModelMatrix(this.ModelB);
+      //this.MeshB.SetModelMatrix(this.ModelB);
     }
 
     if (this.Scene==undefined) {

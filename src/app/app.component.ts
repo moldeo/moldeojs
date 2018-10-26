@@ -36,18 +36,23 @@ export class AppComponent implements OnInit {
   m_ConnectedId : any = false;
   m_ConnectedColor : any = false;
   m_Console : any = false;
+  placeholder : any = "¿Qué imaginas ahora? ...";
 
   canvas_x : any = 0;
   canvas_y : any = 0;
   canvas_x_max : any = 1024;
   canvas_y_max : any = 1024;
   column : any = 0;
-  column_width : any = 140;
+  column_width : any = 20;
+  chat_font_size : any = 13;
+  chat_line_height : any = 16;
+  max_message : any = 64;
 
   m_ChatTexture : moTexture;
 
 
   @ViewChild('moldeojsview') moldeojsview: MoldeojsViewComponent;
+  @ViewChild('chatmsgbox') chatmsgbox: ElementRef;
   @ViewChild('message2send') message2send: ElementRef;
   @ViewChild('message2recv') message2recv: ElementRef;
   @ViewChild('clientcolor') clientcolor: ElementRef;
@@ -112,6 +117,7 @@ export class AppComponent implements OnInit {
       //this.m_Console.AppComponent = this;
       this.chat_canvas = <HTMLCanvasElement> document.getElementById("full_chat_canvas");
       this.ctx_chat_canvas = this.chat_canvas.getContext("2d");
+      this.ctx_chat_canvas.fillStyle = "#000";
       this.ctx_chat_canvas.fillRect(0, 0, this.chat_canvas.width, this.chat_canvas.height);
 
       if (this.electronService.isElectron()) {
@@ -127,6 +133,8 @@ export class AppComponent implements OnInit {
 
           });
       }
+
+      this.m_ConnectedColor = this.clientcolor.nativeElement.value;
   }
 
   createChatTexture() {
@@ -234,8 +242,10 @@ export class AppComponent implements OnInit {
                               +cardNumber+': '+this.recv_message
                         +'</div>';
       //this.message2recv.nativeElement.innerHTML = newMsg+this.message2recv.nativeElement.innerHTML;
+      var stripedHtml = this.recv_message.replace(/<[^>]+>/g, '');
       this.printMsg( {
-                        'msg': cardNumber+': '+this.recv_message,
+                        /*'msg': cardNumber+': '+this.recv_message,*/
+                        'msg': stripedHtml,
                         'color': userColor,
                         'mine':isMyMessage,
                         'cardinal': userCardinal
@@ -244,18 +254,54 @@ export class AppComponent implements OnInit {
   }
 
   printMsg(filterdata) {
-    this.ctx_chat_canvas.font = "13px Courier";
-    this.ctx_chat_canvas.fillStyle = filterdata.color;
-    if (this.canvas_y>this.canvas_y_max) {
-      this.column++;
-      this.canvas_y = 0;
-      if (this.column_width*this.column>this.canvas_x_max) {
-        this.column = 0;
+    var print_x: number;
+    var print_y: number;
+
+    var columnas = false;
+    var metrics : any = this.ctx_chat_canvas.measureText(filterdata.msg);
+    if ( columnas ) {
+      if (this.canvas_y>this.canvas_y_max) {
+        this.column++;
+        this.canvas_y = 0;
+        if ( (this.column_width*this.chat_font_size)*this.column>this.canvas_x_max) {
+          this.column = 0;
+        }
       }
+      this.canvas_x = (this.column_width*this.chat_font_size)*this.column;
+      this.canvas_y+= this.chat_line_height;
+
+      print_x = this.canvas_x;
+      print_y = this.canvas_y;
+
+    } else {
+      if ( (this.canvas_x+metrics.width) > (this.canvas_x_max) ) {
+        print_x = 0;
+        this.canvas_x = metrics.width;
+        this.canvas_y+= this.chat_line_height;
+        print_y = this.canvas_y;
+      } else {
+        print_x = this.canvas_x;
+        this.canvas_x+= metrics.width;
+        print_y = this.canvas_y;
+      }
+      if (this.canvas_y>this.canvas_y_max) {
+        print_x = 0;
+        this.canvas_x = metrics.width;
+        this.canvas_y = 0;
+        print_y = this.canvas_y;
+        this.ctx_chat_canvas.fillStyle = "#000";
+        this.ctx_chat_canvas.globalAlpha = 0.5;
+        this.ctx_chat_canvas.fillRect(0, 0, this.chat_canvas.width, this.chat_canvas.height);
+        this.ctx_chat_canvas.globalAlpha = 1.0;
+      }
+
     }
-    this.canvas_x = this.column_width*this.column;
-    this.canvas_y+= 16;
-    this.ctx_chat_canvas.fillText( filterdata.msg, this.canvas_x, this.canvas_y );
+
+
+
+    this.ctx_chat_canvas.font = this.chat_font_size + "px Courier";
+    this.ctx_chat_canvas.fillStyle = filterdata.color;
+    this.ctx_chat_canvas.fillText( filterdata.msg, print_x, print_y );
 
     //this.ctx_chat_canvas.drawImage( this.video, 0, 0, this.canvas.width, this.canvas.height);
     if (this.column>=0) {
@@ -361,7 +407,10 @@ export class AppComponent implements OnInit {
   }
 
   clientColor(event) {
+
     this.m_ConnectedColor = this.clientcolor.nativeElement.value;
+    this.message2send.nativeElement.setAttribute("style","color: "+this.m_ConnectedColor+";");
+    this.chatmsgbox.nativeElement.setAttribute("style","border: solid 1px "+this.m_ConnectedColor+";");
 
     var data = {
       msg: "color",
@@ -399,7 +448,8 @@ export class AppComponent implements OnInit {
     //debugger;
     this.last_data = {}
     var msg2snd = this.message2send.nativeElement.value;
-    this.sent_message = msg2snd;
+    //this.sent_message = msg2snd;
+    this.sent_message = msg2snd.substr(0,this.max_message);
     this.last_data = { msg: this.sent_message, options: {}}
     this.sendMsg(this.last_data);
     this.message2send.nativeElement.value = "";

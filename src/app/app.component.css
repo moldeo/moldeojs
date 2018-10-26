@@ -21,15 +21,26 @@
 }
 
 input.input_text {
-  color: #0F0 !important;
   background-color: transparent;
   font-family: Courier;
-  border: solid 1px #555;
+  border: solid 0px #555;
   padding: 5px;
+  width: 100%;
+  color: #00ffe4;
+}
+
+.chat_msg_snd {
+  display: block;
+  border: solid 1px #555;
+  border-radius: 10px;
 }
 
 .chat_msg_snd>label {
   display: none;
+}
+
+.chat_msg_snd>table {
+  width: 100%;
 }
 
 button.btn {
@@ -42,12 +53,26 @@ button.btn {
   font-size: 2em;
 }
 
+.btn-send {
+  display: block;
+  position: relative;
+  float: right;
+  right: 0px;
+  top: 4px;
+  border: solid 0px !important;
+  padding: 0px !important;
+  margin: 0px !important;
+  font-size: 30px !important;
+}
+
 input.input_color {
   height: 25px;
-  width: 25px;
+  width: 20px;
   margin: 0px;
   padding: 0px;
-  border: 0px;
+  border: 0px !important;
+  background-color: #000 !important;
+  margin-left: 6px;
 }
 
 
@@ -67,4 +92,8 @@ moldeojs-view {
   display: block;
   position: fixed;
   z-index: -1;
+}
+
+.canvas_text {
+  display: none;
 }

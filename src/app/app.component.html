@@ -65,16 +65,18 @@
 -->
 <div class="chat_online">
 
-  <div class="chat_msg_snd">
+  <div #chatmsgbox class="chat_msg_snd">
     <label>{{m_ConnectedId}}</label>
-    <input #clientcolor (change)="clientColor($event)" type="color" class="input_color">
-    <input #message2send type="text" class="input_text" placeholder="Escribe aquí..."
+    <table >
+      <tr>
+        <td><input title="Cambiar mi color" value="#00ffe4" #clientcolor (change)="clientColor($event)" type="color" class="input_color"></td>
+        <td><input #message2send type="text" class="input_text" placeholder="{{placeholder}}"
     (keyup)="keyup($event)"
-    value=""/>
-    <button class="btn btn-primary"
-    (click)="compose_message($event)">
-      <span class="glyphicon glyphicon-play">&nbsp;</span>
-    </button>
+    value=""/></td>
+        <td style="width: 20px"><button class="btn btn-primary btn-send"
+    (click)="compose_message($event)"><span class="glyphicon glyphicon-play">&nbsp;</span></button></td>
+      </tr>
+    </table>
   </div>
 
   <div class="chat_msg_rec" #message2recv>

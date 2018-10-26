@@ -44,7 +44,15 @@
           </VAL>
         </PARAM>
         <PARAM name="effect" type="MOLDEOOBJECT">
-            <VAL>
+          <VAL>
+              <D type="TXT">plane</D>
+              <D type="TXT">plane</D>
+              <D type="TXT">plane</D>
+              <D type="NUM">0</D>
+              <D type="NUM">1</D>
+              <D type="TXT">K</D>
+          </VAL>
+          <VAL>
                 <D type="TXT">camera</D>
                 <D type="TXT">camera</D>
                 <D type="TXT">camera</D>
