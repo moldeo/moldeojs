@@ -95,7 +95,16 @@ moldeojs-view {
 }
 
 .canvas_text {
+  display: none;
+  position: fixed;
+  opacity: 0.0;
+}
+
+.audios {
   display: block;
   position: fixed;
-  opacity: 0.1;
+  bottom: 0px;
+  right: 0px;
+  opacity: 0.35;
+  z-index: 10000;
 }

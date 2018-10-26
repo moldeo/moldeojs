@@ -42,6 +42,7 @@ export class AppComponent implements OnInit {
   canvas_y : any = 0;
   canvas_x_max : any = 1024;
   canvas_y_max : any = 1024;
+  canvas_y_top : any = 40;
   column : any = 0;
   column_width : any = 20;
   chat_font_size : any = 13;
@@ -93,7 +94,7 @@ export class AppComponent implements OnInit {
     this.collaborativeService = coservice;
     this.clients = 0;
     this.canvas_x = 0;
-    this.canvas_y = 0;
+    this.canvas_y = this.canvas_y_top;
     this.m_ChatTexture = undefined;
   } // {2}
 
@@ -293,7 +294,7 @@ export class AppComponent implements OnInit {
     if ( columnas ) {
       if (this.canvas_y>this.canvas_y_max) {
         this.column++;
-        this.canvas_y = 0;
+        this.canvas_y = this.canvas_y_top;
         if ( (this.column_width*this.chat_font_size)*this.column>this.canvas_x_max) {
           this.column = 0;
         }
@@ -318,7 +319,7 @@ export class AppComponent implements OnInit {
       if (this.canvas_y>this.canvas_y_max) {
         print_x = 0;
         this.canvas_x = metrics.width;
-        this.canvas_y = 0;
+        this.canvas_y = this.canvas_y_top;
         print_y = this.canvas_y;
         this.ctx_chat_canvas.fillStyle = "#000";
         this.ctx_chat_canvas.globalAlpha = 0.5;
