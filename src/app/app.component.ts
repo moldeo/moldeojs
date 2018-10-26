@@ -53,6 +53,7 @@ export class AppComponent implements OnInit {
 
   @ViewChild('moldeojsview') moldeojsview: MoldeojsViewComponent;
   @ViewChild('chatmsgbox') chatmsgbox: ElementRef;
+  @ViewChild('oscmsgbox') oscmsgbox: ElementRef;
   @ViewChild('message2send') message2send: ElementRef;
   @ViewChild('message2recv') message2recv: ElementRef;
   @ViewChild('clientcolor') clientcolor: ElementRef;
@@ -177,7 +178,8 @@ export class AppComponent implements OnInit {
 
       if (data.options==undefined) return;
       if (data.options.osc) {
-        console.log("received:",data.options.osc);
+        //console.log("received:",data.options.osc);
+        this.oscmsgbox.nativeElement.innerHTML = data.options.osc[2][1]+":"+data.options.osc[2][2];
         return;
       }
 
