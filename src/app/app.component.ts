@@ -134,15 +134,16 @@ export class AppComponent implements OnInit {
                   if (msg[2]) {
                     if (msg[2][0]=="/moldeo") {
                       if (msg[2][1]) {
-                        var oscd : any = this.OscBuffer[msg[2][1]];
+                        var oscd : any = self.OscBuffer[msg[2][1]];
                         if (oscd) {
                           oscd.count++;
                           oscd.data.push(Number(msg[2][2]));
                           if (oscd.count==20) {
-                            this.oscData( { "a": oscd.address, "v": oscd.data[0] } );
+                            self.oscData( { "a": oscd.address, "v": Number(msg[2][2]) } );
+                            oscd.data = [Number(msg[2][2])];
                           }
                         } else {
-                          this.OscBuffer[msg[2][1]] = {
+                          self.OscBuffer[msg[2][1]] = {
                             "address": msg[2][1],
                             "count": 1,
                             "data": [ Number(msg[2][2]) ]
