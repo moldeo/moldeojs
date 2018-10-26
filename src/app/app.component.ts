@@ -138,9 +138,10 @@ export class AppComponent implements OnInit {
                         if (oscd) {
                           oscd.count++;
                           oscd.data.push(Number(msg[2][2]));
-                          if (oscd.count==20) {
+                          if (oscd.count==100) {
                             self.oscData( { "a": oscd.address, "v": Number(msg[2][2]) } );
                             oscd.data = [Number(msg[2][2])];
+                            oscd.count = 0;
                           }
                         } else {
                           self.OscBuffer[msg[2][1]] = {

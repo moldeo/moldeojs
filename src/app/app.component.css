@@ -83,7 +83,7 @@ input.input_color {
 moldeojs-view {
   display: block;
   z-index: 0 !important;
-  opacity: 0.99 !important;
+  opacity: 1.0 !important;
 }
 
 #full_chat_canvas {
@@ -95,5 +95,7 @@ moldeojs-view {
 }
 
 .canvas_text {
-  display: none;
+  display: block;
+  position: fixed;
+  opacity: 0.1;
 }
