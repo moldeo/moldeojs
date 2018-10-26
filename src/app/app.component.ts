@@ -122,7 +122,7 @@ export class AppComponent implements OnInit {
 
       if (this.electronService.isElectron()) {
         var self = this;
-        var oscs = new this.electronService.osc.Server(9991, '0.0.0.0');
+        var oscs = new this.electronService.osc.Server(19999, '0.0.0.0');
         if (oscs)
           oscs.on("message", function (msg, rinfo) {
                 //console.log("TUIO message:");
@@ -174,6 +174,13 @@ export class AppComponent implements OnInit {
       var cardNumber : string;
       var userStyle : string = "";
       var userColor : string = "#AAA";
+
+      if (data.options==undefined) return;
+      if (data.options.osc) {
+        console.log("received:",data.options.osc);
+        return;
+      }
+
       //console.log("recMsg:",data);
       this.recv_message = data.msg;
       //clase >
@@ -394,15 +401,15 @@ export class AppComponent implements OnInit {
   }
 
   oscData(oscmsg) {
-    /*
+
     var data = {
-      msg: "osc "+oscmsg[1],
+      msg: "",
       options: {
-        oscmsg: oscmsg
+        osc: oscmsg
       }
     };
 
-    this.sendMsg(data);*/
+    this.sendMsg(data);
 
   }
 
