@@ -49,6 +49,7 @@ export class AppComponent implements OnInit {
   max_message : any = 64;
 
   m_ChatTexture : moTexture;
+  OscBuffer : any;
 
 
   @ViewChild('moldeojsview') moldeojsview: MoldeojsViewComponent;
@@ -113,7 +114,8 @@ export class AppComponent implements OnInit {
       var projectname = this.sample.substr(a+1, b-a-1);
       this.setTitle( projectname + " - MoldeoJS" );
       this.m_Console = this.moldeojsview.GetConsole();
-
+      this.OscBuffer = {};
+      window["OscBuffer"] = this.OscBuffer;
 
       //this.m_Console.AppComponent = this;
       this.chat_canvas = <HTMLCanvasElement> document.getElementById("full_chat_canvas");
@@ -127,11 +129,29 @@ export class AppComponent implements OnInit {
         if (oscs)
           oscs.on("message", function (msg, rinfo) {
                 //console.log("TUIO message:");
-                if (msg[1]>0) {
-                  //console.log(JSON.stringify(msg));
-                  self.oscData(msg);
+                //console.log(JSON.stringify(msg));
+                if (msg[0]=="#bundle") {
+                  if (msg[2]) {
+                    if (msg[2][0]=="/moldeo") {
+                      if (msg[2][1]) {
+                        var oscd : any = this.OscBuffer[msg[2][1]];
+                        if (oscd) {
+                          oscd.count++;
+                          oscd.data.push(Number(msg[2][2]));
+                          if (oscd.count==20) {
+                            this.oscData( { "a": oscd.address, "v": oscd.data[0] } );
+                          }
+                        } else {
+                          this.OscBuffer[msg[2][1]] = {
+                            "address": msg[2][1],
+                            "count": 1,
+                            "data": [ Number(msg[2][2]) ]
+                          };
+                        }
+                      }
+                    }
+                  }
                 }
-
           });
       }
 
@@ -179,7 +199,7 @@ export class AppComponent implements OnInit {
       if (data.options==undefined) return;
       if (data.options.osc) {
         //console.log("received:",data.options.osc);
-        this.oscmsgbox.nativeElement.innerHTML = data.options.osc[2][1]+":"+data.options.osc[2][2];
+        this.oscmsgbox.nativeElement.innerHTML = JSON.stringify(data.options.osc);
         return;
       }
 
