@@ -70,14 +70,15 @@ export class moEffectImage extends MO.moEffect {
         this.m_Config.Eval("anc_cuad_x"),
         this.m_Config.Eval("alt_cuad_y"),
       1.0);
-      //console.log("this.m_Config.Eval(anc_cuad_x)",
-      //  this.m_Config.Eval("anc_cuad_x"),
-      //  this.m_Config.Eval("alt_cuad_y"));
+      console.log("this.m_Config.Eval(anc_cuad_x)",
+        this.m_Config.Eval("anc_cuad_x"),
+        this.m_Config.Eval("alt_cuad_y"));
       this.Model.Translate(
           this.m_Config.Eval("pos_cuad_x"),
           this.m_Config.Eval("pos_cuad_y"),
           0.0);
     }
+    console.log(this.Model);
 
     if (this.Mesh==undefined) {
       this.Mesh = new MO.moMesh( this.Plane, this.Mat );
@@ -95,10 +96,12 @@ export class moEffectImage extends MO.moEffect {
     ///CAMERA PERSPECTIVE
     if (this.Camera==undefined)
       this.Camera = new MO.moCamera3D();
-
+    var rs: MO.moVector2 = new MO.moVector2();
+    this.RM.m_Renderer.getSize(rs);
+    //console.log(rs);
     this.GL.SetDefaultOrthographicView(
-      this.RM.m_Renderer.getSize().width,
-      this.RM.m_Renderer.getSize().height);
+      rs.width,
+      rs.height);
     this.Camera.projectionMatrix = this.GL.GetProjectionMatrix();
 
     ///RENDERING

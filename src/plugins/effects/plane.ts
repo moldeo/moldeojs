@@ -82,7 +82,7 @@ export class moEffectPlane extends MO.moEffect {
     //Mat2.m_vLight.Normalize();
 
     ///MESH GEOMETRY
-    if (this.Plane == undefined) {
+    //if (this.Plane == undefined) {
       this.Plane = new MO.moPlaneGeometry(
         this.m_Config.Eval("width"),
         this.m_Config.Eval("height"),
@@ -91,7 +91,7 @@ export class moEffectPlane extends MO.moEffect {
         this.m_Config.Eval("width"),
         this.m_Config.Eval("height"),
         1, 1);
-    }
+    //}
     if (this.Plane) {
 
       if (this.Plane.m_Width != this.m_Config.Eval("width")
@@ -119,13 +119,13 @@ export class moEffectPlane extends MO.moEffect {
 
     ///MESH MODEL
     if (this.Model == undefined) {
-      this.Model = new MO.moGLMatrixf().MakeIdentity();
-      this.ModelB = new MO.moGLMatrixf().MakeIdentity();
+    this.Model = new MO.moGLMatrixf().MakeIdentity();
+    this.ModelB = new MO.moGLMatrixf().MakeIdentity();
     }
 
     if (this.Model) {
       /// === MODEL A ====
-
+      this.Model.MakeIdentity();
       this.Model.Scale(
         this.m_Config.Eval("scalex"),
         this.m_Config.Eval("scaley"),
@@ -157,19 +157,19 @@ export class moEffectPlane extends MO.moEffect {
           this.m_Config.Eval("translatey"),
           this.m_Config.Eval("translatez"));
 
-
-
     }
 
     if (this.Mesh==undefined) {
       this.Mesh = new MO.moMesh(this.Plane, this.Mat);
-      this.Mesh.add(new MO.three.AxisHelper());
+      this.Mesh.add(new MO.three.AxesHelper());
       this.MeshB = new MO.moMesh( this.PlaneB, this.MatB );
-      this.MeshB.add(new MO.three.AxisHelper());
+      this.MeshB.add(new MO.three.AxesHelper());
     }
     if (this.Mesh && this.Model) {
       this.Mesh.SetModelMatrix(this.Model);
       this.MeshB.SetModelMatrix(this.ModelB);
+      //var _elements : any = this.Model.elements;
+      //console.log(this.Mesh,this.Model,"ry:",this.m_Config.Eval("rotatey"), "tx:",this.m_Config.Eval("translatex"), _elements[12]);
     }
 
     if (this.Scene==undefined) {
@@ -185,10 +185,11 @@ export class moEffectPlane extends MO.moEffect {
       this.Camera.frustumCulled = true;
       this.Camera.castShadow = false;
     }
-
-    this.GL.SetDefaultPerspectiveView(
-      this.RM.m_Renderer.getSize().width,
-      this.RM.m_Renderer.getSize().height);
+    var rs: MO.moVector2 = new MO.moVector2();
+    this.RM.m_Renderer.getSize(rs);
+    this.GL.SetDefaultOrthographicView(
+      rs.width,
+      rs.height);
 
     this.Camera.projectionMatrix = this.GL.GetProjectionMatrix();
 

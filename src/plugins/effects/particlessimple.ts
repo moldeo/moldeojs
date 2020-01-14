@@ -2046,7 +2046,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
                         //this.m_Config[moR(PARTICLES_TEXTURE)].GetData()->GetGLId(&m_EffectState.tempo, 1, NULL );
                         if (pTexBuf) {
                             var nim = pTexBuf.GetImagesProcessed();
-                            //console.log( "nim: ", nim);
+                            console.log( "nim: ", nim);
                             if (pPar.Material == undefined) {
                               pPar.Material = new MO.moMaterialBasic({
                                 color: 0xffffff,

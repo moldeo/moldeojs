@@ -206,8 +206,11 @@ export class moMesh extends THREE.Mesh {
     */
   }
   SetModelMatrix(matrix: moGLMatrixf) {
+    this.matrixAutoUpdate = false;
     this.ResetMatrix();
     this.applyMatrix( matrix );
+    this.matrixAutoUpdate = true;
+    //console.log(this.matrix);
   }
 }
 
@@ -222,8 +225,10 @@ export class moGroup extends THREE.Group {
     */
   }
   SetModelMatrix(matrix: moGLMatrixf) {
+    this.matrixAutoUpdate = false;
     this.ResetMatrix();
     this.applyMatrix( matrix );
+    this.matrixAutoUpdate = true;
   }
 }
 

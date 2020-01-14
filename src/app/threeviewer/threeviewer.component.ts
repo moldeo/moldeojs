@@ -2,7 +2,8 @@ import { Component, ElementRef, OnInit } from '@angular/core';
 import * as THREE from 'three';
 import WebGLRenderer = THREE.WebGLRenderer;
 import Scene = THREE.Scene;
-import TrackballControls = THREE.TrackballControls;
+/*import TrackballControls = THREE.TrackballControls;*/
+import TrackballControls from 'three-trackballcontrols';
 import PerspectiveCamera = THREE.PerspectiveCamera;
 import Mesh = THREE.Mesh;
 
@@ -20,7 +21,7 @@ export class ThreeviewerComponent implements OnInit {
     sphere: THREE.SphereGeometry;
     material: THREE.Material;
     mesh: THREE.Mesh;
-    controls: THREE.TrackballControls;
+    controls: TrackballControls;
     hostElement: ElementRef;
 
     constructor(el: ElementRef) {
@@ -38,7 +39,8 @@ export class ThreeviewerComponent implements OnInit {
         this.scene = new THREE.Scene();
 
         //this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-        this.camera = new THREE.PerspectiveCamera( 75, this.renderer.getSize().width / this.renderer.getSize().height, 1, 10000 );
+        var rs : THREE.Vector2 = new THREE.Vector2();
+        this.camera = new THREE.PerspectiveCamera( 75, this.renderer.getSize(rs).width / this.renderer.getSize(rs).height, 1, 10000 );
         this.camera.position.z = 10;
 
         // Lights

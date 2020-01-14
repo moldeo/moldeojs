@@ -17,6 +17,7 @@ import {
   moMoldeoObject, moMoldeoObjects,
   MO_MOLDEOOBJECTS_OFFSET_ID
 } from "./mo-moldeo-object";
+import { moVector2 } from "./mo-math-manager";
 import {
   moEffect, moSceneEffect, moEffectsArray, moEffectState,
   moPreEffect, moPreEffectsArray,
@@ -942,7 +943,8 @@ export class moConsole extends moMoldeoObject {
     ///CAMERA PERSPECTIVE
     var Camera3D: moCamera3D = new moCamera3D();
     //p_display_info.Resolution().Width(),p_display_info.Resolution().Height()
-    GLMan.SetDefaultPerspectiveView( RMan.m_Renderer.getSize().width, RMan.m_Renderer.getSize().height );
+    var rend_size : moVector2 = new moVector2();
+    GLMan.SetDefaultPerspectiveView( RMan.m_Renderer.getSize(rend_size).width, RMan.m_Renderer.getSize(rend_size).height );
     Camera3D.projectionMatrix = GLMan.GetProjectionMatrix();
 
     ///RENDERING
@@ -980,7 +982,8 @@ export class moConsole extends moMoldeoObject {
 
     ///CAMERA PERSPECTIVE
     var Camera3D2 : moCamera3D = new moCamera3D();
-    GLMan.SetDefaultOrthographicView( RMan.m_Renderer.getSize().width, RMan.m_Renderer.getSize().height );
+    var rend_size : moVector2 = new moVector2();
+    GLMan.SetDefaultOrthographicView( RMan.m_Renderer.getSize(rend_size).width, RMan.m_Renderer.getSize(rend_size).height );
     Camera3D2.projectionMatrix = GLMan.GetProjectionMatrix();
 
     ///RENDERING

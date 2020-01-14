@@ -331,7 +331,11 @@ export class moDirectory extends moAbstract {
     /** Empty subdirs array*/
     this.m_SubDirs = [];
 
-    if (FS == undefined) return (this.m_bExists = true);
+    if (FS == undefined) {
+			console.error("moFileManager > moDirectory > Open could not work with folder:",CompletePathSearch);
+			console.error("moFileManager > moDirectory > Open Not implemented in online mode. TODO: Implement based on standard web directory listings.");
+			return (this.m_bExists = true);
+		}
 
     /** Set by default m_bExists on false*/
     this.m_bExists = false;
@@ -587,11 +591,13 @@ export class moFileManager extends moResource {
 		console.log("window.location.host",window.location.host);
 		console.log("p_FileName",p_FileName);
 		var fullget : string = window.location.protocol+"//"+window.location.host;
-		var fullpath : string = ""+p_FileName;
-		fullpath = fullpath.substring(1,fullpath.length);
+		var fullpath : string = "/"+p_FileName;
+		console.log("fullpath before:",fullpath);
+		fullpath = fullpath.replace("./","/");
 		console.log("fullget",fullget);
 		console.log("fullpath",fullpath);
 		fullget = fullget + fullpath;
+		console.log("Loading url with http get and subscribe:",fullget);
     this.http.get(  fullget ).subscribe(res => {
       //console.log("moFileManager > Load > name: ", p_FileName );
       //this.m_pData = res.json():

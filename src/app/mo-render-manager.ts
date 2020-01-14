@@ -1,6 +1,6 @@
 import { MOint, MOfloat, MOdouble, MOuint } from "./mo-types";
 import { moAbstract } from "./mo-abstract";
-import { moVector2f, moVector3f } from "./mo-math-manager";
+import { moVector2, moVector2f, moVector3f } from "./mo-math-manager";
 import { moResource } from "./mo-resource";
 import * as THREE from 'three';
 import WebGLRenderer = THREE.WebGLRenderer;
@@ -65,7 +65,7 @@ export class moDisplay extends moAbstract {
     this.m_DisplayResolution = new moResolution(w,h);
   }
 
-  
+
 
     Resolution() : moResolution {
       return this.m_DisplayResolution;
@@ -97,19 +97,23 @@ export class moRenderManager extends moResource {
   }
 
   RenderWidth() {
-    return this.m_Renderer.getSize().width;
+    var rend_size : moVector2 = new moVector2();
+    return this.m_Renderer.getSize(rend_size).width;
   }
 
   RenderHeight() {
-    return this.m_Renderer.getSize().height;
+    var rend_size : moVector2 = new moVector2();
+    return this.m_Renderer.getSize(rend_size).height;
   }
 
   ScreenWidth() : MOint {
-    return this.m_Renderer.getSize().width;
+    var ss : moVector2 = new moVector2();
+    return this.m_Renderer.getSize(ss).width;
   }
 
   ScreenHeight() : MOint {
-    return this.m_Renderer.getSize().height;
+    var ss : moVector2 = new moVector2();
+    return this.m_Renderer.getSize(ss).height;
   }
 
   ScreenProportion() : MOfloat {
