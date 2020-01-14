@@ -117,10 +117,11 @@ export class moEffectIcon extends MO.moEffect {
     ///CAMERA PERSPECTIVE
     if (this.Camera==undefined)
       this.Camera = new MO.moCamera3D();
-
+    var rs: MO.moVector2 = new MO.moVector2();
+    this.RM.m_Renderer.getSize(rs);
     this.GL.SetDefaultOrthographicView(
-      this.RM.m_Renderer.getSize().width,
-      this.RM.m_Renderer.getSize().height);
+        rs.width,
+        rs.height);
     this.Camera.projectionMatrix = this.GL.GetProjectionMatrix();
 
     ///RENDERING

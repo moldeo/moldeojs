@@ -40,12 +40,14 @@ export class moGLMatrixf extends THREE.Matrix4 {
     this.lookAt( eye, center, up );
     return this;
   }
+  /** TODO: deprecated for class Frustum https://threejs.org/docs/#api/en/math/Frustum
   MakeFrustrum(left: MOfloat = -1.0, right: MOfloat = 1.0,
     bottom: MOfloat = -1.0, top: MOfloat = 1.0,
     near: MOfloat = 0.0001, far: MOfloat = 1000.0): moGLMatrixf {
     this.makeFrustum( left, right, bottom, top, near, far );
     return this;
   }
+  */
 
   MakeOrthographic(left: MOfloat = -1.0, right: MOfloat = 1.0,
     bottom: MOfloat = -1.0, top: MOfloat = 1.0,

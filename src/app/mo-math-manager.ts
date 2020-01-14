@@ -29,6 +29,7 @@ import Matrix4 = THREE.Matrix4;
 export type moVector = Vector;
 export type moMatrix = Matrix;
 
+export class moVector2 extends Vector2 {};
 export class moVector2f extends Vector2 {};
 export class moVector3f extends Vector3 {};
 export class moVector4f extends Vector4 {};
@@ -210,7 +211,7 @@ export class moMathVariableFactory extends moAbstract
     CreateNewVariable( p_pNewName : moText ) : MOdouble
 	{
 		var pvar : moMathVariable = new moMathVariable(p_pNewName, 0.0);
-
+    //console.log("CreateNewVariable:",p_pNewName);
 		if (p_pNewName.length>0) {
 			if (p_pNewName[0] == '_') this.m_pParArray.push(pvar); // Agregando parámetro.
       else this.m_pVarArray.push(pvar);                      // Agregando variable.
@@ -222,24 +223,61 @@ export class moMathVariableFactory extends moAbstract
     return pvar.GetValue();
 	}
 
-  CreateVariables(p_Node: any) : any {
+  CreateVariables( p_Node: any ) : any {
 
     //create all variables that exist in function? so we can assign them to Parameters
     // and others...
+    var self = this;
+    try {
+      //console.log( p_Node.type);
+      if (p_Node.type=='SymbolNode') {
+        self.CreateNewVariable( p_Node.name );
+      } else {
+        p_Node.forEach(function (node, path, parent) {
+          switch (node.type) {
+            case 'FunctionNode':
+              //console.log(path,node.type, node.fn);
+              self.CreateVariables(node);
+              break
+            case 'OperatorNode':
+              //console.log(path, node.type, node.op);
+              self.CreateVariables(node);
+              break
+            case 'ConstantNode':
+              //console.log(path, node.type, node.value);
+              break
+            case 'SymbolNode':
+              //console.log(path, node.type, node.name);
+              if (path!="fn") {
+                /*console.log(path, node.type, node.name)*/
+                self.CreateNewVariable( node.name );
+              }
+              break
+            default:
+              console.log(node.type)
+          }
+        });
+      }
 
-    var filtered = p_Node.filter(function (node) {
+    }
+    catch(error) {
+      console.log( self, error );
+    }
+
+    /*var filtered = p_Node.filter(function (node) {
       //node.isSymbolNode && node.name == 'x';
+      console.log(node);
       if (node.isSymbolNode) {
         return true;
       }
       return false;
     });
+    console.log("filtered:", filtered);
     for (var i = 0; i < filtered.length; i++){
       var node = filtered[i];
-      //console.log("node or var: ", node.name);
+      console.log("node or var: ", node.name, node);
       this.CreateNewVariable( node.name );
-    }
-    //console.log("filtered:", filtered);
+    }*/
     return this.m_pVarMap;
 
   }
@@ -348,7 +386,7 @@ export class moParserFunction extends moMathFunction {
       //Parser.parse(this.m_Expression);
       //Parser.compile();
       this.m_ParserNode = math.parse("" + this.m_Expression);
-      //console.log("m_ParserNode:", this.m_ParserNode);
+      //console.log("moParserFunction:Init > m_ParserNode:", this.m_ParserNode, this.m_Expression);
       this.m_VarFactory.CreateVariables( this.m_ParserNode );
       this.m_ParserCode = this.m_ParserNode.compile();
     }
@@ -364,6 +402,7 @@ export class moParserFunction extends moMathFunction {
         var mobname : moText = "undefined MOB";
         if (p_pMOB) mobname = p_pMOB.GetLabelName();
         this.MODebug2.Error( mobname + " > " + ":" + msgerror );
+        console.log("this.m_VarFactory:",this.m_VarFactory);
     }
 
         //delete pVarFactory;
@@ -521,10 +560,10 @@ export class moParserFunction extends moMathFunction {
         this.m_Scope = this.m_VarFactory.ToScope();
         //console.log("Eval Parser with variables", this.m_Expression, this.m_Variables_Map, this.m_Scope );
 
-        this.m_LastEval = this.m_ParserCode.eval(this.m_Scope);
+        this.m_LastEval = this.m_ParserCode.evaluate(this.m_Scope);
         return this.m_LastEval;
       } catch (err) {
-        console.error("parser error", err, this.m_Scope, this);
+        //console.error("parser error", err, this.m_Scope, this);
         return err;
       }
     }
@@ -543,7 +582,7 @@ export class moParserFunction extends moMathFunction {
       //console.log("sss:", sss);
     } catch (err) {
 
-      console.error("moParserFunction.OnFuncEval", err.message);
+      //console.error("moParserFunction.OnFuncEval", err.message);
       //console.log("OnFuncEval", this.OnFuncEval.prototype);
 /*
       var startvar = 0;
@@ -585,7 +624,7 @@ export class moMathManager extends moResource {
 
   constructor() {
     super();
-    this.SetName("_timemanager_");
+    this.SetName("_mathmanager_");
   }
 
   GetFunction( p_idx : MOint ) : moMathFunction {

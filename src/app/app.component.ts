@@ -1,5 +1,5 @@
 import { OnInit, Component, TemplateRef, ViewContainerRef, Inject, ViewChild } from '@angular/core';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef , BsModalService } from 'ngx-bootstrap/modal';
 
 import { ViewService } from "./view.service";
 
@@ -11,7 +11,12 @@ import { ViewService } from "./view.service";
 export class AppComponent implements OnInit {
   title = 'app';
   isCollapsed: boolean = true;
-  sample: string = "molrepos/basic/08p_CameraParticles/08p_CameraParticles.mol";
+  //sample: string = "molrepos/basic/08p_CameraParticles/08p_CameraParticles.mol";
+  //sample: string = "molrepos/basic/00_Image/00_Image.mol";
+  //sample: string = "molrepos/basic/02_Plane/02_Plane.mol";
+  //sample: string = "molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol";
+  //assets/molrepos/basic/07_ParticlesSimple/images
+  sample: string = "molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsfera.mol";
   samples: string[] = [];
   viewservice : ViewService;
 

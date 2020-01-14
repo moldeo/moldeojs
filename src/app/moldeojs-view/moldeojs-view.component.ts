@@ -29,9 +29,9 @@ export class MoldeojsViewComponent implements OnInit {
   //jsonRute : string = 'http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_tema_=Mosaico&output=json';
   //jsonRute: string = "http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_temaid_=423&output=json";
   //jsonInit : any;
-  @ViewChild('webview_contenidos') contenidos: ElementRef;
-  @ViewChild('webview_titulo') titulo: ElementRef;
-  @ViewChild('webview_descripcion') descripcion: ElementRef;
+  @ViewChild('webview_contenidos', {static: false } ) contenidos: ElementRef;
+  @ViewChild('webview_titulo', {static: false } ) titulo: ElementRef;
+  @ViewChild('webview_descripcion', {static: false } ) descripcion: ElementRef;
   mititulo: string = "Completar titulo";
   midescripcion : string = "Completar descripcion";
   //baseref : string = "https://www.moldeo.org/assets/";
