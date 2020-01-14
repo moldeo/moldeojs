@@ -570,7 +570,7 @@ export type moDirectoryArray = moDirectory[];
 const httpOptions = {
   headers: new HttpHeaders({
     'Access-Control-Allow-Origin':'*',
-}
+}) };
 
 export class moFileManager extends moResource {
   m_Files : moFileArray = [];
