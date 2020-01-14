@@ -476,7 +476,7 @@ export class moDirectory extends moAbstract {
     return NULL;
   }
 
-Update() {
+	Update() : void {
 
 
 
@@ -551,7 +551,7 @@ Update() {
 */
       return;
 
-}
+	}
 
 
 
@@ -564,12 +564,14 @@ Update() {
   }
 
 }
+
 export type moDirectoryArray = moDirectory[];
 
 const httpOptions = {
   headers: new HttpHeaders({
     'Access-Control-Allow-Origin':'*',
 }
+
 export class moFileManager extends moResource {
   m_Files : moFileArray = [];
   m_Directories : moDirectoryArray = [];
