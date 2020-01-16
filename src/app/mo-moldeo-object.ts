@@ -389,7 +389,7 @@ export class moMoldeoObject extends moScript {
     if (confignamecompleto != undefined && confignamecompleto + "" != "") {
       this.m_pFileManager.Load(confignamecompleto, true, (res) => {
         //console.log("loaded file .. OK");
-        if (this.m_Config.LoadConfig(res._body, (config_res) => {
+        if (this.m_Config.LoadConfig(res, (config_res) => {
           //console.log("CONFIG LOADED!", config_res);
 
           /**
@@ -471,7 +471,6 @@ export class moMoldeoObject extends moScript {
     + param.GetParamDefinition().GetTypeStr() + moText(" name: ")
     + param.GetParamDefinition().GetName() );
 */
-
     ///CREAMOS UN INLET POR CADA PARAMETRO
     var inletidx : MOint = this.GetInletIndex(param.GetParamDefinition().GetName());
     if (inletidx==-1) {

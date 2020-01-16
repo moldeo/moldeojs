@@ -108,7 +108,7 @@ export class moConsole extends moMoldeoObject {
   m_MoldeoObjects: moMoldeoObjects;
   m_MoldeoSceneObjects : moMoldeoObjects;
 
-  constructor( private http: Http ) {
+  constructor( private http: HttpClient ) {
     super();
     this.m_ConsoleState = new moConsoleState();
     this.m_EffectManager = new moEffectManager();

@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, Response } from "@angular/common/http";
+import { HttpClient, HttpResponse } from "@angular/common/http";
 import 'rxjs/Rx';
 
 @Injectable()
 export class JsonService {
- constructor(private http: Http) { }
+ constructor(private http: HttpClient) { }
 
  //////////GET JSON CONTENT//////////
  getJson(url) {
-  return this.http.get(url).map((res:Response) => res.json());
+  return this.http.get(url).map((res) => res);
  }
 
  //////////GET OBJECTS FILTER BY KEY & VALUE//////////
