@@ -593,16 +593,24 @@ export class moFileManager extends moResource {
 		var fullget : string = window.location.protocol+"//"+window.location.host;
 		var fullpath : string = "/"+p_FileName;
 		console.log("fullpath before:",fullpath);
-		fullpath = fullpath.replace("./","/");
+		fullpath = fullpath.replace("./","");
 		console.log("fullget",fullget);
 		console.log("fullpath",fullpath);
 		fullget = fullget + fullpath;
 		console.log("Loading url with http get and subscribe:",fullget);
-    this.http.get(  fullget ).subscribe(res => {
-      //console.log("moFileManager > Load > name: ", p_FileName );
-      //this.m_pData = res.json():
-      if (callback) callback(res);
-    });
+		try {
+    	this.http.get(  fullget, {responseType: 'text'} ).subscribe(
+				res => {
+      		//console.log("moFileManager > Load > name: ", p_FileName );
+					console.log(res);
+      		//this.m_pData = res.json():
+      		if (callback) callback(res);
+    		},
+        error => console.log('oops', error)
+			);
+		} catch(error) {
+			console.log("Error:",error);
+		}
   }
 
   Open(p_Path: moText, bWaitForDownload: boolean = true) {

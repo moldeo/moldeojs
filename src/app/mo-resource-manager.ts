@@ -75,7 +75,7 @@ export class moResourceManager extends moAbstract {
 		//MODecoderMan : moDecoderManager;
     m_Resources: moResources = [];
 
-    constructor(private http: Http) {
+    constructor(private http: HttpClient) {
       super();
     }
 
