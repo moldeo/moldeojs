@@ -1,4 +1,4 @@
-import { Http, RequestOptions, Request, Headers } from "@angular/http";
+//import { Http, RequestOptions, Request, Headers } from "@angular/http";
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 
 import { moAbstract } from "./mo-abstract";
@@ -580,7 +580,7 @@ export class moFileManager extends moResource {
   m_Files : moFileArray = [];
   m_Directories : moDirectoryArray = [];
 
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
     super();
     this.SetName("_filemanager_");
     console.log("dirname:",window["__dirname"]);

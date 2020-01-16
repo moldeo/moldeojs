@@ -6,7 +6,7 @@ import { Injectable,
 
 import { Subject }    from 'rxjs/Subject';
 import {  BehaviorSubject }    from 'rxjs/BehaviorSubject';
-import { Http } from "@angular/http";
+import { HttpClient } from "@angular/common/http";
 
 import { MoldeojsViewComponent } from './moldeojs-view/moldeojs-view.component';
 

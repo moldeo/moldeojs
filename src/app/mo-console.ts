@@ -1,4 +1,4 @@
-import { Http } from "@angular/http";
+import { HttpClient } from "@angular/common/http";
 import * as THREE from "three";
 
 import {
