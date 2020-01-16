@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpModule, JsonpModule } from '@angular/http';
+import { HttpClientModule, JsonpModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { ThreeviewerComponent } from './threeviewer/threeviewer.component';
@@ -34,7 +34,7 @@ const appRoutes: Routes = [
     BrowserModule,
     AppBoostrapModule,
     FormsModule,
-    HttpModule,
+    HttpClientModule,
     RouterModule.forRoot(appRoutes)
   ],
   providers: [ViewService,ConsoleService, JsonService, FileAdminService ],
