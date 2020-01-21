@@ -17,6 +17,7 @@ export class AppComponent implements OnInit {
   //sample: string = "molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol";
   //assets/molrepos/basic/07_ParticlesSimple/images
   sample: string = "molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsfera.mol";
+  //sample: string = "molrepos/moldeoorg/dante/pajarosdefuego/pajaros_de_fuegoX.mol";
   samples: string[] = [];
   viewservice : ViewService;
 
