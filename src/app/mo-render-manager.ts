@@ -143,6 +143,8 @@ export class moRenderManager extends moResource {
   }
 
   Render( p_pObj : moSceneNode, p_pCamera : moCamera3D  ) : void {
+    //renderer.info.autoReset = false;
+    //renderer.info.reset();    
     this.m_Renderer.render( p_pObj, p_pCamera );
   }
 

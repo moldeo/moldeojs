@@ -5,8 +5,9 @@ import {
 } from '@angular/core';
 
 
-import { moConsole } from '../mo-console';
-import { moConsoleState } from '../mo-console-state';
+//import { moConsole } from '../mo-console';
+//import { moConsoleState } from '../mo-console-state';
+import { moDisplay } from '../mo-render-manager';
 import { ConsoleService } from "../console.service";
 
 import { JsonService } from '../json.service';
@@ -22,8 +23,10 @@ export class MoldeojsViewComponent implements OnInit {
   message: string = "- no project -";
   hostElement: ElementRef;
   rendererElement : HTMLCanvasElement;
+
   test: number = 0;
   testmax: number = 120;
+
   @Input() mol: string;
 
   //jsonRute : string = 'http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_tema_=Mosaico&output=json';
@@ -170,7 +173,7 @@ export class MoldeojsViewComponent implements OnInit {
     //console.log("animate: ",this.test);
     if (this.test < this.testmax) {
       //console.log("Running TestScreen!");
-      this.MoldeoCS.m_Console.TestScreen();
+      this.MoldeoCS.m_Console.TestScreen( new moDisplay(0,0), {'step': this.test, 'end_step': this.testmax });
       this.test = Number(this.test) + Number(1);
       this.message = ""+this.test;
     } else

@@ -859,24 +859,60 @@ export class moConsole extends moMoldeoObject {
     return true;
   }
 
-  TestScreen( p_display_info?: moDisplay) {
+  TestScreen( p_display_info?: moDisplay, options?: any ) {
     if (this.m_pResourceManager==null || this.m_pResourceManager==undefined) {
       this.m_pResourceManager = new moResourceManager(this.http);
       this.m_pResourceManager.Init();
     }
     var RMan: moRenderManager = this.m_pResourceManager.MORenderMan;
-    var GMan: moGUIManager = this.m_pResourceManager.MOGuiMan;
+    //var GMan: moGUIManager = this.m_pResourceManager.MOGuiMan;
     var TMan: moTextureManager = this.m_pResourceManager.MOTextureMan;
     var GLMan: moGLManager = this.m_pResourceManager.MOGLMan;
 
     ///MATERIAL
     var Mat: moMaterial = new moMaterial();
+
     var id: MOint = TMan.GetTextureMOId("default");
+    //var id: MOint = TMan.GetTextureMOId("./assets/data/icons/moldeotrans2.png", true, false);
+    //var id: MOint = TMan.GetTextureMOId("./assets/data/icons/water.jpg", true, false);
+    var customwater_id : MOint = TMan.GetTextureMOId("customwater",false,false);
+    console.log( "customwater_id:", customwater_id)
+    if (customwater_id==-1) {
+      customwater_id = TMan.AddTexture("customwater",512,512);
+      var MoldeoWaterTexture : moTexture = TMan.GetTexture(customwater_id);
+      console.log(MoldeoWaterTexture);
+      MoldeoWaterTexture._texture = TMan.m_TextureLoader.load("./assets/data/icons/water.jpg");
+    }
+    id = customwater_id;
     if (id > -1) {
       var T: moTexture = TMan.GetTexture(id);
       Mat.map = T._texture;
       Mat.transparent = true;
     }
+
+    var id2: MOint = TMan.GetTextureMOId("moldeotrans");
+    if (id2 > -1) {
+      var T2: moTexture = TMan.GetTexture(id2);
+      //Mat.map = T2._texture;
+      //Mat.transparent = true;
+    }
+
+
+    var v_options : any = {
+      "bakground_animation": true,
+      "image_animation": true,
+      "sphere_animation": true,
+      "step": 0.0,
+      "end_step": 120.0
+    };
+
+    if (options) {
+      for( let i in options ) {
+        v_options[i] = options[i];
+        console.log( i, options[i] );
+      };
+    }
+
 
     this.m_ConsoleState.step_interval = 40;
     //var stepi : MOfloat = this.m_ConsoleState.step_interval;
@@ -884,12 +920,22 @@ export class moConsole extends moMoldeoObject {
     //var progress: MOfloat = (steps / stepi) / 120.0;
 
     //var stepi : MOfloat = this.m_ConsoleState.step_interval;
-    var stepi: MOfloat = 15;
+    var stepi: MOfloat = 1.0;//between 15 and 40
     var steps: MOfloat = moGetTicksAbsolute(true);
-    //console.log("steps:", steps);
-    var progress: MOfloat = (steps / stepi) / 120.0;
+    if ( v_options["step"] ) {
+      steps = v_options["step"]+1;
+      stepi = 1.0;
+    }
 
-    RMan.m_Renderer.setClearColor(new moColor(1.0 - progress, 1.0 - progress, 1.0 - progress), 1.0);
+    //console.log("steps:", steps);
+    //120 is defined in
+    var progress: MOfloat = (steps / stepi) / v_options["end_step"];
+    console.log( "progress: ", steps, v_options["end_step"], progress )
+    if (v_options["bakground_animation"])
+      RMan.m_Renderer.setClearColor(new moColor(1.0 - progress, 1.0 - progress, 1.0 - progress), 1.0);
+    else
+      RMan.m_Renderer.setClearColor(new moColor(0.0, 0.0, 0.0), 1.0);
+
     RMan.m_Renderer.clear( true, true, false);
     //glClearColor( 1.0 - progress, 1.0 - progress, 1.0 - progress, 1.0 );
     //glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -903,91 +949,114 @@ export class moConsole extends moMoldeoObject {
       //Mat.id = TMan.GetTextureMOId( "default" );
       //Mat.base.map =
       //Mat.base.
-      /*
-        Mat.m_Map = pTMan->GetTexture(pTMan->GetTextureMOId( "default", false ));
-        Mat.m_MapGLId = Mat.m_Map->GetGLId();
-        Mat.m_Color = moColor( 1.0, 1.0, 1.0 );
-        Mat.m_fTextWSegments = 13.0f;
-        Mat.m_fTextHSegments = 13.0f;
-        Mat.m_vLight = moVector3f( -1.0, -1.0, -1.0 );
-        Mat.m_vLight.Normalize();
-        //Mat.m_PolygonMode = MO_POLYGONMODE_LINE;
-        Mat.m_PolygonMode = MO_POLYGONMODE_FILL;
-        Mat.m_fWireframeWidth = 0.0005f;
-  */
+    /*
+      Mat.m_Map = pTMan->GetTexture(pTMan->GetTextureMOId( "default", false ));
+      Mat.m_MapGLId = Mat.m_Map->GetGLId();
+      Mat.m_Color = moColor( 1.0, 1.0, 1.0 );
+      Mat.m_fTextWSegments = 13.0f;
+      Mat.m_fTextHSegments = 13.0f;
+      Mat.m_vLight = moVector3f( -1.0, -1.0, -1.0 );
+      Mat.m_vLight.Normalize();
+      //Mat.m_PolygonMode = MO_POLYGONMODE_LINE;
+      Mat.m_PolygonMode = MO_POLYGONMODE_FILL;
+      Mat.m_fWireframeWidth = 0.0005f;
+    */
 
-        ///GEOMETRY
-    var Sphere : moSphereGeometry = new moSphereGeometry( 0.5, 20, 20 );
+    ///GEOMETRY
+    if (v_options["sphere_animation"]) {
 
-      ///MESH MODEL (aka SCENE NODE)
-    var Model : moGLMatrixf = new moGLMatrixf();
-    Model.MakeIdentity()
-        .Rotate(360.0 * progress * DEG_TO_RAD, 0.0, 1.0, 0.0)
-        .Translate(    0.0, 0.0, -2.618 + 0.618*progress );
-    //console.log("Model:", Model);
+      console.log("Rendering sphere_animation");
+      //console.log( RMan.m_Renderer.info );
+      var Sphere : moSphereGeometry = new moSphereGeometry( 3*0.1618, 24.0, 24.0 );
 
-    var Mesh: moMesh = new moMesh(Sphere, Mat);
-    Mesh.SetModelMatrix(Model);
+        ///MESH MODEL (aka SCENE NODE)
+      var Model : moGLMatrixf = new moGLMatrixf();
+      Model.MakeIdentity();
+      //Model.Scale( 2.0, 1.4, 2.0);
+      Model.Rotate(-40+0.01*360.0 * progress * DEG_TO_RAD, 0.0, 1.0, 0.0);
+      Model.Translate(    0*3.14*0.1618+0.05*progress, 0.2*3.14*0.1618+-0.25*0.0+0.0*0.4*progress, -1.5 + 0.1*0.618*progress );
+      //console.log("Model:", Model);
+      Mat.color = new moColor(1.0*(1-progress), 0.0, 1.0*progress);
 
-    var Scene: moSceneNode = new moSceneNode();
-    Scene.add(Mesh);
+      var Mesh: moMesh = new moMesh(Sphere, Mat);
+      Mesh.SetModelMatrix(Model);
 
-    var ambientLight : THREE.AmbientLight = new THREE.AmbientLight(0xcccccc);
-    Scene.add(ambientLight);
+      var Scene: moSceneNode = new moSceneNode();
+      Scene.add(Mesh);
 
-    var pointLight : THREE.PointLight = new THREE.PointLight(0xffffff);
-    pointLight.position.set(300, 0, 300);
-    Scene.add( pointLight );
+      var ambientLight : THREE.AmbientLight = new THREE.AmbientLight(0xcccccc);
+      Scene.add(ambientLight);
+
+      var pointLight : THREE.PointLight = new THREE.PointLight(0xffffff);
+      pointLight.position.set(300, 0, 300);
+      Scene.add( pointLight );
 
 
-    ///CAMERA PERSPECTIVE
-    var Camera3D: moCamera3D = new moCamera3D();
-    //p_display_info.Resolution().Width(),p_display_info.Resolution().Height()
-    var rend_size : moVector2 = new moVector2();
-    GLMan.SetDefaultPerspectiveView( RMan.m_Renderer.getSize(rend_size).width, RMan.m_Renderer.getSize(rend_size).height );
-    Camera3D.projectionMatrix = GLMan.GetProjectionMatrix();
+      ///CAMERA PERSPECTIVE
+      var Camera3D: moCamera3D = new moCamera3D();
+      //p_display_info.Resolution().Width(),p_display_info.Resolution().Height()
+      var rend_size : moVector2 = new moVector2();
+      RMan.m_Renderer.getSize(rend_size);
+      if (p_display_info) {
+        //rend_size.x = p_display_info.Resolution().width;
+        //rend_size.y = p_display_info.Resolution().height;
+        console.log("Display info: ", rend_size);
+      }
+      GLMan.SetDefaultPerspectiveView( rend_size.width, rend_size.height );
+      Camera3D.projectionMatrix = GLMan.GetProjectionMatrix();
 
-    ///RENDERING
-    RMan.Render(Scene, Camera3D);
+      ///RENDERING SPHERE
+      RMan.m_Renderer.autoClearDepth = true;
+      RMan.Render( Scene, Camera3D );
+    }
+
+
+    if (v_options["image_animation"]) {
+      //console.log( RMan.m_Renderer.info );
+      var Mat2: moMaterialBasic = new moMaterialBasic();
+      var id2: MOint = TMan.GetTextureMOId("moldeotrans");
+
+      if (id2 > -1) {
+        var T2: moTexture = TMan.GetTexture(id2);
+        Mat2.map = T2._texture;
+        Mat2.transparent = true;
+        //Mat2.color = new moColor(1.0, 1.0, 1.0);
+        //Mat2;
+      }
+      //Mat2.m_Map = pTMan->GetTexture(pTMan->GetTextureMOId( "moldeotrans", false ));
+      //Mat2.m_MapGLId = Mat2.m_Map->GetGLId();
+      //Mat2.m_Color = moColor(1.0, 1.0, 1.0);
+      //Mat2.m_vLight = moVector3f( -1.0, -1.0, -1.0 );
+      //Mat2.m_vLight.Normalize();
+
+      ///MESH GEOMETRY
+      var Plane3 : moPlaneGeometry = new moPlaneGeometry( 1.0, 0.33, 1, 1 );
+
+      ///MESH MODEL
+      var Model2 : moGLMatrixf = new moGLMatrixf().MakeIdentity();
+      Model2.Scale( 1.0, 1.0, 1.0 );
+      Model2.Translate( 0.0, -0.0, +1 );
+      Mat2.color = new moColor(1.0*(progress), 0.0, 1.0*(1.0-progress));
+      var Mesh2 : moMesh = new moMesh( Plane3, Mat2 );
+      Mesh2.SetModelMatrix(Model2);
+      var Scene2: moSceneNode = new moSceneNode();
+      Scene2.add(Mesh2);
+
+
+      ///CAMERA PERSPECTIVE
+      var Camera3D2 : moCamera3D = new moCamera3D();
+      var rend2_size : moVector2 = new moVector2();
+      RMan.m_Renderer.getSize(rend2_size);
+      GLMan.SetDefaultOrthographicView( rend2_size.width, rend2_size.height );
+      Camera3D2.projectionMatrix = GLMan.GetProjectionMatrix();
+
+      ///RENDERING
+      RMan.Render( Scene2, Camera3D2 );
+    }
+
 
 
 ///MESH MATERIAL
-    var Mat2: moMaterialBasic = new moMaterialBasic();
-    var id2: MOint = TMan.GetTextureMOId("moldeotrans");
-    if (id2 > -1) {
-      var T: moTexture = TMan.GetTexture(id2);
-      Mat2.map = T._texture;
-      Mat2.transparent = true;
-      //Mat2.color = new moColor(1.0, 1.0, 1.0);
-      //Mat2;
-    }
-    //Mat2.m_Map = pTMan->GetTexture(pTMan->GetTextureMOId( "moldeotrans", false ));
-    //Mat2.m_MapGLId = Mat2.m_Map->GetGLId();
-    //Mat2.m_Color = moColor(1.0, 1.0, 1.0);
-    //Mat2.m_vLight = moVector3f( -1.0, -1.0, -1.0 );
-    //Mat2.m_vLight.Normalize();
-
-    ///MESH GEOMETRY
-    var Plane3 : moPlaneGeometry = new moPlaneGeometry( 1.0, 0.33, 1, 1 );
-
-    ///MESH MODEL
-    var Model2 : moGLMatrixf = new moGLMatrixf().MakeIdentity();
-    Model2.Scale( 1.0, 1.0, 1.0 );
-    Model2.Translate( 0.0, 0.0, -0.5 );
-    var Mesh2 : moMesh = new moMesh( Plane3, Mat2 );
-    Mesh2.SetModelMatrix(Model2);
-    var Scene2: moSceneNode = new moSceneNode();
-    Scene2.add(Mesh2);
-
-
-    ///CAMERA PERSPECTIVE
-    var Camera3D2 : moCamera3D = new moCamera3D();
-    var rend_size : moVector2 = new moVector2();
-    GLMan.SetDefaultOrthographicView( RMan.m_Renderer.getSize(rend_size).width, RMan.m_Renderer.getSize(rend_size).height );
-    Camera3D2.projectionMatrix = GLMan.GetProjectionMatrix();
-
-    ///RENDERING
-    RMan.Render( Scene2, Camera3D2 );
 
   }
 

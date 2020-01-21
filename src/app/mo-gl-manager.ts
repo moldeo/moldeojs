@@ -105,6 +105,11 @@ export class moGLViewport extends moVector2f {
   }
 }
 
+/**
+* class moGLManager
+* traditional GL matrix operations for typical OpenGL Projection and Model transformation matrices.
+* m_ProjectionMatrix
+*/
 export class moGLManager extends moResource {
 
   /*
@@ -152,10 +157,15 @@ export class moGLManager extends moResource {
     if (aspect == 0.0) {
       aspect = this.m_Viewport.GetProportion();
     }
+    //this.m_ProjectionMatrix.MakeIdentity();
+    //this.m_ProjectionMatrix.MakePerspective(fovy, aspect, znear, zfar);
     /*
     this.m_ProjectionMatrix.MakePerspective(fovy, aspect, znear, zfar);
     var Cam: THREE.Camera = new THREE.PerspectiveCamera(fovy, aspect, znear, zfar);
     */
+    var Cam: THREE.Camera = new THREE.PerspectiveCamera(fovy, aspect, znear, zfar);
+    this.m_ProjectionMatrix.copy(Cam.projectionMatrix);
+    //this.Camera = new THREE.PerspectiveCamera(60, this.RM.ScreenProportion(), 0.01, 1000.0);
     //check for errors
     //console.log("SetPerspectiveView: ",this.m_ProjectionMatrix, "THREE.PerspectiveCamera:",Cam.projectionMatrix);
   }
