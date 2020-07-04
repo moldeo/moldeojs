@@ -3,6 +3,7 @@ import * as MO from "moldeojs";
 export class moPreEffectErase extends MO.moPreEffect {
 
   RMan: MO.moRenderManager;
+  step : number = 0;
 
   constructor() {
     super();
@@ -30,9 +31,11 @@ export class moPreEffectErase extends MO.moPreEffect {
     var rgb: any = this.m_Config.EvalColor("color");
     var ccolor: MO.moColor = new MO.moColor( rgb.r, rgb.g, rgb.b);
 
-
+    this.step+=1;
     this.RMan.m_Renderer.setClearColor( ccolor, 1.0);
-    this.RMan.m_Renderer.clear(true, true, false);
+    //if (this.step<100)
+      this.RMan.m_Renderer.clear(true, true, false);
+    //console.log(this.RMan.m_Renderer.autoClear);
 
     this.EndDraw();
   }
@@ -43,7 +46,7 @@ export class moPreEffectErase extends MO.moPreEffect {
   }
 
   GetDefinition(): MO.moConfigDefinition {
-    console.log("moPreEffectErase.GetDefinition Erase");
+    //console.log("moPreEffectErase.GetDefinition Erase");
     super.GetDefinition();
 
     return this.m_Config.GetConfigDefinition();
