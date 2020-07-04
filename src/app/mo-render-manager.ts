@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import WebGLRenderer = THREE.WebGLRenderer;
 import { moSceneNode } from "./mo-3d-model-manager";
 import { moCamera3D, moObject3D } from "./mo-gui-manager";
+import { moGLManager } from "./mo-gl-manager";
 
 
 export var three = THREE;
@@ -85,15 +86,102 @@ export class moDisplay extends moAbstract {
 export class moRenderManager extends moResource {
 
   m_Renderer: THREE.WebGLRenderer;
+  m_RendererTarget : THREE.WebGLRenderTarget = null;
+  m_RendererTarget2 : THREE.WebGLRenderTarget = null;
+  m_FxTexture : THREE.Texture = null;
+
+  m_TargetScene : THREE.Scene;
+  m_TargetCamera : THREE.Camera = undefined;
+  m_step : number = 0;
+
+  m_TargetMaterial : THREE.MeshBasicMaterial;
+  m_TargetGeometry : THREE.Geometry;
+  m_TargetMesh : THREE.Mesh;
+  m_TargetSceneMode : number = 0;
+
+  GL : moGLManager;
+
+  m_bUpdated : boolean = false;
 
   constructor() {
     super();
     this.SetName("_rendermanager_");
-    this.m_Renderer = new THREE.WebGLRenderer({ alpha: true});
+
+    this.m_Renderer = new THREE.WebGLRenderer({ alpha: true, preserveDrawingBuffer: true });
     this.m_Renderer.setSize( window.innerWidth, window.innerHeight);
     this.m_Renderer.setClearColor(0xFF000000, 1);
     this.m_Renderer.autoClear = false;
     //console.log("moRenderManager::constructor",  this.renderer);
+    this.m_bUpdated = true;
+  }
+
+  Init(callback?:any) : boolean {
+    this.GL = this.m_pResourceManager.GetGLMan();
+
+    this.TargetScene(window.innerWidth, window.innerHeight);
+
+    return super.Init(callback);
+  }
+
+  Resize(w ?: number, h ?: number) : void {
+    this.m_bUpdated = true;
+    this.m_Renderer.setSize( w, h);
+    //this.m_Renderer.setSize(w,h);
+    this.TargetScene(w,h);
+    this.m_Renderer.setViewport(0, 0, w, h);
+  }
+
+  TargetScene(w ?: number, h ?: number ) : void {
+    if (w==undefined) w = window.innerWidth;
+    if (w==0) w=1;
+    if (h==undefined) h = window.innerHeight;
+    this.m_RendererTarget2 = new THREE.WebGLRenderTarget( w, h, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter});
+    this.m_RendererTarget = new THREE.WebGLRenderTarget( w, h, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter});
+
+    //console.log(this.m_RendererTarget,this.m_RendererTarget2);
+
+
+
+    if (this.m_TargetSceneMode==0) {
+      if (this.m_TargetCamera==undefined || this.m_bUpdated)
+        this.m_TargetCamera = new moCamera3D();
+      this.GL.SetDefaultOrthographicView( w, h );
+      this.m_TargetCamera.projectionMatrix = this.GL.GetProjectionMatrix();
+      //this.m_TargetCamera.position.z = 0;
+    } else {
+      if (this.m_TargetCamera==undefined || this.m_bUpdated)
+        this.m_TargetCamera = new THREE.PerspectiveCamera( 70, w/h, 1, 1000 );
+    }
+
+    this.m_TargetScene = new THREE.Scene();
+    this.m_TargetScene.background = new THREE.Color("red");
+
+    this.m_TargetMaterial = new THREE.MeshBasicMaterial({
+      map: this.m_RendererTarget.texture
+    });
+
+    this.m_FxTexture = this.m_RendererTarget2.texture;
+
+    if (this.m_TargetSceneMode==0) {
+      this.m_TargetGeometry = new THREE.PlaneGeometry( 1.0, h/w, 1, 1 );
+      this.m_TargetMesh = new THREE.Mesh(this.m_TargetGeometry,this.m_TargetMaterial);
+      this.m_TargetMesh.position.z = -1;
+    } else {
+      this.m_TargetGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+      this.m_TargetMesh = new THREE.Mesh(this.m_TargetGeometry,this.m_TargetMaterial);
+      this.m_TargetMesh.position.z = -2;
+    }
+    // Add it to the main scene
+    this.m_TargetScene.add(this.m_TargetMesh);
+  }
+
+  UpdateTargetScene() : void {
+    if (this.m_TargetSceneMode==0) {
+
+    } else {
+      this.m_TargetMesh.rotation.x = this.m_step;
+      this.m_TargetMesh.rotation.y = this.m_step*1.5;
+    }
   }
 
   RenderWidth() {
@@ -132,10 +220,22 @@ export class moRenderManager extends moResource {
     return this.Width()/this.Height();
   }
 
+  CopyRenderToTexture( ptex_num : number = 0 ) : void {
+    //this.m_FxTexture = this.m_RendererTarget.texture.clone();
+    //this.m_FxTexture.needsUpdate = true;
+    //this.m_RendererTarget2 = this.m_RendererTarget.clone();
+    this.m_Renderer.setRenderTarget( this.m_RendererTarget2 );
+    this.m_Renderer.render( this.m_TargetScene, this.m_TargetCamera);
+    this.m_Renderer.setRenderTarget( this.m_RendererTarget );
+  }
 
 
   BeginDraw() : void {
-
+    this.m_Renderer.setRenderTarget( this.m_RendererTarget );
+    if (this.m_bUpdated) {
+      this.m_Renderer.setClearColor(new THREE.Color(0.0, 0.0, 0.0), 1.0);
+      this.m_Renderer.clear( true, true, false );
+    }
   }
 
   BeginDrawEffect(): void {
@@ -143,13 +243,22 @@ export class moRenderManager extends moResource {
   }
 
   Render( p_pObj : moSceneNode, p_pCamera : moCamera3D  ) : void {
+    this.m_step+=0.005;
     //renderer.info.autoReset = false;
-    //renderer.info.reset();    
+    //renderer.info.reset();
+    this.m_Renderer.setRenderTarget( this.m_RendererTarget );
     this.m_Renderer.render( p_pObj, p_pCamera );
+    //this.m_Renderer.setRenderTarget( null );
   }
 
   EndDraw() : void {
 
+    this.UpdateTargetScene();
+    //this.m_Renderer.setClearColor(new THREE.Color(0.0, 0.0, 0.0), 1.0);
+    //this.m_Renderer.clear(true,true,false);
+    this.m_Renderer.setRenderTarget( null );
+    this.m_Renderer.render( this.m_TargetScene, this.m_TargetCamera);
+    this.m_bUpdated = false;
   }
 
   EndDrawEffect(): void {

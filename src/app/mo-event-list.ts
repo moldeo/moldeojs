@@ -1,3 +1,5 @@
+import { MOint, MOpointer, MOboolean, MOdouble, MOfloat } from "./mo-types";
+import { moText } from "./mo-text";
 import { moAbstract } from "./mo-abstract";
 
 /// Estructura base de un evento
@@ -23,33 +25,35 @@ struct LIBMOLDEO_API moEventStruct
 */
 
 export class moEvent {
-  /*
-public:
 
-	moEvent *previous;
-	moEvent *next;
+		previous : moEvent;
+		next : moEvent;
 
-	MOint deviceid; //esto vuela
-	MOint devicecode;//esto puede q quede
-	MOint reservedvalue0;
-	MOint reservedvalue1;
-	MOint reservedvalue2;
-	MOint reservedvalue3;
-	MOpointer pointer;
+		deviceid : MOint; //esto vuela
+		devicecode : MOint;//esto puede q quede
+		reservedvalue0 : MOint;
+		reservedvalue1 : MOint;
+		reservedvalue2 : MOint;
+		reservedvalue3 : MOint;
+		pointer : MOpointer;
+
+		jsevent : any;
 
     /// Constructor
-	moEvent();
 	/// Constructor
-	moEvent(MOint did, MOint cod, MOint val0 = 0, MOint val1 = 0, MOint val2 = 0, MOint val3 = 0, MOpointer ptr=0);
-	/// Constructor
-	moEvent(MOint did, MOint cod, MOint val0, MOpointer ptr );
-	/// Destructor
-	virtual ~moEvent();
+	constructor( did : MOint, cod : MOint, val0?: MOint, val1?: MOint, val2?: MOint, val3? : MOint, ptr? : MOpointer) {
+		this.deviceid = did;
+		this.devicecode = cod;
+		this.reservedvalue0 = val0;
+		this.reservedvalue1 = val1;
+		this.reservedvalue2 = val2;
+		this.reservedvalue3 = val3;
+		this.pointer = ptr;
+	}
+	//moEvent(MOint did, MOint cod, MOint val0, MOpointer ptr );
+	//moText JSON;
+  //virtual const moText& ToJSON();
 
-	moText JSON;
-
-  virtual const moText& ToJSON();
-  */
 };
 
 export const MO_MESSAGE  = 0xFABC05;
@@ -121,12 +125,44 @@ utilizada de forma asinc´ronica
 export class moEventList extends moAbstract {
 
 	//moLock	m_lock;
-	First : moEvent = null;
-	Last : moEvent = null;
+	m_First : moEvent = null;
+	m_Last : moEvent = null;
   m_Array : moEvent[] = [];
+
   constructor() {
     super();
   }
+
+	Init() : boolean {
+		return super.Init();
+	}
+
+	First() : moEvent {
+		this.m_First = this.m_Array[0];
+		return this.m_First;
+	}
+
+	Last() : moEvent {
+		this.m_Last = this.m_Array[this.m_Array.length-1];
+		return this.m_Last;
+	}
+
+	List() : any {
+		return this.m_Array;
+	}
+
+	Add( did : any, cod? : MOint, val0? : MOint, val1? : MOint, val2? : MOint, val3? : MOint, ptr? : MOpointer ) {
+		//moMessage or moEvent
+		console.log(did)
+		console.log(typeof did)
+		this.m_Array.push(did);
+	}
+
+
+	GetRef( index : MOint ) : moEvent {
+		return this.m_Array[index];
+	}
+
 
 
 /*
@@ -184,4 +220,3 @@ private:
 moDeclareExportedDynamicArray( moEventPacket*, moEventPacketArray );
 
 */
-

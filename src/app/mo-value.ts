@@ -91,6 +91,9 @@ export class moData {
     this.SetDataType(moDataType.MO_DATA_NUMBER_DOUBLE);
     this.m_Number = Number(p_float);
   }
+  SetNumber(p_number: moNumber) {
+    this.m_Number = p_number;
+  }
   //SetColor( p_color: moText);
   SetTexture(p_texture: any /**moTexture*/) {
     this.SetDataType(moDataType.MO_DATA_IMAGESAMPLE);

@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import * as THREE from "three";
 
 import {
+  MO_VERSION,MO_USERAGENT,
   MOfloat, MOdouble, MOulong,
   MOlong, MOint, MOuint, moNumber,
   moTextFilterParam, MOswitch,
@@ -14,7 +15,7 @@ import { moText } from "./mo-text";
 import { moConfig } from "./mo-config";
 import { moMoldeoObjectType } from "./mo-moldeo-object-type.enum";
 import {
-  moMoldeoObject, moMoldeoObjects,
+  moMoldeoObject, moMoldeoObjects, moMobDefinition,
   MO_MOLDEOOBJECTS_OFFSET_ID
 } from "./mo-moldeo-object";
 import { moVector2 } from "./mo-math-manager";
@@ -25,6 +26,7 @@ import {
   moMasterEffect, moMasterEffectsArray
 } from "./mo-effect";
 import { moEffectManager } from "./mo-effect-manager";
+import { moEventList, moEvent, moMessage } from "./mo-event-list";
 import { moIODeviceManager, moIODevice, moIODevices, moIODeviceArray } from "./mo-iodevice-manager";
 import { moResourceManager, moResource, moResources } from "./mo-resource-manager";
 import {
@@ -61,7 +63,9 @@ import {
   moDataSession, moDataSessionConfig, moDataSessionEventKey,
   moDataSessionConfigParameters
 } from "./mo-data-manager";
-
+import { moValue } from "./mo-value";
+import { moParam } from "./mo-param";
+import { moNewIODevice, moNewEffect, moNewResource } from "./mo-plugin";
 
 export const MO_MAX_EFFECT = 40;
 export const MO_MAX_PRESETS = 9;
@@ -94,6 +98,7 @@ export class moConsoleOptions {
     render_height : MOint = MO_DEF_RENDER_HEIGHT;
     OpWindowHandle : MO_HANDLE = 0;
     Display: MO_DISPLAY = NULL;
+    moldeojs_version : moText = MO_VERSION;
 
     constructor() {
 
@@ -107,6 +112,10 @@ export class moConsole extends moMoldeoObject {
   m_pIODeviceManager: moIODeviceManager;
   m_MoldeoObjects: moMoldeoObjects;
   m_MoldeoSceneObjects : moMoldeoObjects;
+
+  /** Console options are saved in .mol > related to context, moldeojs_version, output layout (1,2 monitors), etc... */
+  moldeojs_version : moText = MO_VERSION;
+  version : moText = "";
 
   constructor( private http: HttpClient ) {
     super();
@@ -152,7 +161,7 @@ export class moConsole extends moMoldeoObject {
  */
   Init(options?: any): boolean {
 
-    console.log("moConsole.Init > options: ", options, typeof options);
+    //console.log("moConsole.Init > options: ", options, typeof options);
 
     if (typeof options == "string") {
       //we assume it is the full console config path... minimal...
@@ -174,6 +183,7 @@ export class moConsole extends moMoldeoObject {
         this.m_pFileManager.Init();
         //console.log("moConsole::Init > moResourceManager: ", this.m_pResourceManager);
       }
+
 
       // "consoleconfig"
       if ("consoleconfig" in options) {
@@ -199,14 +209,14 @@ export class moConsole extends moMoldeoObject {
 
     //OK ===
     if (this.GetConfigName() == undefined || this.GetConfigName() == "") {
-      console.log("No config file (.mol) defined. Please read the manual.")
+      console.error("No config file (.mol) defined. Please read the manual.")
       return false;
     }
 
     //RUNNING MOLDEO OBJECT INIT for loading base
     super.Init((result) => {
       var File : moFile = new moFile(this.GetConfigName());
-      console.log("Config Loaded!", this.m_Config, File);
+      console.log("Config Loaded!", File.GetFileName());
 
       var res_ok = this.InitResources({
         "apppath": EXEDIR,
@@ -222,10 +232,30 @@ export class moConsole extends moMoldeoObject {
 
         this.m_ConsoleState.Init();
 
-        this.LoadObjects(moMoldeoObjectType.MO_OBJECT_PREEFFECT, (pre) => {
-          this.LoadObjects(moMoldeoObjectType.MO_OBJECT_EFFECT, (efe) => {
-            this.LoadObjects(moMoldeoObjectType.MO_OBJECT_POSTEFFECT, (pos) => {
-              this.LoadObjects(moMoldeoObjectType.MO_OBJECT_MASTEREFFECT, (mas) => {
+        if(this.m_pResourceManager) {
+
+          for(var i = 0; i<this.m_pResourceManager.Resources().length; i++) {
+            var mobject : moMoldeoObject = this.m_pResourceManager.GetResource(i);
+            if (mobject) {
+              this.m_MoldeoObjects.push( mobject );
+            }
+          }
+
+          if (this.m_pIODeviceManager) {
+            this.m_pIODeviceManager.m_pResourceManager = this.m_pResourceManager;
+          }
+
+        }
+
+        this.LoadObjects(moMoldeoObjectType.MO_OBJECT_IODEVICE, (iod) => {
+          this.LoadObjects(moMoldeoObjectType.MO_OBJECT_RESOURCE, (res) => {
+
+            //check sensors and mouse...
+
+            this.LoadObjects(moMoldeoObjectType.MO_OBJECT_PREEFFECT, (pre) => {
+              this.LoadObjects(moMoldeoObjectType.MO_OBJECT_EFFECT, (efe) => {
+                this.LoadObjects(moMoldeoObjectType.MO_OBJECT_POSTEFFECT, (pos) => {
+                  this.LoadObjects(moMoldeoObjectType.MO_OBJECT_MASTEREFFECT, (mas) => {
 /*
                 this.InitObjects(moMoldeoObjectType.MO_OBJECT_PREEFFECT, (initpre) => {
                   this.InitObjects(moMoldeoObjectType.MO_OBJECT_EFFECT, (initefe) => {
@@ -234,24 +264,24 @@ export class moConsole extends moMoldeoObject {
                 });
 */
 
-                if(this.m_pResourceManager) {
+                    //adding console!
+                    this.m_MoldeoObjects.push(this);
 
-                    for(var i = 0; i<this.m_pResourceManager.Resources().length; i++) {
-                      var mobject : moMoldeoObject = this.m_pResourceManager.GetResource(i);
-                      if (mobject) {
-                        this.m_MoldeoObjects.push( mobject );
-                      }
-                    }
+                    this.UpdateMoldeoIds();
+                    if (options["effects_loaded"]) options["effects_loaded"](this);
+                    //TODO: OJO: chequear el orden de ScriptExeUpdate > CreateConnectos (que llama a ScriptExeInit) > luego Inicializar los objetos...
+                    this.ScriptExeUpdate();
+                    this.CreateConnectors();
 
-                  }
-                //adding console!
-                this.m_MoldeoObjects.push(this);
+                    //Effects are all initalized (that's when every config is really processed by every moMoldeoObject.... then taking references from others configs )
+                    this.InitializeAllEffects();
 
-                this.UpdateMoldeoIds();
-                if (options["effects_loaded"]) options["effects_loaded"](this);
+                    //var RenderMan: moRenderManager = this.m_pResourceManager.GetRenderMan();
+                    //RenderMan.Black();
 
-                this.InitializeAllEffects();
-                if (options["effects_started"]) options["effects_started"](this);
+                    if (options["effects_started"]) options["effects_started"](this);
+                  });
+                });
               });
             });
           });
@@ -477,9 +507,9 @@ export class moConsole extends moMoldeoObject {
 
   }
 
-  LoadObjects( fx_type : moMoldeoObjectType, callback?: any ): void {
+  LoadObjects( obj_type : moMoldeoObjectType, callback?: any ): void {
 
-    if (fx_type == moMoldeoObjectType.MO_OBJECT_UNDEFINED) {
+    if (obj_type == moMoldeoObjectType.MO_OBJECT_UNDEFINED) {
 
       for(var i=0;i<moMoldeoObjectType.MO_OBJECT_TYPES;i++ ) {
         this.LoadObjects( i );
@@ -490,78 +520,121 @@ export class moConsole extends moMoldeoObject {
     }
 
     var text: moText;
-    var fxname: moText;
+    var objname: moText;
     var cfname: moText;
     var lblname: moText;
     var keyname : moText;
-    var efx: MOint;
-    var i: MOint;
-    var N : MOint;
     var activate : boolean = true;
     var peffect : moEffect;
+    var pobject : moMoldeoObject;
 
-    var fx_string: moText = this.m_MobDefinition.GetTypeToName(fx_type);
+    var obj_string: moText = this.m_MobDefinition.GetTypeToName(obj_type, true);
+    var param_obj_index : MOint = this.m_Config.GetParamIndex(obj_string);
 
-    efx = this.m_Config.GetParamIndex(fx_string);
-    this.m_Config.SetCurrentParamIndex(efx);
-    N = this.m_Config.GetValuesCount(efx);
+    this.m_Config.SetCurrentParamIndex(param_obj_index);
+    var N : MOint = this.m_Config.GetValuesCount(param_obj_index);
 
     if (this.MODebug2) {
       //this.MODebug2.Message( "moConsole::LoadObjects > Loading Object configs..." );
       //this.MODebug2.Message( "moConsole::LoadObjects > Objects number: " + N );
     }
 
-    if(N>0) {
-      this.m_Config.FirstValue();
-    for( var i=0; i < N; i++) {
+    if ( N <= 0 ) {
+      if (callback) callback("LoadObjects ok");
+      return;
+    }
+
+    this.m_Config.FirstValue();
+
+    for( var param_obj_val_index=0; param_obj_val_index < N; param_obj_val_index++) {
       //this.Draw();
-      fxname = this.m_Config.GetParam().GetValue().GetSubValue(MO_CFG_EFFECT).Text();
-      cfname = this.m_Config.GetParam().GetValue().GetSubValue(MO_CFG_EFFECT_CONFIG).Text();
-      lblname = this.m_Config.GetParam().GetValue().GetSubValue(MO_CFG_EFFECT_LABEL).Text();
+      //objname = this.m_Config.GetParam().GetValue().GetSubValue(MO_CFG_EFFECT).Text();
+      var Value : moValue = this.m_Config.GetParam().GetValue();
+      objname = Value.GetSubValue(MO_CFG_EFFECT).Text();
+      cfname = Value.GetSubValue(MO_CFG_EFFECT_CONFIG).Text();
+      lblname = Value.GetSubValue(MO_CFG_EFFECT_LABEL).Text();
+      var subvalues : any = Value.GetSubValueCount()
+      if (subvalues>=6)
+        keyname = Value.GetSubValue(MO_CFG_EFFECT_KEY).Text();
 
-      if (this.m_Config.GetParam().GetValue().GetSubValueCount()>=6)
-        keyname = this.m_Config.GetParam().GetValue().GetSubValue(MO_CFG_EFFECT_KEY).Text();
-
-      if (this.m_Config.GetParam().GetValue().GetSubValueCount()>=4)
-        activate = (this.m_Config.GetParam().GetValue().GetSubValue(MO_CFG_EFFECT_ON).Int()>0);
+      if (subvalues>=4)
+        activate = (Value.GetSubValue(MO_CFG_EFFECT_ON).Int()>0);
 
 
       var completecfname : moText = "" + this.m_pResourceManager.GetDataMan().GetDataPath() + moSlash + cfname+ ".cfg";
       var FullCF : moFile = new moFile(completecfname);
 
-      if ( FullCF.Exists() ) {
-                if ( fxname  != "nil" ) {
-
-                  peffect = this.m_EffectManager.NewEffect(fxname, cfname, lblname,
-                    keyname, fx_type, efx, i, activate);
-
-                    if (peffect) {
-                      this.m_MoldeoObjects.push( peffect );
-                    }
-
-                    if (this.MODebug2) {
-                      //this.MODebug2.Message( "moConsole::LoadObjects > " + completecfname );
-                    }
-
-                } else {
-                  /*
-                    peffect = null;
-                    if (fx_type == moMoldeoObjectType.MO_OBJECT_EFFECT)
-                      this.m_EffectManager.m_Effects.push(peffect);
-                    if (fx_type == moMoldeoObjectType.MO_OBJECT_PREEFFECT)
-                      this.m_EffectManager.m_PreEffects.push(peffect);
-                    if (fx_type == moMoldeoObjectType.MO_OBJECT_POSTEFFECT)
-                      this.m_EffectManager.m_PostEffects.push(peffect);
-                    if (fx_type == moMoldeoObjectType.MO_OBJECT_MASTEREFFECT)
-                        this.m_EffectManager.m_MasterEffects.push(peffect);
-                    this.m_EffectManager.m_AllEffects.push(peffect);
-                    this.m_MoldeoObjects.push( peffect );*/
-                }
-      } else {
-          this.MODebug2.Error( "moConsole::LoadObjects > Error: Config File doesn't exist : " + completecfname);
+      if ( !FullCF.Exists() || objname  == "nil" ) {
+        if (!!FullCF.Exists()) this.MODebug2.Error( "moConsole::LoadObjects > Error: Config File doesn't exist : " + completecfname);
+        if (objname  == "nil") this.MODebug2.Error( "moConsole::LoadObjects > Error: Object file is nil : " + completecfname);
+        continue;
       }
+
+      switch( obj_type) {
+        case moMoldeoObjectType.MO_OBJECT_EFFECT:
+        case moMoldeoObjectType.MO_OBJECT_PREEFFECT:
+        case moMoldeoObjectType.MO_OBJECT_POSTEFFECT:
+        case moMoldeoObjectType.MO_OBJECT_MASTEREFFECT:
+          pobject = this.m_EffectManager.NewEffect( objname, cfname, lblname,
+                                                    keyname, obj_type, param_obj_index, param_obj_val_index,
+                                                    activate);
+          break;
+
+        case moMoldeoObjectType.MO_OBJECT_RESOURCE:
+        case moMoldeoObjectType.MO_OBJECT_IODEVICE:
+
+          if ( obj_type == moMoldeoObjectType.MO_OBJECT_RESOURCE ) {
+            //create plugin resource from "plugins/resources/objname.ts" see mo-plugins.ts
+            var presource : moResource = moNewResource( objname, {} );
+            if (presource) {
+              this.m_pResourceManager.AddResource(presource);
+              pobject = presource;
+            }
+          } else {
+            //create plugin iodevice from "plugins/iodevices/objname.ts" see mo-plugins.ts
+            pobject = moNewIODevice( objname, {} );
+            //if (pobject) this.m_pIODeviceManager.AddDevice(pobject);
+          }
+
+          if (pobject) {
+            //console.log("moEffectManager.NewEffect", peffect);
+            var MDef : moMobDefinition = pobject.GetMobDefinition();
+            MDef.SetConfigName( cfname );
+            MDef.SetLabelName( lblname );
+            MDef.SetKeyName( keyname );
+
+            MDef.SetConsoleParamIndex(param_obj_index);
+            MDef.SetConsoleValueIndex(param_obj_val_index);
+            MDef.SetActivate(activate);
+            if (activate) {
+              pobject.Activate();
+            } else {
+              pobject.Deactivate();
+            }
+
+            pobject.SetMobDefinition( MDef );
+            //m_pMoldeoObjects->Add( (moMoldeoObject*) peffect );
+            pobject.SetResourceManager( this.m_pResourceManager );
+            pobject.Init();
+
+          }
+
+          break;
+
+        default:
+
+          break;
+
+      }
+      if (pobject) {
+        this.m_MoldeoObjects.push( pobject );
+      }
+
+      if (this.MODebug2) {
+        //this.MODebug2.Message( "moConsole::LoadObjects > " + completecfname );
+      }
+
       this.m_Config.NextValue();
-    }
     }
 
     //if (this.MODebug2)
@@ -598,7 +671,7 @@ export class moConsole extends moMoldeoObject {
         }
       }
     }
-
+    //console.log("borrar:",borrar,"pre_effect_on",pre_effect_on);
     if (borrar == MO_ACTIVATED) {
       if (this.m_EffectManager.m_PreEffects.length > 0) {
         var pEffect: moEffect = this.m_EffectManager.m_PreEffects[0];
@@ -621,13 +694,44 @@ export class moConsole extends moMoldeoObject {
       if (pEffect) {
         if (pEffect.Activated()) {
           RenderMan.BeginDrawEffect();
+          //console.log("draw:",pEffect.GetName());
           pEffect.Draw(this.m_ConsoleState.tempo);
           RenderMan.EndDrawEffect();
         }
       }
     }
 
+    if (this.IsInitialized()) {
+        if (this.ScriptHasFunction("Draw")) {
+            this.SelectScriptFunction("Draw");
+            //this.AddFunctionParam( i + j*this.m_cols);
+            //this.AddFunctionParam( this.dt );
+            if (!this.RunSelectedFunction(1)) {
+                //this.MODebug2.Error( moText("RunParticle function not executed") );
+            }
+        }
+    }
+
+    RenderMan.CopyRenderToTexture(0);
+
+    //draw overlay (out of render texture...)
+    if (this.IsInitialized()) {
+        if (this.ScriptHasFunction("DrawOverlay")) {
+            this.SelectScriptFunction("DrawOverlay");
+            //this.AddFunctionParam( i + j*this.m_cols);
+            //this.AddFunctionParam( this.dt );
+            if (!this.RunSelectedFunction(1)) {
+                //this.MODebug2.Error( moText("RunParticle function not executed") );
+            }
+        }
+    }
+
     RenderMan.EndDraw();
+
+
+  }
+
+  DrawX( p_tempo: moTempo) : void {
 
   }
 
@@ -724,10 +828,13 @@ export class moConsole extends moMoldeoObject {
     };
 
   }
+
   Update() : void {
     if (!this.m_pResourceManager) return;
     var RenderMan : moRenderManager = this.m_pResourceManager.GetRenderMan();
-/*
+    if (!this.m_pIODeviceManager) return;
+    var m_pEventList : moEventList = this.m_pIODeviceManager.GetEvents();
+    /*
     m_ScreenshotInterval = m_Config.Int(moR(CONSOLE_SCREENSHOTS));
 
       if (m_ScreenshotInterval>30) {
@@ -743,34 +850,34 @@ export class moConsole extends moMoldeoObject {
 
           }
       }
-*/
+      */
 
-  ///TODO: each Object see all events and process a few... can and should be optimized
-  /// optimization: only send a partial event list to every object, filtered by
-  /// moMoldeoObject->GetMobDefinition()->GetMoldeoId()
-	RenderMan.BeginUpdate();
-	if (this.m_pIODeviceManager) {
-		for(var i = 0; i<(this.m_MoldeoObjects.length + this.m_MoldeoSceneObjects.length); i++) {
-			RenderMan.BeginUpdateObject();
-			var pMOB : moMoldeoObject = null;
-			if (i<this.m_MoldeoObjects.length)
-        pMOB = this.m_MoldeoObjects[i];
-			else
-        pMOB = this.m_MoldeoSceneObjects[i-this.m_MoldeoObjects.length];
-			if (pMOB) {
-        if (pMOB.GetType() != moMoldeoObjectType.MO_OBJECT_IODEVICE)
-                ///MO_OBJECT_IODEVICE WERE ALREADY UPDATED VIA m_pIODeviceManager->Update()
-                    if (pMOB.Activated()) {
-                      //console.log("updating obj",pMOB,this.m_pIODeviceManager.GetEvents());
-                      pMOB.Update( this.m_pIODeviceManager.GetEvents());
-                    }
-			}
-			RenderMan.EndUpdateObject();
-		}
+    ///TODO: each Object see all events and process a few... can and should be optimized
+    /// optimization: only send a partial event list to every object, filtered by
+    /// moMoldeoObject->GetMobDefinition()->GetMoldeoId()
+  	RenderMan.BeginUpdate();
+  	if (this.m_pIODeviceManager) {
+  		for(var i = 0; i<(this.m_MoldeoObjects.length + this.m_MoldeoSceneObjects.length); i++) {
+  			RenderMan.BeginUpdateObject();
+  			var pMOB : moMoldeoObject = null;
+  			if (i<this.m_MoldeoObjects.length)
+          pMOB = this.m_MoldeoObjects[i];
+  			else
+          pMOB = this.m_MoldeoSceneObjects[i-this.m_MoldeoObjects.length];
+  			if (pMOB) {
+          if (pMOB.GetType() != moMoldeoObjectType.MO_OBJECT_IODEVICE)
+            ///MO_OBJECT_IODEVICE WERE ALREADY UPDATED VIA m_pIODeviceManager->Update()
+            if (pMOB.Activated()) {
+              //console.log("updating obj",pMOB,this.m_pIODeviceManager.GetEvents());
+              pMOB.Update( m_pEventList );
+            }
+  			}
+  			RenderMan.EndUpdateObject();
+  		}
 
-		this.m_pIODeviceManager.PurgeEvents();
-	}
-	RenderMan.EndUpdate();
+  		this.m_pIODeviceManager.PurgeEvents();
+  	}
+  	RenderMan.EndUpdate();
 /*
   moEventList* pEvents = m_pIODeviceManager->GetEvents();
   int nevents = 0;
@@ -842,6 +949,12 @@ export class moConsole extends moMoldeoObject {
 
 	moMoldeoObject::Update( m_pIODeviceManager->GetEvents() );
   */
+    super.Update( m_pEventList );
+  }
+
+  Resize( w : number, h : number ) : void {
+    if (this.m_pResourceManager)
+      this.m_pResourceManager.GetRenderMan().Resize(w,h);
   }
 
   Interaction() : boolean {
@@ -856,6 +969,35 @@ export class moConsole extends moMoldeoObject {
       RenderMan.EndUpdateDevice();
     }
     RenderMan.EndUpdate();
+
+
+    //INTERACCION EFFECTS MAESTROS
+
+  	for( var i : MOint = 0; i < this.m_EffectManager.m_MasterEffects.length; i++) {
+  		let pEffect = this.m_EffectManager.m_MasterEffects[i];
+  		let fxstate: moEffectState = pEffect.GetEffectState();
+  		if(pEffect) {
+  			if(pEffect.Activated()) {
+  				pEffect.Interaction( this.m_pIODeviceManager );
+  			}
+  		}
+  	}
+
+    for( var i : MOint = 0; i < this.m_EffectManager.m_Effects.length; i++) {
+  		let pEffect = this.m_EffectManager.m_Effects[i];
+  		let fxstate: moEffectState = pEffect.GetEffectState();
+  		if(pEffect) {
+  			if(pEffect.Activated()) {
+  				pEffect.Interaction( this.m_pIODeviceManager );
+  			}
+  		}
+  	}
+
+    return true;
+  }
+
+  TestEnabled() : boolean {
+    // clear here:
     return true;
   }
 
@@ -876,11 +1018,11 @@ export class moConsole extends moMoldeoObject {
     //var id: MOint = TMan.GetTextureMOId("./assets/data/icons/moldeotrans2.png", true, false);
     //var id: MOint = TMan.GetTextureMOId("./assets/data/icons/water.jpg", true, false);
     var customwater_id : MOint = TMan.GetTextureMOId("customwater",false,false);
-    console.log( "customwater_id:", customwater_id)
+    //console.log( "customwater_id:", customwater_id)
     if (customwater_id==-1) {
       customwater_id = TMan.AddTexture("customwater",512,512);
       var MoldeoWaterTexture : moTexture = TMan.GetTexture(customwater_id);
-      console.log(MoldeoWaterTexture);
+      //console.log(MoldeoWaterTexture);
       MoldeoWaterTexture._texture = TMan.m_TextureLoader.load("./assets/data/icons/water.jpg");
     }
     id = customwater_id;
@@ -909,7 +1051,7 @@ export class moConsole extends moMoldeoObject {
     if (options) {
       for( let i in options ) {
         v_options[i] = options[i];
-        console.log( i, options[i] );
+        //console.log( i, options[i] );
       };
     }
 
@@ -930,13 +1072,17 @@ export class moConsole extends moMoldeoObject {
     //console.log("steps:", steps);
     //120 is defined in
     var progress: MOfloat = (steps / stepi) / v_options["end_step"];
-    console.log( "progress: ", steps, v_options["end_step"], progress )
+    //console.log( "progress: ", steps, v_options["end_step"], progress )
     if (v_options["bakground_animation"])
       RMan.m_Renderer.setClearColor(new moColor(1.0 - progress, 1.0 - progress, 1.0 - progress), 1.0);
     else
       RMan.m_Renderer.setClearColor(new moColor(0.0, 0.0, 0.0), 1.0);
 
-    RMan.m_Renderer.clear( true, true, false);
+    RMan.m_Renderer.autoClear = false;
+    //RMan.m_Renderer.autoClearColor = false;
+    //RMan.m_Renderer.autoClearDepth = false;
+    //RMan.m_Renderer.autoClearStencil = false;
+    if (progress<1.0) RMan.m_Renderer.clear( true, true, false);
     //glClearColor( 1.0 - progress, 1.0 - progress, 1.0 - progress, 1.0 );
     //glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -965,23 +1111,26 @@ export class moConsole extends moMoldeoObject {
     ///GEOMETRY
     if (v_options["sphere_animation"]) {
 
-      console.log("Rendering sphere_animation");
+      //console.log("Rendering sphere_animation");
       //console.log( RMan.m_Renderer.info );
-      var Sphere : moSphereGeometry = new moSphereGeometry( 3*0.1618, 24.0, 24.0 );
+      var Sphere : moSphereGeometry = new moSphereGeometry( 4.0*3.14*0.1618, 64.0, 64.0 );
 
         ///MESH MODEL (aka SCENE NODE)
       var Model : moGLMatrixf = new moGLMatrixf();
       Model.MakeIdentity();
       //Model.Scale( 2.0, 1.4, 2.0);
-      Model.Rotate(-40+0.01*360.0 * progress * DEG_TO_RAD, 0.0, 1.0, 0.0);
-      Model.Translate(    0*3.14*0.1618+0.05*progress, 0.2*3.14*0.1618+-0.25*0.0+0.0*0.4*progress, -1.5 + 0.1*0.618*progress );
+      Model.Rotate(-40+0.02*360.0 * progress * DEG_TO_RAD, 0.0, 1.0, 0.0);
+      //Model.Translate(    0*3.14*0.1618+0.05*progress, 0.2*3.14*0.1618+-0.25*0.0+0.0*0.4*progress, -1.5 + 0.1*0.618*progress );
+      Model.Translate(    0.005*progress, -2.5*0 - 1.7+0.1*progress, -1.5 + 0.1*0.618*progress );
       //console.log("Model:", Model);
-      Mat.color = new moColor(1.0*(1-progress), 0.0, 1.0*progress);
+      Mat.color = new moColor(1.0*(1.0-progress), 0.0, 1.0*(progress));
+      Mat.opacity = progress;
 
       var Mesh: moMesh = new moMesh(Sphere, Mat);
       Mesh.SetModelMatrix(Model);
 
       var Scene: moSceneNode = new moSceneNode();
+      //Scene.background = new THREE.Color( 'red' );
       Scene.add(Mesh);
 
       var ambientLight : THREE.AmbientLight = new THREE.AmbientLight(0xcccccc);
@@ -997,11 +1146,11 @@ export class moConsole extends moMoldeoObject {
       //p_display_info.Resolution().Width(),p_display_info.Resolution().Height()
       var rend_size : moVector2 = new moVector2();
       RMan.m_Renderer.getSize(rend_size);
-      if (p_display_info) {
+      //if (p_display_info) {
         //rend_size.x = p_display_info.Resolution().width;
         //rend_size.y = p_display_info.Resolution().height;
-        console.log("Display info: ", rend_size);
-      }
+        //console.log("Display info: ", rend_size);
+      //}
       GLMan.SetDefaultPerspectiveView( rend_size.width, rend_size.height );
       Camera3D.projectionMatrix = GLMan.GetProjectionMatrix();
 
@@ -1036,7 +1185,8 @@ export class moConsole extends moMoldeoObject {
       var Model2 : moGLMatrixf = new moGLMatrixf().MakeIdentity();
       Model2.Scale( 1.0, 1.0, 1.0 );
       Model2.Translate( 0.0, -0.0, +1 );
-      Mat2.color = new moColor(1.0*(progress), 0.0, 1.0*(1.0-progress));
+      Mat2.color = new moColor( 1.0, progress, progress );
+      Mat2.opacity = (progress-0.25)/(1.0-0.25);
       var Mesh2 : moMesh = new moMesh( Plane3, Mat2 );
       Mesh2.SetModelMatrix(Model2);
       var Scene2: moSceneNode = new moSceneNode();
@@ -1101,6 +1251,15 @@ export class moConsole extends moMoldeoObject {
       GetResourceManager()->GetDataMan()->GetSession()->AddKey( key );
     }
     */
+  }
+
+  GetDisplayVersion() : moText {
+    this.version = this.GetConfig().m_MajorVersion+"."+this.GetConfig().m_MinorVersion;
+    return "mol-version: "+this.version+ " ( moldeojs_version: " +this.moldeojs_version + ")";
+  }
+
+  GetUserAgent() : any {
+    return MO_USERAGENT;
   }
 
   GetConsoleState() : moTimerState {

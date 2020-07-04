@@ -27,7 +27,9 @@ export enum moTextureType {
 
 export class moTexture extends moAbstract {
 
-  _texture: Texture;
+  _texture : Texture;
+  _video : any;
+
   m_type : moTextureType;
   m_moid : MOint = -1;
   m_name : moText = "";
@@ -67,11 +69,13 @@ export class moTexture extends moAbstract {
 		MOuint m_buffer_height;
 		MOuint m_buffer_bytespp;
 */
+  MetaData : any = {};
+
   constructor() { super(); }
   Init(): boolean { return super.Init(); }
 
   BuildFromFile( p_fullfilename: moText, p_textureloader: TextureLoader, p_callback?:any  ): boolean {
-    console.log("moTexture.BuildFromFile >", p_fullfilename);
+    //console.log("moTexture.BuildFromFile >", p_fullfilename);
     this._texture = p_textureloader.load("" + p_fullfilename, (texture) => {
       this.m_width = texture.image.width;
       this.m_height = texture.image.height;
@@ -140,7 +144,7 @@ export class moTextureBuffer extends moTexture {
 	m_BufferPath : moText;
 	m_BufferFormat : moText;
 
-  m_Frames : moTextureFrames;
+  m_Frames : moTextureFrames = [];
   m_pDirectory: moDirectory;
 
   max_luminance : MOint;
@@ -240,7 +244,7 @@ export class moTextureBuffer extends moTexture {
         if (this.LoadImage(pFile.GetCompletePath())) {
           this.m_ImagesProcessed++;
         }
-        console.log("Image processed:", this.m_ImagesProcessed, pFile );
+        //console.log("Image processed:", this.m_ImagesProcessed, pFile );
         /*if (pFile.GetType() == moFileType.MO_FILETYPE_LOCAL && pFile.Exists()) {
           */
           /*

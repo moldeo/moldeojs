@@ -36,6 +36,21 @@ export type moPluginDefinitions = moPluginDefinition[];
 export const PluginsDefinitions: moPluginDefinitions = [];
 export const PluginsDefinitionsMap = {};
 
+/// Effect Plane ====================================================================
+import { moMobile } from "../plugins/iodevices/mobile";
+PluginsDefinitions.push( new moPluginDefinition(
+  "mobile",
+  "/plugins/iodevices/mobile.ts",
+  moMoldeoObjectType.MO_OBJECT_IODEVICE,
+moMobile ) );
+
+import { moMouse } from "../plugins/iodevices/mouse";
+PluginsDefinitions.push( new moPluginDefinition(
+  "mouse",
+  "/plugins/iodevices/mouse.ts",
+  moMoldeoObjectType.MO_OBJECT_IODEVICE,
+moMouse ) );
+
 /// PreEffect Erase ====================================================================
 import { moPreEffectErase } from "../plugins/preeffects/erase";
 PluginsDefinitions.push( new moPluginDefinition(
@@ -91,6 +106,33 @@ PluginsDefinitions.push( new moPluginDefinition(
   "/plugins/effects/particlessimple.ts",
   moMoldeoObjectType.MO_OBJECT_EFFECT,
 moEffectParticlesSimple ) );
+
+/// Effect Sound ====================================================================
+import { moEffectSound } from "../plugins/effects/sound";
+PluginsDefinitions.push( new moPluginDefinition(
+  "sound",
+  "/plugins/effects/sound.ts",
+  moMoldeoObjectType.MO_OBJECT_EFFECT,
+moEffectSound ));
+
+/// Effect Faust ====================================================================
+import { moEffectFaust } from "../plugins/effects/faust";
+PluginsDefinitions.push( new moPluginDefinition(
+  "faust",
+  "/plugins/effects/faust.ts",
+  moMoldeoObjectType.MO_OBJECT_EFFECT,
+moEffectFaust ));
+
+
+/// Effect Plane ====================================================================
+import { moResourceMl5 } from "../plugins/resources/ml5";
+PluginsDefinitions.push( new moPluginDefinition(
+  "ml5",
+  "/plugins/resources/ml5.ts",
+  moMoldeoObjectType.MO_OBJECT_RESOURCE,
+moResourceMl5 ) );
+
+
 /*
 export const PluginsTree = {
   "preeffects": {

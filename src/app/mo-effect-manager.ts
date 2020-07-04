@@ -99,6 +99,7 @@ export class moEffectManager extends moAbstract {
         this.m_MasterEffects.push( pmastereffect );
         peffect = pmastereffect;
         break;
+        
       default:
         break;
     }

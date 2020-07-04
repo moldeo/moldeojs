@@ -68,7 +68,7 @@ Button with tooltip
 <!--<app-threeviewer></app-threeviewer>-->
 <!--<moldeocontrol></moldeocontrol>-->
 <!--<ng-template #dynamic></ng-template>-->
-<moldeojs-view [mol]="this.sample"></moldeojs-view>
+<moldeojs-view id="moldeojsview" [mol]="this.sample" (window:resize)="onResize($event)"></moldeojs-view>
 <!--router-outlet></router-outlet-->
 <!--touch-component></touch-component-->
-<router-outlet></router-outlet>
+<!--router-outlet></router-outlet-->

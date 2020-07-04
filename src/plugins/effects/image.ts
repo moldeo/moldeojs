@@ -122,7 +122,7 @@ export class moEffectImage extends MO.moEffect {
   }
 
   GetDefinition(): MO.moConfigDefinition {
-    console.log("moEffectImage.GetDefinition Erase");
+    //console.log("moEffectImage.GetDefinition Erase");
     super.GetDefinition();
 
     return this.m_Config.GetConfigDefinition();

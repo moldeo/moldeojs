@@ -8,7 +8,7 @@ import {
 //export { moMoldeoObjectType, moMoldeoObjectTypeStr,
 // moMoldeoObjectTypeToText } from "./mo-moldeo-object-type.enum";
 import {
-  MOswitch, MOint,
+  MOswitch, MOint, MOboolean,
   MO_ACTIVATED, MO_DEACTIVATED, MO_OFF, MO_ON,
   MO_FALSE, MO_TRUE
 } from "./mo-types";
@@ -37,6 +37,7 @@ import {
 import { moGetDuration } from "./mo-timer";
 import { moEventList } from "./mo-event-list";
 
+import * as THREE from "three";
 /**
  * Moldeo Object Constants
  */
@@ -61,6 +62,7 @@ export const MO_IODEVICE_TRACKER = 10;
 
 export const MO_IODEVICE_TABLET = 11;
 export const MO_IODEVICE_TOUCH = 12;
+export const MO_IODEVICE_MOBILE = 13;
 export const MO_IODEVICE_CONSOLE = 20;
 export const MO_IODEVICE_ANY = -1;
 
@@ -71,7 +73,6 @@ export const MO_MOLDEOOBJECTS_OFFSET_ID = 100;
 export const MO_MOLDEOSCENEOBJECTS_OFFSET_ID = 10000;
 
 export const MO_MOLDEOOBJECT_UNDEFINED_ID = -1;
-
 
 export class moMobState extends moAbstract {
 
@@ -243,8 +244,13 @@ export class moMobDefinition {
     this.m_MobIndex.m_valueindex = p_valueindex;
   }
 
-  GetTypeToName(p_type: moMoldeoObjectType) : moText {
-    return moMoldeoObjectTypeToText[p_type];
+  GetTypeToName(p_type: moMoldeoObjectType, for_console_param?: MOboolean ) : moText {
+    var str : moText = moMoldeoObjectTypeToText[p_type];
+    if (for_console_param) {
+      if (p_type==moMoldeoObjectType.MO_OBJECT_RESOURCE) str = "resources";
+      if (p_type==moMoldeoObjectType.MO_OBJECT_IODEVICE) str = "devices";
+    }
+    return str;
   }
 
   GetMobIndex() : moMobIndex  {
@@ -257,6 +263,9 @@ export class moMobDefinition {
 
 
 export class moMoldeoObject extends moScript {
+
+  THREE : any;
+
   moid: number;
   name: string;
   label: string;
@@ -285,7 +294,11 @@ export class moMoldeoObject extends moScript {
   m_InletsStr: any = {};
 
   InletScreenWidth : moInlet;
+  screen_width : number;
   InletScreenHeight : moInlet;
+  screen_height : number;
+  InletScreenProportion : moInlet;
+  screen_proportion : number;
   InletTimeabs : moInlet;
   InletPreconfig : moInlet;
 
@@ -295,6 +308,7 @@ export class moMoldeoObject extends moScript {
 
   constructor() {
     super();
+    this.THREE = THREE;
 
     this.m_pResourceManager = null;
     //this.m_Script = "";
@@ -330,6 +344,13 @@ export class moMoldeoObject extends moScript {
       this.m_InletsStr["screen_height"] = this.InletScreenHeight;
     }
 
+    this.InletScreenProportion = new moInlet();
+    if (this.InletScreenProportion) {
+      this.InletScreenProportion.Init( "screen_proportion", this.m_Inlets.length, "DOUBLE" );
+      this.m_Inlets.push(this.InletScreenProportion);
+      this.m_InletsStr["screen_proportion"] = this.InletScreenProportion;
+    }
+
     this.InletTimeabs = new moInlet();
     if (this.InletTimeabs) {
       this.InletTimeabs.Init( "timeabs", this.m_Inlets.length, "DOUBLE" );
@@ -353,15 +374,20 @@ export class moMoldeoObject extends moScript {
     } else if (
       this.GetType() == moMoldeoObjectType.MO_OBJECT_PREEFFECT
       || this.GetType() == moMoldeoObjectType.MO_OBJECT_EFFECT
-      /*|| this.GetType() == moMoldeoObjectType.MO_OBJECT_POSTEFFECT
+      || this.GetType() == moMoldeoObjectType.MO_OBJECT_POSTEFFECT
       || this.GetType() == moMoldeoObjectType.MO_OBJECT_MASTEREFFECT
       || this.GetType() == moMoldeoObjectType.MO_OBJECT_RESOURCE
-    || this.GetType() == moMoldeoObjectType.MO_OBJECT_IODEVICE*/) {
+    || this.GetType() == moMoldeoObjectType.MO_OBJECT_IODEVICE ) {
+      if (this.m_pResourceManager) {
+        var datap: moText = this.m_pResourceManager.GetDataMan().GetDataPath();
+        //confignamecompleto = "" + this.m_pResourceManager.GetDataMan().GetDataPath();
+        var cname : moText = this.GetConfigName();
+        if (cname == "") return false;
+        confignamecompleto = `${datap}${this.GetConfigName()}.cfg`;
+      }
 
-      var datap: moText = this.m_pResourceManager.GetDataMan().GetDataPath();
-      //confignamecompleto = "" + this.m_pResourceManager.GetDataMan().GetDataPath();
-      confignamecompleto = `${datap}${this.GetConfigName()}.cfg`;
-
+    } else {
+      return false;
     }
 
     /*else {
@@ -386,7 +412,7 @@ export class moMoldeoObject extends moScript {
     }*/
 
   this.MODebug2.Message(`***** Initializing ${this.GetName()} ***** ${confignamecompleto}`);
-    if (confignamecompleto != undefined && confignamecompleto + "" != "") {
+    if (confignamecompleto != undefined && confignamecompleto + "" != "" ) {
       this.m_pFileManager.Load(confignamecompleto, true, (res) => {
         //console.log("loaded file .. OK");
         if (this.m_Config.LoadConfig(res, (config_res) => {
@@ -421,131 +447,131 @@ export class moMoldeoObject extends moScript {
 
   CreateConnectors() : boolean {
     //console.log( `moMoldeoObject.CreateConnectors > ${this.GetConfigName()}`);
-/*
-    if (m_pResourceManager == NULL) {
-    MODebug2->Error("moMoldeoObject::CreateConnectors > ResourceManager is NULL!!! Can't continue. Sorry for object: "
-    +GetName()+ " config: " + GetConfigName() + " label:"+GetLabelName() );
-    return false;
-  }
-*/
-  if (this.m_bConnectorsLoaded) {
-    this.MODebug2.Error("moMoldeoObject::CreateConnectors > Calling twice."
-      + " Can't continue. Sorry for object: "
-      + this.GetName()
-      + " config: " + this.GetConfigName() + " label:" + this.GetLabelName());
-    return false;
-  }
-/*
-  MODebug2->Message("moMoldeoObject::CreateConnectors > Calling once. object: "
-  +GetName()+ " config: " + GetConfigName() + " label:" + GetLabelName() );
-*/
-
-	///crea los Inlets adicionales a los parámetros: definidos en el parámetro "inlet"
-
-  var pinlets : moParam = this.m_Config.GetParam("inlet");
-
-  for (let i = 0; i < pinlets.GetValuesCount(); i++) {
-    let InletName = pinlets.GetValue(i).GetSubValue(MO_INLET_NAME).Text();
-    let InletType = pinlets.GetValue(i).GetSubValue(MO_INLET_TYPE).Text();
-    if ( this.GetInletIndex( InletName )==-1 ) {
-      var Inlet : moInlet = new moInlet();
-      if (Inlet) {
-        Inlet.SetMoldeoLabelName( this.GetLabelName() );
-        ///lo creamos si y solo si no existe como parámetro....
-        if (this.m_Config.GetParamIndex(InletName) == -1) {
-          Inlet.Init( InletName, this.m_Inlets.length, ""+InletType );
-          this.m_Inlets.push( Inlet );
-        }
+    /*
+        if (m_pResourceManager == NULL) {
+        MODebug2->Error("moMoldeoObject::CreateConnectors > ResourceManager is NULL!!! Can't continue. Sorry for object: "
+        +GetName()+ " config: " + GetConfigName() + " label:"+GetLabelName() );
+        return false;
       }
-    }
-	}
-
-	///Inicializa las funciones matemáticas del config
-	///así como los inlets y outlets por cada parámetro
-	///así como las texturas
-	for( var p=0;p<this.m_Config.GetParamsCount();p++) {
-
-    var param: moParam = this.m_Config.GetParam(p);
-/*
-		this.MODebug2.Log( moText("moMoldeoObject::CreateConnectors > Init param type ")
-    + param.GetParamDefinition().GetTypeStr() + moText(" name: ")
-    + param.GetParamDefinition().GetName() );
-*/
-    ///CREAMOS UN INLET POR CADA PARAMETRO
-    var inletidx : MOint = this.GetInletIndex(param.GetParamDefinition().GetName());
-    if (inletidx==-1) {
-      var Inlet : moInlet = new moInlet();
-      if (Inlet) {
-        var iname = param.GetParamDefinition().GetName();
-        Inlet.Init( iname, this.m_Inlets.length, param );
-        this.m_Inlets.push(Inlet);
-        this.m_InletsStr[""+iname] = Inlet;
-      }
-    }
-
-		for( var v=0;v<param.GetValuesCount();v++) {
-      this.ResolveValue( param, v );
-
-		}
-	}
-/*
-  MODebug2->Message("moMoldeoObject::CreateConnectors > loaded params & values for Object: "
-  + GetName() + " config:" + GetConfigName() + " label:" + GetLabelName() );
-*/
-    /** VERIFICAR ESTO!!!!*/
-    /**
-    Solo se crean los outlets declarados en el xml.
     */
-/*
-    /// Crea aquellos Outlets definidos dentro del parámetro "outlet"
-    /// y conecta aquellos nombrados que ya existen como parámetros de este config
-	moParam& poutlets = m_Config[moText("outlet")];
+    if (this.m_bConnectorsLoaded) {
+      this.MODebug2.Error("moMoldeoObject::CreateConnectors > Calling twice."
+        + " Can't continue. Sorry for object: "
+        + this.GetName()
+        + " config: " + this.GetConfigName() + " label:" + this.GetLabelName());
+      return false;
+    }
+    /*
+      MODebug2->Message("moMoldeoObject::CreateConnectors > Calling once. object: "
+      +GetName()+ " config: " + GetConfigName() + " label:" + GetLabelName() );
+    */
 
-	for( MOuint i=0; i<poutlets.GetValuesCount(); i++ ) {
-    if ( GetOutletIndex(poutlets[i][MO_OUTLET_NAME].Text())==-1 ) {
-      moOutlet* Outlet = new moOutlet();
-      if (Outlet) {
-        Outlet->SetMoldeoLabelName( GetLabelName() );
-        ///Buscamos el parametro asociado al outlet
-        ///para asociar un parametro a un outlet debe simplemente tener el mismo nombre...
-        moText OutletName = poutlets[i][MO_OUTLET_NAME].Text();
+  	///crea los Inlets adicionales a los parámetros: definidos en el parámetro "inlet"
 
-        if ( m_Config.GetParamIndex(OutletName) > -1 ) {
-          ///CREAMOS UN OUTLET nuevo para este parametro....
-          MODebug2->Log( moText("moMoldeoObject::CreateConnectors > ")
-          + this->GetLabelName() + moText(" creating Outlet as parameter \"") + OutletName + "\""  );
-          Outlet->Init( OutletName, i, m_Config.GetParam(OutletName).GetPtr());
-        } else {
-          ///CREAMOS UN OUTLET desde el .cfg, teniendo en cuenta los tipos...
-          MODebug2->Log( moText("moMoldeoObject::CreateConnectors > ")
-          + this->GetLabelName() + moText(" Init > creating outlet not as param.") + OutletName  );
-          Outlet->Init( OutletName, i, poutlets[i][MO_OUTLET_TYPE].Text() );
-        }
-        m_Outlets.Add( Outlet );
+    var pinlets : moParam = this.m_Config.GetParam("inlet");
 
-        /// Creamos sus conecciones
-        /// las conecciones viene de a pares: object label name + object inlet name
-        for( MOuint j=MO_OUTLET_INLETS_OFFSET; j<poutlets[i].GetSubValueCount(); j+=2 ) {
-          moText objectname = poutlets[i][j].Text();
-          moText inletname = poutlets[i][j+1].Text();
-          moConnection* Connection = new moConnection( objectname, inletname );
-          if (Connection)
-            Outlet->GetConnections()->Add(Connection);
+    for (let i = 0; i < pinlets.GetValuesCount(); i++) {
+      let InletName = pinlets.GetValue(i).GetSubValue(MO_INLET_NAME).Text();
+      let InletType = pinlets.GetValue(i).GetSubValue(MO_INLET_TYPE).Text();
+      if ( this.GetInletIndex( InletName )==-1 ) {
+        var Inlet : moInlet = new moInlet();
+        if (Inlet) {
+          Inlet.SetMoldeoLabelName( this.GetLabelName() );
+          ///lo creamos si y solo si no existe como parámetro....
+          if (this.m_Config.GetParamIndex(InletName) == -1) {
+            Inlet.Init( InletName, this.m_Inlets.length, ""+InletType );
+            this.m_Inlets.push( Inlet );
+          }
         }
       }
-    }
-	}
-*/
-  this.m_bConnectorsLoaded = true;
+  	}
 
-  ///Una vez establecidos los conectores, podemos inicializar el script a su vez....
-	//moMoldeoObject::ScriptExeInit();
-	this.ScriptExeInit();
-/*
-  MODebug2->Message("moMoldeoObject::CreateConnectors > OK! Object: "
-  + GetName() + " config:" + GetConfigName() + " label: " + GetLabelName() );
+  	///Inicializa las funciones matemáticas del config
+  	///así como los inlets y outlets por cada parámetro
+  	///así como las texturas
+  	for( var p=0;p<this.m_Config.GetParamsCount();p++) {
 
-  */
+      var param: moParam = this.m_Config.GetParam(p);
+      /*
+      		this.MODebug2.Log( moText("moMoldeoObject::CreateConnectors > Init param type ")
+          + param.GetParamDefinition().GetTypeStr() + moText(" name: ")
+          + param.GetParamDefinition().GetName() );
+      */
+      ///CREAMOS UN INLET POR CADA PARAMETRO
+      var inletidx : MOint = this.GetInletIndex(param.GetParamDefinition().GetName());
+      if (inletidx==-1) {
+        var Inlet : moInlet = new moInlet();
+        if (Inlet) {
+          var iname = param.GetParamDefinition().GetName();
+          Inlet.Init( iname, this.m_Inlets.length, param );
+          this.m_Inlets.push(Inlet);
+          this.m_InletsStr[""+iname] = Inlet;
+        }
+      }
+
+  		for( var v=0;v<param.GetValuesCount();v++) {
+        this.ResolveValue( param, v );
+
+  		}
+  	}
+    /*
+      MODebug2->Message("moMoldeoObject::CreateConnectors > loaded params & values for Object: "
+      + GetName() + " config:" + GetConfigName() + " label:" + GetLabelName() );
+    */
+        /** VERIFICAR ESTO!!!!*/
+        /**
+        Solo se crean los outlets declarados en el xml.
+        */
+    /*
+        /// Crea aquellos Outlets definidos dentro del parámetro "outlet"
+        /// y conecta aquellos nombrados que ya existen como parámetros de este config
+    	moParam& poutlets = m_Config[moText("outlet")];
+
+    	for( MOuint i=0; i<poutlets.GetValuesCount(); i++ ) {
+        if ( GetOutletIndex(poutlets[i][MO_OUTLET_NAME].Text())==-1 ) {
+          moOutlet* Outlet = new moOutlet();
+          if (Outlet) {
+            Outlet->SetMoldeoLabelName( GetLabelName() );
+            ///Buscamos el parametro asociado al outlet
+            ///para asociar un parametro a un outlet debe simplemente tener el mismo nombre...
+            moText OutletName = poutlets[i][MO_OUTLET_NAME].Text();
+
+            if ( m_Config.GetParamIndex(OutletName) > -1 ) {
+              ///CREAMOS UN OUTLET nuevo para este parametro....
+              MODebug2->Log( moText("moMoldeoObject::CreateConnectors > ")
+              + this->GetLabelName() + moText(" creating Outlet as parameter \"") + OutletName + "\""  );
+              Outlet->Init( OutletName, i, m_Config.GetParam(OutletName).GetPtr());
+            } else {
+              ///CREAMOS UN OUTLET desde el .cfg, teniendo en cuenta los tipos...
+              MODebug2->Log( moText("moMoldeoObject::CreateConnectors > ")
+              + this->GetLabelName() + moText(" Init > creating outlet not as param.") + OutletName  );
+              Outlet->Init( OutletName, i, poutlets[i][MO_OUTLET_TYPE].Text() );
+            }
+            m_Outlets.Add( Outlet );
+
+            /// Creamos sus conecciones
+            /// las conecciones viene de a pares: object label name + object inlet name
+            for( MOuint j=MO_OUTLET_INLETS_OFFSET; j<poutlets[i].GetSubValueCount(); j+=2 ) {
+              moText objectname = poutlets[i][j].Text();
+              moText inletname = poutlets[i][j+1].Text();
+              moConnection* Connection = new moConnection( objectname, inletname );
+              if (Connection)
+                Outlet->GetConnections()->Add(Connection);
+            }
+          }
+        }
+    	}
+    */
+    this.m_bConnectorsLoaded = true;
+
+    ///Una vez establecidos los conectores, podemos inicializar el script a su vez....
+  	//moMoldeoObject::ScriptExeInit();
+  	this.ScriptExeInit();
+    /*
+    MODebug2->Message("moMoldeoObject::CreateConnectors > OK! Object: "
+    + GetName() + " config:" + GetConfigName() + " label: " + GetLabelName() );
+
+    */
   	return this.m_bConnectorsLoaded;
   }
 
@@ -554,11 +580,19 @@ export class moMoldeoObject extends moScript {
     if (this.InletScreenWidth) {
       if (this.InletScreenWidth.GetData())
           this.InletScreenWidth.GetData().SetDouble( this.m_pResourceManager.GetRenderMan().ScreenWidth());
+      this.screen_width = this.InletScreenWidth.GetData().Double();
     }
 
     if (this.InletScreenHeight) {
       if (this.InletScreenHeight.GetData())
         this.InletScreenHeight.GetData().SetDouble( this.m_pResourceManager.GetRenderMan().ScreenHeight());
+      this.screen_height = this.InletScreenHeight.GetData().Double();
+    }
+
+    if (this.InletScreenProportion) {
+      if (this.InletScreenProportion.GetData())
+        this.InletScreenProportion.GetData().SetDouble( this.m_pResourceManager.GetRenderMan().ScreenProportion());
+      this.screen_proportion = this.InletScreenProportion.GetData().Double();
     }
 
     if (this.InletTimeabs) {
@@ -572,111 +606,111 @@ export class moMoldeoObject extends moScript {
     }
 
 
-/*
-	moEvent *actual,*tmp;
-	moMessage *pmessage;
+    /**
+    	moEvent *actual,*tmp;
+    	moMessage *pmessage;
 
-	actual = p_EventList->First;
+    	actual = p_EventList->First;
 
-	///Procesamos los eventos recibidos
-	/// de los MoldeoObject Outlets
-	while(actual!=NULL) {
-		tmp = actual->next;
-		///procesamos aquellos Outlet q estan dirigidos a este objeto
+    	///Procesamos los eventos recibidos
+    	/// de los MoldeoObject Outlets
+    	while(actual!=NULL) {
+    		tmp = actual->next;
+    		///procesamos aquellos Outlet q estan dirigidos a este objeto
 
-		if (actual->deviceid == GetId() && actual->reservedvalue3 == MO_MESSAGE) {
+    		if (actual->deviceid == GetId() && actual->reservedvalue3 == MO_MESSAGE) {
 
-			///pSample = (moVideoSample*)actual->pointer;
-			pmessage = (moMessage*)actual;
+    			///pSample = (moVideoSample*)actual->pointer;
+    			pmessage = (moMessage*)actual;
 
-			///process message:
-			MOint inletid = pmessage->m_InletIdDest;
-			moData pdata = pmessage->m_Data;
-      //MODebug2->Message("Receiving outlet message to inlet: ");
-			///buscar el inlet...
-			if (inletid>=0 && inletid<(int)m_Inlets.Count() ) {
-				moInlet* pinlet = m_Inlets[inletid];
-        //MODebug2->Message("Updating inlet: object: " + GetLabelName() + " inlet: " + pinlet->GetConnectorLabelName()
-        //                  + " outlet_data: " + pdata.ToText() );
+    			///process message:
+    			MOint inletid = pmessage->m_InletIdDest;
+    			moData pdata = pmessage->m_Data;
+          //MODebug2->Message("Receiving outlet message to inlet: ");
+    			///buscar el inlet...
+    			if (inletid>=0 && inletid<(int)m_Inlets.Count() ) {
+    				moInlet* pinlet = m_Inlets[inletid];
+            //MODebug2->Message("Updating inlet: object: " + GetLabelName() + " inlet: " + pinlet->GetConnectorLabelName()
+            //                  + " outlet_data: " + pdata.ToText() );
 
-				///Only create Data if this is a custom Inlet
-				if (pinlet->GetData()==NULL)
-          pinlet->NewData();
+    				///Only create Data if this is a custom Inlet
+    				if (pinlet->GetData()==NULL)
+              pinlet->NewData();
 
-        ///si tiene un dato (por ejemplo es el dato referencia de un moParam)
-        /// copia directamente (ya que se refleja directamente en: pinlet->m_pParam->Data
-        /// sin embargo al estar interpolado
-				if (pinlet->GetConnectorLabelName()=="control_roll_angle") pinlet->GetInternalData()->Copy(pdata);
-				else if (pinlet->IsParameterDependent()) pinlet->GetInternalData()->Copy(pdata);
-				else pinlet->GetData()->Copy(pdata);
-
-
-				pinlet->Update();///notifica al inlet que ya esta actualizado...
-
-        //MODebug2->Message("Updating inlet: object: " + GetLabelName() + " inlet: " + pinlet->GetConnectorLabelName()
-        //                  + " outlet_data: " + pinlet->GetData()->ToText() );
-
-			}
-
-		} else if (actual->reservedvalue3 == MO_MESSAGE) {
-		    ///Broadcasting: borra su propio mensaje....
-
-			pmessage = (moMessage*)actual;
-
-			///se fija si es un mensaje generado por este objeto
-			if (pmessage->m_MoldeoIdSrc == GetId() ) {
-				p_EventList->Delete(pmessage);
-			}
-
-		}
-		///pasamos al siguiente
-		actual = tmp;
-	}
-*/
-/*
-	///generamos los mensajes emergentes de los Outlets
-	for( MOuint i=0; i<m_Outlets.Count() ; i++) {
-		moOutlet* poutlet = m_Outlets[i];
-
-    if (poutlet) {
+            ///si tiene un dato (por ejemplo es el dato referencia de un moParam)
+            /// copia directamente (ya que se refleja directamente en: pinlet->m_pParam->Data
+            /// sin embargo al estar interpolado
+    				if (pinlet->GetConnectorLabelName()=="control_roll_angle") pinlet->GetInternalData()->Copy(pdata);
+    				else if (pinlet->IsParameterDependent()) pinlet->GetInternalData()->Copy(pdata);
+    				else pinlet->GetData()->Copy(pdata);
 
 
-      bool forcingParameterEmition = false;
-      if (  poutlet->IsParameterDependent()
-            &&
-            poutlet->GetConnections()->Count()>0) {
-          ///TODO: chequear encadenamiento
-          /// ( outlet (object2) >> inlet (thisobject) (translatex)
-          /// outlet (thisobject) (translatex) >> inlet (object3)
-          forcingParameterEmition = true;
-      }
+    				pinlet->Update();///notifica al inlet que ya esta actualizado...
 
-      ///Emit the internal Outlet's data
-      if ( poutlet->Updated() || forcingParameterEmition ) {
-        ///solo notificamos a los inlets si los outlets estan Updated() importante revisar esto...
-        ///puede  deba ser algo condicional: claramente lo es, sobre todo para los Outlets que asociados a
-        ///parámetros, por ejemplo el alpha.. o el translatex
+            //MODebug2->Message("Updating inlet: object: " + GetLabelName() + " inlet: " + pinlet->GetConnectorLabelName()
+            //                  + " outlet_data: " + pinlet->GetData()->ToText() );
 
-        //MODebug2->Message( poutlet->GetConnectorLabelName() + moText(" outlet updated. MOB : ") + this->GetLabelName() );
+    			}
 
-        moData pdata = (*(poutlet->GetData()));
-        moConnections* pconnections = poutlet->GetConnections();
-        for(MOuint j=0; j<pconnections->Count(); j++) {
-          moConnection* pconnection = pconnections->Get(j);
-          pmessage = new moMessage( pconnection->GetDestinationMoldeoId(),
-                                    pconnection->GetDestinationConnectorId(),
-                                    GetId(),
-                                    pdata );
-          p_EventList->Add( (moEvent*) pmessage );
-          //if (pmessage) delete pmessage;
-          //MODebug2->Message(moText("added outlet message for:") + IntToStr(pconnection->GetDestinationMoldeoId())  );
+    		} else if (actual->reservedvalue3 == MO_MESSAGE) {
+    		    ///Broadcasting: borra su propio mensaje....
+
+    			pmessage = (moMessage*)actual;
+
+    			///se fija si es un mensaje generado por este objeto
+    			if (pmessage->m_MoldeoIdSrc == GetId() ) {
+    				p_EventList->Delete(pmessage);
+    			}
+
+    		}
+    		///pasamos al siguiente
+    		actual = tmp;
+    	}
+    */
+    /**
+    	///generamos los mensajes emergentes de los Outlets
+    	for( MOuint i=0; i<m_Outlets.Count() ; i++) {
+    		moOutlet* poutlet = m_Outlets[i];
+
+        if (poutlet) {
+
+
+          bool forcingParameterEmition = false;
+          if (  poutlet->IsParameterDependent()
+                &&
+                poutlet->GetConnections()->Count()>0) {
+              ///TODO: chequear encadenamiento
+              /// ( outlet (object2) >> inlet (thisobject) (translatex)
+              /// outlet (thisobject) (translatex) >> inlet (object3)
+              forcingParameterEmition = true;
+          }
+
+          ///Emit the internal Outlet's data
+          if ( poutlet->Updated() || forcingParameterEmition ) {
+            ///solo notificamos a los inlets si los outlets estan Updated() importante revisar esto...
+            ///puede  deba ser algo condicional: claramente lo es, sobre todo para los Outlets que asociados a
+            ///parámetros, por ejemplo el alpha.. o el translatex
+
+            //MODebug2->Message( poutlet->GetConnectorLabelName() + moText(" outlet updated. MOB : ") + this->GetLabelName() );
+
+            moData pdata = (*(poutlet->GetData()));
+            moConnections* pconnections = poutlet->GetConnections();
+            for(MOuint j=0; j<pconnections->Count(); j++) {
+              moConnection* pconnection = pconnections->Get(j);
+              pmessage = new moMessage( pconnection->GetDestinationMoldeoId(),
+                                        pconnection->GetDestinationConnectorId(),
+                                        GetId(),
+                                        pdata );
+              p_EventList->Add( (moEvent*) pmessage );
+              //if (pmessage) delete pmessage;
+              //MODebug2->Message(moText("added outlet message for:") + IntToStr(pconnection->GetDestinationMoldeoId())  );
+            }
+            ///reset to update false, so it doesnt continue sending!
+            poutlet->Update(false);
+          }
         }
-        ///reset to update false, so it doesnt continue sending!
-        poutlet->Update(false);
-      }
-    }
-  }*/
-  this.ScriptExeUpdate();
+      }*/
+    this.ScriptExeUpdate();
 
   }
 
@@ -971,6 +1005,17 @@ export class moMoldeoObject extends moScript {
 
   GetInlets(): moInlets {
     return this.m_Inlets;
+  }
+
+  AddInlet( name : string, type : any ) : moInlet {
+    var newInlet : moInlet = new moInlet();
+    if (newInlet) {
+      newInlet.Init( name, this.m_Inlets.length, type );
+      this.m_Inlets.push(newInlet);
+      this.m_InletsStr[name] = newInlet;
+      return this.m_InletsStr[name];
+    }
+    return null;
   }
 
   GetOutlets(): moOutlets {

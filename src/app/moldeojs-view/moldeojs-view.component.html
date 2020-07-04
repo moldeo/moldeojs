@@ -1,8 +1,20 @@
-<div style="display: block; position: absolute; float: left; font-size: 13px; color: #CCC;font-weight: bolder;">
-  {{message}} - mol: {{mol}}
+<div id="moldeomessage" #moldeomessage>
+  <span>{{message}} - mol: {{mol}}</span>
+</div>
+
+<div id="overlayer" [innerHTML]="overlayerhtml" #overlayer>
+  <span>{{overlayer}}</span>
+</div>
+
+  <div id="moldeobuttons" #moldeobuttons class="btn-group moldeo_control" role="group" aria-label="..." style="position: fixed; display: none; right: 60px; top: 10px; z-index: 10000;">
+    <button type="button" class="btn btn-default" (click)="stop();"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span></button>
+    <button type="button" class="btn btn-default" (click)="play();"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
+    <button type="button" class="btn btn-default" (click)="fullscreen();"><span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span></button>
+    <!--button type="button" class="btn btn-default" (click)="pause();"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span></button-->
+    <button type="button" id="audioonoff" class="btn btn-default hidden" (click)="audioonoff();"><span #audioonoff_ico class="glyphicon glyphicon-volume-off" aria-hidden="true"></span></button>
   </div>
 
   <div id="webview_contenidos" #webview_contenidos class="contenido_over_hide">
-    <div id="webview_titulo" #webview_titulo class="titulo">{{mititulo}}</div>
+    <div id="webview_titulo" #webview_titulo class="titulo">SONIDO VISTO {{mititulo}}</div>
     <div id="webview_descripcion" #webview_descripcion class="descripcion">{{midescripcion}}</div>
   </div>

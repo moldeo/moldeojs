@@ -253,6 +253,10 @@ export class moMathVariableFactory extends moAbstract
                 self.CreateNewVariable( node.name );
               }
               break
+            case 'ParenthesisNode':
+              //console.log(path,node.type, node.fn);
+              self.CreateVariables(node);
+              break
             default:
               console.log(node.type)
           }
@@ -621,10 +625,12 @@ export class moMathManager extends moResource {
 
   m_functions : moMathFunctionArray = [];
   m_functions_str: any = {};
-
+  math : any;
+  
   constructor() {
     super();
     this.SetName("_mathmanager_");
+    this.math = math;
   }
 
   GetFunction( p_idx : MOint ) : moMathFunction {

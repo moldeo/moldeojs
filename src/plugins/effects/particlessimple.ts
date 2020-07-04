@@ -693,6 +693,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
     }
 
     Init(callback?:any): boolean {
+
       this.RM = this.m_pResourceManager.GetRenderMan();
       this.GL = this.m_pResourceManager.GetGLMan();
 
@@ -2046,7 +2047,7 @@ export class moEffectParticlesSimple extends MO.moEffect {
                         //this.m_Config[moR(PARTICLES_TEXTURE)].GetData()->GetGLId(&m_EffectState.tempo, 1, NULL );
                         if (pTexBuf) {
                             var nim = pTexBuf.GetImagesProcessed();
-                            console.log( "nim: ", nim);
+                            //console.log( "nim: ", nim);
                             if (pPar.Material == undefined) {
                               pPar.Material = new MO.moMaterialBasic({
                                 color: 0xffffff,
@@ -3196,6 +3197,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
       this.Scene.add(this.GroupedParticles);
     } else {
       this.GroupedParticles.SetModelMatrix(this.Model);
+      //this.Scene.SetModelMatrix(this.Model);
     }
 
 /* TODO: add guidelines / axes ?
@@ -3213,7 +3215,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 */
 
     ///CAMERA PERSPECTIVE
-    if (this.Camera == undefined) {
+    if (this.Camera == undefined || this.RM.m_bUpdated) {
       //this.Camera = new MO.moCamera3D();
       this.Camera = new THREE.PerspectiveCamera(60, this.RM.ScreenProportion(), 0.01, 1000.0);
       var lookat: moVector3f = new moVector3f();
@@ -3244,19 +3246,37 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
       if (this.raycaster == undefined)
         this.raycaster = new THREE.Raycaster();
 
+      //console.log("raycasting");
+
       this.raycaster.setFromCamera({ x: this.mouse.x, y: this.mouse.y }, this.Camera);
       this.intersects = this.raycaster.intersectObjects(this.Scene.children, true /*recursive*/);
       if (this.intersects.length) {
-        //for (var i = 0; i < this.intersects.length; i++) {
-          var i = 0;
-          this.intersects[i].object.material.color = new THREE.Color(2.0, 2.0, 2.0);
+        for (var i = 0; i < this.intersects.length; i++) {
+          //var i = 0;
+          //this.intersects[i].object.material.color = new THREE.Color(2.0, 2.0, 2.0);
           //this.intersects[i].object["userData"]["selected"] = true;
-          if (this.intersects[i].object["userData"]["Particle"])
+          //this.intersects[i].object.material.color = new THREE.Color(2.0, 2.0, 2.0);
+          //console.log(this.intersects[i].object,this.intersects[i].object["userData"]);
+          if (this.intersects[i].object["userData"]["Particle"]) {
+            this.intersects[i].object.material.color = new THREE.Color(2.0, 2.0, 2.0);
             this.intersects[i].object["userData"]["Particle"]["selected"] = true;
-        //}
+          }
+        }
       }
       //if (this.intersects.length)
         //console.log("this.intersects[i].object:", this.intersects.length, this.intersects);
+    }
+
+    //super.ScriptExeDraw();
+    if (this.IsInitialized()) {
+        if (this.ScriptHasFunction("Draw")) {
+            this.SelectScriptFunction("Draw");
+            //this.AddFunctionParam( i + j*this.m_cols);
+            //this.AddFunctionParam( this.dt );
+            if (!this.RunSelectedFunction(1)) {
+                //this.MODebug2.Error( moText("RunParticle function not executed") );
+            }
+        }
     }
 
     ///RENDERING
@@ -3271,12 +3291,14 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 
     if (p_Event.m_Array.length > 0) {
       var mevent = p_Event.m_Array[0];
-      if (mevent["type"] == "mousedown" /*|| mevent["type"] == "mousemove"*/) {
+      if (mevent.jsevent["type"] == "mousedown"
+    || mevent.jsevent["type"] == "touchend" /*|| mevent["type"] == "mousemove"*/) {
         this.mouse = new THREE.Vector2();
-        this.mouse.x = mevent["clientX"]*2-1.0;
-        this.mouse.y = -1*mevent["clientY"]*2+1.0;
+        this.mouse.x = mevent.jsevent["clientX"]*2-1.0;
+        this.mouse.y = -1*mevent.jsevent["clientY"]*2+1.0;
+        console.log("moParticlesSimple.Update() > ", this.mouse, mevent );
       }
-      //console.log("moParticlesSimple.Update() > ", this.mouse );
+
     } else {
       this.mouse = null;
     }

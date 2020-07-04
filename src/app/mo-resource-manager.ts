@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 
 import { MOlong } from "./mo-types";
 import { moText } from "./mo-text";
+import { moNewResource } from "./mo-plugin";
 import { moAbstract } from "./mo-abstract";
 import { moMoldeoObject } from "./mo-moldeo-object";
 import { moConfig } from "./mo-config";
@@ -213,6 +214,10 @@ export class moResourceManager extends moAbstract {
 
     GetResource( index : number ) : moResource {
       return this.m_Resources[index];
+    }
+
+    AddResource( Resource : moResource ) {
+      this.m_Resources.push(Resource);
     }
 
 }

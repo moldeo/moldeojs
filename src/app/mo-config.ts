@@ -236,9 +236,15 @@ export class moConfig extends moAbstract {
     if ( configtext && typeof configtext == "string" ) {
         //console.log("moConfig::LoadConfig > Full text", configname);
         //parse XML:
-        var result : any = xmljs.xml2js( configtext, {alwaysArray: true,compact: true,ignoreComment: true, alwaysChildren: false});
+        var result : any;
+        try {
+         result = xmljs.xml2js( configtext, {alwaysArray: true,compact: true,ignoreComment: true, alwaysChildren: false});
+       } catch (exc) {
+         console.error(exc);
+       }
+
         //{compact: true, spaces: 4}
-        console.log( "xmljs",result );
+        //console.log( "xmljs",result );
         var attr_sym = "_attributes";
         var xml_text_value = "_text";
 
@@ -359,7 +365,7 @@ export class moConfig extends moAbstract {
         this.m_ConfigLoaded = true;
         if (callback) callback(MO_CONFIG_OK);
 
-        return MO_CONFIG_OK;      
+        return MO_CONFIG_OK;
     }
     this.m_ConfigLoaded = false;
     return MO_CONFIGFILE_NOT_FOUND;

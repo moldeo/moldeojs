@@ -54,7 +54,7 @@ export class moEffectCamera extends MO.moEffect {
   }
 
   InitDevice( camera : MO.moText ) : void {
-    console.log("InitDevice",camera);
+    //console.log("moCamera:InitDevice",camera);
     if (this.CheckIfDeviceNameExists(camera)) {
       this.m_DeviceName = camera;
       this.m_pCamera = this.VMan.GetCameraByName( this.m_DeviceName, true /*CREATE!!!*/, this.m_CaptureDevice );
@@ -66,7 +66,7 @@ export class moEffectCamera extends MO.moEffect {
 
   CheckIfDeviceNameExists( camera : MO.moText ) : boolean {
     var c:number = 0;
-    console.log("CheckIfDeviceNameExists",camera);
+    //console.log("CheckIfDeviceNameExists",camera);
 
     var CapDevs : MO.moCaptureDevices = this.VMan.GetCaptureDevices(true);
 
@@ -75,7 +75,7 @@ export class moEffectCamera extends MO.moEffect {
       if (Cam) {
         if (Cam.GetCaptureDevice().GetName()==camera
       || Cam.GetCaptureDevice().GetLabelName()==camera ) {
-          console.log("CheckIfDeviceNameExists: founded",camera);
+          //console.log("CheckIfDeviceNameExists: founded",camera);
           return true;
         }
       }
@@ -103,6 +103,8 @@ export class moEffectCamera extends MO.moEffect {
     this.BeginDraw( p_tempo, p_parentstate );
 
     if (this.RM == undefined) return;
+
+    var size_updated : boolean = this.RM.m_bUpdated;
 
     var rgb: any = this.m_Config.EvalColor("color");
     var ccolor: MO.moColor = new MO.moColor( rgb.r, rgb.g, rgb.b);
@@ -136,7 +138,7 @@ export class moEffectCamera extends MO.moEffect {
     //Mat2.m_vLight.Normalize();
 
     ///MESH GEOMETRY
-    if (this.Plane == undefined) {
+    if (this.Plane == undefined || size_updated) {
       this.Plane = new MO.moPlaneGeometry( 1.0, 1.0/this.RM.Proportion(), 1, 1 );
     }
 
@@ -158,14 +160,14 @@ export class moEffectCamera extends MO.moEffect {
           0.0);
     }
 
-    if (this.Mesh==undefined) {
+    if (this.Mesh==undefined || size_updated) {
       this.Mesh = new MO.moMesh( this.Plane, this.Mat );
     }
     if (this.Mesh && this.Model) {
       this.Mesh.SetModelMatrix(this.Model);
     }
 
-    if (this.Scene==undefined) {
+    if (this.Scene==undefined || size_updated) {
       this.Scene = new MO.moSceneNode();
       this.Scene.add(this.Mesh);
     }
@@ -200,7 +202,7 @@ export class moEffectCamera extends MO.moEffect {
   }
 
   GetDefinition(): MO.moConfigDefinition {
-    console.log("moEffectCamera.GetDefinition Erase");
+    //console.log("moEffectCamera.GetDefinition Erase");
     super.GetDefinition();
 
     return this.m_Config.GetConfigDefinition();

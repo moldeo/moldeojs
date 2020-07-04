@@ -10,7 +10,33 @@
   background-color: rgba(255,255,255,0.2);
 }
 
+#overlayer {
+  display: none;
+  width: 80%;
+  left: 10%;
+  border: solid 1px #100;
+  padding: 15px;
+  top: 10%;
+  font-family: Arial;
+  position: absolute;
+  float: left;
+  letter-spacing: 0.1em;
+  font-size: 14px;
+  line-height:20px;
+  color: #F00;
+  font-weight: normal;
+  text-align: left;
+  z-index: 0;
+}
 
+#moldeomessage {
+  display: none;
+  position: absolute;
+  float: left;
+  font-size: 13px;
+  color: #CCC;
+  font-weight: bolder;
+}
 
 .contenido_over {
   color: #FFFFFF;
@@ -63,4 +89,14 @@
 .descripcion p {
   margin: 0px !important;
   padding: 0px !important;
+}
+
+.moldeo_control button {
+  padding-right: 5px;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  background-color: rgba(0,0,0,0.0) !important;
+  color: #FFFFFF !important;
+  border: 0px solid #000000 !important;
 }
