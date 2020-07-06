@@ -1,0 +1,41 @@
+<div class="moContainer" #moObj [ngDraggable]="drag" draggable="true" (dragstart)="toggle=false;">
+  <div class="moInlet" (mousedown)="drag=false;">
+  </div>
+  <div class="moObject" (dblclick)="showSet();">
+    <img *ngIf="texturePath" [src]="texturePath" style="border-left:2px solid #fff;border-bottom:2px solid #fff;" [style.border-color]="colorPath" [style.background-color]="colorPath">
+    <b *ngIf="!texturePath" [style.background-color]="colorPath"></b>
+    <p>{{motype}}</p>
+  </div>
+  <div class="moOutlet" (mousedown)="drag=false;con.dataOut($event, moObj, moPrecon, moConnect, '12aced');">
+  </div>
+</div>
+
+<div #moSettings class="moObjOpen moOpenAni" [hidden]="!toggle">
+  <div class="moOptionsObject">
+    <a class="moCopyButton"></a>
+    <a class="moTrashButton" (click)="removeMOObject()"></a>
+  </div>
+  <img *ngIf="texturePath" [src]="texturePath" style="border:2px solid #fff" [style.border-color]="colorPath">
+  <b *ngIf="!texturePath" [style.background-color]="colorPath"></b>
+  <h4>{{type}}<br><span>{{name}}</span></h4>
+</div>
+
+<div #moParams class="moParams" [hidden]="!toggle">
+  <h2 class="moParamsContent">{{type}}</h2>
+  <input id="moObjectName" class="moParamsContent" type="text" value="{{name}}" (keyup)="changeName($event)">
+  <input id="moObjectKey" class="moParamsContent" type="text" value="{{key}}" (keyup)="changeKey($event)" maxlength="1">
+  <ul class="moParamsContent">
+    <li *ngFor="let i of params" class="moParamsContent" (click)="selParam(i)">
+      {{i[0]}}
+    </li>
+  </ul>
+  <h3 class="moParamsContent">{{paramSelect[0]}}</h3>
+  <div #moCurrentParams class="moParamsContent" *ngIf="showParams">
+    <input *ngFor="let i of paramSelect[1]" type="text" class="moParamsContent" value="{{i}}" (keyup)="getNewParam($event)">
+  </div>
+</div>
+
+<svg #moPrecon id="moPrecon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">
+</svg>
+<svg #moConnect id="moConnect" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">
+</svg>

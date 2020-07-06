@@ -100,3 +100,10 @@
   color: #FFFFFF !important;
   border: 0px solid #000000 !important;
 }
+
+#moldeojsview canvas {
+  left: 0px !important;
+  top: 0px !important;
+  position: fixed !important;
+  display: block !important;
+}

@@ -14,6 +14,20 @@ import { AlertModule } from 'ngx-bootstrap';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
+import { MoldeojsInterfaceComponent } from './moldeojs-interface/moldeojs-interface.component';
+//Moldeo Components
+import { MoDefaultComponent } from './moldeojs-interface/mo-objects/mo-default/mo-default.component';
+import { MoErase } from './moldeojs-interface/mo-objects/mo-erase.component';
+import { MoIcon } from './moldeojs-interface/mo-objects/mo-icon.component';
+
+//Services
+import { ConnectionsService } from './moldeojs-interface/services/connections.service';
+import { ParamsService } from './moldeojs-interface/services/params.service';
+import { MoConfigService } from './moldeojs-interface/services/mo-config.service';
+//Directives - Pipes
+import { DraggableDirective } from './moldeojs-interface/draggable.directive';
+
+
 import { ConsoleService } from "./console.service";
 import { ViewService } from "./view.service";
 
@@ -32,7 +46,12 @@ const appRoutes: Routes = [
     AppComponent,
     ThreeviewerComponent,
     MoldeojsViewComponent,
-    PageNotFoundComponent
+    PageNotFoundComponent,
+    MoldeojsInterfaceComponent,
+    DraggableDirective,
+    MoDefaultComponent,
+    MoErase,
+    MoIcon
   ],
   imports: [
     BrowserAnimationsModule,
@@ -45,8 +64,8 @@ const appRoutes: Routes = [
     HttpClientModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [ViewService,ConsoleService, JsonService, FileAdminService ],
-  entryComponents: [MoldeojsViewComponent,PageNotFoundComponent],
+  providers: [ViewService,ConsoleService, JsonService, FileAdminService, ConnectionsService, ParamsService, MoConfigService ],
+  entryComponents: [MoldeojsViewComponent,PageNotFoundComponent,MoDefaultComponent, MoErase, MoIcon],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

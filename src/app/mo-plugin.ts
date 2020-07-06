@@ -132,6 +132,30 @@ PluginsDefinitions.push( new moPluginDefinition(
   moMoldeoObjectType.MO_OBJECT_RESOURCE,
 moResourceMl5 ) );
 
+/// IODevice NetOscIn ====================================================================
+import { moNetOscIn } from "../plugins/iodevices/netoscin";
+PluginsDefinitions.push( new moPluginDefinition(
+  "netoscin",
+  "/plugins/iodevices/netoscin.ts",
+  moMoldeoObjectType.MO_OBJECT_IODEVICE,
+moNetOscIn ) );
+
+/// IODevice NetOscOut ====================================================================
+import { moNetOscOut } from "../plugins/iodevices/netoscout";
+PluginsDefinitions.push( new moPluginDefinition(
+  "netoscout",
+  "/plugins/iodevices/netoscout.ts",
+  moMoldeoObjectType.MO_OBJECT_IODEVICE,
+moNetOscOut ) );
+
+/// IODevice NetSocketIO ====================================================================
+import { moNetSocketIO } from "../plugins/iodevices/netsocketio";
+PluginsDefinitions.push( new moPluginDefinition(
+  "netsocketio",
+  "/plugins/iodevices/netsocketio.ts",
+  moMoldeoObjectType.MO_OBJECT_IODEVICE,
+moNetSocketIO ) );
+
 
 /*
 export const PluginsTree = {

@@ -288,6 +288,8 @@ export class moFile extends moAbstract {
 			fullpath = ""+p_FileName;
 		}
 
+    fullget = fullget.replace("index.html","");
+    console.log("fullget:",fullget);
 		//console.log("fullpath before:",fullpath);
 		fullpath = fullpath.replace("./","");
 
@@ -691,6 +693,9 @@ export class moFileManager extends moResource {
 			fullget = ff;
 			fullpath = ""+p_FileName;
 		}
+
+    fullget = fullget.replace("index.html","");
+    console.log("fullget:",fullget);
 
 		//console.log("fullpath before:",fullpath);
 		fullpath = fullpath.replace("./","");

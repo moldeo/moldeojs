@@ -110,7 +110,11 @@ export class moRenderManager extends moResource {
     this.m_Renderer = new THREE.WebGLRenderer({ alpha: true, preserveDrawingBuffer: true });
     this.m_Renderer.setSize( window.innerWidth, window.innerHeight);
     this.m_Renderer.setClearColor(0xFF000000, 1);
-    this.m_Renderer.autoClear = false;
+    this.m_Renderer.autoClear = false
+    this.m_Renderer.domElement.style.position = "fixed";
+    this.m_Renderer.domElement.style.top = "0px";
+    this.m_Renderer.domElement.style.left = "0px";
+    this.m_Renderer.domElement.style.display = "block";
     //console.log("moRenderManager::constructor",  this.renderer);
     this.m_bUpdated = true;
   }

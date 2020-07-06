@@ -1,5 +1,5 @@
-<nav class="navbar navbar-default">
-    <!--div class="container-fluid">
+<nav class="navbar navbar-default" style="display: none; border:0px;left:0px;top:0px;background-color: black;">
+    <div class="container-fluid">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed"
           (click)="isCollapsed = !isCollapsed"
@@ -11,9 +11,9 @@
             <span class="icon-bar"></span>
           </button>
             <a class="navbar-brand">
-              <img src="/assets/data/icons/M@_moldeo.svg" class="logo">
+              <img src="/assets/data/icons/moldeo_logo.svg" class="logo" title="Moldeo@JS">
             </a>
-            <span class="navbar-brand">Moldeo JS</span>
+            <span class="navbar-brand"></span>
         </div>
         <div class="collapse navbar-collapse"
             (collapsed)="collapsed($event)"
@@ -41,7 +41,7 @@
               </li>
           </ul>
         </div>
-    </div-->    
+    </div>
 </nav>
 <!--
 <button type="button" class="btn btn-primary"
@@ -68,7 +68,8 @@ Button with tooltip
 <!--<app-threeviewer></app-threeviewer>-->
 <!--<moldeocontrol></moldeocontrol>-->
 <!--<ng-template #dynamic></ng-template>-->
-<moldeojs-view id="moldeojsview" [mol]="this.sample" (window:resize)="onResize($event)"></moldeojs-view>
+<moldeojs-interface id="moldeojsinterface" #moldeojsinterface [mol]="this.sample"></moldeojs-interface>
+<moldeojs-view id="moldeojsview" #moldeojsview [mol]="this.sample" (window:resize)="onResize($event)"></moldeojs-view>
 <!--router-outlet></router-outlet-->
 <!--touch-component></touch-component-->
 <!--router-outlet></router-outlet-->

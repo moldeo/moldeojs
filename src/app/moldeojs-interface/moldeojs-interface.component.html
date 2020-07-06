@@ -1,0 +1,43 @@
+<div #moCanvas id="moCanvas" (mouseenter)="moWheelDisplay=false;"></div>
+
+<div #moWheel id="moWheel" [hidden]="!moWheelDisplay">
+  <div class="circle moWheelAni"></div>
+  <div class="objectSelect selectAni">
+    <h3>PreEffects</h3>
+    <ul>
+      <li name="erase" (click)="newMOObject('erase')">Erase</li>
+      <!--li name="mirror" (click)="newMOObject()">Mirror</li>
+      <li name="mirrorg" (click)="newMOObject()">MirrorG</li>
+      <li name="mirrormorphing" (click)="newMOObject()">MirrorMorphing</li-->
+    </ul>
+    <h3>Effects</h3>
+    <ul>
+      <li name="icon" (click)="newMOObject('icon')">Icon</li>
+      <!--li name="img" (click)="newMOObject()">Image</li>
+      <li name="plane" (click)="newMOObject()">Plane</li>
+      <li name="particlessimple" (click)="newMOObject()">ParticlesSimple</li>
+      <li name="camera" (click)="newMOObject()">Camera</li-->
+    </ul>
+    <h3>PostEffects</h3>
+    <ul>
+      <!--li name="calibrationgrid" (click)="newMOObject()">CalibrationGrid</li>
+      <li name="colorfilter" (click)="newMOObject()">ColorFilter</li>
+      <li name="debug" (click)="newMOObject()">Debug</li>
+      <li name="deformationgrid" (click)="newMOObject()">DeformationGrid</li>
+      <li name="postprocess2d" (click)="newMOObject()">PostProcess2D</li>
+      <li name="videopanel" (click)="newMOObject()">VideoPanel</li>
+      <li name="videowall" (click)="newMOObject()">VideoWall</li>
+      <li name="videowallmorphing" (click)="newMOObject()">VideoWallMorphing</li-->
+    </ul>
+  </div>
+</div>
+
+<div id="moConfig" #moConfig (mouseenter)="moWheelDisplay=false;">
+</div>
+
+<header class="moHeader" (mouseenter)="moToolDisplay=false;">
+  <div class="moldeoicon"></div>
+  <div class="moldeofile">{{moFileName}}</div>
+  <button class="moldeobutton" (click)="showmoView();" type="button" name="moButton" title="Moldeojs View">moView</button>
+  <button class="moldeobutton" type="button" name="auto" title="Auto Layout" (click)="autoLayout()">auto</button>
+</header>

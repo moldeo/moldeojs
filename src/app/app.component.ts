@@ -2,6 +2,7 @@ import { OnInit, Component, TemplateRef, ViewContainerRef, Inject, ViewChild, El
 import { BsModalRef , BsModalService } from 'ngx-bootstrap/modal';
 
 import { MoldeojsViewComponent } from './moldeojs-view/moldeojs-view.component';
+import { MoldeojsInterfaceComponent } from './moldeojs-interface/moldeojs-interface.component';
 
 import { ViewService } from "./view.service";
 import * as THREE from "three";
@@ -20,9 +21,9 @@ export class AppComponent implements OnInit {
   //sample: string = "molrepos/basic/02_Plane/02_Plane.mol";
   //sample: string = "molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol";
   //sample: string = "molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.Sphere.mol";
-  sample: string = "molrepos/haro/sonidovisto/sonidovisto.mol";
   //assets/molrepos/basic/07_ParticlesSimple/images
-  sample: string = "molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsfera.mol";
+  //sample: string = "molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsfera.mol";
+  sample: string = "molrepos/moldeoorg/fabri/OscToSocketIO/OscToSocketIO.mol";
   //sample: string = "molrepos/moldeoorg/dante/pajarosdefuego/pajaros_de_fuegoX.mol";
   samples: string[] = [];
   viewservice : ViewService;
@@ -35,6 +36,7 @@ export class AppComponent implements OnInit {
 
   @ViewChild('navmenu', {static: false } ) navmenu: ElementRef;
   @ViewChild(MoldeojsViewComponent, { static: false }) moldeojsview: MoldeojsViewComponent;
+  @ViewChild(MoldeojsInterfaceComponent, { static: false }) moldeojsinterface: MoldeojsInterfaceComponent;
 /*
   @ViewChild('dynamic', {
     read: ViewContainerRef
@@ -61,8 +63,23 @@ export class AppComponent implements OnInit {
     this.elstart = document.createElement("button");
     this.elstart.setAttribute("id","btn_start");
     this.elstart.setAttribute("style","display: block; position: relative; left: 50%; top: 50%; margin-left: -50px; margin-top: -50px; border: solid 0px #BBB;width: 100px; height: 100px; color: #BBB; background-color: #000;border-radius: 50px; font-size: 14px;letter-spacing: 2px;font-weight: bold;");
-    this.elstart.innerHTML = '<img src="assets/molrepos/haro/sonidovisto/favicon_haro.png" height="48" width="48" hspace="8" vpspac="8"/><span>start</span>';
+    this.elstart.innerHTML = '<img src="assets/data/icons/favicon.png" height="48" width="48" hspace="8" vpspac="8"/><span>start</span>';
     this.divstart.appendChild( this.elstart );
+
+    var self = this;
+    this.elstart.addEventListener( 'click', function(event) {
+      console.log(event);
+      var landscapeok = window.innerWidth>=window.innerHeight;
+      try {
+      eval("/*alert('request motion click');*/ if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission == 'function') DeviceMotionEvent.requestPermission().then(response => { /*alert(response);*/"+
+              "if (response != 'granted') "+
+                "alert('requestPermission '+response+', no utilizaremos los sensores de movimiento.');"+
+           "}).catch(function(err) { /*alert(err);*/ });");
+      } catch(err) { alert(err); }
+
+      if (landscapeok) self.divstart.style.display = 'none';
+      else { alert("Rotar el teléfono a posición apaisada"); }
+    });
 
     this.progressbar = new ProgressBar.Circle('#btn_start', {
       color: 'white',

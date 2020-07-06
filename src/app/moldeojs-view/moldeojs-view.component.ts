@@ -25,7 +25,7 @@ export class MoldeojsViewComponent implements OnInit {
   overlayer: string = "texto";
   overlayerhtml: string = "a<BR/>b";
   hostElement: ElementRef;
-  rendererElement : HTMLCanvasElement;
+  rendererElement : HTMLCanvasElement;  
 
   test: number = 0;
   testmax: number = 30;//3*120;
@@ -119,13 +119,13 @@ export class MoldeojsViewComponent implements OnInit {
     if (w>h) {
       if (window.outerHeight>window.innerHeight || window.outerWidth>window.innerWidth) {
         /*try full screen*/
-        this.fullscreen();
+        //this.fullscreen();
       }
       this.MoldeoCS.m_Console.Resize(w,h);
     }
     else {
       console.log("moldeojsview: Forcing Landscape Resize to ",h,w);
-      document.body.style.width = window.outerHeight+"px";
+      //document.body.style.width = window.outerHeight+"px";
       //document.body.style.height = window.outerWidth+"px";
       this.MoldeoCS.m_Console.Resize(h,w);
     }

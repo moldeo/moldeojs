@@ -6,7 +6,7 @@
   <span>{{overlayer}}</span>
 </div>
 
-  <div id="moldeobuttons" #moldeobuttons class="btn-group moldeo_control" role="group" aria-label="..." style="position: fixed; display: none; right: 60px; top: 10px; z-index: 10000;">
+  <div id="moldeobuttons" #moldeobuttons class="btn-group moldeo_control" role="group" aria-label="..." style="position: fixed; display: block; right: 160px; top: 10px; z-index: 10000;">
     <button type="button" class="btn btn-default" (click)="stop();"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span></button>
     <button type="button" class="btn btn-default" (click)="play();"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
     <button type="button" class="btn btn-default" (click)="fullscreen();"><span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span></button>
@@ -15,6 +15,6 @@
   </div>
 
   <div id="webview_contenidos" #webview_contenidos class="contenido_over_hide">
-    <div id="webview_titulo" #webview_titulo class="titulo">SONIDO VISTO {{mititulo}}</div>
+    <div id="webview_titulo" #webview_titulo class="titulo">MOLDEO@JS {{mititulo}}</div>
     <div id="webview_descripcion" #webview_descripcion class="descripcion">{{midescripcion}}</div>
   </div>

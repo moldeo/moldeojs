@@ -1,0 +1,453 @@
+
+/***********START CSS FOR INTERFACE************/
+
+header{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:40px;
+  background: rgba(90, 90, 90, 0.7);
+  opacity:0.85;
+  border-bottom:4px solid #101010;
+  z-index: 101;
+}
+ul{
+  margin:0;
+  padding:0;
+  width:100%;
+}
+ul li{
+  list-style-type: none;
+  width:100%;
+  padding:5px 0 5px 10px;
+}
+h3{
+  margin:0;
+  padding:2px 0 0 3px;
+  font-size:12px;
+  border-bottom: 1px solid #010101;
+}
+#moCanvas{
+  position:fixed;
+  z-index: 91;
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  background-image: url('/assets/mojs-interface-data/back.jpg');
+}
+@keyframes showmeAnimation {
+    from {margin-top: -1500px;}
+    to {margin-top: 0px;}
+}
+@keyframes hidemeAnimation {
+  from {margin-top: 0px;}
+  to {margin-top: -1500px;}
+}
+.showme {
+  animation: showmeAnimation 1.0s;
+  transition-timing-function: ease-in;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+.hideme {
+  animation: hidemeAnimation 1.0s;
+  animation-delay: 0.1s;
+  transition-timing-function: ease-in;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+.moldeofile{
+  float:left;
+  width:50%;
+  height:21px;
+  background:#a6aab0;
+  margin:7px 0 0 10px;
+  opacity:0.8;
+  padding:2px 0 0 2px;
+  border:1px solid #a6aab0;
+  text-overflow: clip;
+  color:#333;
+  font-family: monospace;
+  font-size:14px;
+}
+.moldeofile:hover{
+  background:#c5cfdc;
+  border:1px solid #202020;
+  color:#010101;
+}
+.moldeoicon{
+  background-image: url('/assets/mojs-interface-data/moldeo_logo_2020_M@_512_blanco_bblanco.png');
+  background-size: 90%;
+  background-repeat:   no-repeat;
+  background-position: center center;
+  width:70px;
+  height:40px;
+  float:left;
+}
+.moldeobutton{
+  position:relative;
+  margin-right:10px;
+  top:5px;
+  right:0;
+  width:auto;
+  height:30px;
+  background:#ccc;
+  color:#222;
+  border:2px solid #202020;
+  font-weight: bold;
+  font-size:12px;
+  opacity:0.75;
+  padding:0 5px;
+  float:right;
+  outline:none;
+}
+.moldeobutton:hover{
+  background:#eee;
+  opacity:0.95;
+}
+.moldeobutton:active{
+  color:#eee;
+  background:#222;
+  opacity:0.95;
+}
+#moConfig{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  background:transparent;
+}
+/*- moWheel -*/
+@keyframes moWheelMove {
+    from {width:30px;height:30px;margin:30px 0 0 30px;}
+    to {width:80px;height:80px;margin:0;}
+}
+@keyframes selectMove {
+    from {width:1px;border-right:0px solid #353535;}
+    to {width:200px;border-right:4px solid #353535;}
+}
+.moWheelAni{
+  animation: moWheelMove 0.3s;
+  transition-timing-function: ease-in;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+.selectAni{
+  animation: selectMove 0.2s;
+  animation-delay: 0.3s;
+  transition-timing-function: ease-in;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+#moWheel{
+  margin:0;
+  position:relative;
+  top:0;
+  left:0;
+  opacity:0.7;
+  user-select: none;
+  z-index:999;
+}
+.circle{
+  width:30px;
+  height:30px;
+  position:absolute;
+  margin:0;
+  border-radius: 50%;
+  border:4px solid #353535;
+  background: #eee;
+  background-image: url('/assets/mojs-interface-data/moldeo.svg');
+  background-size: 90%;
+  background-repeat:   no-repeat;
+  background-position: center center;
+  float:left;
+}
+.objectSelect{
+  width:0px;
+  height:50px;
+  position:absolute;
+  top:15px;
+  left:75px;
+  background: #eee;
+  border-top:4px solid #353535;
+  border-bottom:4px solid #353535;
+  overflow-y:scroll;
+  overflow-x:hidden;
+}
+.objectSelect::-webkit-scrollbar{
+  width: 1em;
+}
+.objectSelect::-webkit-scrollbar-track{
+  background:rgba(255,255,255,0.3);
+  border-left:1px solid #050505;
+}
+.objectSelect::-webkit-scrollbar-thumb{
+  background-color: #364f70;
+}
+.objectSelect::-webkit-scrollbar-track{
+  background:rgba(255,255,255,0.3);
+  border-left:1px solid #050505;
+}
+.objectSelect::-webkit-scrollbar-thumb{
+  background-color: #364f70;
+}
+.objectSelect li:hover{
+  cursor:pointer;
+  background:#ddd;
+}
+
+/**********OBJECTS**********/
+
+svg{
+  position: fixed;
+}
+
+.moContainer{
+  width:100px;
+  height:68px;
+  position:relative;
+  user-select: none;
+  z-index: 1;
+}
+
+.moObject{
+  background:#eee;
+  background-image: url('/assets/mojs-interface-data/moldeo.svg');
+  background-size: 90%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  border-bottom-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border:solid 4px #353535;
+  width:60px;
+  height:60px;
+  position:absolute;
+  top:0;
+  left:16px;
+}
+.moObject p{
+  font-family: monospace;
+  font-size:10px;
+  width:100%;
+  text-align: center;
+  position:absolute;
+  bottom:-5px;
+}
+.moObject img, .moObject b{
+  display:block;
+  width:20px;
+  height:20px;
+  position:absolute;
+  right:0;
+  border-bottom-left-radius: 100%;
+}
+@keyframes objOpen {
+  from {width:68px;height:68px;margin:0 0 0 16px;border:4px solid #353535;border-bottom-left-radius:10px;border-top-right-radius:10px;border-top-left-radius:0px;border-bottom-right-radius:0px;}
+  to {width:120px;height:120px;margin:-30px 0 0 -12px;border:2px solid #353535;border-radius:40%;}
+}
+.moObjOpen{
+  width:120px;
+  height:120px;
+  margin:-30px 0 0 -12px;
+  position:absolute;
+  background:#eee;
+  border-radius:40%;
+  border:2px solid #353535;
+  z-index:2;
+  animation: objOpen 0.3s;
+  transition-timing-function: ease-in;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+.moObjOpen h4{
+  width: 120px;
+  text-align: center;
+  margin:55px auto 0 auto;
+  animation: moFadeIn 0.3s;
+  transition-timing-function: ease-in;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-delay: 0.3s;
+  opacity:0;
+}
+.moObjOpen h4 span{
+  font-weight:normal;
+}
+.moObjOpen img, .moObjOpen b{
+  width:30px;
+  height:30px;
+  position:absolute;
+  border-radius:50%;
+  left:50%;
+  margin: 20px 0 0 -15px;
+  opacity:0;
+  animation: moFadeIn 0.3s;
+  transition-timing-function: ease-in;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-delay: 0.3s;
+}
+.moOptionsObject{
+  position:absolute;
+  opacity:0;
+  bottom:0;
+  left:50%;
+  margin:0 0 -3px -11px;
+  animation: moFadeIn 0.3s;
+  transition-timing-function: ease-in;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-delay: 0.3s;
+}
+.moOptionsObject a{
+  display: inline-block;
+  margin-left:-7px;
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  cursor:pointer;
+  background-size: 10px 10px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  border: 1px solid #2c2c36;
+  background-color: #4e525b;
+}
+.moOptionsObject a:hover{
+  background-color: #2c2c36;
+}
+.moCopyButton{
+  background-image:url('/assets/mojs-interface-data/icons/copy.png');
+}
+.moTrashButton{
+  background-color: #e6586c !important;
+  border-color: #bc1c33 !important;
+  background-image:url('/assets/mojs-interface-data/icons/trash.png');
+}
+.moTrashButton:hover{
+  background-color: #bc1c33 !important;
+}
+.moParams{
+  position:fixed;
+  width: 220px;
+  height: 100%;
+  top:40px;
+  background: rgba(10, 10, 10, 0.85);
+  padding: 5px;
+  color: #bbb;
+  z-index: 99;
+  animation: paramSlide 0.3s;
+  transition-timing-function: ease-in;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+@keyframes paramSlide {
+  from {left:-220px;}
+  to {left:0;}
+}
+.moParams h2{
+  margin:0;
+}
+.moParams ul{
+  margin-top: 10px;
+  max-height: 40%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+.moParams ul::-webkit-scrollbar{
+  width: 1em;
+}
+.moParams ul::-webkit-scrollbar-track{
+  background:rgba(255,255,255,0.3);
+  border-left:1px solid #050505;
+}
+.moParams ul::-webkit-scrollbar-thumb{
+  background-color: #364f70;
+}
+.moParams ul::-webkit-scrollbar-track{
+  background:rgba(255,255,255,0.3);
+  border-left:1px solid #050505;
+}
+.moParams ul::-webkit-scrollbar-thumb{
+  background-color: #364f70;
+}
+.moParams ul li:hover{
+  background:#353535;
+  cursor:pointer;
+}
+.moParams ul li:focus{
+  background:#353535;
+}
+.moParams h3{
+  margin:10px 0 5px 0;
+  font-size:14px;
+  height:14px;
+}
+.moParams input{
+  height:16px;
+  width:95%;
+  margin:5px 0 0 0;
+  background:#ddd;
+  color:#101010;
+  border:solid 1px #010101;
+  resize: none;
+  padding-left: 5px;
+  padding-right: 5px;
+  outline: none;
+}
+.moParams input:focus{
+  box-shadow: 0 0 3px 1px #4fa9dc;
+  font-weight: bold;
+}
+#moObjectName{
+  width:74% !important;
+}
+#moObjectKey{
+  width: 10% !important;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/*Inlets-Outlets*/
+.moInlet{
+  background: #23508e;
+  width:16px;
+  height:16px;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  position:absolute;
+  top:0;
+  left:0;
+}
+.moInlet:hover{
+  background: #2f87ff;
+}
+.moOutlet{
+  background: #b01c1c;
+  width:16px;
+  height:16px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  position:absolute;
+  bottom:0;
+  right:0;
+}
+.moOutlet:hover{
+  background: #ff253a;
+}
+/*-Connections-*/
+#moPrecon{
+  opacity:0.5;
+}
+/***********END CSS FOR INTERFACE************/
+
+/*************OTHER ANIMATIONS***************/
+@keyframes moFadeIn {
+  from {opacity:0;}
+  to {opacity:1;}
+}
+@keyframes moFadeOut {
+  from {opacity:1;}
+  to {opacity:0;}
+}

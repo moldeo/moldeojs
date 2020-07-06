@@ -1,0 +1,31 @@
+.moSettings{
+  background:#eee;
+  border:3px solid #111;
+  width:140px;
+  height:45px;
+  position:absolute;
+  top:0;
+  left:0;
+  margin:30px 0 0 50px;
+  font-size: 11px;
+  user-select: none;
+  z-index:2;
+}
+.moSettings p{
+  margin:2px 10px 0 10px;
+  text-overflow: clip;
+}
+.moSettings button{
+  font-size: 12px;
+  background:#fff;
+  border:1px solid #333;
+  width:120px;
+  margin:5px 10px;
+}
+.moSettings button:hover{
+  background:#ddd;
+}
+.moSettings button:active{
+  background:#618fcd;
+  color:#eee;
+}
