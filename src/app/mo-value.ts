@@ -91,6 +91,35 @@ export class moData {
     this.SetDataType(moDataType.MO_DATA_NUMBER_DOUBLE);
     this.m_Number = Number(p_float);
   }
+  SetNumber(p_number: moNumber) {
+    this.m_Number = p_number;
+  }
+  SetVal( p_value : any ) {
+
+    switch( this.m_DataType ) {
+      case moDataType.MO_DATA_TEXT:
+        this.SetText( p_value );
+        break;
+
+      case moDataType.MO_DATA_NUMBER_INT:
+      case moDataType.MO_DATA_NUMBER_CHAR:
+      case moDataType.MO_DATA_NUMBER_LONG:
+      case moDataType.MO_DATA_NUMBER_FLOAT:
+      case moDataType.MO_DATA_NUMBER_DOUBLE:
+        this.m_Number = p_value;
+        break;
+      case moDataType.MO_DATA_FUNCTION:
+        this.m_Text = p_value;
+        break;
+
+      default:
+        this.m_Text = p_value;
+        break;
+    }
+
+
+
+  }
   //SetColor( p_color: moText);
   SetTexture(p_texture: any /**moTexture*/) {
     this.SetDataType(moDataType.MO_DATA_IMAGESAMPLE);
@@ -131,6 +160,26 @@ export class moData {
 
   Text() : moText {
     return this.m_Text;
+  }
+
+  ToText() : moText {
+    //var val = this.Eval();
+    switch(this.m_DataType) {
+      case moDataType.MO_DATA_NUMBER_CHAR:
+      case moDataType.MO_DATA_NUMBER_INT:
+      case moDataType.MO_DATA_NUMBER_LONG:
+      case moDataType.MO_DATA_NUMBER_FLOAT:
+      case moDataType.MO_DATA_NUMBER_DOUBLE:
+
+        return ""+this.m_Number;
+        break;
+
+      default:
+
+        return ""+this.m_Text;
+        break;
+    }
+    return ""+this.m_Text;
   }
 
   Int() : MOint {

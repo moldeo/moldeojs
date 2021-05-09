@@ -42,7 +42,8 @@ export class moScript extends moAbstract {
     if (this.m_pFileManager) {
       this.m_pFileManager.Load(strFilename, false, (res) => {
         console.log("CompileFile > Loaded > name: ", res);
-        this.m_fullscript = res._body;
+        if (res._body) this.m_fullscript = res._body;
+        else this.m_fullscript = res;
         //eval( ""+this.m_fullscript );
         try {
           this._compile.call(this);

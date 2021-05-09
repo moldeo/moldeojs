@@ -41,7 +41,7 @@ export const moSlash : moText = "/";
 export class moFile extends moAbstract {
 
   _File: File;
-//  private http: Http;
+   m_FileManager : moFileManager = NULL;
 //
     m_FileType : moFileType = moFileType.MO_FILETYPE_LOCAL;
 		m_FileStatus : moFileStatus = moFileStatus.MO_FILESTATUS_NOT_READY;
@@ -76,6 +76,10 @@ export class moFile extends moAbstract {
   Init(): boolean {
     return super.Init();
   }
+
+	SetFileManager( p_FileManager : moFileManager ) {
+		this.m_FileManager = p_FileManager;
+	}
 
   SetCompletePath( p_completepath : moText ) : void {
 
@@ -270,6 +274,50 @@ export class moFile extends moAbstract {
 	  return ( "" + this.m_FileName + this.m_Extension );
   }
 
+	Load( bWaitForDownload : boolean=true, callback?:any ) {
+
+		var p_FileName = this.GetCompletePath();
+
+		//console.log("p_FileName",p_FileName);
+
+		var fullget : string = window.location.protocol+"//"+window.location.host;
+		var fullpath : string = "/"+p_FileName;
+		var ff : string = window.location.origin+window.location.pathname;
+		if ( ff != fullget+"/" ) {
+			fullget = ff;
+			fullpath = ""+p_FileName;
+		}
+
+    fullget = fullget.replace("index.html","");
+    console.log("fullget:",fullget);
+		//console.log("fullpath before:",fullpath);
+		fullpath = fullpath.replace("./","");
+
+		//console.log("fullpath",fullpath);
+		var _fullget = fullget;
+		fullget = fullget + fullpath;
+		//console.log("Loading url with http get and subscribe:",fullget);
+		try {
+			//console.log("fullget",fullget);
+    	var request_get = this.m_FileManager.GetHttp().get(  fullget+"?rd="+(Math.random()*1000000000), {
+				//headers: undefined,
+				//params: undefined,
+				responseType: 'text',
+				//observe: 'response',
+				//reportProgress: true,
+				//withCredentials: undefined
+			} ).subscribe(
+				res => {
+      		if (callback) {
+						callback(res, this);
+					}
+    		},
+        error => { console.log('oops', error); }
+			);
+		} catch(error) {
+			console.log("Error:",error);
+		}
+  }
 };
 
 export type moFileArray = moFile[];
@@ -294,19 +342,23 @@ export class moDirectory extends moAbstract {
   m_Files : moFileArray = [];
   m_SubDirs: moDirectoryArray = [];
 
-  constructor(p_foldername?:moText, p_res?: moFileManager) {
+  constructor(p_foldername?:moText, p_res?: moFileManager, callback?:any) {
     super();
+		if (p_res) {
+			this.m_pFileManager = p_res;
+		}
     if (p_foldername) {
-      this.Open( p_foldername, "" );
+      this.Open( p_foldername, "", callback );
     }
   }
 
 
-  Open(p_CompletePath: moText, p_Search: moText): boolean {
+  Open(p_CompletePath: moText, p_Search: moText, callback?:any): boolean {
 
     var path: moText = "";
     var stdFileName: moText = "";
     var stdCompleteFileName: moText = "";
+		var self = this;
     //var set<string> stdListOfFileNames;
     //var set<string> stdListOfCompleteFileNames;
 
@@ -331,19 +383,54 @@ export class moDirectory extends moAbstract {
     /** Empty subdirs array*/
     this.m_SubDirs = [];
 
-    if (FS == undefined) {
-			console.error("moFileManager > moDirectory > Open could not work with folder:",CompletePathSearch);
-			console.error("moFileManager > moDirectory > Open Not implemented in online mode. TODO: Implement based on standard web directory listings.");
-			return (this.m_bExists = true);
-		}
-
     /** Set by default m_bExists on false*/
     this.m_bExists = false;
 
     /** Check files*/
     var file_names = [];
 
-    if( FS.existsSync( path ) )
+		if (FS == undefined) {
+			//try to open : p_CompletePath+"/list.cfg"
+			var p_CompletePath2 : moText =  p_CompletePath+"/list.cfg";
+			console.log("try to open list.cfg: at ", p_CompletePath2 );
+
+			if (this.m_pFileManager) {
+				this.m_bExists = true;
+				this.m_pFileManager.Load( p_CompletePath2, true, res => {
+					console.log("Files are there in "+p_CompletePath2, res );
+					var milista : moText0 = new moText0(res);
+					var listcfg : moTextArray = milista.Explode("\n");
+					console.log(listcfg);
+					for(var l in listcfg ) {
+						var name : any = listcfg[l];
+						if (name.length>1) {
+							var p_CompletePath2FileName: any = p_CompletePath+"/" + name;
+							file_names.push(p_CompletePath2FileName);
+						}
+					}
+
+					file_names.sort();
+			    for (var i = 0; i < file_names.length; i++) {
+			      var pFile: moFile = new moFile(file_names[i]);
+						pFile.m_FileManager = this.m_pFileManager;
+			      this.m_Files.push(pFile);
+			    }
+
+					if (callback) {
+						callback(this);
+					}
+
+				} );
+				//TODO: must return a promise
+				this.m_bExists = true;
+				return this.m_bExists;
+			}
+
+			//console.error("moFileManager > moDirectory > Open could not work with folder:",CompletePathSearch);
+			//console.error("moFileManager > moDirectory > Open Not implemented in online mode. TODO: Implement based on standard web directory listings.");
+			//return (this.m_bExists == true);
+		}
+		else if( FS.existsSync( path ) )
     {
         this.m_bExists = true;
         var files = FS.readdirSync(path);
@@ -362,6 +449,10 @@ export class moDirectory extends moAbstract {
             file_names.push(name);
           }
         }
+
+				if (callback) {
+					callback(this);
+				}
 
     }
 
@@ -583,37 +674,57 @@ export class moFileManager extends moResource {
   constructor(private http: HttpClient) {
     super();
     this.SetName("_filemanager_");
-    console.log("dirname:",window["__dirname"]);
+    //console.log("dirname:",window["__dirname"]);
   }
 
-  Load( p_FileName : moText , bWaitForDownload : boolean=true, callback?:any ) {
-		console.log("window.location.protocol",window.location.protocol);
-		console.log("window.location.host",window.location.host);
-		console.log("p_FileName",p_FileName);
+	GetHttp() : HttpClient {
+		return this.http;
+	}
+
+  Load( p_FileName : moText , bWaitForDownload : boolean=true, callback?:any, callbackerror?: any ) {
+		//console.log("window.location.protocol",window.location.protocol);
+		//console.log("window.location.host",window.location.host);
+		//console.log("window.location.href",window.location.href);
+		//console.log("p_FileName",p_FileName);
 		var fullget : string = window.location.protocol+"//"+window.location.host;
 		var fullpath : string = "/"+p_FileName;
-		console.log("fullpath before:",fullpath);
+		var ff : string = window.location.origin+window.location.pathname;
+		if ( ff != fullget+"/" ) {
+			fullget = ff;
+			fullpath = ""+p_FileName;
+		}
+
+    fullget = fullget.replace("index.html","");
+    console.log("fullget:",fullget);
+
+		//console.log("fullpath before:",fullpath);
 		fullpath = fullpath.replace("./","");
-		console.log("fullget",fullget);
-		console.log("fullpath",fullpath);
+
+		//console.log("fullpath",fullpath);
+		var _fullget = fullget;
 		fullget = fullget + fullpath;
-		console.log("Loading url with http get and subscribe:",fullget);
+		//console.log("Loading url with http get and subscribe:",fullget);
 		try {
-    	this.http.get(  fullget, {responseType: 'text'} ).subscribe(
+			//console.log("fullget",fullget);
+    	this.http.get(  fullget+"?rd="+(Math.random()*1000000000), {
+				//headers: undefined,
+				//params: undefined,
+				responseType: 'text',
+				//observe: 'response',
+				//reportProgress: true,
+				//withCredentials: undefined
+			} ).subscribe(
 				res => {
-      		//console.log("moFileManager > Load > name: ", p_FileName );
-					console.log(res);
-      		//this.m_pData = res.json():
-      		if (callback) callback(res);
+      		if (callback) { callback(res); }
     		},
-        error => console.log('oops', error)
+        error => { console.log('oops', error); if (callbackerror) { callbackerror(error); } }
 			);
 		} catch(error) {
 			console.log("Error:",error);
 		}
   }
 
-  Open(p_Path: moText, bWaitForDownload: boolean = true) {
+  Open(p_Path: moText, bWaitForDownload: boolean = true, callback?:any) {
 
     for (var i = 0; i < this.m_Directories.length; i++) {
       if (this.m_Directories[i].GetCompletePath() == p_Path) {
@@ -621,7 +732,7 @@ export class moFileManager extends moResource {
       }
     }
 
-    var pDir: moDirectory = new moDirectory(p_Path, this);
+    var pDir: moDirectory = new moDirectory(p_Path, this, callback);
     console.log("Opened Dir:", pDir);
     if (pDir) {
       if (pDir.GetType() == moFileType.MO_FILETYPE_LOCAL
@@ -640,8 +751,8 @@ export class moFileManager extends moResource {
     return false;
   }
 
-  GetDirectory( p_Path : moText ): moDirectory {
-    if ( this.Open(p_Path) ) {
+  GetDirectory( p_Path : moText, callback?:any ): moDirectory {
+    if ( this.Open( p_Path, true, callback ) ) {
       for(var i = 0; i< this.m_Directories.length; i++ ) {
         if ( this.m_Directories[i].GetCompletePath() == p_Path ) {
           return this.m_Directories[i];

@@ -1,5 +1,27 @@
 import * as MO from "moldeojs";
 
+export enum moIconParamIndex {
+  ICON_INLET=0,
+  ICON_OUTLET,
+  ICON_SCRIPT,
+	ICON_ALPHA,
+	ICON_COLOR,
+	ICON_SYNC,
+	ICON_PHASE,
+
+  ICON_TEXTURE,
+  ICON_BLENDING,
+  ICON_WIDTH,
+  ICON_HEIGHT,
+  ICON_TRANSLATEX,
+  ICON_TRANSLATEY,
+  ICON_ROTATE,
+  ICON_SCALEX,
+  ICON_SCALEY
+
+};
+
+
 export class moEffectIcon extends MO.moEffect {
 
   RM: MO.moRenderManager;
@@ -141,9 +163,20 @@ export class moEffectIcon extends MO.moEffect {
     //console.log("moEffectIcon.Update");
   }
 
-  GetDefinition(): MO.moConfigDefinition {
-    console.log("moEffectImage.GetDefinition Erase");
-    super.GetDefinition();
+  GetDefinition(p_configdefinition?: MO.moConfigDefinition): MO.moConfigDefinition {
+
+    p_configdefinition = super.GetDefinition(p_configdefinition);
+
+    p_configdefinition.Add( "texture", MO.moParamType.MO_PARAM_TEXTURE, moIconParamIndex.ICON_TEXTURE, new MO.moValue( "default", "TXT" ) );
+    p_configdefinition.Add( "blending", MO.moParamType.MO_PARAM_BLENDING, moIconParamIndex.ICON_BLENDING, new MO.moValue( "0", "NUM" ) );
+    p_configdefinition.Add( "width", MO.moParamType.MO_PARAM_FUNCTION, moIconParamIndex.ICON_WIDTH, new MO.moValue( "1.0", "FUNCTION" ) );
+    p_configdefinition.Add( "height", MO.moParamType.MO_PARAM_FUNCTION, moIconParamIndex.ICON_HEIGHT, new MO.moValue( "1.0", "FUNCTION" ) );
+    p_configdefinition.Add( "translatex", MO.moParamType.MO_PARAM_TRANSLATEX, moIconParamIndex.ICON_TRANSLATEX, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "translatey", MO.moParamType.MO_PARAM_TRANSLATEY, moIconParamIndex.ICON_TRANSLATEY, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "rotate", MO.moParamType.MO_PARAM_ROTATEZ, moIconParamIndex.ICON_ROTATE );
+    p_configdefinition.Add( "scalex", MO.moParamType.MO_PARAM_SCALEX, moIconParamIndex.ICON_SCALEX );
+    p_configdefinition.Add( "scaley", MO.moParamType.MO_PARAM_SCALEY, moIconParamIndex.ICON_SCALEY );
+    console.log("moEffectIcon.GetDefinition Erase",p_configdefinition);
 
     return this.m_Config.GetConfigDefinition();
   }

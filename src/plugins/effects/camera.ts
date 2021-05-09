@@ -1,5 +1,104 @@
 import * as MO from "moldeojs";
 
+export enum moEffectCameraMode {
+	MO_CAMERA_MODE_VCR = 0,
+	MO_CAMERA_MODE_SCRIPT = 1,
+	MO_CAMERA_MODE_CYCLE = 2,
+	MO_CAMERA_MODE_VCR_PLAYLIST = 3
+};
+
+export enum moEffectCameraPlayState {
+	MO_CAMERA_PLAYSTATE_STOPPED = 0,
+	MO_CAMERA_PLAYSTATE_PLAYING = 1,
+	MO_CAMERA_PLAYSTATE_REVERSE = 2,
+	MO_CAMERA_PLAYSTATE_SPEED = 3,
+	MO_CAMERA_PLAYSTATE_PAUSED = 4,
+	MO_CAMERA_PLAYSTATE_SEEKING = 5
+};
+
+
+export enum moEffectCameraSeekState {
+	MO_CAMERA_SEEKSTATE_SEEKING = 0,
+	MO_CAMERA_SEEKSTATE_REACHED = 1,
+	MO_CAMERA_SEEKSTATE_PLAYING = 2,
+	MO_CAMERA_SEEKSTATE_PAUSED = 3
+};
+
+export enum moEffectCameraVCRCommand {
+	MO_CAMERA_VCR_STOP = 0,//Stop
+	MO_CAMERA_VCR_PLAY = 1,//Play
+	MO_CAMERA_VCR_PAUSE = 2,//Stop
+	MO_CAMERA_VCR_REVERSE = 3,//Reverse
+	MO_CAMERA_VCR_FW = 4,//Forward
+	MO_CAMERA_VCR_RW = 5,//Rewind
+	MO_CAMERA_VCR_FF = 6,//Fast Forward
+	MO_CAMERA_VCR_FR = 7,//Fast Rewind
+	MO_CAMERA_VCR_SEEK = 8,//Seek for a frame
+	MO_CAMERA_VCR_SPEED = 9,//Play at speed
+	MO_CAMERA_VCR_PREVFRAME = 10,//move to prev frame
+	MO_CAMERA_VCR_NEXTFRAME = 11,//move to next frame
+	MO_CAMERA_VCR_LOOP = 12//loop
+};
+
+
+export enum moCameraParamIndex {
+	CAMERA_INLET=0,
+	CAMERA_OUTLET,
+	CAMERA_ALPHA,
+	CAMERA_COLOR,
+	CAMERA_SYNC,
+
+	CAMERA_CAMERA,
+	CAMERA_COLOR_FORMAT,
+	CAMERA_WIDTH,
+	CAMERA_HEIGHT,
+
+	CAMERA_COLOR_BITS,
+
+	CAMERA_SCALE_WIDTH,
+	CAMERA_SCALE_HEIGHT,
+
+	CAMERA_FLIP_HORIZONTAL,
+	CAMERA_FLIP_VERTICAL,
+
+	CAMERA_TEXTURE,
+
+	CAMERA_POSITION,
+	CAMERA_SPEED,
+	CAMERA_VOLUME,
+	CAMERA_BALANCE,
+	CAMERA_BRIGHTNESS,
+	CAMERA_CONTRAST,
+	CAMERA_SATURATION,
+	CAMERA_HUE,
+
+	CAMERA_MODE,
+
+	CAMERA_BLENDING,
+
+	CAMERA_STARTPLAYING,
+
+	CAMERA_LOOP,
+
+	CAMERA_INTERPOLATION,
+
+	CAMERA_POSTEXX,
+	CAMERA_POSTEXY,
+	CAMERA_ANCTEXX,
+	CAMERA_ALTTEXY,
+	CAMERA_POSCUADX,
+	CAMERA_POSCUADY,
+	CAMERA_ANCCUADX,
+	CAMERA_ALTCUADY,
+
+	CAMERA_SHOWCAMERADATA,
+
+	CAMERA_DISPLAY_X,
+	CAMERA_DISPLAY_Y,
+	CAMERA_DISPLAY_WIDTH,
+	CAMERA_DISPLAY_HEIGHT
+};
+
 export class moEffectCamera extends MO.moEffect {
 
   RM: MO.moRenderManager;
@@ -54,7 +153,7 @@ export class moEffectCamera extends MO.moEffect {
   }
 
   InitDevice( camera : MO.moText ) : void {
-    console.log("InitDevice",camera);
+    //console.log("moCamera:InitDevice",camera);
     if (this.CheckIfDeviceNameExists(camera)) {
       this.m_DeviceName = camera;
       this.m_pCamera = this.VMan.GetCameraByName( this.m_DeviceName, true /*CREATE!!!*/, this.m_CaptureDevice );
@@ -66,7 +165,7 @@ export class moEffectCamera extends MO.moEffect {
 
   CheckIfDeviceNameExists( camera : MO.moText ) : boolean {
     var c:number = 0;
-    console.log("CheckIfDeviceNameExists",camera);
+    //console.log("CheckIfDeviceNameExists",camera);
 
     var CapDevs : MO.moCaptureDevices = this.VMan.GetCaptureDevices(true);
 
@@ -75,7 +174,7 @@ export class moEffectCamera extends MO.moEffect {
       if (Cam) {
         if (Cam.GetCaptureDevice().GetName()==camera
       || Cam.GetCaptureDevice().GetLabelName()==camera ) {
-          console.log("CheckIfDeviceNameExists: founded",camera);
+          //console.log("CheckIfDeviceNameExists: founded",camera);
           return true;
         }
       }
@@ -103,6 +202,8 @@ export class moEffectCamera extends MO.moEffect {
     this.BeginDraw( p_tempo, p_parentstate );
 
     if (this.RM == undefined) return;
+
+    var size_updated : boolean = this.RM.m_bUpdated;
 
     var rgb: any = this.m_Config.EvalColor("color");
     var ccolor: MO.moColor = new MO.moColor( rgb.r, rgb.g, rgb.b);
@@ -136,7 +237,7 @@ export class moEffectCamera extends MO.moEffect {
     //Mat2.m_vLight.Normalize();
 
     ///MESH GEOMETRY
-    if (this.Plane == undefined) {
+    if (this.Plane == undefined || size_updated) {
       this.Plane = new MO.moPlaneGeometry( 1.0, 1.0/this.RM.Proportion(), 1, 1 );
     }
 
@@ -158,14 +259,14 @@ export class moEffectCamera extends MO.moEffect {
           0.0);
     }
 
-    if (this.Mesh==undefined) {
+    if (this.Mesh==undefined || size_updated) {
       this.Mesh = new MO.moMesh( this.Plane, this.Mat );
     }
     if (this.Mesh && this.Model) {
       this.Mesh.SetModelMatrix(this.Model);
     }
 
-    if (this.Scene==undefined) {
+    if (this.Scene==undefined || size_updated) {
       this.Scene = new MO.moSceneNode();
       this.Scene.add(this.Mesh);
     }
@@ -199,9 +300,21 @@ export class moEffectCamera extends MO.moEffect {
     //console.log("moEffectImage.Update");
   }
 
-  GetDefinition(): MO.moConfigDefinition {
-    console.log("moEffectCamera.GetDefinition Erase");
-    super.GetDefinition();
+  GetDefinition( p_configdefinition?: MO.moConfigDefinition): MO.moConfigDefinition {
+
+    p_configdefinition = super.GetDefinition(p_configdefinition);
+
+    p_configdefinition.Add( "camera", MO.moParamType.MO_PARAM_TEXT, moCameraParamIndex.CAMERA_TEXTURE, new MO.moValue( "default", "TXT" ) );
+    p_configdefinition.Add( "blending", MO.moParamType.MO_PARAM_BLENDING, moCameraParamIndex.CAMERA_BLENDING, new MO.moValue( "0", "NUM" ) );
+    p_configdefinition.Add( "pos_tex_x", MO.moParamType.MO_PARAM_FUNCTION, moCameraParamIndex.CAMERA_POSTEXX, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "pos_tex_y", MO.moParamType.MO_PARAM_FUNCTION, moCameraParamIndex.CAMERA_POSTEXY, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "anc_tex_x", MO.moParamType.MO_PARAM_FUNCTION, moCameraParamIndex.CAMERA_ANCTEXX, new MO.moValue( "1.0", "FUNCTION" ) );
+    p_configdefinition.Add( "alt_tex_y", MO.moParamType.MO_PARAM_FUNCTION, moCameraParamIndex.CAMERA_ALTTEXY, new MO.moValue( "1.0", "FUNCTION" ) );
+    p_configdefinition.Add( "pos_cuad_x", MO.moParamType.MO_PARAM_FUNCTION, moCameraParamIndex.CAMERA_POSCUADX, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "pos_cuad_y", MO.moParamType.MO_PARAM_FUNCTION, moCameraParamIndex.CAMERA_POSCUADY, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "anc_cuad_x", MO.moParamType.MO_PARAM_FUNCTION, moCameraParamIndex.CAMERA_ANCCUADX, new MO.moValue( "1.0", "FUNCTION" ) );
+    p_configdefinition.Add( "alt_cuad_y", MO.moParamType.MO_PARAM_FUNCTION, moCameraParamIndex.CAMERA_ALTCUADY, new MO.moValue( "1.0", "FUNCTION" ) );
+    console.log("moEffectCamera.GetDefinition Camera",p_configdefinition);
 
     return this.m_Config.GetConfigDefinition();
   }

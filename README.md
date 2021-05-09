@@ -27,6 +27,17 @@ Install the dependencies and MoldeoJS from your console typing
 $ npm install  
 ```
 
+# Run the server with:
+```sh
+$ npm start
+```
+
+#Build to deploy later in a site
+```sh
+$ npm run buildsite
+```
+
+
 # Open an existing project to start using the platform
 You can use existing projects (samples) created by Moldeo’s community. You can find them in “moldeojs/a2cli/src/assets/molrepos”, and you can display them from Samples button in the menu. You can also download projects from http://proyectos.moldeo.org/proyecto#head
 
@@ -46,6 +57,39 @@ Plugins are applied in chronological order, in three stages inside the drawing c
 - [ParticlesSimple](http://proyectos.moldeo.org/documentation/moldeoplugins/Effects/ParticlesSimple/doc/es/html/index.html) (Simple particles effect, in Euler’s logarithm)
 - Camera (Access to the user’s webcam)
 
+- Sound (based on P5.js oscillator)
+- Faust (Faust sound compiler for javascript based on wasm and webaudio) https://github.com/faust/tree/architecture/webaudio
+  
+  IMPORTANT modify some things like:
+    The base library file libfaust-wasm.js: 
+      var REMOTE_PACKAGE_BASE="libfaust-wasm.data"; 
+    with:
+      var REMOTE_PACKAGE_BASE="./assets/data/effects/faust/libfaust-wasm.data";
+      
+    Then for each compiled effect do:
+    
+    Modify the .js file (compiled with 'faust2wasm -worklet wind.dsp'), aka 'wind.js' reference with the correct path,
+    replace:
+      let real_url = (this.baseURL === "") ? "wind.wasm" : (this.baseURL + "/wind.wasm");
+    with:
+      let real_url = (this.baseURL === "") ? "wind.wasm" : (this.baseURL + "/assets/effects/faust/wind.wasm");
+    
+    Modify the dspName constant with a specific one,
+    replace:
+      const dspName = "wind"
+      ...
+      window[dspName] = wind;
+    with:
+      const dspNameWind = "wind"
+      ...
+      window[dspNameWind] = wind;
+      
+    Then check that you added to header of your index.html for every effect, the script link to the js file, like this:
+          <script name="faustnoise" src="./assets/data/effects/faust/wind.js"></script>
+        
+
+      
+- ML5 (based on ml5.js https://github.com/ml5js) works with live camera, and texture buffers (image/texture collections) for image classification
 
 **Post- Effect:**  Apply filters to the final image.
 - Mapping (transform the final image to fit a desired shape)

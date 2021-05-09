@@ -1,5 +1,27 @@
 import * as MO from "moldeojs";
 
+export enum moPlaneParamIndex {
+  PLANE_INLET=0,
+	PLANE_OUTLET,
+	PLANE_ALPHA,
+	PLANE_COLOR,
+	PLANE_SYNC,
+	PLANE_PHASE,
+	PLANE_TEXTURE,
+	PLANE_BLENDING,
+	PLANE_WIDTH,
+	PLANE_HEIGHT,
+	PLANE_TRANSLATEX,
+	PLANE_TRANSLATEY,
+	PLANE_TRANSLATEZ,
+	PLANE_ROTATEX,
+	PLANE_ROTATEY,
+	PLANE_ROTATEZ,
+	PLANE_SCALEX,
+	PLANE_SCALEY,
+	PLANE_SCALEZ
+};
+
 export class moEffectPlane extends MO.moEffect {
 
   RM: MO.moRenderManager;
@@ -209,8 +231,26 @@ export class moEffectPlane extends MO.moEffect {
     super.Update(p_Event);
   }
 
-  GetDefinition(): MO.moConfigDefinition {
-    super.GetDefinition();
+  GetDefinition(p_configdefinition?: MO.moConfigDefinition): MO.moConfigDefinition {
+
+    p_configdefinition = super.GetDefinition(p_configdefinition);
+
+    p_configdefinition.Add( "texture", MO.moParamType.MO_PARAM_TEXTURE, moPlaneParamIndex.PLANE_TEXTURE, new MO.moValue( "default", "TXT" ) );
+    p_configdefinition.Add( "blending", MO.moParamType.MO_PARAM_BLENDING, moPlaneParamIndex.PLANE_BLENDING, new MO.moValue( "0", "NUM" ) );
+
+    p_configdefinition.Add( "translatex", MO.moParamType.MO_PARAM_TRANSLATEX, moPlaneParamIndex.PLANE_TRANSLATEX, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "translatey", MO.moParamType.MO_PARAM_TRANSLATEY, moPlaneParamIndex.PLANE_TRANSLATEY, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "translatez", MO.moParamType.MO_PARAM_TRANSLATEZ, moPlaneParamIndex.PLANE_TRANSLATEZ, new MO.moValue( "0.0", "FUNCTION" ) );
+
+    p_configdefinition.Add( "rotatex", MO.moParamType.MO_PARAM_ROTATEX, moPlaneParamIndex.PLANE_ROTATEX, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "rotatey", MO.moParamType.MO_PARAM_ROTATEY, moPlaneParamIndex.PLANE_ROTATEY, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "rotatez", MO.moParamType.MO_PARAM_ROTATEZ, moPlaneParamIndex.PLANE_ROTATEZ, new MO.moValue( "0.0", "FUNCTION" ) );
+
+    p_configdefinition.Add( "scalex", MO.moParamType.MO_PARAM_SCALEX, moPlaneParamIndex.PLANE_SCALEX, new MO.moValue( "1.0", "FUNCTION" ) );
+    p_configdefinition.Add( "scaley", MO.moParamType.MO_PARAM_SCALEY, moPlaneParamIndex.PLANE_SCALEY, new MO.moValue( "1.0", "FUNCTION" ) );
+    p_configdefinition.Add( "scalez", MO.moParamType.MO_PARAM_SCALEZ, moPlaneParamIndex.PLANE_SCALEZ, new MO.moValue( "1.0", "FUNCTION" ) );
+    console.log("moEffectPlane.GetDefinition Plane",p_configdefinition);
+
     return this.m_Config.GetConfigDefinition();
   }
 

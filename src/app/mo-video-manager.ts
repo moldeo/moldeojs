@@ -114,7 +114,7 @@ export class moVideoFramework extends moAbstract {
 
   LoadCaptureDevices() : moCaptureDevices {
     var cap : moCaptureDevice;
-		console.log("moVideoFramework::LoadCaptureDevices")
+		//console.log("moVideoFramework::LoadCaptureDevices")
     this.m_CaptureDevices = [];
 
     cap = new moCaptureDevice();
@@ -144,17 +144,19 @@ export class moLiveSystem extends moAbstract {
   m_VideoGraph : moVideoGraph;
   m_Texture : moTexture;
   video : any;
+	video_ready : boolean = false;
   n : any;
   canvas : any;
-  context : any;
+  cv_context : any;
 	cv_id: any;
 	vi_id: any;
+	devices_str : any = "";
 
   constructor( cap : moCaptureDevice ) {
     super();
     this.m_CaptureDevice = cap;
     this.video = document.createElement("VIDEO");
-    this.video.setAttribute("style", "display:none;");
+    this.video.setAttribute("style", "display: none; position: fixed; bottom: 0px; left: 0px; width: 100px; heigh: 100px; z-index: 250000;");
 		this.vi_id = "_VIDEO_" + IntToStr(this.m_CaptureDevice.m_Index)+"_";
     this.video.setAttribute("id", this.vi_id );
     document.body.appendChild(this.video);
@@ -199,14 +201,51 @@ export class moLiveSystem extends moAbstract {
     var _self = this;
     this.m_VideoGraph = new moUserMediaVideoGraph();
     /////////////////////////////
-		console.log("moLiveSystem::Init",this.m_CaptureDevice);
+		//console.log("moLiveSystem::Init",this.m_CaptureDevice);
     let constraints:any = {
       audio: false,
       video: {
-          width: this.m_CaptureDevice.m_SourceWidth,
-          height: this.m_CaptureDevice.m_SourceHeight
+        facingMode: 'environment',
+        width: { min: 320, max: 640, ideal: 320 }
       }
+       //{
+				//facingMode: { ideal: "environment" }, //working in iOS 13 so in Android 7
+
+				//facingMode: ["environment","user"], // ["environment","user"] "user" or "environment"
+				//facingMode: ["environment"],
+				//width: {
+				//	ideal: 320,
+				//},
+				/*
+				height: {
+					ideal: 999999
+				},*/
+				/*frameRate: {
+					ideal: 60,
+						min: 10
+				}*/
+			//}
+			/*advanced: [{
+					facingMode: "environment"
+			}]*/
     };
+		if ( this.m_CaptureDevice.m_SourceWidth>0 && false ) {
+			if (constraints['video']==true) {
+				constraints['video'] = { width: { ideal: this.m_CaptureDevice.m_SourceWidth } };
+			} else {
+				constraints['video']['width'] = { ideal: this.m_CaptureDevice.m_SourceWidth };
+			}
+		}
+
+		if ( this.m_CaptureDevice.m_SourceHeight>0 && false ) {
+			if (constraints['video']==true) {
+				constraints['video'] = { height: { ideal: this.m_CaptureDevice.m_SourceHeight }};
+			} else {
+				constraints['video']['height'] = { ideal: this.m_CaptureDevice.m_SourceHeight };
+			}
+		}
+
+		console.log("constraints:",constraints);
     if (this.n.mediaDevices === undefined) { //For Old Browsers
       this.n.mediaDevices = {};
     } //END mediaDevices for old browsers
@@ -214,9 +253,10 @@ export class moLiveSystem extends moAbstract {
     if (this.n.mediaDevices.getUserMedia === undefined) {  //Check the existence of getUserMedia
       this.n.mediaDevices.getUserMedia = function(constraints) {
 				console.log("this.n.mediaDevices.getUserMedia",constraints);
-        var getUserMedia = this.n.webkitGetUserMedia || this.n.mozGetUserMedia;
+        var getUserMedia = this.n.getUserMedia;
 
         if (!getUserMedia) {
+					alert('getUserMedia is not implemented in this browser');
           return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
         }
 
@@ -226,29 +266,99 @@ export class moLiveSystem extends moAbstract {
       }
     }//END check for getUserMedia
 
-    this.n.mediaDevices.getUserMedia(constraints).then(function(stream) {
-			console.log("getUserMedia",constraints);
-      if ("srcObject" in _self.video) {
-        _self.video.srcObject = stream;
-      } else {
-        _self.video.src = window.URL.createObjectURL(stream);//video.src just for older implementations
-      }
-      _self.video.onloadedmetadata = function(e) {
-        _self.video.play();
-      };
-    });
+		this.n.mediaDevices.enumerateDevices()
+        .then(devices => {
+					 let devs = "";
+					 let idx = 0;
+					 console.log(devices,JSON.stringify(devices));
+					 let bestdevice_id = "";
+					 for(let dev in devices) {
+						 //alert(devices[dev]);
+						 if (devices[dev].kind == "videoinput") {
+							 devs+= " [ ("+idx+") label:" + devices[dev].label + " id: " + devices[dev].deviceId+"]";
+							 idx+=1;
+							 bestdevice_id = devices[dev].deviceId;
+						 }
+					 }
+
+					 _self.devices_str = devs + "bestdevice_id: "+bestdevice_id;
+					 _self.video.setAttribute('autoplay', '');
+    	 		 _self.video.setAttribute('muted', '');
+    			 _self.video.setAttribute('playsinline', '');
+
+					 //alert(devices_str);
+
+					//constraints["video"]["deviceId"] = bestdevice_id;
+					//constraints["video"]["facingMode"] = { exact: "environment" };
+          _self.getMedia(constraints);
+          /*
+					_self.n.mediaDevices.getUserMedia(constraints).then(function(stream) {
+						console.log("getUserMedia",constraints);
+						//alert( JSON.stringify(constraints) );
+
+			      if ("srcObject" in _self.video) {
+							 //alert("srcObject assignation")
+			        _self.video.srcObject = stream;
+			      } else {
+			        _self.video.src = window.URL.createObjectURL(stream);//video.src just for older implementations
+			      }
+			      _self.video.onloadedmetadata = function(e) {
+								//alert("on loaded metadata")
+			       		_self.video.play();
+								_self.video_ready = true;
+			      };
+			    }).catch(function(err) {
+						alert(err);
+            alert(JSON.stringify(_self.n.mediaDevices.getSupportedConstraints()));
+					});*/
+
+				});
 
     this.canvas = document.getElementById(this.cv_id);
 		if (this.canvas) {
-    	this.context = this.canvas.getContext('2d');
+    	this.cv_context = this.canvas.getContext('2d');
 		}
 
     return super.Init();
   }
 
+  getMedia( constraints : any ) : void {
+    var _self = this;
+    _self.n.mediaDevices.getUserMedia(constraints).then(function(stream) {
+        console.log("getUserMedia",constraints);
+        //alert( JSON.stringify(constraints) );
+
+        if ("srcObject" in _self.video) {
+           //alert("srcObject assignation")
+          _self.video.srcObject = stream;
+        } else {
+          _self.video.src = window.URL.createObjectURL(stream);//video.src just for older implementations
+        }
+        _self.video.onloadedmetadata = function(e) {
+            //alert("on loaded metadata")
+            //alert(_self.video.videoWidth+"x"+_self.video.videoHeight );
+            eval("window.videowxh = _self.video.videoWidth+'x'+_self.video.videoHeight+'"+JSON.stringify(constraints)+"';");
+            _self.video.play();
+            _self.video_ready = true;
+        };
+      }).catch(function(err) {
+        if (window["moldeodebug"]) alert(err);
+        if (window["moldeodebug"]) alert(JSON.stringify(constraints));
+        if (window["moldeodebug"]) alert(JSON.stringify(_self.n.mediaDevices.getSupportedConstraints()));
+        var constraints_base : any = { audio: false, video: { facingMode: 'environment', width: { min: 320, max: 640}}};
+        var constraints_sure : any = { audio: false, video: { facingMode: 'environment' }};
+        var constraints_supersure : any = { audio: false, video: true };
+        if (JSON.stringify(constraints) == JSON.stringify(constraints_sure)) {constraints = constraints_supersure;}
+        else if (JSON.stringify(constraints) == JSON.stringify(constraints_base)) { constraints = constraints_sure;}
+        else if (JSON.stringify(constraints) != JSON.stringify(constraints_base)) { constraints = constraints_base;}
+        _self.getMedia(constraints);
+      });
+  }
+
   Update() : void {
-    this.context.drawImage( this.video, 0, 0, this.canvas.width, this.canvas.height);
+    this.cv_context.drawImage( this.video, 0, 0, this.canvas.width, this.canvas.height);
     if (this.m_Texture._texture) {
+			this.m_Texture._video = this.video;
       this.m_Texture._texture.needsUpdate = true;//Important for update
     }
   }
@@ -306,7 +416,7 @@ export class moVideoManager extends moResource {
   m_LiveSystems : moLiveSystems;
   m_CaptureDevices : moCaptureDevices;
 
-constructor() {
+	constructor() {
     super();
     this.SetName("_videomanager_");
     this.m_LiveSystems = new moLiveSystems();
@@ -320,7 +430,7 @@ constructor() {
   GetCameraByName( camera : moText, load : boolean, customCD :  moCaptureDevice ) : moLiveSystem {
     var Cam : moLiveSystem = null;
     var c : number;
-		console.log("moVideoManager::GetCameraByName",camera,load,customCD);
+		//console.log("moVideoManager::GetCameraByName",camera,load,customCD);
     if (this.m_LiveSystems) {
       for( c=0; c<this.m_LiveSystems.m_LiveSystemsPtr.length; c++ ) {
         Cam = this.m_LiveSystems.m_LiveSystemsPtr[c];
@@ -361,10 +471,10 @@ constructor() {
   }
 
   GetCaptureDevices( reload? : boolean ) : moCaptureDevices {
-		console.log("moVideoManager::GetCaptureDevices > reload:",reload)
+		//console.log("moVideoManager::GetCaptureDevices > reload:",reload)
     if (reload) {
       this.m_CaptureDevices = this.m_LiveSystems.GetVideoFramework().LoadCaptureDevices();
-			console.log("moVideoManager::m_CaptureDevices",this.m_CaptureDevices);
+			//console.log("moVideoManager::m_CaptureDevices",this.m_CaptureDevices);
     }
     return this.m_CaptureDevices;
   }
@@ -383,7 +493,7 @@ constructor() {
 
   CreateCamera( cap_device : moCaptureDevice ) : moLiveSystem {
     var Cam : moLiveSystem;
-		console.log( "CreateCamera:", cap_device );
+		//console.log( "CreateCamera:", cap_device );
     Cam = new moLiveSystem( cap_device );
     Cam.Init();
 
