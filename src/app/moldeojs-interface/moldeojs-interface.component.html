@@ -1,0 +1,23 @@
+<div #moCanvas id="moCanvas" (mouseenter)="moWheelDisplay=false;"></div>
+
+<div #moWheel id="moWheel" [hidden]="!moWheelDisplay">
+  <div class="circle moWheelAni"></div>
+  <div class="objectSelect selectAni">
+    <div *ngFor="let type of PluginsDefinitionsMapTypes">
+      <h3>{{moMoldeoObjectTypeToText[type]}}</h3>
+      <li *ngFor="let mob of PluginsDefinitionsMapTypeArray[type]" name="mob" class="mob.m_Name" (click)="createMOObject(mob)">
+        {{mob.m_Name}}:{{mob.m_MoldeoObjectType}}
+      </li>
+    </div>
+  </div>
+</div>
+
+<div id="moConfig" #moConfig (mouseenter)="moWheelDisplay=false;">
+</div>
+
+<header class="moHeader" (mouseenter)="moToolDisplay=false;">
+  <div class="moldeoicon"></div>
+  <div class="moldeofile">{{moFileName}}</div>
+  <button class="moldeobutton" (click)="showmoView();" type="button" name="moButton" title="Moldeojs View">moView</button>
+  <button class="moldeobutton" type="button" name="auto" title="Auto Layout" (click)="autoLayout()">auto</button>
+</header>
