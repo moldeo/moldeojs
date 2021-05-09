@@ -217,10 +217,72 @@ export class moConfig extends moAbstract {
   }
 
   CreateParam( p_ParamDef: moParamDefinition ) : void {
-    //
+    var xparam: moParam = new moParam(p_ParamDef);
+
+    ///asigna valor predeterminado definido por el plugin, sino
+    ///aplica el estandar
+    if ( p_ParamDef.GetDefaultValue().GetSubValueCount()>0
+        &&
+        p_ParamDef.GetDefaultValue().GetSubValue(0).GetTypeStr()!="UNDEFINED" ) {
+        xparam.AddValue( p_ParamDef.GetDefaultValue() );
+    } else {
+        xparam.SetDefaultValue();
+    }
+    this.m_Params.push( xparam );
+    this.m_ParamsByName[""+p_ParamDef.GetName()] = xparam;
+
+    ///asigna los indices...
+    var pParam : moParam = this.m_Params[this.m_Params.length-1];
+    pParam.GetParamDefinition().SetIndex(this.m_Params.length-1);
+    p_ParamDef.SetIndex(this.m_Params.length-1);
   }
 
-  CreateDefault(p_fullconfigname: moText) : boolean {
+  CreateDefault( p_fullconfigfilename?: moText) : boolean {
+
+    //moFile cFile( p_fullconfigfilename );
+
+    var pt : moText;
+    pt = p_fullconfigfilename;
+
+    /// Do not overwrite... by default
+    //if (cFile.Exists()) {
+    //    cout << "moConfig::CreateDefault > file already exists " << pt << endl;
+    //    return false;
+    //}
+
+    if (this.IsConfigLoaded()) {
+        //cout << "moConfig::CreateDefault > config has information already (is loaded) " << endl;
+        return false;
+    }
+
+    //crea los par�metros en funci�n de las definiciones, con valores por default...
+    var pParamDefinitions : moParamDefinitions = undefined;
+
+    pParamDefinitions = this.GetConfigDefinition().GetParamDefinitions();
+    console.log("pParamDefinitions: ", pParamDefinitions);
+
+    if (pParamDefinitions) {
+
+        //this.UnloadConfig();
+
+        //cout << "moConfig::CreateDefault > Loading default ParamDefinition in moConfig : number of params : " << pParamDefinitions->Count() << endl;
+        for( var i=0; i<pParamDefinitions.length; i++) {
+
+            var pParamDefinition : moParamDefinition = pParamDefinitions[i];
+
+            this.CreateParam( pParamDefinition );
+        }
+
+        //cout << "moConfig::CreateDefault > Saving Config to disk..." << endl;
+        //if (this.SaveConfig( pt )==MO_CONFIG_OK) {
+            //cout << "moConfig::CreateDefault > Saved Config Succesfully " << endl;
+        //    return true;
+        //}
+        //cout << "moConfig::CreateDefault > Error Saving Config to disk " << endl;
+        return true;
+    }
+
+    //cout << "moConfig::CreateDefault > Errors occured " << endl;
     return false;
   }
 
@@ -236,9 +298,15 @@ export class moConfig extends moAbstract {
     if ( configtext && typeof configtext == "string" ) {
         //console.log("moConfig::LoadConfig > Full text", configname);
         //parse XML:
-        var result : any = xmljs.xml2js( configtext, {alwaysArray: true,compact: true,ignoreComment: true, alwaysChildren: false});
+        var result : any;
+        try {
+         result = xmljs.xml2js( configtext, {alwaysArray: true,compact: true,ignoreComment: true, alwaysChildren: false});
+       } catch (exc) {
+         console.error(exc);
+       }
+
         //{compact: true, spaces: 4}
-        console.log( "xmljs",result );
+        //console.log( "xmljs",result );
         var attr_sym = "_attributes";
         var xml_text_value = "_text";
 
@@ -359,7 +427,7 @@ export class moConfig extends moAbstract {
         this.m_ConfigLoaded = true;
         if (callback) callback(MO_CONFIG_OK);
 
-        return MO_CONFIG_OK;      
+        return MO_CONFIG_OK;
     }
     this.m_ConfigLoaded = false;
     return MO_CONFIGFILE_NOT_FOUND;

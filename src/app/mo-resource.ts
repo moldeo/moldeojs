@@ -45,8 +45,8 @@ export class moResource extends moMoldeoObject {
     this.SetType(moMoldeoObjectType.MO_OBJECT_RESOURCE);
   }
 
-  Init(): boolean {
-    return super.Init();
+  Init(callback?:any): boolean {    
+    return super.Init(callback);
   }
 
   GetResourceType(): moResourceType {

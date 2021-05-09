@@ -1,5 +1,27 @@
 import * as MO from "moldeojs";
 
+export enum moImageParamIndex {
+  IMAGE_INLET=0,
+	IMAGE_OUTLET,
+
+  IMAGE_ALPHA,
+	IMAGE_COLOR,
+	IMAGE_SYNC,
+	IMAGE_PHASE,
+	IMAGE_TEXTURE,
+	/*IMAGE_FILTER,*/
+	IMAGE_BLENDING,
+	IMAGE_POSTEXX,
+	IMAGE_POSTEXY,
+	IMAGE_ANCTEXX,
+	IMAGE_ALTTEXY,
+	IMAGE_POSCUADX,
+	IMAGE_POSCUADY,
+	IMAGE_ANCCUADX,
+	IMAGE_ALTCUADY
+
+};
+
 export class moEffectImage extends MO.moEffect {
 
   RM: MO.moRenderManager;
@@ -70,15 +92,15 @@ export class moEffectImage extends MO.moEffect {
         this.m_Config.Eval("anc_cuad_x"),
         this.m_Config.Eval("alt_cuad_y"),
       1.0);
-      console.log("this.m_Config.Eval(anc_cuad_x)",
-        this.m_Config.Eval("anc_cuad_x"),
-        this.m_Config.Eval("alt_cuad_y"));
+      //console.log("this.m_Config.Eval(anc_cuad_x)",
+      //  this.m_Config.Eval("anc_cuad_x"),
+      //  this.m_Config.Eval("alt_cuad_y"));
       this.Model.Translate(
           this.m_Config.Eval("pos_cuad_x"),
           this.m_Config.Eval("pos_cuad_y"),
           0.0);
     }
-    console.log(this.Model);
+    //console.log(this.Model);
 
     if (this.Mesh==undefined) {
       this.Mesh = new MO.moMesh( this.Plane, this.Mat );
@@ -121,9 +143,21 @@ export class moEffectImage extends MO.moEffect {
     //console.log("moEffectImage.Update");
   }
 
-  GetDefinition(): MO.moConfigDefinition {
-    console.log("moEffectImage.GetDefinition Erase");
-    super.GetDefinition();
+  GetDefinition(p_configdefinition?: MO.moConfigDefinition): MO.moConfigDefinition {
+
+    p_configdefinition = super.GetDefinition(p_configdefinition);
+
+    p_configdefinition.Add( "texture", MO.moParamType.MO_PARAM_TEXTURE, moImageParamIndex.IMAGE_TEXTURE, new MO.moValue( "default", "TXT" ) );
+    p_configdefinition.Add( "blending", MO.moParamType.MO_PARAM_BLENDING, moImageParamIndex.IMAGE_BLENDING, new MO.moValue( "0", "NUM" ) );
+    p_configdefinition.Add( "pos_tex_x", MO.moParamType.MO_PARAM_FUNCTION, moImageParamIndex.IMAGE_POSTEXX, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "pos_tex_y", MO.moParamType.MO_PARAM_FUNCTION, moImageParamIndex.IMAGE_POSTEXY, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "anc_tex_x", MO.moParamType.MO_PARAM_FUNCTION, moImageParamIndex.IMAGE_ANCTEXX, new MO.moValue( "1.0", "FUNCTION" ) );
+    p_configdefinition.Add( "alt_tex_y", MO.moParamType.MO_PARAM_FUNCTION, moImageParamIndex.IMAGE_ALTTEXY, new MO.moValue( "1.0", "FUNCTION" ) );
+    p_configdefinition.Add( "pos_cuad_x", MO.moParamType.MO_PARAM_FUNCTION, moImageParamIndex.IMAGE_POSCUADX, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "pos_cuad_y", MO.moParamType.MO_PARAM_FUNCTION, moImageParamIndex.IMAGE_POSCUADY, new MO.moValue( "0.0", "FUNCTION" ) );
+    p_configdefinition.Add( "anc_cuad_x", MO.moParamType.MO_PARAM_FUNCTION, moImageParamIndex.IMAGE_ANCCUADX, new MO.moValue( "1.0", "FUNCTION" ) );
+    p_configdefinition.Add( "alt_cuad_y", MO.moParamType.MO_PARAM_FUNCTION, moImageParamIndex.IMAGE_ALTCUADY, new MO.moValue( "1.0", "FUNCTION" ) );
+    console.log("moEffectImage.GetDefinition Image",p_configdefinition);
 
     return this.m_Config.GetConfigDefinition();
   }

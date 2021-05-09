@@ -22,6 +22,8 @@ import { moDataManager } from "./mo-data-manager";
 import { moFileManager } from "./mo-file-manager";
 import { moResourceManager } from "./mo-resource-manager";
 
+function arrayRemove(arr, value) { return arr.filter(function(mob){ return mob.GetLabelName() != value.GetLabelName(); });}
+
 export class moEffectManager extends moAbstract {
 
     m_PreEffects : moPreEffectsArray  = [];
@@ -99,6 +101,7 @@ export class moEffectManager extends moAbstract {
         this.m_MasterEffects.push( pmastereffect );
         peffect = pmastereffect;
         break;
+
       default:
         break;
     }
@@ -152,6 +155,33 @@ export class moEffectManager extends moAbstract {
 
   MasterEffects(): moMasterEffectsArray {
     return this.m_MasterEffects;
+  }
+
+  RemoveEffect( p_MobDefinition : moMobDefinition ) : void {
+    var removed : any = this.m_AllEffects;
+    for( var i=0; i < this.m_AllEffects.length; i++) {
+      var pfx = this.m_AllEffects[i];
+      if ( pfx.GetMobDefinition().GetLabelName() == p_MobDefinition.GetLabelName() ) {
+        removed = arrayRemove( this.m_AllEffects, pfx.GetMobDefinition());
+        switch(pfx.GetType()) {
+          case moMoldeoObjectType.MO_OBJECT_PREEFFECT:
+              this.m_PreEffects = arrayRemove( this.m_PreEffects, pfx.GetMobDefinition());
+              break;
+          case moMoldeoObjectType.MO_OBJECT_EFFECT:
+              this.m_Effects = arrayRemove( this.m_Effects, pfx.GetMobDefinition());
+              break;
+          case moMoldeoObjectType.MO_OBJECT_PREEFFECT:
+              this.m_PostEffects = arrayRemove( this.m_PostEffects, pfx.GetMobDefinition());
+              break;
+          case moMoldeoObjectType.MO_OBJECT_MASTEREFFECT:
+              this.m_MasterEffects = arrayRemove( this.m_MasterEffects, pfx.GetMobDefinition());
+              break;
+        }
+        break;
+      }
+    }
+    this.m_AllEffects = removed;    
+    //
   }
 
 }

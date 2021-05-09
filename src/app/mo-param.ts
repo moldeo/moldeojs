@@ -262,6 +262,10 @@ export class moParam extends moAbstract {
     this.m_Values = [];
   }
 
+  GetName() : moText {
+    return this.GetParamDefinition().GetName();
+  }
+
   GetData() : moData {
     var pReturnData : moData = null;
 

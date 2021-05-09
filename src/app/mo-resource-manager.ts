@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 
 import { MOlong } from "./mo-types";
 import { moText } from "./mo-text";
+import { moNewResource } from "./mo-plugin";
 import { moAbstract } from "./mo-abstract";
 import { moMoldeoObject } from "./mo-moldeo-object";
 import { moConfig } from "./mo-config";
@@ -47,12 +48,11 @@ import { moDebugManager } from "./mo-debug-manager";
 
 import { moScriptManager } from "./mo-script-manager";
 
+export { moResource, moResources } from "./mo-resource";
+
+function arrayRemove(arr, value) { return arr.filter(function(mob){ return mob.GetLabelName() != value.GetLabelName(); });}
 
 
-export
-{
-  moResource, moResources
-} from "./mo-resource";
 export class moResourceManager extends moAbstract {
     MOFileMan : moFileManager;
 		MOVideoMan : moVideoManager;
@@ -213,6 +213,15 @@ export class moResourceManager extends moAbstract {
 
     GetResource( index : number ) : moResource {
       return this.m_Resources[index];
+    }
+
+    AddResource( Resource : moResource ) {
+      this.m_Resources.push(Resource);
+    }
+
+    RemoveResource( resource : any ) : boolean {
+      this.m_Resources = arrayRemove( this.m_Resources, resource );
+      return true;
     }
 
 }

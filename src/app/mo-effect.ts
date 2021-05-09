@@ -1,4 +1,3 @@
-
 import { moEffectState } from "./mo-effect-state";
 export { moEffectState } from "./mo-effect-state";
 import {
@@ -6,9 +5,10 @@ import {
   MO_PARAM_NOT_FOUND, MO_PARAM_NOT_SEL, MO_SELECTED,
   MO_CONFIG_OK, MO_CONFIGFILE_NOT_FOUND
 } from "./mo-config";
-import { moMoldeoObject, moMobState } from "./mo-moldeo-object";
+import { moMoldeoObject, moMobState, MO_IODEVICE_KEYBOARD, MO_IODEVICE_MOUSE, MO_IODEVICE_MOBILE } from "./mo-moldeo-object";
 import { moMoldeoObjectType } from "./mo-moldeo-object-type.enum";
 import { moEffectManager } from "./mo-effect-manager";
+import { moIODeviceManager, moIODeviceCode, moIODeviceMobileCode } from "./mo-iodevice-manager";
 import { moConsoleState } from "./mo-console-state";
 import { moTempo } from "./mo-tempo";
 import { moParamType, moParamTypeStrs, moParamTypeToText } from "./mo-param";
@@ -22,6 +22,7 @@ import { moInlet, moOutlet, moConnector, moConnections } from "./mo-connectors";
 import * as moMath from "./mo-math";
 import { moMathFunction } from "./mo-math-manager";
 import { moTimerState, moTimer } from "./mo-timer";
+import { moEvent, moEventList } from "./mo-event-list";
 
 export class moEffect extends moMoldeoObject {
 
@@ -34,9 +35,122 @@ export class moEffect extends moMoldeoObject {
   InletT: moInlet;
   InletMilliseconds: moInlet;
   InletSeconds : moInlet;
+  InletSecondsS : moInlet;
+
+  InletMouseX : moInlet;
+  InletMouseY : moInlet;
+  InletMouseFactor : moInlet;
+  InletMouseButtonLeft : moInlet;
+  InletMouseButtonRight : moInlet;
+  InletMouseButtonMiddle : moInlet;
+  InletMouseXButtonLeft : moInlet;
+  InletMouseXButtonRight : moInlet;
+  InletMouseXButtonMiddle : moInlet;
+  InletMouseYButtonLeft : moInlet;
+  InletMouseYButtonRight : moInlet;
+  InletMouseYButtonMiddle : moInlet;
+
+  InletMouseXWheel : moInlet;
+  InletMouseYWheel : moInlet;
+  InletMouseZWheel : moInlet;
+  
+  InletAccVelY: moInlet;
+  InletAccVelX: moInlet;
+  InletAccVelZ: moInlet;
+
+  InletAccX: moInlet;
+  InletAccY: moInlet;
+  InletAccZ: moInlet;
+
+  InletAccGX: moInlet;
+  InletAccGY: moInlet;
+  InletAccGZ: moInlet;
+
+  InletRotX: moInlet;
+  InletRotY: moInlet;
+  InletRotZ: moInlet;
+
+  InletVelocity: moInlet;
+  InletVelocityX: moInlet;
+  InletVelocityY: moInlet;
+  InletVelocityZ: moInlet;
+
+  InletMouseVelocity: moInlet;
+  InletMouseVelocityX: moInlet;
+  InletMouseVelocityY: moInlet;
+  InletMouseVelocityZ: moInlet;
+
+  mousex : MOdouble = 0.0;
+  mousey : MOdouble = 0.0;
+  mousex_old : MOdouble = 0.0;
+  mousey_old : MOdouble = 0.0;
+  mousexrel : MOdouble = 0.0;
+  mouseyrel : MOdouble = 0.0;
+  mousexleft_old : MOdouble = 0.0;
+  mouseyleft_old : MOdouble = 0.0;
+  mousexrel_left : MOdouble = 0.0;
+  mouseyrel_left : MOdouble = 0.0;
+  mousefactor : MOdouble = 0.0;
+  //button left
+  mousebuttonleft : MOdouble = 0.0;
+  mousexbuttonleft : MOdouble = 0.0;
+  mouseybuttonleft : MOdouble = 0.0;
+  //button right
+  mousebuttonright : MOdouble = 0.0;
+  mousexbuttonright : MOdouble = 0.0;
+  mouseybuttonright : MOdouble = 0.0;
+  //button middle
+  mousebuttonmiddle : MOdouble = 0.0;
+  mousexbuttonmiddle : MOdouble = 0.0;
+  mouseybuttonmiddle : MOdouble = 0.0;
+
+  accelerationgx : MOdouble = 0.0;
+  accelerationgy : MOdouble = 0.0;
+  accelerationgz : MOdouble = 0.0;
+
+  accelerationx : MOdouble = 0.0;
+  accelerationy : MOdouble = 0.0;
+  accelerationz : MOdouble = 0.0;
+
+  rotationx : MOdouble = 0.0;
+  rotationy : MOdouble = 0.0;
+  rotationz : MOdouble = 0.0;
+
+  timestamp : any = 0;
+
+  velocity : MOdouble = 0.0;
+  velocityx : MOdouble = 0.0;
+  velocityy : MOdouble = 0.0;
+  velocityz : MOdouble = 0.0;
+
+  mousevelocity : MOdouble = 0.0;
+  mousevelocityx : MOdouble = 0.0;
+  mousevelocityy : MOdouble = 0.0;
+  mousevelocityz : MOdouble = 0.0;
+
+  accelerationvelx : MOdouble = 0.0;
+  accelerationvely : MOdouble = 0.0;
+  accelerationvelz : MOdouble = 0.0;
 
   isyncro: MOint = -1;
   iphase: MOint = -1;
+
+  mousexwheel : MOdouble = 0.0;
+  mouseywheel : MOdouble = 0.0;
+  mousezwheel : MOdouble = 0.0;
+  mousewheeldeltamode : MOdouble = 0.0;
+  lax : any = 0.0;
+  lay : any = 0.0;
+  laz : any = 0.0;
+  la : any = 0.0;
+  dT : any = 1.0;
+  laccx : any = 0.0;
+  laccy : any = 0.0;
+  laccz : any = 0.0;
+  lacc : any = 0.0;
+  laccmax : any = 0.0;
+  laccmaxcut : any = 0.0;
+  laccsum : any = "";
 
   constructor() {
     super();
@@ -51,59 +165,58 @@ export class moEffect extends moMoldeoObject {
       return false;
     }
 
-    this.InletTimems = new moInlet();
-    if (this.InletTimems) {
-      this.InletTimems.Init( "timems", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
-      this.m_Inlets.push(this.InletTimems);
-      this.m_InletsStr["timems"] = this.InletTimems;
-    }
+    this.InletTimems = this.AddInlet("timems","DOUBLE");
+    this.InletTimes = this.AddInlet("times","DOUBLE");
+    this.InletTime = this.AddInlet("time","DOUBLE");
+    this.InletTempo = this.AddInlet("tempo","DOUBLE");
+    this.InletT = this.AddInlet("t","DOUBLE");
+    this.InletMilliseconds = this.AddInlet("milliseconds","DOUBLE");
+    this.InletSeconds = this.AddInlet("seconds","DOUBLE");
+    this.InletSecondsS = this.AddInlet("s","DOUBLE");
+    this.InletMouseX = this.AddInlet("mousex","DOUBLE");
+    this.InletMouseY = this.AddInlet("mousey","DOUBLE");
 
-    this.InletTimes = new moInlet();
-    if (this.InletTimes) {
-      this.InletTimes.Init( "times", this.m_Inlets.length, moDataType.MO_DATA_NUMBER_DOUBLE );
-      this.m_Inlets.push(this.InletTimes);
-      this.m_InletsStr["times"] = this.InletTimes;
-    }
+    this.InletMouseButtonLeft = this.AddInlet("mousebuttonleft", "DOUBLE");
+    this.InletMouseButtonMiddle = this.AddInlet("mousebuttonmiddle", "DOUBLE");
+    this.InletMouseButtonRight = this.AddInlet("mousebuttonright", "DOUBLE");
 
-    /** Crea INLETS INTERNOS, es decir que no tienen un parametro asociado... (especificamente para su uso generico*/
-    this.InletTime = new moInlet();
-    if (this.InletTime) {
-      //moDataType.MO_DATA_NUMBER_DOUBLE
-      this.InletTime.Init( "time", this.m_Inlets.length, "DOUBLE"  );
-      this.m_Inlets.push(this.InletTime);
-      this.m_InletsStr["time"] = this.InletTime;
-    }
+    this.InletMouseXButtonLeft = this.AddInlet("mousexbuttonleft","DOUBLE");
+    this.InletMouseYButtonLeft = this.AddInlet("mouseybuttonleft","DOUBLE");
+    this.InletMouseXButtonRight = this.AddInlet("mousexbuttonright","DOUBLE");
+    this.InletMouseYButtonRight = this.AddInlet("mouseybuttonright","DOUBLE");
+    this.InletMouseXButtonMiddle = this.AddInlet("mousexbuttonmiddle","DOUBLE");
+    this.InletMouseYButtonMiddle = this.AddInlet("mouseybuttonmiddle","DOUBLE");
 
-    this.InletTempo = new moInlet();
-    if (this.InletTempo) {
-      //Inlet->Init( "tempo", m_Inlets.Count(), param.GetPtr() );
-      //param.SetExternData( Inlet->GetData() );
-      this.InletTempo.Init( "tempo", this.m_Inlets.length, "DOUBLE" );
-      this.m_Inlets.push(this.InletTempo);
-      this.m_InletsStr["tempo"] = this.InletTempo;
-    }
+    this.InletMouseXWheel = this.AddInlet("mousexwheel","DOUBLE");
+    this.InletMouseYWheel = this.AddInlet("mouseywheel","DOUBLE");
+    this.InletMouseZWheel = this.AddInlet("mousezwheel","DOUBLE");
 
-    this.InletT = new moInlet();
-    if (this.InletT) {
-      this.InletT.Init( "t", this.m_Inlets.length, "DOUBLE" );
-      this.m_Inlets.push(this.InletT);
-      this.m_InletsStr["t"] = this.InletT;
-    }
+    this.InletAccX = this.AddInlet("accelerationx", "DOUBLE");
+    this.InletAccY = this.AddInlet("accelerationy", "DOUBLE");
+    this.InletAccZ = this.AddInlet("accelerationz", "DOUBLE");
+
+    this.InletAccGX = this.AddInlet("accelerationgx", "DOUBLE");
+    this.InletAccGY = this.AddInlet("accelerationgy", "DOUBLE");
+    this.InletAccGZ = this.AddInlet("accelerationgz", "DOUBLE");
+
+    this.InletRotX = this.AddInlet("rotationx", "DOUBLE");
+    this.InletRotY = this.AddInlet("rotationy", "DOUBLE");
+    this.InletRotZ = this.AddInlet("rotationz", "DOUBLE");
+
+    this.InletVelocity = this.AddInlet("velocity", "DOUBLE");
+    this.InletVelocityX = this.AddInlet("velocityx", "DOUBLE");
+    this.InletVelocityY = this.AddInlet("velocityy", "DOUBLE");
+    this.InletVelocityZ = this.AddInlet("velocityz", "DOUBLE");
+
+    this.InletMouseVelocity = this.AddInlet("mousevelocity", "DOUBLE");
+    this.InletMouseVelocityX = this.AddInlet("mousevelocityx", "DOUBLE");
+    this.InletMouseVelocityY = this.AddInlet("mousevelocityy", "DOUBLE");
+    this.InletMouseVelocityZ = this.AddInlet("mousevelocityz", "DOUBLE");
 
 
-    this.InletMilliseconds = new moInlet();
-    if (this.InletMilliseconds) {
-      this.InletMilliseconds.Init( "milliseconds", this.m_Inlets.length, "DOUBLE" );
-      this.m_Inlets.push(this.InletMilliseconds);
-      this.m_InletsStr["milliseconds"] = this.InletMilliseconds;
-    }
-
-    this.InletSeconds = new moInlet();
-    if (this.InletSeconds) {
-      this.InletSeconds.Init( "seconds", this.m_Inlets.length, "DOUBLE" );
-      this.m_Inlets.push(this.InletSeconds);
-      this.m_InletsStr["seconds"] = this.InletSeconds;
-    }
+    this.InletAccVelX = this.AddInlet("accelerationvelx", "DOUBLE");
+    this.InletAccVelY = this.AddInlet("accelerationvely", "DOUBLE");
+    this.InletAccVelZ = this.AddInlet("accelerationvelz", "DOUBLE");
 
     if (super.Init((res) => {
 
@@ -113,7 +226,7 @@ export class moEffect extends moMoldeoObject {
       this.isyncro = this.m_Config.GetParamIndex("syncro");
       this.iphase = this.m_Config.GetParamIndex("phase");
       this.CreateConnectors();
-      console.log( `moEffect.PreInit OK! ${this.GetLabelName()}:(${this.m_Config.m_Params.length})<-I[${this.m_Inlets.length}]->O[${this.m_Outlets.length}]]`, this);
+      //console.log( `moEffect.PreInit OK! ${this.GetLabelName()}:(${this.m_Config.m_Params.length})<-I[${this.m_Inlets.length}]->O[${this.m_Outlets.length}]]`, this);
       if (callback) callback(res);
     } )) {
       // esta función es asincrónica ahora
@@ -173,36 +286,14 @@ export class moEffect extends moMoldeoObject {
       Object.assign(this.m_EffectState, parentstate);
     }
 
-    if (this.InletTime) {
-      if (this.InletTime.GetData())
-        this.InletTime.GetData().SetDouble(this.m_EffectState.tempo.ang);
-      //console.log("tempo.ang", this.m_EffectState.tempo.ang);
-    }
-
-    if (this.InletTimems) {
-      if (this.InletTimems.GetData())
-        this.InletTimems.GetData().SetDouble(this.m_EffectState.tempo.Duration());
-    }
-    if (this.InletMilliseconds) {
-      if (this.InletMilliseconds.GetData())
-        this.InletMilliseconds.GetData().SetDouble( this.m_EffectState.tempo.Duration());
-    }
-    if (this.InletTimes) {
-      if (this.InletTimes.GetData())
-        this.InletTimes.GetData().SetDouble(this.m_EffectState.tempo.Duration() / 1000.0);
-    }
-    if (this.InletSeconds) {
-      if (this.InletSeconds.GetData())
-        this.InletSeconds.GetData().SetDouble(this.m_EffectState.tempo.Duration() / 1000.0);
-    }
-    if (this.InletT) {
-      if (this.InletT.GetData())
-        this.InletT.GetData().SetDouble( this.m_EffectState.tempo.ang);
-    }
-    if (this.InletTempo) {
-      if (this.InletTempo.GetData())
-        this.InletTempo.GetData().SetDouble( moMath.FMod( this.m_EffectState.tempo.ang, moMath.TWO_PI));
-    }
+    this.InletTime.SetNumber(this.m_EffectState.tempo.ang);
+    this.InletTimems.SetNumber(this.m_EffectState.tempo.Duration());
+    this.InletMilliseconds.SetNumber(this.m_EffectState.tempo.Duration());
+    this.InletTimes.SetNumber(this.m_EffectState.tempo.Duration() / 1000.0);
+    this.InletSeconds.SetNumber(this.m_EffectState.tempo.Duration() / 1000.0);
+    this.InletSecondsS.SetNumber(this.m_EffectState.tempo.Duration() / 1000.0);
+    this.InletT.SetNumber( this.m_EffectState.tempo.ang);
+    this.InletTempo.SetNumber( moMath.FMod( this.m_EffectState.tempo.ang, moMath.TWO_PI));
 
     this.m_pResourceManager.GetRenderMan().m_Renderer.clearDepth();
     //this.m_pResourceManager.GetRenderMan().m_Renderer.clear(false, true, false);
@@ -218,11 +309,20 @@ export class moEffect extends moMoldeoObject {
   }
 
   EndDraw() {
-    this.ScriptExeDraw();
+    // MUST CALL THIS BEFORE EndDraw. this.ScriptExeDraw();
   }
 
   ScriptExeDraw(): void {
-
+    if (this.IsInitialized()) {
+        if (this.ScriptHasFunction("Draw")) {
+            this.SelectScriptFunction("Draw");
+            //this.AddFunctionParam( i + j*this.m_cols);
+            //this.AddFunctionParam( this.dt );
+            if (!this.RunSelectedFunction(1)) {
+                //this.MODebug2.Error( moText("RunParticle function not executed") );
+            }
+        }
+    }
   }
 /*
   GetState() : moMobState {
@@ -252,6 +352,11 @@ export class moEffect extends moMoldeoObject {
       return this.GetState().Activated();
   }
 */
+
+  GetEffectState() : moEffectState {
+    return this.m_EffectState;
+  }
+
   Select() {
       var mobstate : moMobState = this.GetState();
       mobstate.Select();
@@ -348,6 +453,260 @@ export class moEffect extends moMoldeoObject {
       new moValue("0", "NUM"), "No,Yes,Full" );
     //console.log("Effect definitions:", p_configdefinition);
     return p_configdefinition;
+  }
+
+  Interaction( p_iodeviceman : moIODeviceManager ) {
+
+    if (p_iodeviceman==undefined || !p_iodeviceman) return;
+
+    //console.log("moEffect::Interaction > p_iodeviceman");
+    this.mousexrel = 0.0;
+    this.mouseyrel = 0.0;
+    this.mousexrel_left = 0.0;
+    this.mouseyrel_left = 0.0;
+
+    for( var ev_idx : MOint = 0; ev_idx < p_iodeviceman.GetEvents().List().length; ev_idx++ ) {
+      var event : moEvent = p_iodeviceman.GetEvents().GetRef(ev_idx);
+      //console.log(event);
+
+      if (event.deviceid==MO_IODEVICE_MOUSE) {
+        if (event.jsevent) {
+
+          if (event.devicecode==moIODeviceCode.MO_SDL_MOUSEMOTION ) {
+            //console.log("x: "+mevent.clientX,"y: "+mevent.clientY);
+            //console.log(event);
+            this.mousexrel = event.reservedvalue0;
+            this.mouseyrel = event.reservedvalue1;
+            this.mousex_old = this.mousex;
+            this.mousey_old = this.mousey;
+            this.mousex = event.reservedvalue2;
+            this.mousey = event.reservedvalue3;
+
+            this.mousexrel = this.mousex-this.mousex_old;
+            this.mouseyrel = this.mousey-this.mousey_old;
+            //this.mousefactor = event.reservedvalue2;
+          } else {
+            this.mousexrel = 0.0;
+            this.mouseyrel = 0.0;
+          }
+
+          if (event.jsevent.type=="mouseup" || event.devicecode == moIODeviceCode.MO_SDL_MOUSEBUTTONUP) {
+            if (event.jsevent.button==0) {
+              this.mousebuttonleft = 0.0;
+            }
+            if (event.jsevent.button==1) {
+              this.mousebuttonmiddle = 0.0;
+            }
+            if (event.jsevent.button==2) {
+              this.mousebuttonright = 0.0;
+            }
+
+            this.InletMouseButtonLeft.SetNumber( this.mousebuttonleft );
+            this.InletMouseButtonMiddle.SetNumber( this.mousebuttonmiddle );
+            this.InletMouseButtonRight.SetNumber( this.mousebuttonright );
+
+            //console.log(event);
+            //console.log(event, this);
+          }
+
+          if (event.jsevent.type=="mousedown" || event.devicecode == moIODeviceCode.MO_SDL_MOUSEBUTTONDOWN) {
+            if (event.jsevent.button==0) {
+              this.mousebuttonleft = 1.0;
+              this.mousex = event.reservedvalue1;
+              this.mousey = event.reservedvalue2;
+              this.mousex_old = this.mousex;
+              this.mousey_old = this.mousey;
+              console.log("mousex_old",this.mousex_old);
+            }
+            if (event.jsevent.button==1) {
+              this.mousebuttonmiddle = 1.0;
+              this.mousex = event.reservedvalue1;
+              this.mousey = event.reservedvalue2;
+              this.mousex_old = this.mousex;
+              this.mousey_old = this.mousey;
+            }
+            if (event.jsevent.button==2) {
+              this.mousebuttonright = 1.0;
+              this.mousex = event.reservedvalue1;
+              this.mousey = event.reservedvalue2;
+              this.mousex_old = this.mousex;
+              this.mousey_old = this.mousey;
+            }
+            this.InletMouseButtonLeft.SetNumber( this.mousebuttonleft );
+            this.InletMouseButtonMiddle.SetNumber( this.mousebuttonmiddle );
+            this.InletMouseButtonRight.SetNumber( this.mousebuttonright );
+            //console.log(event);
+            //console.log(event, this);
+          }
+
+          this.InletMouseX.SetNumber( this.mousex );
+          this.InletMouseY.SetNumber( this.mousey );
+
+          if (event.jsevent.type=="mousemove" || event.devicecode == moIODeviceCode.MO_SDL_MOUSEMOTION) {
+
+            //this.mousexrel = 0.0;
+            //this.mouseyrel = 0.0;
+
+            if (this.mousebuttonleft==1.0) {
+              //console.log("mousebuttonleft",this.mousexbuttonleft, this.mousexrel);
+              this.mousexbuttonleft+= Number(this.mousexrel);
+              this.mouseybuttonleft+= Number(this.mouseyrel);
+            }
+
+            if (this.mousebuttonmiddle==1.0) {
+              this.mousexbuttonmiddle+= this.mousexrel;
+              this.mouseybuttonmiddle+= this.mouseyrel;
+            }
+
+            if (this.mousebuttonright==1.0) {
+              this.mousexbuttonright+= this.mousexrel;
+              this.mouseybuttonright+= this.mouseyrel;
+            }
+
+            this.InletMouseXButtonLeft.SetNumber( this.mousexbuttonleft );
+            this.InletMouseXButtonMiddle.SetNumber( this.mousexbuttonmiddle );
+            this.InletMouseXButtonRight.SetNumber( this.mousexbuttonright );
+            this.InletMouseYButtonLeft.SetNumber( this.mouseybuttonleft );
+            this.InletMouseYButtonMiddle.SetNumber( this.mouseybuttonmiddle );
+            this.InletMouseYButtonRight.SetNumber( this.mouseybuttonright );
+            //console.log(event);
+          }
+
+          if (event.devicecode==moIODeviceCode.MO_SDL_MOUSEWHEEL ) {
+            this.mousexwheel+= event.reservedvalue0;
+            this.mouseywheel+= event.reservedvalue1;
+            this.mousezwheel+= event.reservedvalue2;
+            this.mousewheeldeltamode = event.reservedvalue3;
+            //console.log(this.mouseywheel);
+          }
+          this.InletMouseXWheel.SetNumber( this.mousexwheel );
+          this.InletMouseYWheel.SetNumber( this.mouseywheel );
+          this.InletMouseZWheel.SetNumber( this.mousezwheel );
+
+          //if ( this.timestamp != 0 ) {
+
+              //var NS2S : MOdouble = 1.0 / 1000000000;
+              //var NS2Sm : MOdouble = 1.0 / 100000;
+              //console.log("NS2S:",NS2S)
+              //console.log("jsev.timestamp:",this.m_EffectState.tempo.Duration())
+              //var dT : any = ( this.m_EffectState.tempo.Duration() - this.timestamp ) * NS2Sm;
+              this.dT = 1.0;
+              //console.log("dT:",dT)
+              /*
+              lax = this.accelerationx;
+              lay = this.accelerationy;
+              laz = this.accelerationz;
+              */
+              this.lax = this.mousexrel;
+              this.lay = this.mouseyrel;
+              this.laz = 0.0;//this.mousezrel;
+
+              this.mousevelocityx = this.mousevelocityx + this.lax * this.dT ;
+              this.mousevelocityy = this.mousevelocityy + this.lay * this.dT ;
+              this.mousevelocityz = this.mousevelocityz + this.laz * this.dT ;
+
+              this.mousevelocity = Math.sqrt( this.mousevelocityx*this.mousevelocityx + this.mousevelocityy*this.mousevelocityy + this.mousevelocityz*this.mousevelocityz );
+              if (this.mousevelocity < 0.01) { this.mousevelocity = 0 ; }
+              //tv_speed.setText(String.valueOf(speed));
+
+          //}
+
+          //this.timestamp = this.m_EffectState.tempo.Duration();
+
+        }
+
+      }
+
+      if (event.deviceid==MO_IODEVICE_MOBILE) {
+
+        if (event.devicecode==moIODeviceMobileCode.MO_ACCELERATION_LINEAR ) {
+          this.InletAccX.SetNumber( event.reservedvalue0 );
+          this.accelerationx = event.reservedvalue0;
+          this.InletAccY.SetNumber( event.reservedvalue1 );
+          this.accelerationy = event.reservedvalue1;
+          this.InletAccZ.SetNumber( event.reservedvalue2 );
+          this.accelerationz = event.reservedvalue2;
+        }
+
+
+
+        if (event.devicecode==moIODeviceMobileCode.MO_ROTATION ) {
+          this.InletRotX.SetNumber( event.reservedvalue0 );
+          this.rotationx = event.reservedvalue0;
+          this.InletRotY.SetNumber( event.reservedvalue1 );
+          this.rotationy = event.reservedvalue1;
+          this.InletRotZ.SetNumber( event.reservedvalue2 );
+          this.rotationz = event.reservedvalue2;
+        }
+
+
+
+        this.dT = 1.0;
+        //console.log("dT:",dT)
+        /*
+        lax = this.accelerationx;
+        lay = this.accelerationy;
+        laz = this.accelerationz;
+        */
+        //this.lax = this.accelerationgx*this.dT;
+        //this.lay = this.accelerationgy*this.dT;
+        //this.laz = this.accelerationgz*this.dT;
+        if (event.devicecode==moIODeviceMobileCode.MO_ACCELERATION_LINEAR_W_GRAVITY ) {
+          this.InletAccGX.SetNumber( event.reservedvalue0 );
+          this.laccx = event.reservedvalue0 - this.accelerationgx;
+          this.accelerationgx = event.reservedvalue0;
+
+          this.InletAccGY.SetNumber( event.reservedvalue1 );
+          this.laccy = event.reservedvalue1 - this.accelerationgy;
+          this.accelerationgy = event.reservedvalue1;
+
+          this.InletAccGZ.SetNumber( event.reservedvalue2 );
+          this.laccz = event.reservedvalue2 - this.accelerationgz;
+          this.accelerationgz = event.reservedvalue2;
+
+          this.lacc = Math.sqrt( this.laccx*this.laccx + this.laccy*this.laccy + this.laccz*this.laccz );
+
+          this.laccmax = ( this.laccmax >= this.lacc ) ? this.laccmax : this.lacc;
+          if (this.laccmaxcut == 0.0) this.laccmaxcut = 2.0;
+          this.laccsum = String(this.lacc > this.laccmaxcut);
+          if ( this.lacc > this.laccmaxcut ) {
+
+            /*
+            this.velocityx = this.velocityx + this.laccx * this.dT ;
+            this.velocityy = this.velocityy + this.laccy * this.dT ;
+            this.velocityz = this.velocityz + this.laccz * this.dT ;
+*/
+            this.velocityx = this.laccx * this.dT ;
+            this.velocityy = this.laccy * this.dT ;
+            this.velocityz = this.laccz * this.dT ;
+          }
+
+          this.velocity = Math.sqrt( this.velocityx*this.velocityx + this.velocityy*this.velocityy + this.velocityz*this.velocityz );
+
+          if (this.velocity < 0.01) { this.velocity = 0 ; }
+	}
+	
+        if (event.devicecode==moIODeviceMobileCode.MO_ROTATION ) {
+          this.InletRotX.SetNumber( event.reservedvalue0 );
+          this.InletRotY.SetNumber( event.reservedvalue1 );
+          this.InletRotZ.SetNumber( event.reservedvalue2 );
+        }
+
+      }
+
+    }
+
+    //console.log( "mousevelocity: ", this.mousevelocity );
+    this.InletMouseVelocity.SetNumber( this.mousevelocity );
+    this.mousevelocity = this.mousevelocity * 0.98;
+    if (this.mousevelocity<0.001) this.mousevelocity = 0.0;
+
+    this.velocity = this.velocity * 0.98;
+    this.velocityx = this.velocityx * 0.98;
+    this.velocityy = this.velocityy * 0.98;
+    this.velocityz = this.velocityz * 0.98;
+    if (this.velocity<0.001) this.velocity = 0.0;
+    this.InletVelocity.SetNumber( this.velocity );
   }
 
 }

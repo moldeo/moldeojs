@@ -67,7 +67,7 @@ export class moTextureManager extends moResource {
     var extension : string = FileName.GetExtension() + "";
 
     if (extension in [
-      ".tga", ".jpg", ".png", ".bmp", ".tif", ".xpm"
+      ".tga", ".jpg", ".jpeg", ".png", ".bmp", ".tif", ".xpm"
     ]) {
       return moTextureType.MO_TYPE_TEXTURE;
     }
@@ -79,7 +79,7 @@ export class moTextureManager extends moResource {
     if (extension in [
       ".mkv", ".ogg", ".ogv", ".avi", ".mov", ".mpg",
       ".mpeg", ".mts", ".m2ts", ".vob", ".m2v", ".mp4",
-      ".web", ".webm"
+      ".web", ".webm", ".flv", ".swf"
     ]) {
       return moTextureType.MO_TYPE_MOVIE;
     }
@@ -110,7 +110,7 @@ export class moTextureManager extends moResource {
     var p_width : number;
 
     if (typeof arg1 == "number" && typeof arg2 == "string") {
-      console.log("AddTexture Number");
+      //console.log("AddTexture Number");
       type = arg1;
       name = arg2;
     } else {
@@ -185,7 +185,7 @@ export class moTextureManager extends moResource {
     if (ptexbuffer) {
         if ( ptexbuffer.Init( p_foldername, p_bufferformat, this.m_pResourceManager ) ) {
             this.m_textures_buffers.push( ptexbuffer );
-            console.log("tbuffer:", ptexbuffer );
+            //console.log("tbuffer:", ptexbuffer );
             //MODebug2->Push( moText("TextureBuffer created:")
             // + (moText)p_foldername + moText(" idx:") +IntToStr((m_textures_buffers.Count() - 1)) );
             return (this.m_textures_buffers.length - 1);

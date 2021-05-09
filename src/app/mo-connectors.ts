@@ -1,7 +1,7 @@
 
 import { moAbstract } from "./mo-abstract";
 import { moText } from "./mo-text";
-import { MOint, MOuint, MOlong, MOulong } from "./mo-types";
+import { MOint, MOuint, MOlong, MOulong, moNumber } from "./mo-types";
 import { moMoldeoObject } from "./mo-moldeo-object";
 import { moParam, moParamType } from "./mo-param";
 import { moData, moDataType, moDataMessages, moDataMessage } from "./mo-value";
@@ -348,7 +348,15 @@ export class moConnector extends moAbstract {
   * marca este dato como actualizado
   */
   Update( force : boolean = true) : void {
+    this.m_bUpdated = force;
+    if (this.m_pParam) {
+      // TODO: this.m_pParam.Update();
+    }
+  }
 
+  //TODO: put in C++ code
+  SetNumber( number : moNumber ) {
+    this.GetData().SetNumber(number);
   }
 
   /**
@@ -566,6 +574,3 @@ export class moOutlet extends moConnector {
 
 
 export type moOutlets = moOutlet[];
-
-
-

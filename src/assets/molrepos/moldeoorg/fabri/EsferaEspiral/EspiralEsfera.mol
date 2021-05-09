@@ -15,7 +15,9 @@
                 <D type="TXT"></D>
             </VAL>
         </PARAM>
-        <PARAM name="devices" type="MOLDEOOBJECT" />
+        <PARAM name="devices" type="MOLDEOOBJECT">
+          
+        </PARAM>
         <PARAM name="preeffect" type="MOLDEOOBJECT">
             <VAL>
                 <D type="TXT">erase</D>

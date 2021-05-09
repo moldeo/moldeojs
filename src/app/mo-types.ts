@@ -1,3 +1,6 @@
+var uaparser = require('ua-parser-js');
+export const MO_USERAGENT = uaparser(navigator.userAgent);
+export const MO_VERSION = require('../../package.json').version;
 export const MO_PI = 3.1415926535897932384626433832795;
 export const MO_ON = 1;
 export const MO_OFF = -1;
@@ -32,6 +35,9 @@ export type MOubyte = number;
 export type MObyte = number;
 export type MOswitch = number;
 export type moNumber = number;
+
+export type MOpointer = any;
+export type moPointer = any;
 
 export type MO_DISPLAY = any;
 export type MO_HANDLE = any;
