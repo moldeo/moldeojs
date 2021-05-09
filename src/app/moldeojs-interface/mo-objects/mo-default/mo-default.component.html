@@ -1,0 +1,65 @@
+<!--div class="moContainer" #moDefault [ngDraggable]="drag" draggable="true" (click)="toggle=false" (dragstart)="toggle=false">
+  <div class="moInlet" (mousedown)="drag=false;">
+  </div>
+  <div class="moObject" (dblclick)="showSet()">
+    <p>{{objectname}}</p>
+  </div>
+  <div class="moOutlet" (mousedown)="drag=false;con.dataOut($event, moDefault, moPrecon, moConnect, '12aced');">
+  </div>
+</div-->
+
+<div class="moContainer weight_0" #moObj [ngDraggable]="drag" draggable="true" (dragstart)="toggle=false;">
+  <div class="moInlet" (mousedown)="drag=false;">
+  </div>
+  <div class="moObject" (dblclick)="showSet();">
+    <img *ngIf="texturePath" [src]="texturePath" style="border-left:2px solid #fff;border-bottom:2px solid #fff;" [style.border-color]="colorPath" [style.background-color]="colorPath">
+    <b *ngIf="!texturePath" [style.background-color]="colorPath"></b>
+    <p>{{title}}</p>
+  </div>
+  <div class="moOutlet" (mousedown)="drag=false;con.dataOut($event, moObj, moPrecon, moConnect, '12aced');">
+  </div>
+</div>
+
+<!--div #moSettings class="moSettings" [hidden]="!toggle">
+  <p>{{title}}</p>
+  <button type="button" name="button" (click)="testObject()">Test Object</button>
+</div-->
+<div #moSettings class="moObjOpen moOpenAni moSettings" [hidden]="!toggle">
+  <div class="moOptionsObject">
+    <a class="moCopyButton"></a>
+    <a class="moTrashButton" (click)="removeMOObject()"></a>
+  </div>
+  <img *ngIf="texturePath" [src]="texturePath" style="border:2px solid #fff" [style.border-color]="colorPath">
+  <b *ngIf="!texturePath" [style.background-color]="colorPath"></b>
+  <h4 #moMob (click)="EditMobDef($event)" class="moMobDefinition">{{title}}<br/><span>{{name}}</span><br/>{{type}}</h4>
+  <h4 #moMobEdit>
+    <input #moMobEditTitle (blur)="SaveMobDef($event)"  value="{{title}}" type="text"/><br/>
+    <span><input  #moMobEditName (blur)="SaveMobDef($event)" value="{{name}}" type="text"/></span>
+    <input  #moMobEditType (blur)="SaveMobDef($event)" class="hidden" value="{{type}}" type="text"/>
+  </h4>
+</div>
+
+<div #moParams class="moParams" [hidden]="!toggle">
+  <h2 class="moParamsContent">{{title}}</h2>
+  <span style="font-size: 10px;">{{type}} ({{motype}}): </span>
+  <input id="moObjectName" class="moParamsContent" type="text" value="{{name}}" (keyup)="changeName($event)">
+  <input id="moObjectKey" class="moParamsContent" type="text" value="{{key}}" (keyup)="changeKey($event)" maxlength="1">
+  <ul class="moParamsContent">
+    <li *ngFor="let p of Params" class="moParamsContent" (click)="selParam(p)">
+      {{p.GetName()}}
+    </li>
+  </ul>
+  <h3 *ngIf="paramSelect" class="moParamsContent">{{paramSelect.GetName()}}</h3>
+  <div #moCurrentParams class="moParamsContent" *ngIf="showParams && paramSelect.m_Values.length && paramSelect.m_Values[0].m_List">
+    <input *ngFor="let v of paramSelect.m_Values[0].m_List"
+        type="text"
+        class="moParamsContent"
+        value="{{v.ToText()}}"
+        (keyup)="getNewParam($event)">
+  </div>
+</div>
+
+<svg #moPrecon id="moPrecon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">
+</svg>
+<svg #moConnect id="moConnect" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">
+</svg>
