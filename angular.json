@@ -17,6 +17,19 @@
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.json",
             "showCircularDependencies": false,
+            "allowedCommonJsDependencies": [
+              "rxjs/Rx",
+              "zone.js/dist/zone",
+              "socket.io-client",
+              "rxjs/BehaviorSubject",
+              "xml-js",
+              "progressbar.js",
+              "p5/lib/addons/p5.sound",
+              "typed-function",
+              "decimal.js",
+              "fraction.js",
+              "complex.js"
+            ],
             "assets": [
               "src/assets",
               "src/favicon.ico"

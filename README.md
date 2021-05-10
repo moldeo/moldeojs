@@ -26,6 +26,27 @@ fixed with: import { BsDatepickerModule } from 'ngx-bootstrap/datepicker'
 ### Setting Max File Watches
 echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 
+## Angular 10.0:
+### FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+solution: export NODE_OPTIONS=--max_old_space_size=4096
+
+### WARNING: CommonJS Dependencies must be defined in angular.json
+https://angular.io/guide/build#configuring-commonjs-dependencies
+fixed adding to angular.json options: 
+"allowedCommonJsDependencies": [
+  "rxjs/Rx",
+  "zone.js/dist/zone",
+  "socket.io-client",
+  "rxjs/BehaviorSubject",
+  "xml-js",
+  "progressbar.js",
+  "p5/lib/addons/p5.sound",
+  "typed-function",
+  "decimal.js",
+  "fraction.js",
+  "complex.js"
+],
+
 
 # Pre-requisites
 1) Install  [NodeJS](https://nodejs.org/es/) > 6.9.0

@@ -61,7 +61,8 @@ export class moConfigDefinition extends moAbstract {
   }
 
   Exists(p_name: moText): boolean {
-    if (p_name in this.m_ParamDefinitions_Map) return true;
+    var name : string = p_name as string;
+    if ( name in this.m_ParamDefinitions_Map) return true;
     return false;
   }
 
