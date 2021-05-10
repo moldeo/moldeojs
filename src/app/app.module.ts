@@ -73,7 +73,8 @@ import { SocketIoModule, SocketIoConfig, Socket } from 'ngx-socket-io';
     HttpClientModule,
     SocketIoModule,
     /*SocketIoModule.forRoot(SocketIoConfig),*/
-    RouterModule.forRoot(appRoutes)
+    /*SocketIoModule.forRoot(SocketIoConfig),*/
+RouterModule.forRoot(appRoutes, { relativeLinkResolution: 'legacy' })
   ],
   providers: [
     Title,
