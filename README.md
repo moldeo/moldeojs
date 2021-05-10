@@ -47,6 +47,14 @@ fixed adding to angular.json options:
   "complex.js"
 ],
 
+## Angular 11.0:
+
+### ERROR: Migration failed: Incompatible peer dependencies found
+Package "codelyzer" has an incompatible peer dependency to "@angular/compiler"
+(must upgrade codelyzer/tslint to eslint in angular 11.0 as soon as possible)
+Fixed with: ng update codelyzer --allow-dirty
+### FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+solution: export NODE_OPTIONS=--max_old_space_size=8192
 
 # Pre-requisites
 1) Install  [NodeJS](https://nodejs.org/es/) > 6.9.0
