@@ -4,7 +4,8 @@ import { CommonModule } from '@angular/common';
 //import { BsDropdownModule } from 'ngx-bootstrap';
 import { TooltipModule } from 'ngx-bootstrap';
 import { ModalModule } from 'ngx-bootstrap';
-import { BsDatepickerModule } from 'ngx-bootstrap';
+//import { BsDatepickerModule } from 'ngx-bootstrap';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker'
 import { CollapseModule } from 'ngx-bootstrap';
 
 

@@ -225,15 +225,16 @@ export function moGetTicks(): MOulong {
   return GlobalMoldeoTimer.Duration();
 }
 
-window["Performance"] = window.performance || {};
-window["Performance"].now = (function() {
+//window["Performance"] = window.performance  || {};
+/*window["Performance"].now = (function() {
     return performance.now       ||
         performance["mozNow"]    ||
         performance["msNow"]     ||
         performance["oNow"]      ||
         performance["webkitNow"] ||
-        Date.now  /*none found - fallback to browser default */
+        Date.now  //none found - fallback to browser default
 })();
+*/
 
 ///Devuelve en milisegundos el valor del reloj de Moldeo
 /**
@@ -256,7 +257,15 @@ export function moGetTicksAbsolute( force_real_absolute : boolean = false): MOul
 
   return clockt.total_milliseconds();
 */
-  return window["Performance"].now();
+  //return window["Performance"].now();
+  /*return performance.now       ||
+      performance["mozNow"]    ||
+      performance["msNow"]     ||
+      performance["oNow"]      ||
+      performance["webkitNow"] ||
+      Date.now; */
+    //console.log(performance.now);
+    return performance.now();
   //return 0;
 }
 
@@ -333,5 +342,3 @@ export function moIsTimerPlaying() : boolean {
 }
 
 export var GlobalMoldeoTimer : moTimerAbsolute = new moTimerAbsolute();
-
-

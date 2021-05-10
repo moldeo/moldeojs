@@ -9,6 +9,24 @@ Moldeo is an Open Source platform for making interactive projects. MoldeoJS is i
 - Parcticles system rendered in real time using Euler algorithm.
 - Multiple Audiovisual processes in a same canvas.
 
+# IMPORTANT: Angular versions fixes
+
+## Angular 9.0:
+### tsconfig.json add files and include sections:
+  "files": [
+    "main.ts",
+    "polyfills.ts"
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ]
+### ngx-bootstrap compatibility
+fixed with: import { BsDatepickerModule } from 'ngx-bootstrap/datepicker'
+
+### Setting Max File Watches
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+
+
 # Pre-requisites
 1) Install  [NodeJS](https://nodejs.org/es/) > 6.9.0
 # Using Ubuntu
