@@ -2,6 +2,7 @@
 Javascript Moldeo Platform
 
 Moldeo is an Open Source platform for making interactive projects. MoldeoJS is it's lighter version, to be used in web browsers.
+
 # Features in MoldeoJS
 - Export projects recorded from your screen.
 - Access different webcams and display simultaneously.
