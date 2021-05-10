@@ -59,17 +59,17 @@ export class MoldeojsInterfaceComponent implements OnInit {
   @Input() moldeojsview: MoldeojsViewComponent;
   /////////////////////////////////////////////
   /*- moWheel definitions -*/
-  @ViewChild('moWheel', {static: false } ) moWheel: ElementRef;
+  @ViewChild('moWheel') moWheel: ElementRef;
   public moWheelDisplay:boolean = false;
   public moToolDisplay:boolean = false;
   /////////////////////////////////////////////
   /*- moConfig definitions, for save Components -*/
-  @ViewChild('moConfig', {static: false } ) moConfig: ElementRef;
+  @ViewChild('moConfig') moConfig: ElementRef;
   containers: HtmlContainer[] = [];
   /////////////////////////////////////////////
   public moFileName: any = "No File (.MOL)";
 
-  @ViewChild('moCanvas', {static: false } ) moCanvas: ElementRef;
+  @ViewChild('moCanvas') moCanvas: ElementRef;
   /////////////////////////////////////////////
   //- Listeners -//
   public configDblClick: () => void;

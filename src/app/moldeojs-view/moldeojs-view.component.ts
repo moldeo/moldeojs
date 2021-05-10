@@ -40,12 +40,12 @@ export class MoldeojsViewComponent implements OnInit {
   //jsonRute : string = 'http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_tema_=Mosaico&output=json';
   //jsonRute: string = "http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_temaid_=423&output=json";
   //jsonInit : any;
-  @ViewChild('overlayer', {static: false } ) overlayerel: ElementRef;
-  @ViewChild('webview_contenidos', {static: false } ) contenidos: ElementRef;
-  @ViewChild('webview_titulo', {static: false } ) titulo: ElementRef;
-  @ViewChild('webview_descripcion', {static: false } ) descripcion: ElementRef;
-  @ViewChild('audioonoff_ico', {static: false}) audioonoff_ico : ElementRef;
-  @ViewChild('moldeobuttons', {static: false } ) moldeobuttons: ElementRef;
+  @ViewChild('overlayer') overlayerel: ElementRef;
+  @ViewChild('webview_contenidos') contenidos: ElementRef;
+  @ViewChild('webview_titulo') titulo: ElementRef;
+  @ViewChild('webview_descripcion') descripcion: ElementRef;
+  @ViewChild('audioonoff_ico') audioonoff_ico : ElementRef;
+  @ViewChild('moldeobuttons') moldeobuttons: ElementRef;
   mititulo: string = "Completar titulo";
   midescripcion : string = "Completar descripcion";
   //baseref : string = "https://www.moldeo.org/assets/";

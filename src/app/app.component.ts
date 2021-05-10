@@ -70,19 +70,19 @@ export class AppComponent implements OnInit {
 
   public modalRef: BsModalRef; // {1}
 
-  @ViewChild('chatmsgbox', { static: false } ) chatmsgbox: ElementRef;
-  @ViewChild('oscmsgbox', { static: false } ) oscmsgbox: ElementRef;
-  @ViewChild('message2send', { static: false } ) message2send: ElementRef;
-  @ViewChild('message2recv', { static: false } ) message2recv: ElementRef;
-  @ViewChild('clientcolor', { static: false } ) clientcolor: ElementRef;
+  @ViewChild('chatmsgbox') chatmsgbox: ElementRef;
+  @ViewChild('oscmsgbox') oscmsgbox: ElementRef;
+  @ViewChild('message2send') message2send: ElementRef;
+  @ViewChild('message2recv') message2recv: ElementRef;
+  @ViewChild('clientcolor') clientcolor: ElementRef;
 
   public chat_canvas: HTMLCanvasElement;
   public ctx_chat_canvas: CanvasRenderingContext2D;
 
 
-  @ViewChild('navmenu', { static: false } ) navmenu: ElementRef;
-  @ViewChild(MoldeojsViewComponent, { static: false }) moldeojsview: MoldeojsViewComponent;
-  @ViewChild(MoldeojsInterfaceComponent, { static: false }) moldeojsinterface: MoldeojsInterfaceComponent;
+  @ViewChild('navmenu') navmenu: ElementRef;
+  @ViewChild(MoldeojsViewComponent) moldeojsview: MoldeojsViewComponent;
+  @ViewChild(MoldeojsInterfaceComponent) moldeojsinterface: MoldeojsInterfaceComponent;
 /*
   @ViewChild('dynamic', {
     read: ViewContainerRef

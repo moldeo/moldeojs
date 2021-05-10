@@ -12,13 +12,13 @@ export class MoErase implements OnInit {
   @Input() public posY:number = 0;
   @Input() public name:string = "";
   @Input() public key:string = "";
-  @ViewChild('moObj', {static: false } ) moErase;
-  @ViewChild('moObj', {static: false } ) moObj;
-  @ViewChild('moSettings', {static: false } ) moSettings;
-  @ViewChild('moParams', {static: false } ) moParams;
-  @ViewChild('moCurrentParams', {static: false } ) moCurrentParams;
-  @ViewChild('moConnect', {static: false } ) moConnect;
-  @ViewChild('moPrecon', {static: false } ) moPrecon;
+  @ViewChild('moObj') moErase;
+  @ViewChild('moObj') moObj;
+  @ViewChild('moSettings') moSettings;
+  @ViewChild('moParams') moParams;
+  @ViewChild('moCurrentParams') moCurrentParams;
+  @ViewChild('moConnect') moConnect;
+  @ViewChild('moPrecon') moPrecon;
   public toggle:boolean = false;
   public drag:boolean = true;
 
