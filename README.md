@@ -6,7 +6,7 @@ Moldeo is an Open Source platform for making interactive projects. MoldeoJS is i
 # Features in MoldeoJS
 - Export projects recorded from your screen.
 - Access different webcams and display simultaneously.
-- Parcticles system rendered in real time using Euler algorithm.
+- Particles system rendered in real time using Euler algorithm.
 - Multiple Audiovisual processes in a same canvas.
 
 # IMPORTANT: Angular versions fixes
@@ -80,7 +80,7 @@ $ npm install
 $ npm start
 ```
 
-#Build to deploy later in a site
+# Build to deploy later in a site
 ```sh
 $ npm run buildsite
 ```
