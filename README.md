@@ -148,10 +148,11 @@ Plugins are applied in chronological order, in three stages inside the drawing c
 # Contact:
 - info@moldeo.org
 - [Moldeo's Community on Facebook](https://www.facebook.com/comunidadmoldeo?3e71y)
-- www.moldeo.org
+- [Official Site](www.moldeo.org)
+
 
 # Demo
-https://moldeojs.moldeo.org/a2cli/dist/
+https://moldeojs.moldeo.org/
 
 # Licence
 [GNU GPL](https://github.com/moldeo/moldeojs/blob/master/LICENSE)
