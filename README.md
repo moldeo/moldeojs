@@ -32,7 +32,7 @@ solution: export NODE_OPTIONS=--max_old_space_size=4096
 
 ### WARNING: CommonJS Dependencies must be defined in angular.json
 https://angular.io/guide/build#configuring-commonjs-dependencies
-fixed adding to angular.json options: 
+fixed adding to angular.json options:
 "allowedCommonJsDependencies": [
   "rxjs/Rx",
   "zone.js/dist/zone",
@@ -72,7 +72,7 @@ $ npm install -g @angular/cli
 #  Execute MoldeoJS
 Install the dependencies and MoldeoJS from your console typing
 ```sh
-$ npm install  
+$ npm install
 ```
 
 # Run the server with:
@@ -107,21 +107,21 @@ Plugins are applied in chronological order, in three stages inside the drawing c
 
 - Sound (based on P5.js oscillator)
 - Faust (Faust sound compiler for javascript based on wasm and webaudio) https://github.com/faust/tree/architecture/webaudio
-  
+
   IMPORTANT modify some things like:
-    The base library file libfaust-wasm.js: 
-      var REMOTE_PACKAGE_BASE="libfaust-wasm.data"; 
+    The base library file libfaust-wasm.js:
+      var REMOTE_PACKAGE_BASE="libfaust-wasm.data";
     with:
       var REMOTE_PACKAGE_BASE="./assets/data/effects/faust/libfaust-wasm.data";
-      
+
     Then for each compiled effect do:
-    
+
     Modify the .js file (compiled with 'faust2wasm -worklet wind.dsp'), aka 'wind.js' reference with the correct path,
     replace:
       let real_url = (this.baseURL === "") ? "wind.wasm" : (this.baseURL + "/wind.wasm");
     with:
       let real_url = (this.baseURL === "") ? "wind.wasm" : (this.baseURL + "/assets/effects/faust/wind.wasm");
-    
+
     Modify the dspName constant with a specific one,
     replace:
       const dspName = "wind"
@@ -131,12 +131,12 @@ Plugins are applied in chronological order, in three stages inside the drawing c
       const dspNameWind = "wind"
       ...
       window[dspNameWind] = wind;
-      
+
     Then check that you added to header of your index.html for every effect, the script link to the js file, like this:
           <script name="faustnoise" src="./assets/data/effects/faust/wind.js"></script>
-        
 
-      
+
+
 - ML5 (based on ml5.js https://github.com/ml5js) works with live camera, and texture buffers (image/texture collections) for image classification
 
 **Post- Effect:**  Apply filters to the final image.
@@ -148,8 +148,8 @@ Plugins are applied in chronological order, in three stages inside the drawing c
 # Contact:
 - info@moldeo.org
 - [Moldeo's Community on Facebook](https://www.facebook.com/comunidadmoldeo?3e71y)
-- [Official Site](www.moldeo.org)
-
+- [Official Site](https://www.moldeo.org)
+- [Official Forum](https://odoo14.moldeo.org/forum)
 
 # Demo
 https://moldeojs.moldeo.org/
