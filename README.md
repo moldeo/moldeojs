@@ -1,15 +1,26 @@
 # MoldeoJS
 Javascript Moldeo Platform
 
-Moldeo is an Open Source platform for making interactive projects. MoldeoJS is it's lighter version, to be used in web browsers.
+Moldeo is an Open Source platform for making interactive projects.
+MoldeoJS is it's lighter version, to be used in web browsers.
+
 
 # Features in MoldeoJS
-- Export projects recorded from your screen.
-- Access different webcams and display simultaneously.
-- Parcticles system rendered in real time using Euler algorithm.
-- Multiple Audiovisual processes in a same canvas.
+- Modularity, each layer/effect as a plugin based class
+- Full scripting capabilities: you can access full core functions from any scripts.
+- 3D/Shaders capabilities based on Three.js
+- Processing as a plugin ( experimental ) : using p5.js
+- Machine learning ready: with ml5.js.
+- Export screenshots, video ready using html2canvas, and html5 basics.
+
+# Future features in MoldeoJS
+- Shader edition on the fly 
+- 
 
 # IMPORTANT: Angular versions fixes
+
+## ngx-bootstrap
+### upgraded bootstrap 4.6
 
 ## Angular 9.0:
 ### tsconfig.json add files and include sections:
@@ -32,7 +43,7 @@ solution: export NODE_OPTIONS=--max_old_space_size=4096
 
 ### WARNING: CommonJS Dependencies must be defined in angular.json
 https://angular.io/guide/build#configuring-commonjs-dependencies
-fixed adding to angular.json options:
+fixed adding to angular.json options: 
 "allowedCommonJsDependencies": [
   "rxjs/Rx",
   "zone.js/dist/zone",
@@ -46,6 +57,12 @@ fixed adding to angular.json options:
   "fraction.js",
   "complex.js"
 ],
+
+### build production error in runtime: TypeError: i.BehaviorSubject is not a constructor
+https://github.com/angular/angular-cli/issues/18035
+solution: replace import { BehaviorSubject } from 'rxjs/BehaviorSubject' or 'rxjs/somthing' to
+import { BehaviorSubject } from 'rxjs'
+
 
 ## Angular 11.0:
 
@@ -72,7 +89,7 @@ $ npm install -g @angular/cli
 #  Execute MoldeoJS
 Install the dependencies and MoldeoJS from your console typing
 ```sh
-$ npm install
+$ npm install  
 ```
 
 # Run the server with:
@@ -107,21 +124,21 @@ Plugins are applied in chronological order, in three stages inside the drawing c
 
 - Sound (based on P5.js oscillator)
 - Faust (Faust sound compiler for javascript based on wasm and webaudio) https://github.com/faust/tree/architecture/webaudio
-
+  
   IMPORTANT modify some things like:
-    The base library file libfaust-wasm.js:
-      var REMOTE_PACKAGE_BASE="libfaust-wasm.data";
+    The base library file libfaust-wasm.js: 
+      var REMOTE_PACKAGE_BASE="libfaust-wasm.data"; 
     with:
       var REMOTE_PACKAGE_BASE="./assets/data/effects/faust/libfaust-wasm.data";
-
+      
     Then for each compiled effect do:
-
+    
     Modify the .js file (compiled with 'faust2wasm -worklet wind.dsp'), aka 'wind.js' reference with the correct path,
     replace:
       let real_url = (this.baseURL === "") ? "wind.wasm" : (this.baseURL + "/wind.wasm");
     with:
       let real_url = (this.baseURL === "") ? "wind.wasm" : (this.baseURL + "/assets/effects/faust/wind.wasm");
-
+    
     Modify the dspName constant with a specific one,
     replace:
       const dspName = "wind"
@@ -131,12 +148,12 @@ Plugins are applied in chronological order, in three stages inside the drawing c
       const dspNameWind = "wind"
       ...
       window[dspNameWind] = wind;
-
+      
     Then check that you added to header of your index.html for every effect, the script link to the js file, like this:
           <script name="faustnoise" src="./assets/data/effects/faust/wind.js"></script>
+        
 
-
-
+      
 - ML5 (based on ml5.js https://github.com/ml5js) works with live camera, and texture buffers (image/texture collections) for image classification
 
 **Post- Effect:**  Apply filters to the final image.

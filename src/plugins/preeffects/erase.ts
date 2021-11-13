@@ -12,7 +12,7 @@ export class moPreEffectErase extends MO.moPreEffect {
 
   Init(callback?:any): boolean {
     this.RMan = this.m_pResourceManager.GetRenderMan();
-    console.log(`moPreEffect${this.GetName()}.Init`);
+    console.log(`moPreEffect${this.GetName()}.Init  ${this.GetName()}`);
     if (this.PreInit((res) => {
 
       if (callback) callback(res);
@@ -30,9 +30,9 @@ export class moPreEffectErase extends MO.moPreEffect {
 
     var rgb: any = this.m_Config.EvalColor("color");
     var ccolor: MO.moColor = new MO.moColor( rgb.r, rgb.g, rgb.b);
-
+    var alpha : any = this.m_Config.Eval("alpha") * rgb.a;
     this.step+=1;
-    this.RMan.m_Renderer.setClearColor( ccolor, 1.0);
+    this.RMan.m_Renderer.setClearColor( ccolor, alpha);
     //if (this.step<100)
       this.RMan.m_Renderer.clear(true, true, false);
     //console.log(this.RMan.m_Renderer.autoClear);

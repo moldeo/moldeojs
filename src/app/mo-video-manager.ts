@@ -156,7 +156,7 @@ export class moLiveSystem extends moAbstract {
     super();
     this.m_CaptureDevice = cap;
     this.video = document.createElement("VIDEO");
-    this.video.setAttribute("style", "display: none; position: fixed; bottom: 0px; left: 0px; width: 100px; heigh: 100px; z-index: 250000;");
+    this.video.setAttribute("style", "display: none; position: fixed; bottom: 0px; left: 0px; width: 100px; heigh: 100px; z-index: -1;");
 		this.vi_id = "_VIDEO_" + IntToStr(this.m_CaptureDevice.m_Index)+"_";
     this.video.setAttribute("id", this.vi_id );
     document.body.appendChild(this.video);
@@ -245,14 +245,14 @@ export class moLiveSystem extends moAbstract {
 			}
 		}
 
-		console.log("constraints:",constraints);
+		//console.log("constraints:",constraints);
     if (this.n.mediaDevices === undefined) { //For Old Browsers
       this.n.mediaDevices = {};
     } //END mediaDevices for old browsers
 
     if (this.n.mediaDevices.getUserMedia === undefined) {  //Check the existence of getUserMedia
       this.n.mediaDevices.getUserMedia = function(constraints) {
-				console.log("this.n.mediaDevices.getUserMedia",constraints);
+				//console.log("this.n.mediaDevices.getUserMedia",constraints);
         var getUserMedia = this.n.getUserMedia;
 
         if (!getUserMedia) {
@@ -270,7 +270,7 @@ export class moLiveSystem extends moAbstract {
         .then(devices => {
 					 let devs = "";
 					 let idx = 0;
-					 console.log(devices,JSON.stringify(devices));
+					 //console.log(devices,JSON.stringify(devices));
 					 let bestdevice_id = "";
 					 for(let dev in devices) {
 						 //alert(devices[dev]);
@@ -325,7 +325,7 @@ export class moLiveSystem extends moAbstract {
   getMedia( constraints : any ) : void {
     var _self = this;
     _self.n.mediaDevices.getUserMedia(constraints).then(function(stream) {
-        console.log("getUserMedia",constraints);
+        //console.log("getUserMedia",constraints);
         //alert( JSON.stringify(constraints) );
 
         if ("srcObject" in _self.video) {
@@ -458,7 +458,7 @@ export class moVideoManager extends moResource {
          ) {
            ///Try to create it!!!
            if (load) {
-						 this.MODebug2.Message("moVideoManager::GetCameraByName > load ok, creating camera:"+camera);
+						 //this.MODebug2.Message("moVideoManager::GetCameraByName > load ok, creating camera:"+camera);
 						 if (customCD) {
 							 CapDev.m_SourceWidth = customCD.m_SourceWidth;
 							 CapDev.m_SourceHeight = customCD.m_SourceHeight;

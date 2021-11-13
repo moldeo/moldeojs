@@ -85,7 +85,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
 
   public ngOnInit(): void {
     this.configDblClick = this.renderer.listen("document", 'dblclick', (e) => {
-      console.log( e.target, e.target.className, e.target.getAttribute("id") );
+      //console.log( e.target, e.target.className, e.target.getAttribute("id") );
       //if(e.target.className !== "moObject" && e.target.className !== "moHeader" && e.target.className !== "moldeobutton"){
       if (e.target.getAttribute("id") === "moConnect") {
           this.showWheel(e);

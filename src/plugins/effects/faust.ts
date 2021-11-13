@@ -248,7 +248,7 @@ export class moEffectFaust extends moEffectSound {
   }
 
   GetDefinition(): MO.moConfigDefinition {
-    console.log("moEffectSound.GetDefinition Erase");
+    //console.log("moEffectSound.GetDefinition Erase");
     super.GetDefinition();
 
     return this.m_Config.GetConfigDefinition();
@@ -260,7 +260,7 @@ export class moEffectFaust extends moEffectSound {
   }
 
   UpdateParameters() : void {
-    console.log("this.Activated()",this.Activated());
+    //console.log("this.Activated()",this.Activated());
     this.UpdatePlayState();
 
     this.sound_type = this.m_Config.Text("sound_type");

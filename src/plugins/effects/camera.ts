@@ -187,10 +187,10 @@ export class moEffectCamera extends MO.moEffect {
     if (camera=="default" && CapDevs.length>0 ) {
     var Cap : MO.moCaptureDevice = CapDevs[0];
     if (Cap.IsPresent()) {
-      this.MODebug2.Message("moEffectCamera::CheckIfDeviceNameExists > default selected, at least one camera device is available. Cap. Label Name: "
-                    + Cap.GetLabelName()+" WxH:" + MO.IntToStr(Cap.GetSourceWidth())+"x"+ MO.IntToStr(Cap.GetSourceHeight()) );
+      //this.MODebug2.Message("moEffectCamera::CheckIfDeviceNameExists > default selected, at least one camera device is available. Cap. Label Name: "
+      //              + Cap.GetLabelName()+" WxH:" + MO.IntToStr(Cap.GetSourceWidth())+"x"+ MO.IntToStr(Cap.GetSourceHeight()) );
     } else {
-      this.MODebug2.Message("moEffectCamera::CheckIfDeviceNameExists > default selected, available but not present?");
+      //this.MODebug2.Message("moEffectCamera::CheckIfDeviceNameExists > default selected, available but not present?");
     }
     return true;
   }
@@ -314,7 +314,7 @@ export class moEffectCamera extends MO.moEffect {
     p_configdefinition.Add( "pos_cuad_y", MO.moParamType.MO_PARAM_FUNCTION, moCameraParamIndex.CAMERA_POSCUADY, new MO.moValue( "0.0", "FUNCTION" ) );
     p_configdefinition.Add( "anc_cuad_x", MO.moParamType.MO_PARAM_FUNCTION, moCameraParamIndex.CAMERA_ANCCUADX, new MO.moValue( "1.0", "FUNCTION" ) );
     p_configdefinition.Add( "alt_cuad_y", MO.moParamType.MO_PARAM_FUNCTION, moCameraParamIndex.CAMERA_ALTCUADY, new MO.moValue( "1.0", "FUNCTION" ) );
-    console.log("moEffectCamera.GetDefinition Camera",p_configdefinition);
+    //console.log("moEffectCamera.GetDefinition Camera",p_configdefinition);
 
     return this.m_Config.GetConfigDefinition();
   }

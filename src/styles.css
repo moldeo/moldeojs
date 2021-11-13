@@ -279,7 +279,7 @@ h3{
 /**********OBJECTS**********/
 
 svg{
-  position: fixed;
+  /*position: fixed;*/
 }
 
 .moContainer{
@@ -538,3 +538,41 @@ svg{
   to {opacity:0;}
 }
 
+#_VIDEO_0_ {
+  /*display: block !important;*/
+
+  position: fixed !important;
+  left: 80px !important;
+  top: 100px !important;
+  width: auto !important;
+  height: 240px !important;
+  border: solid 2px rgba(0,0,0,0.5);
+  z-index: 100 !important;
+}
+
+.modal {
+  z-index: 30000 !important;
+}
+
+#paraviajar {
+  display: none;
+      position: fixed;
+      left: 80px;
+      top: 345px;
+      z-index: 20000;
+      font-size: 15px;
+      font-family: Roboto;
+      /*background-color: rgba(0,0,0,0.5);*/
+      color: #e1e259 !important;
+      padding: 10Px;
+      z-index: 10;
+
+}
+
+#tooltipscreenshot {
+  display: none;
+}
+
+.popover * {
+  color: black;
+}

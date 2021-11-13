@@ -4,6 +4,10 @@ import {
   ContentChild, ViewChild, ViewChildren
 } from '@angular/core';
 
+import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { faSquare, faCheckSquare, faCamera, faVideo, faGlobeAmericas, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { faSquare as farSquare, faCheckSquare as farCheckSquare } from '@fortawesome/free-regular-svg-icons';
+import { faStackOverflow, faGithub, faMedium } from '@fortawesome/free-brands-svg-icons';
 
 import { moConsole } from '../mo-console';
 //import { moConsoleState } from '../mo-console-state';
@@ -36,6 +40,8 @@ export class MoldeojsViewComponent implements OnInit {
 
   @Input() mol: string;
   @Output() loaded = new EventEmitter<any>();
+  @Output() help = new EventEmitter<string>();
+  @Output() onscreenshot = new EventEmitter<string>();
 
   //jsonRute : string = 'http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_tema_=Mosaico&output=json';
   //jsonRute: string = "http://admin.moldeointeractive.com.ar/wiwe/principal/home/jasones.php?_temaid_=423&output=json";
@@ -52,6 +58,10 @@ export class MoldeojsViewComponent implements OnInit {
   //baseref : string = "https://localhost:4200/assets/";
   baseref : string = "./assets/";
   //baseref : string = "https://localhost:4200/assets/";
+  videocap : any = undefined;
+  videocap_canvas : any = undefined;
+  screenshotcap : any = undefined;
+  screenshotcap_download : any = undefined;
 
   constructor(el: ElementRef, private MoldeoCS: ConsoleService,
     private jsonService: JsonService,
@@ -111,12 +121,12 @@ export class MoldeojsViewComponent implements OnInit {
   }
 
   onResize( event : any ) : void {
-    console.log("moldeojs-view:",event);
+    //console.log("moldeojs-view:",event);
 
   }
 
   Resize( w : number, h : number ) : void {
-    console.log("moldeojsview: Resize",w,h);
+    //console.log("moldeojsview: Resize",w,h);
     if (w>h) {
       if (window.outerHeight>window.innerHeight || window.outerWidth>window.innerWidth) {
         /*try full screen*/
@@ -124,7 +134,7 @@ export class MoldeojsViewComponent implements OnInit {
       }
       this.MoldeoCS.m_Console.Resize(w,h);
     } else {
-      console.log("moldeojsview: Forcing Landscape Resize to ",h,w);
+      //console.log("moldeojsview: Forcing Landscape Resize to ",h,w);
       //document.body.style.width = window.outerHeight+"px";
       //document.body.style.height = window.outerWidth+"px";
       //check landscapeok !!!!
@@ -136,7 +146,7 @@ export class MoldeojsViewComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges) {
 
-      console.log("MoldeojsViewComponent::ngOnChanges > changes:", changes);
+      //console.log("MoldeojsViewComponent::ngOnChanges > changes:", changes);
       this.marge = 0;
       if (changes["mol"]) {
         const mol : SimpleChange = changes.mol;
@@ -148,23 +158,31 @@ export class MoldeojsViewComponent implements OnInit {
         if (mol.firstChange) {
           this.MoldeoCS.Init({
               "consoleconfig": this.baseref+mol.currentValue ,
+              "effects_loaded": (result) => {
+                this.loaded.emit('effects_loaded');
+              },
               "effects_started": (result) => {
-                console.log("effects_started firstChange:", result, this );
-                this.loaded.emit('event emitted');
+                //console.log("effects_started firstChange:", result, this );
+                this.loaded.emit('effects_started');
+                if (this.MoldeoCS.m_Console.Script && this.MoldeoCS.m_Console.Script.AfterInit) this.MoldeoCS.m_Console.Script.AfterInit();
                 this.Resize( window.innerWidth, window.innerHeight-this.marge);
               }
           } );
         }
 
         if (!mol.firstChange && mol.previousValue!=mol.currentValue) {
-          console.log("MoldeojsViewComponent::ngOnChanges > Change view please!");
+          //console.log("MoldeojsViewComponent::ngOnChanges > Change view please!");
           if (this.MoldeoCS.m_Console.Initialized()) {
             this.MoldeoCS.Finish();
             this.MoldeoCS.Init( {
                 "consoleconfig": this.baseref+mol.currentValue,
+                "effects_loaded": (result) => {
+                  this.loaded.emit('effects_loaded');
+                },
                 "effects_started": (result) => {
                     console.log("effects_started:", result, this );
-                    this.loaded.emit('event emitted');
+                    this.loaded.emit('effects_started');
+                    if (this.MoldeoCS.m_Console.Script && this.MoldeoCS.m_Console.Script.AfterInit) this.MoldeoCS.m_Console.Script.AfterInit();
                     this.set_audioonoff_ico();
                     this.Resize( window.innerWidth, window.innerHeight-this.marge);
                 }
@@ -172,9 +190,13 @@ export class MoldeojsViewComponent implements OnInit {
           } else {
             this.MoldeoCS.Init({
                 "consoleconfig": this.baseref+mol.currentValue,
+                "effects_loaded": (result) => {
+                  this.loaded.emit('effects_loaded');
+                },
                 "effects_started": (result) => {
-                  console.log("effects_started not init:", result, this );
-                  this.loaded.emit('event emitted');
+                  //console.log("effects_started not init:", result, this );
+                  this.loaded.emit('effects_started');
+                  if (this.MoldeoCS.m_Console.Script && this.MoldeoCS.m_Console.Script.AfterInit) this.MoldeoCS.m_Console.Script.AfterInit();
                   this.set_audioonoff_ico();
                   this.Resize( window.innerWidth, window.innerHeight-this.marge);
                 }
@@ -229,7 +251,7 @@ export class MoldeojsViewComponent implements OnInit {
 
   ngAfterViewInit () {
 
-    console.log(this.audioonoff_ico);
+    //console.log(this.audioonoff_ico);
     if (window.location.href.indexOf("debug")>0) {
       this.moldeobuttons.nativeElement.style.display = "block";
     }
@@ -273,8 +295,8 @@ export class MoldeojsViewComponent implements OnInit {
   }
 
   loadsample(event:any, index: number) : void {
-    console.log("loadsample from moldeojs view",this);
-    console.log(window["MoldeoApp"])
+    //console.log("loadsample from moldeojs view",this);
+    //console.log(window["MoldeoApp"])
     if (window["MoldeoApp"]) {
       //window["MoldeoApp"].prototype.loadsample( event, index );
       window["MoldeoApp"].loadsample( event, index );
@@ -282,22 +304,37 @@ export class MoldeojsViewComponent implements OnInit {
 
   }
 
+  hide() {
+    //console.log("MoldeoJSView hide()");
+
+    this.hostElement.nativeElement.style.display = "none";
+    if (this.MoldeoCS.m_Console.Script && this.MoldeoCS.m_Console.Script.Hide) this.MoldeoCS.m_Console.Script.Hide();
+    //pickPosition()
+  }
+
+  show() {
+    //console.log("MoldeoJSView show()");
+
+    this.hostElement.nativeElement.style.display = "block";
+    if (this.MoldeoCS.m_Console.Script && this.MoldeoCS.m_Console.Script.Show) this.MoldeoCS.m_Console.Script.Show();
+  }
+
   toggleplay() : void {
-    console.log("toggleplay", this);
+    //console.log("toggleplay", this);
   }
 
   stop() : void {
-    console.log("stop");
+    //console.log("stop");
     this.MoldeoCS.m_Console.ConsoleStop();
   }
 
   play() : void {
-    console.log("play");
+  //  console.log("play");
     this.MoldeoCS.m_Console.ConsolePlay();
   }
 
   pause() : void {
-    console.log("pause");
+    //console.log("pause");
     this.MoldeoCS.m_Console.ConsolePause();
   }
 
@@ -351,9 +388,65 @@ export class MoldeojsViewComponent implements OnInit {
       }
   }
 
+  screenshot(delay : any = 0) : void {
+    //console.log("moldeojs-view screenshot, delay:",delay);
+    this.MoldeoCS.m_Console.Screenshot(delay);
+    this.onscreenshot.emit('screenshot');
+  }
+
+  startscreencapture() : void {
+    //console.log("moldeojs-view startscreencapture");
+    this.videocap = document.getElementById('videocap2');
+    this.videocap_canvas = document.getElementById('videoscreenshot_canvas');
+    this.screenshotcap = document.getElementById('screenshotcap');
+    this.screenshotcap_download = document.getElementById('screenshotcap_download');
+
+    if (!this.videocap) {
+      return;
+    }
+    if (this.videocap.srcObject) {
+      //console.log(this.videocap.srcObject.readyState);
+      this.MoldeoCS.m_Console.StopScreenCapture();
+      this.videocap.srcObject = null;
+    }
+    var result : any = this.MoldeoCS.m_Console.StartScreenCapture( { audio: false, video: true }, (stream) => {
+      //console.log("screencapture stream ok:", stream, stream.readyState);
+      this.videocap.srcObject = stream;
+      setTimeout(() => {
+        var ctx = this.videocap_canvas.getContext('2d');
+        var cuttop = 100;
+        this.videocap_canvas.height = this.videocap_canvas.height-cuttop;
+        ctx && ctx.drawImage( this.videocap, 0, -cuttop, this.videocap_canvas.width, this.videocap_canvas.height+cuttop);
+        this.screenshotcap.src = this.videocap_canvas.toDataURL();
+        this.MoldeoCS.m_Console.StopScreenCapture();
+
+        this.screenshotcap_download.href = this.screenshotcap.src;
+        //this.screenshotcap_download.click();
+        this.onscreenshot.emit('screencapture');
+      }, 8000)
+    });
+    //console.log("StartScreenCapture result:", result);
+    /*if (result) {
+
+      this.videocap.srcObject = await result;
+    }*/
+  }
+
+  stopscreencapture() {
+    //console.log("moldeojs-view stopscreencapture");
+    this.videocap = document.getElementById('videocap2');
+    if (!this.videocap) {
+      return;
+    }
+    if (this.videocap.srcObject) {
+      //console.log(this.videocap.srcObject.readyState);
+      this.MoldeoCS.m_Console.StopScreenCapture();
+      this.videocap.srcObject = null;
+    }
+  }
 
   audioon() : void {
-    console.log("audioon");
+    //console.log("audioon");
     for( var i = 0; i < this.MoldeoCS.m_Console.m_MoldeoObjects.length; i++ ) {
       var object : moEffectSound = (this.MoldeoCS.m_Console.m_MoldeoObjects[i] as moEffectSound);
       if (object.GetMobDefinition().GetName()=="sound" || object.GetMobDefinition().GetName()=="faust") {
@@ -364,7 +457,7 @@ export class MoldeojsViewComponent implements OnInit {
   }
 
   audiooff() : void {
-    console.log("audiooff");
+    //console.log("audiooff");
     for( var i = 0; i < this.MoldeoCS.m_Console.m_MoldeoObjects.length; i++ ) {
       var object : moEffectSound = (this.MoldeoCS.m_Console.m_MoldeoObjects[i] as moEffectSound);
       if (object.GetMobDefinition().GetName()=="sound" || object.GetMobDefinition().GetName()=="faust") {
@@ -375,7 +468,7 @@ export class MoldeojsViewComponent implements OnInit {
   }
 
   audioonoff() : void {
-    console.log("audioonoff");
+    //console.log("audioonoff");
     for( var i = 0; i < this.MoldeoCS.m_Console.m_MoldeoObjects.length; i++ ) {
       var object : moEffectSound = (this.MoldeoCS.m_Console.m_MoldeoObjects[i] as moEffectSound);
       if (object.GetMobDefinition().GetName()=="sound" || object.GetMobDefinition().GetName()=="faust") {
@@ -400,6 +493,11 @@ export class MoldeojsViewComponent implements OnInit {
 
   HideOver() {
     this.contenidos.nativeElement.setAttribute("class", "contenido_over_hide");
+  }
+
+  showhelp() {
+    console.log("showhelp");
+    this.help.emit('Show Modal Help Please!');
   }
 
 }

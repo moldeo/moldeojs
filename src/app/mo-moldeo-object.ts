@@ -415,7 +415,7 @@ export class moMoldeoObject extends moScript {
       }
     }*/
 
-  this.MODebug2.Message(`***** Initializing ${this.GetName()} ***** ${confignamecompleto}`);
+  //this.MODebug2.Message(`***** Initializing ${this.GetName()} ***** ${confignamecompleto}`);
     if (confignamecompleto != undefined && confignamecompleto + "" != "" ) {
       this.m_pFileManager.Load( confignamecompleto, true, (res) => {
         //console.log("loaded file .. OK");

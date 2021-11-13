@@ -134,14 +134,14 @@ PluginsDefinitions.push( new moPluginDefinition(
 moEffectFaust ));
 
 
-/// Effect Plane ====================================================================
-/*import { moResourceMl5 } from "../plugins/resources/ml5";
+/// Effect ML5 ====================================================================
+import { moResourceMl5 } from "../plugins/resources/ml5";
 PluginsDefinitions.push( new moPluginDefinition(
   "ml5",
   "/plugins/resources/ml5.ts",
   moMoldeoObjectType.MO_OBJECT_RESOURCE,
 moResourceMl5 ) );
-*/
+
 
 /// IODevice NetOscIn ====================================================================
 import { moNetOscIn } from "../plugins/iodevices/netoscin";

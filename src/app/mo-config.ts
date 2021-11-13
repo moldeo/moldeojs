@@ -260,7 +260,7 @@ export class moConfig extends moAbstract {
     var pParamDefinitions : moParamDefinitions = undefined;
 
     pParamDefinitions = this.GetConfigDefinition().GetParamDefinitions();
-    console.log("pParamDefinitions: ", pParamDefinitions);
+    //console.log("pParamDefinitions: ", pParamDefinitions);
 
     if (pParamDefinitions) {
 

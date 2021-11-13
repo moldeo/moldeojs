@@ -5,7 +5,7 @@ import { Injectable,
   ViewContainerRef } from '@angular/core';
 
 import { Subject }    from 'rxjs/Subject';
-import {  BehaviorSubject }    from 'rxjs/BehaviorSubject';
+import {  BehaviorSubject }    from 'rxjs';
 import { HttpClient } from "@angular/common/http";
 
 import { MoldeojsViewComponent } from './moldeojs-view/moldeojs-view.component';
@@ -38,13 +38,13 @@ export class ViewService {
       };
     });
     let resolvedInputs = ReflectiveInjector.resolve(inputProviders);
-    console.log("inputProviders:",inputProviders);
-    console.log("resolvedInputs:",resolvedInputs);
+    //console.log("inputProviders:",inputProviders);
+    //console.log("resolvedInputs:",resolvedInputs);
     // We create an injector out of the data we want to pass down and this components injector
     //let injector = ReflectiveInjector.fromResolvedProviders(resolvedInputs, this.rootViewContainer.parentInjector);
     let injector = ReflectiveInjector.resolveAndCreate(inputProviders);
     const component: any = factory.create(injector);
-    console.log("setting component instance inputs:",component);
+    //console.log("setting component instance inputs:",component);
     //component.instance.mol = mol;
     //Object.keys(parameters).forEach(input => component.instance[input] = parameters[input]))
     this.rootViewContainer.insert(component.hostView);

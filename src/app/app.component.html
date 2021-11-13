@@ -11,7 +11,7 @@
             <span class="icon-bar"></span>
           </button>
             <a class="navbar-brand">
-              <img src="/assets/data/icons/moldeo_logo.svg" class="logo" title="Moldeo@JS">
+              <img src="./assets/data/icons/moldeo_logo.svg" class="logo" title="Moldeo@JS">
             </a>
             <span class="navbar-brand"></span>
         </div>
@@ -76,6 +76,7 @@ Button with tooltip
 <!--iframe src="" width="100%" height="100%">
   no final
 </iframe-->
+
 <div class="chat_online" style="display: none;">
   <div #oscmsgbox class="osc_msg_snd">
 
@@ -109,7 +110,121 @@ Button with tooltip
   #moldeojsview
   [mol]="this.sample"
   (window:resize)="onResize($event)"
-  (loaded)="this.sampleLoaded($event)"></moldeojs-view>
-<!--router-outlet></router-outlet-->
-<!--touch-component></touch-component-->
-<!--router-outlet></router-outlet-->
+  (loaded)="this.sampleLoaded($event)"
+  (onscreenshot)="this.screenshotTaken($event)"
+  (help)="this.showHelp($event)"
+  style="display: none;"
+  ></moldeojs-view>
+
+
+  <div id="mapsmask">
+    <video id="videocap2"  autoplay="autoplay" width="120" data-html2canvas-ignore>
+    </video>
+    <canvas id="videoscreenshot_canvas" style="display: none;" width="1280" height="720"></canvas>
+    <span id="tooltipscreenshot" tooltip="Click para abrir y compartir" data-html2canvas-ignore>
+        <img #screenshotcap id="screenshotcap" border="0" src="" (click)="this.shareImage($event)"/>
+        <a id="screenshotcap_download" href="" download="AIT_Captura.png"></a>
+    </span>
+    <div class="logo-ait">
+        <img src="./assets/molrepos/moldeoorg/ait/bodypix/logos/GIF/ES/AIT-128-B.gif" class="imglogo"/>
+    </div>
+  </div>
+
+  <ng-template #template_warning >
+    <div class="modal-content template_warning">
+      <div class="modal-header">
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-ok close pull-left" aria-label="ACEPTAR" (click)="modalRef.hide()">
+          <span aria-hidden="true">&nbsp;</span>
+        </button>
+      </div>
+    </div>
+</ng-template>
+
+<ng-template #template_help >
+  <div class="modal-content template_warning template_help">
+    <div class="modal-header">
+      <h1>AIT Instrucciones para la teletransportacion</h1>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>
+      Ud se encuentra a punto de atravesar el umbral cuántico - donde los átomos se transforman en bits y los cuerpos se “desmaterializan”- lo cual hace posible la teletransportacion.
+      </p>
+      <br/>
+      <p>
+      Para realizar el viaje. presione:<br/><br/>
+      1- viajar > aceptar el aviso de advertencia<br/>
+      2- esperar mientras se enciende la camara y se define el fondo<br/>
+      3- recorrer el espacio en 360 grados<br/>
+      4. sacar foto selfie > elegir "pestaña o ventana AIT" viajar > guardar<br/>
+      5- compartir en redes<br/>
+      6- nuevo destino > girar el mundo > elegir ciudad > doble click > nuevo street view<br/>
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="modal-ok close pull-left" aria-label="ACEPTAR" (click)="modalRef.hide()">
+        <span aria-hidden="true">&nbsp;</span>
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #template_share >
+  <div class="modal-content template_warningx template_helpx template_share">
+    <div class="modal-header">
+      <h1>Crear postal y compartir</h1>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form>
+      <img id="preview_image" src="" style="height: 100px;"/>
+      <div class="form-group row">
+    			<label class="col-4 col-form-label">Tu Nombre</label>
+          <div class="col-6">
+    			     <input id="share_name" type="text" class="form-control" aria-describedby="sizing-addon1">
+          </div>
+    	</div>
+      <div class="form-group row">
+    			<label class="col-4 col-form-label">Tu Correo</label>
+          <div class="col-6">
+    			     <input id="share_email" type="text" class="form-control" aria-describedby="sizing-addon1">
+          </div>
+    	</div>
+      <div class="form-group row">
+    			<label class="col-4 col-form-label">T&iacute;tulo de la postal</label>
+          <div class="col-6">
+    			     <input id="share_title" type="text" class="form-control" aria-describedby="sizing-addon1">
+          </div>
+    	</div>
+      <div class="form-group row">
+  			<label class="col-4 col-form-label">Descripci&oacute;n de la postal</label>
+        <div class="col-6">
+    			<textarea id="share_description" type="text" class="form-control" aria-describedby="sizing-addon1">
+    			</textarea>
+        </div>
+      </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="pull-right btn btn-primary" aria-label="COMPARTIR" (click)="sharePostcard()">
+        <span aria-hidden="true"><fa-icon [icon]="['fas', 'share']"></fa-icon>&nbsp;CREAR Y COMPARTIR</span>
+      </button>
+      <button type="button" class="pull-right btn btn-primary" aria_label="DESCARGAR" (click)="downloadPostcard()">
+        <span aria-hidden="true"><fa-icon [icon]="['fas', 'download']"></fa-icon>&nbsp;DESCARGAR</span>
+      </button>
+
+    </div>
+  </div>
+</ng-template>
+

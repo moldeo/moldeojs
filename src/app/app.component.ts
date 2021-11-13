@@ -75,6 +75,12 @@ export class AppComponent implements OnInit {
   @ViewChild('message2send') message2send: ElementRef;
   @ViewChild('message2recv') message2recv: ElementRef;
   @ViewChild('clientcolor') clientcolor: ElementRef;
+  @ViewChild('screenshotcap') screenshotcap : ElementRef;
+  @ViewChild('videoscreenshot_canvas') videoscreenshot_canvas : ElementRef;
+  @ViewChild('template_warning') template_warning : TemplateRef<any>;
+  @ViewChild('template_help') template_help : TemplateRef<any>;
+  @ViewChild('template_share') template_share : TemplateRef<any>;
+
 
   public chat_canvas: HTMLCanvasElement;
   public ctx_chat_canvas: CanvasRenderingContext2D;
@@ -109,11 +115,15 @@ export class AppComponent implements OnInit {
     this.viewservice = service;
     this.viewservice.setRootViewContainerRef(viewContainerRef);
     window["MoldeoApp"] = this;
+
+    //############### COLLABORATE SERVICE / CHAT ###############
     this.collaborativeService = coservice;
     this.clients = 0;
     this.canvas_x = 0;
     this.canvas_y = this.canvas_y_top;
     this.m_ChatTexture = undefined;
+
+    //############### TOUCH START AUDIO ###############
 
     this.divstart = document.createElement("div");
     this.divstart.setAttribute("id","startaudio");
@@ -121,6 +131,7 @@ export class AppComponent implements OnInit {
     this.divstart.setAttribute("class","ready_to_load");
     this.divstart.setAttribute("style","display: none; position: fixed; z-index: 10001; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.98);");
     document.body.appendChild(this.divstart);
+
 
     this.elstart = document.createElement("button");
     this.elstart.setAttribute("id","btn_start");
@@ -130,7 +141,7 @@ export class AppComponent implements OnInit {
 
     var self = this;
     this.elstart.addEventListener( 'click', function(event) {
-      console.log(event);
+      //console.log(event);
       var landscapeok = window.innerWidth>=window.innerHeight;
       try {
       eval("/*alert('request motion click');*/ if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission == 'function') DeviceMotionEvent.requestPermission().then(response => { /*alert(response);*/"+
@@ -143,6 +154,7 @@ export class AppComponent implements OnInit {
       else { alert("Rotar el teléfono a posición apaisada"); }*/
     });
 
+    //############### PROGRESS BAR ###############
     this.progressbar = new ProgressBar.Circle('#btn_start', {
       color: 'white',
       strokeWidth: 2,
@@ -154,25 +166,32 @@ export class AppComponent implements OnInit {
   } // {2}
 
   createChatTexture() {
-    console.log(this.m_Console);
+
+    //console.log(this.m_Console);
+
     var resid : number = -1;
-    console.log(this.m_Console);
+
+    //console.log(this.m_Console);
+
     if (this.m_ChatTexture==undefined && resid==-1) {
+
       resid = this.m_Console.GetResourceManager().GetTextureMan().GetTextureMOId("full_chat_canvas", false);
 
-      if (resid==-1) resid = this.m_Console.GetResourceManager().GetTextureMan().AddTexture( moTextureType.MO_TYPE_TEXTURE, "full_chat_canvas" );
+      if (resid==-1) { resid = this.m_Console.GetResourceManager().GetTextureMan().AddTexture( moTextureType.MO_TYPE_TEXTURE, "full_chat_canvas" ); }
       if (resid>-1) {
         this.m_ChatTexture = this.m_Console.GetResourceManager().GetTextureMan().GetTexture(resid);
         this.m_ChatTexture._texture = new THREE.Texture(this.chat_canvas);
         this.m_ChatTexture._texture.minFilter = THREE.LinearFilter;
         this.m_ChatTexture._texture.needsUpdate = true;//Important for update
       }
+
     }
 
   }
 
-  onResize( event : any ) : void {
-      console.log(event,event.target.innerWidth,event.target.innerHeight,event.target.innerHeight-this.marge);
+
+  onResize( event : any ) {
+      //console.log( event, event.target.innerWidth, event.target.innerHeight, event.target.innerHeight-this.marge );
       this.moldeojsview.Resize( event.target.innerWidth, event.target.innerHeight-this.marge);
   }
 
@@ -180,6 +199,8 @@ export class AppComponent implements OnInit {
       //this.service.setRootViewContainerRef(this.viewContainerRef)
       //this.service.addDynamicComponent()
       //this.viewservice.addMoldeojsViewComponent(this.sample);
+      //console.log("ngOnInit esfera mapsManagerService :",this.mapsManagerService);
+      //console.log("ngOnInit acMapComponent: ", this.acMapComponent );
       if (this.collaborativeService && this.collaborativeService.getSocket()) {
         this.collaborativeService.getMessage().subscribe( data => { this.recMsg(data); } );
         this.collaborativeService.getClients().subscribe(clients=> {this.clients = clients;});
@@ -215,6 +236,15 @@ export class AppComponent implements OnInit {
         this.navmenu.nativeElement.style.display = "block";
       }
       this.message2send.nativeElement.focus();
+
+
+
+      this.openModal( this.template_warning );
+  }
+
+  showHelp( event : any ) {
+    console.log(event);
+    this.openModal( this.template_help );
   }
 
   removeByClass( className : string ) : void {
@@ -252,9 +282,9 @@ export class AppComponent implements OnInit {
 
   loadsample( event: any, index: number) : void {
 
-    console.log("loadsample",this.moldeojsview);
-    console.log(event);
-    console.log("Loading:",this.samples[index]);
+    //console.log("loadsample",this.moldeojsview);
+    //console.log(event);
+    //console.log("Loading:",this.samples[index]);
 
     this.removeByClass("moldeo_var");
 
@@ -270,22 +300,22 @@ export class AppComponent implements OnInit {
     console.log( "sampleLoaded:", event );
   }
 
-  public openModal(template: TemplateRef<any>) {
-    this.modalRef = this.modalService.show(template); // {3}
+  public openModal(template: TemplateRef<any>, initialState : any = {}) {
+    this.modalRef = this.modalService.show(template, initialState);
   }
 
-  toggleCollapse(): void {
+  toggleCollapse() {
     this.isCollapsed = !this.isCollapsed;
   }
 
   keyup(event:any) {
-      console.log(event);
+      //console.log(event);
       if (event.keyCode==13) {
         this.compose_message(event);
       }
   }
 
-  oscData(oscmsg) {
+  oscData( oscmsg : any) {
 
     var data = {
       msg: "",
@@ -298,7 +328,7 @@ export class AppComponent implements OnInit {
 
   }
 
-  clientColor(event) {
+  clientColor( event : any ) {
 
     this.m_ConnectedColor = this.clientcolor.nativeElement.value;
     this.message2send.nativeElement.setAttribute("style","color: "+this.m_ConnectedColor+";");
@@ -316,7 +346,7 @@ export class AppComponent implements OnInit {
   }
 
   toggleplay() : void {
-    console.log("toggle play",this.moldeojsview);
+    //console.log("toggle play",this.moldeojsview);
   }
 
   compose_message(event:any) {
@@ -346,7 +376,7 @@ export class AppComponent implements OnInit {
         return;
       }
 
-      console.log("recMsg:",data);
+      //console.log("recMsg:",data);
       this.recv_message = data.msg;
       //clase >
       var source_id = data.options.source_id;
@@ -476,7 +506,7 @@ export class AppComponent implements OnInit {
 
     //this.ctx_chat_canvas.drawImage( this.video, 0, 0, this.canvas.width, this.canvas.height);
     if (this.column>=0) {
-      console.log(this.column);
+      //console.log(this.column);
       this.createChatTexture();
       if (this.m_ChatTexture) {
         if (this.m_ChatTexture._texture) {
@@ -516,7 +546,7 @@ export class AppComponent implements OnInit {
   }
 
   Connected(data) {
-    console.log("Connected!",data);
+    //console.log("Connected!",data);
     if (data.state) {
       if (data.state=="connected") {
 
@@ -551,7 +581,7 @@ export class AppComponent implements OnInit {
   }
 
   Disconnected(data) {
-    console.log("Disconnected!",data);
+    //console.log("Disconnected!",data);
     if (data.state) {
       if (data.state=="disconnected") {
         this.m_ConnectedId = data.id;
@@ -566,16 +596,88 @@ export class AppComponent implements OnInit {
   }
 
   collapsed(event: any): void {
-    console.log(event);
+    //console.log(event);
   }
 
   expanded(event: any): void {
-    console.log(event);
+    //console.log(event);
   }
 
   setTitle( title : string ) : void {
     this.titleService.setTitle(title);
   }
 
+  screenshotTaken( event : any ) {
+    console.log("screenshotTaken", event );
+    this.openModal( this.template_share );
+    setTimeout(() => {
+        var imgpreview : any = document.getElementById("preview_image");
+        var imgscreenshot : any = document.getElementById("screenshotcap");
+        imgpreview.src = imgscreenshot.src;
+    }, 1500);
+
+  }
+
+  shareImage( event : any ) : void {
+    //console.log("shareimage:",event);
+    if (this.screenshotcap.nativeElement.src) {
+      var a : any = document.getElementById('screenshotcap_download');
+      a.href = this.screenshotcap.nativeElement.src;
+      document.getElementById('screenshotcap_download').click();
+    }
+    //var w = window.open("",'_blank');
+    //w.document.write(this.screenshotcap.nativeElement.outerHTML);
+    //w.document.close();
+
+  }
+
+  downloadPostcard() {
+    document.getElementById('screenshotcap_download').click();
+  }
+
+  sharePostcard( event : any ) : void {
+
+    console.log("sharePostcard");
+
+    var backoffice_url : any = "https://www.teleportation.com.ar/";
+    //var backoffice_url : any = "http://odoo14.moldeo.local/";
+    var share_name : any = document.getElementById("share_name");
+    var share_email : any = document.getElementById("share_email");
+    var share_title : any = document.getElementById("share_title");
+    var share_description : any = document.getElementById("share_description");
+    var fnew : any = document.createElement("form");
+    fnew.setAttribute( "id", "newreport");
+    fnew.setAttribute( "method", "post" );
+    fnew.setAttribute( "target", "_blank" );
+    fnew.setAttribute( "enctype", "multipart/form-data");
+    fnew.setAttribute( "action", backoffice_url+"my/moldeo_asset_new");
+    fnew.innerHTML = '';
+    //fnew.innerHTML = '<input name="url_object_key" type="hidden" value="'+compressed+'"/>';
+    //fnew.innerHTML+= '<textarea name="url_object_key_uncompressed" type="hidden">'+uncompressed+'</textarea>';
+    fnew.innerHTML+= '<input name="user" type="hidden" value="'+share_name.value+'"/>';
+    fnew.innerHTML+= '<input name="email" type="hidden" value="'+share_email.value+'"/>';
+    fnew.innerHTML+= '<input name="name" type="hidden" value="'+share_title.value+'"/>';
+    fnew.innerHTML+= '<textarea name="description" type="hidden">'+share_description.value+'</textarea>';
+    //fnew.innerHTML+= '<input type="hidden" value="'+compressed+'"/>';
+    document.body.appendChild(fnew);
+
+    var input_image : any = document.createElement("input");
+    input_image.setAttribute("name","url_image");
+    input_image.setAttribute("type","hidden");
+    input_image.setAttribute("value","");
+    fnew.appendChild(input_image);
+
+    var dataURL : any = this.screenshotcap.nativeElement.src;
+    if (dataURL) {
+      //console.log("dataURL",dataURL.substr(0,5),dataURL.substr(-5,5),dataURL);
+      var base : string = "data:image/png;base64,";
+      var dataURL2 : string = dataURL.substr(base.length,dataURL.length-base.length);
+      //console.log("dataURL2",dataURL2.substr(0,5),dataURL2.substr(-5,5),dataURL2);
+      input_image.setAttribute("value",dataURL2);
+      fnew.submit();
+    } else {
+      console.error("error",dataURL);
+    }
+  }
 
 }

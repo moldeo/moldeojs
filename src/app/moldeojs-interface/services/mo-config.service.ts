@@ -36,7 +36,7 @@ export class MoConfigService {
       _declaration: {
         _attributes: { version: "1.0", encoding: "ISO-8859-1"}}
     };
-    console.log("Copia: ", obJS);
+    //console.log("Copia: ", obJS);
 
     return mojs;
   }

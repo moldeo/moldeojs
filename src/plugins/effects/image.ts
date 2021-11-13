@@ -157,7 +157,7 @@ export class moEffectImage extends MO.moEffect {
     p_configdefinition.Add( "pos_cuad_y", MO.moParamType.MO_PARAM_FUNCTION, moImageParamIndex.IMAGE_POSCUADY, new MO.moValue( "0.0", "FUNCTION" ) );
     p_configdefinition.Add( "anc_cuad_x", MO.moParamType.MO_PARAM_FUNCTION, moImageParamIndex.IMAGE_ANCCUADX, new MO.moValue( "1.0", "FUNCTION" ) );
     p_configdefinition.Add( "alt_cuad_y", MO.moParamType.MO_PARAM_FUNCTION, moImageParamIndex.IMAGE_ALTCUADY, new MO.moValue( "1.0", "FUNCTION" ) );
-    console.log("moEffectImage.GetDefinition Image",p_configdefinition);
+    //console.log("moEffectImage.GetDefinition Image",p_configdefinition);
 
     return this.m_Config.GetConfigDefinition();
   }

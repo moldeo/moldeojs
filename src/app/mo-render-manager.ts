@@ -99,6 +99,10 @@ export class moRenderManager extends moResource {
   m_TargetMesh : THREE.Mesh;
   m_TargetSceneMode : number = 0;
 
+  last_screenshot : any = undefined;
+
+  m_CaptureStream : any = undefined;
+
   GL : moGLManager;
 
   m_bUpdated : boolean = false;
@@ -109,12 +113,14 @@ export class moRenderManager extends moResource {
 
     this.m_Renderer = new THREE.WebGLRenderer({ alpha: true, preserveDrawingBuffer: true });
     this.m_Renderer.setSize( window.innerWidth, window.innerHeight);
-    this.m_Renderer.setClearColor(0xFF000000, 1);
+    //this.m_Renderer.setClearColor(0xFF000000, 1);
+    this.m_Renderer.setClearColor(0x00000000, 0);
     this.m_Renderer.autoClear = false
     this.m_Renderer.domElement.style.position = "fixed";
     this.m_Renderer.domElement.style.top = "0px";
     this.m_Renderer.domElement.style.left = "0px";
     this.m_Renderer.domElement.style.display = "block";
+    this.m_Renderer.domElement.style.background = "transparent";
     //console.log("moRenderManager::constructor",  this.renderer);
     this.m_bUpdated = true;
   }
@@ -158,7 +164,8 @@ export class moRenderManager extends moResource {
     }
 
     this.m_TargetScene = new THREE.Scene();
-    this.m_TargetScene.background = new THREE.Color("red");
+    //this.m_TargetScene.background = new THREE.Color("red");
+    this.m_TargetScene.background = null;
 
     this.m_TargetMaterial = new THREE.MeshBasicMaterial({
       map: this.m_RendererTarget.texture
@@ -237,7 +244,10 @@ export class moRenderManager extends moResource {
   BeginDraw() : void {
     this.m_Renderer.setRenderTarget( this.m_RendererTarget );
     if (this.m_bUpdated) {
-      this.m_Renderer.setClearColor(new THREE.Color(0.0, 0.0, 0.0), 1.0);
+      //TODO: make background transparent
+      //this.m_Renderer.setClearColor(new THREE.Color(0.0, 0.0, 0.0), 1.0);
+      //this.m_Renderer.clear( true, true, false );
+      this.m_Renderer.setClearColor(0x00000000, 0);
       this.m_Renderer.clear( true, true, false );
     }
   }
@@ -266,12 +276,60 @@ export class moRenderManager extends moResource {
   }
 
   EndDrawEffect(): void {
-
   }
 
+  /*Screenshot( pathname : moText, screenshot_result : moText, image_format : moText, file_pattern : moText ) {*/
+  Screenshot( delay : any = 0) {
+    //console.log( pathname, screenshot_result, image_format, file_pattern);
+    console.log( "Screenshot (deelay) ", delay );
+    this.last_screenshot = this.m_Renderer.domElement.toDataURL();
+    console.log( "Screenshot: ", this.last_screenshot );
+    //var img = new Image();
+    //w.document.body.appendChild(img);
+  }
 
-  BeginUpdate() : void
-  {
+  StartScreenCapture( options : any, callback : any = null ) {
+    /*function startCapture(displayMediaOptions) {
+      let captureStream = null;
+
+      return navigator.mediaDevices.getDisplayMedia(displayMediaOptions)
+          .catch(err => { console.error("Error:" + err); return null; });
+    }*/
+    let captureStream = null;
+    // @ts-ignore
+    captureStream = navigator.mediaDevices.getDisplayMedia(options)
+        .then( cstream => {
+          this.m_CaptureStream = cstream;
+          console.log("captureStream ok:",cstream, this.m_CaptureStream.readyState);
+          var mediaStreamTracks : any = this.m_CaptureStream.getTracks();
+          var track : any;
+          for( let idx in mediaStreamTracks) {
+            track = mediaStreamTracks[idx];
+            console.log("captureStream tracks:",track);
+
+          }
+          if (callback) {
+            callback(cstream);
+          }
+        })
+        .catch(err => {
+          console.error("Error:" + err); return null;
+        });
+
+    return captureStream;
+  }
+
+  StopScreenCapture( options : any = undefined ) {
+    var mediaStreamTracks = this.m_CaptureStream.getTracks();
+    var track : any;
+    for( let idx in mediaStreamTracks) {
+      track = mediaStreamTracks[idx];
+      console.log("Stopping track",track,track.enabled);
+      track.stop();
+    }
+  }
+
+  BeginUpdate() : void {
   }
 
   BeginUpdateDevice() : void

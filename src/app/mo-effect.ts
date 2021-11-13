@@ -53,7 +53,7 @@ export class moEffect extends moMoldeoObject {
   InletMouseXWheel : moInlet;
   InletMouseYWheel : moInlet;
   InletMouseZWheel : moInlet;
-  
+
   InletAccVelY: moInlet;
   InletAccVelX: moInlet;
   InletAccVelZ: moInlet;
@@ -516,7 +516,7 @@ export class moEffect extends moMoldeoObject {
               this.mousey = event.reservedvalue2;
               this.mousex_old = this.mousex;
               this.mousey_old = this.mousey;
-              console.log("mousex_old",this.mousex_old);
+              //console.log("mousex_old",this.mousex_old);
             }
             if (event.jsevent.button==1) {
               this.mousebuttonmiddle = 1.0;
@@ -685,7 +685,7 @@ export class moEffect extends moMoldeoObject {
 
           if (this.velocity < 0.01) { this.velocity = 0 ; }
 	}
-	
+
         if (event.devicecode==moIODeviceMobileCode.MO_ROTATION ) {
           this.InletRotX.SetNumber( event.reservedvalue0 );
           this.InletRotY.SetNumber( event.reservedvalue1 );

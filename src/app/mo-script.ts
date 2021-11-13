@@ -38,10 +38,10 @@ export class moScript extends moAbstract {
 
   CompileFile( strFilename :  moText, callback?: any ) : boolean {
     //load file
-    console.log("CompileFile", strFilename);
+    //console.log("CompileFile", strFilename);
     if (this.m_pFileManager) {
       this.m_pFileManager.Load(strFilename, false, (res) => {
-        console.log("CompileFile > Loaded > name: ", res);
+        //console.log("CompileFile > Loaded > name: ", res);
         if (res._body) this.m_fullscript = res._body;
         else this.m_fullscript = res;
         //eval( ""+this.m_fullscript );

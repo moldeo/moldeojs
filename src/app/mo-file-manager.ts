@@ -289,7 +289,7 @@ export class moFile extends moAbstract {
 		}
 
     fullget = fullget.replace("index.html","");
-    console.log("fullget:",fullget);
+    //console.log("fullget:",fullget);
 		//console.log("fullpath before:",fullpath);
 		fullpath = fullpath.replace("./","");
 
@@ -312,10 +312,10 @@ export class moFile extends moAbstract {
 						callback(res, this);
 					}
     		},
-        error => { console.log('oops', error); }
+        error => { console.error('oops', error); }
 			);
 		} catch(error) {
-			console.log("Error:",error);
+			console.error("Error:",error);
 		}
   }
 };
@@ -392,15 +392,15 @@ export class moDirectory extends moAbstract {
 		if (FS == undefined) {
 			//try to open : p_CompletePath+"/list.cfg"
 			var p_CompletePath2 : moText =  p_CompletePath+"/list.cfg";
-			console.log("try to open list.cfg: at ", p_CompletePath2 );
+			//console.log("try to open list.cfg: at ", p_CompletePath2 );
 
 			if (this.m_pFileManager) {
 				this.m_bExists = true;
 				this.m_pFileManager.Load( p_CompletePath2, true, res => {
-					console.log("Files are there in "+p_CompletePath2, res );
+					//console.log("Files are there in "+p_CompletePath2, res );
 					var milista : moText0 = new moText0(res);
 					var listcfg : moTextArray = milista.Explode("\n");
-					console.log(listcfg);
+					//console.log(listcfg);
 					for(var l in listcfg ) {
 						var name : any = listcfg[l];
 						if (name.length>1) {
@@ -695,7 +695,7 @@ export class moFileManager extends moResource {
 		}
 
     fullget = fullget.replace("index.html","");
-    console.log("fullget:",fullget);
+    //console.log("fullget:",fullget);
 
 		//console.log("fullpath before:",fullpath);
 		fullpath = fullpath.replace("./","");
@@ -717,10 +717,10 @@ export class moFileManager extends moResource {
 				res => {
       		if (callback) { callback(res); }
     		},
-        error => { console.log('oops', error); if (callbackerror) { callbackerror(error); } }
+        error => { console.error('oops', error); if (callbackerror) { callbackerror(error); } }
 			);
 		} catch(error) {
-			console.log("Error:",error);
+			console.error("Error:",error);
 		}
   }
 
@@ -733,7 +733,7 @@ export class moFileManager extends moResource {
     }
 
     var pDir: moDirectory = new moDirectory(p_Path, this, callback);
-    console.log("Opened Dir:", pDir);
+    //console.log("Opened Dir:", pDir);
     if (pDir) {
       if (pDir.GetType() == moFileType.MO_FILETYPE_LOCAL
         && pDir.Exists() == false) {

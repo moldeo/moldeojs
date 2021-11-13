@@ -36,6 +36,8 @@ export class moIODeviceManager extends moAbstract {
   m_lastsensor : any = "";
   m_pResourceManager : any = null;
 
+  m_Triggers : any = [];
+
   constructor() {
     super();
     //this.SetName("_iodevicemanager_");
@@ -84,7 +86,7 @@ export class moIODeviceManager extends moAbstract {
      */
     Init() : boolean {
 
-      console.log("moIODeviceManager::Init");
+      //console.log("moIODeviceManager::Init");
 
       window.addEventListener('mousemove', (event) => { return this.ProcessEvent(event) }, false);
       window.addEventListener('touchmove', (event) => { return this.ProcessEvent(event) }, false);
@@ -146,11 +148,11 @@ export class moIODeviceManager extends moAbstract {
     PurgeEvents() : void {
       this.m_Events.m_Array = [];
     }
+
     ProcessEvent( event : any ) : void {
       if (event) {
 
         //console.log("window.innerHeight:", window.innerHeight);
-
         var screen_height = window.innerHeight;
         var screen_width = window.innerWidth;
         var top_height = 0;
@@ -195,7 +197,7 @@ export class moIODeviceManager extends moAbstract {
 
           if (event.type=="mouseup") {
             Event = new moEvent( MO_IODEVICE_MOUSE, moIODeviceCode.MO_SDL_MOUSEBUTTONUP, mevent.button, mevent.clientX, mevent.clientY );
-            console.log(screen_height,top_height,mevent.clientX,mevent.clientY);
+            //console.log(screen_height,top_height,mevent.clientX,mevent.clientY);
           } else
           if (event.type=="touchend") {
             mevent.button = 0;
@@ -325,7 +327,7 @@ export class moIODeviceManager extends moAbstract {
           }
 
           if (event.type=="wheel" || event.type=="mousewheel") {
-            console.log("wheel",event)
+            //console.log("wheel",event)
             Event = new moEvent( MO_IODEVICE_MOUSE, moIODeviceCode.MO_SDL_MOUSEWHEEL, event.deltaX, event.deltaY, event.deltaZ, event.deltaMode );
             if (Event) {
               Event.jsevent = event;
@@ -338,9 +340,35 @@ export class moIODeviceManager extends moAbstract {
           //console.log("Processed MouseEvent:", this.m_MouseEvent);
         //}
         //console.log(event);
+
+        //propagate events to other elements in dom
+        /*
+        console.log(this.m_Triggers);
+        if (this.m_Triggers) {
+          var el : any;
+          for( let a in this.m_Triggers) {
+            el = this.m_Triggers[a]
+            console.log(el);
+            if (el) {
+              var eventClone : any = new event.constructor(event.type, {
+                screenX: event.screenX,
+                screenY: event.screenY,
+                clientX: event.clientX,
+                clientY: event.clientY,
+                button: event.button,
+                buttons: event.buttons,
+                relX: event.relX,
+                relY: event.relY
+              } )
+              el.dispatchEvent(eventClone);
+            }
+          }
+        }
+        */
       }
 
     }
+
     PollEvents() : void {
       //console.log("pollevent>post mouse event", this.m_MouseEvent);
       if (this.m_MouseEvents.length) {
@@ -357,5 +385,11 @@ export class moIODeviceManager extends moAbstract {
         this.m_MobileEvents = [];
       }
 
+    }
+
+    AddTriggerElement( target_element : any ) : void {
+      var tp : typeof target_element;
+      console.log("AddTriggerElement type:", tp )
+      this.m_Triggers.push(target_element);
     }
 }

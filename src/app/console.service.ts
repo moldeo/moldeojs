@@ -1,7 +1,7 @@
 import { Injectable,  Inject} from '@angular/core';
 
 import { Subject }    from 'rxjs/Subject';
-import {  BehaviorSubject }    from 'rxjs/BehaviorSubject';
+import {  BehaviorSubject }    from 'rxjs';
 import { HttpClient } from "@angular/common/http";
 
 import { moConsole } from './mo-console';
@@ -33,22 +33,22 @@ export class ConsoleService {
 
     if (options["config_open"] == undefined)
       options["config_open"] = (result) => {
-        console.log("Config opened ok.");
+        //console.log("Config opened ok.");
       };
 
     if (options["config_loaded"] == undefined)
       options["config_loaded"] = (result) => {
-        console.log("Config Loaded! Start Playing!");
+        //console.log("Config Loaded! Start Playing!");
       };
 
     if (options["effects_loaded"] == undefined)
       options["effects_loaded"] = (result) => {
-        console.log("ALL Effects Loaded!");
+        //console.log("ALL Effects Loaded!");
       };
 
     if (options["effects_started"] == undefined)
       options["effects_started"] = (result) => {
-        console.log("ALL Effects Started!");
+        //console.log("ALL Effects Started!");
       };
 
     var consoled: boolean = this.m_Console.Init(options);

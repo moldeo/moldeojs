@@ -14,6 +14,10 @@ import { AppBoostrapModule } from './app-boostrap/app-boostrap.module';
 import { AlertModule } from 'ngx-bootstrap';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { PopoverModule } from 'ngx-bootstrap/popover';
+
 
 import { MoldeojsInterfaceComponent } from './moldeojs-interface/moldeojs-interface.component';
 //Moldeo Components
@@ -47,8 +51,16 @@ const appRoutes: Routes = [
 
 import { SocketIoModule, SocketIoConfig, Socket } from 'ngx-socket-io';
 
+import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import { faSquare, faCheckSquare, faCamera,
+  faGlobeAmericas,faVideo, faInfo, faShare, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faSquare as farSquare, faCheckSquare as farCheckSquare } from '@fortawesome/free-regular-svg-icons';
+import { faStackOverflow, faGithub, faMedium } from '@fortawesome/free-brands-svg-icons';
+
 //const config: SocketIoConfig = { url: 'https://speak.moldeo.org:8989', options: {rejectUnauthorized: false} };
 //const config: SocketIoConfig = { url: 'http://localhost:8988', options: {rejectUnauthorized: false} };
+
+
 
 @NgModule({
   declarations: [
@@ -67,11 +79,15 @@ import { SocketIoModule, SocketIoConfig, Socket } from 'ngx-socket-io';
     AlertModule.forRoot(),
     BsDropdownModule.forRoot(),
     CollapseModule.forRoot(),
+    ModalModule.forRoot(),
+    PopoverModule.forRoot(),
     BrowserModule,
+    FontAwesomeModule,
     AppBoostrapModule,
     FormsModule,
     HttpClientModule,
     SocketIoModule,
+    TooltipModule.forRoot(),
     /*SocketIoModule.forRoot(SocketIoConfig),*/
     /*SocketIoModule.forRoot(SocketIoConfig),*/
 RouterModule.forRoot(appRoutes, { relativeLinkResolution: 'legacy' })
@@ -97,4 +113,11 @@ RouterModule.forRoot(appRoutes, { relativeLinkResolution: 'legacy' })
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor(private library: FaIconLibrary) {
+    library.addIcons(faSquare, faCheckSquare, farSquare,
+      farCheckSquare, faStackOverflow, faGithub,
+      faMedium, faCamera, faGlobeAmericas,
+      faVideo, faInfo, faShare, faDownload);
+  }
+}

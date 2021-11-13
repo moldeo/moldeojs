@@ -3,14 +3,20 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "a2cli": {
+    "moldeojs": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-builders/custom-webpack:browser",
           "options": {
+            "customWebpackConfig": {
+                "path": "./extra-webpack.config.js",
+                "mergeStrategies": {
+                  "node": "replace"
+                }
+            },
             "aot": true,
             "outputPath": "dist",
             "index": "src/index.html",
@@ -28,7 +34,10 @@
               "typed-function",
               "decimal.js",
               "fraction.js",
-              "complex.js"
+              "complex.js",
+              "ml5",
+              "geodesy",
+              "util"
             ],
             "assets": [
               "src/assets",
@@ -63,25 +72,25 @@
                 }
               ]
             }
-          }
+          },
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
-            "browserTarget": "a2cli:build",
+            "browserTarget": "moldeojs:build",
             "sslKey": "sslcert/server.key",
             "sslCert": "sslcert/server.crt"
           },
           "configurations": {
             "production": {
-              "browserTarget": "a2cli:build:production"
+              "browserTarget": "moldeojs:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "a2cli:build"
+            "browserTarget": "moldeojs:build"
           }
         },
         "test": {
@@ -109,7 +118,7 @@
         }
       }
     },
-    "a2cli-e2e": {
+    "moldeojs-e2e": {
       "root": "e2e",
       "sourceRoot": "e2e",
       "projectType": "application",
@@ -118,7 +127,7 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "a2cli:serve"
+            "devServerTarget": "moldeojs:serve"
           }
         },
         "lint": {
@@ -131,7 +140,7 @@
       }
     }
   },
-  "defaultProject": "a2cli",
+  "defaultProject": "moldeojs",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",

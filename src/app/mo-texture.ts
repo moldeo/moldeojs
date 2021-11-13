@@ -106,8 +106,13 @@ export class moTexture extends moAbstract {
     return this.m_width;
   }
 
+  SetWidth( p_width : number ) : void {
+    this.m_width = p_width;
+  }
 
-
+  SetHeight( p_height : number ) : void {
+    this.m_height = p_height;
+  }
 };
 
 export type moTextureArray = moTexture[];

@@ -141,7 +141,7 @@ export class moNetOscIn extends MO.moIODevice {
   }
 
   GetDefinition(): MO.moConfigDefinition {
-    console.log("moNetOscIn.GetDefinition");
+    //console.log("moNetOscIn.GetDefinition");
     super.GetDefinition();
 
     return this.m_Config.GetConfigDefinition();

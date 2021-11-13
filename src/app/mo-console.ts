@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import * as THREE from "three";
+import * as html2canvas from "html2canvas";
 
 import {
   MO_VERSION,MO_USERAGENT,
@@ -118,8 +119,12 @@ export class moConsole extends moMoldeoObject {
   moldeojs_version : moText = MO_VERSION;
   version : moText = "";
 
+  html2canvas : any = undefined;
+
   constructor( private http: HttpClient ) {
     super();
+    this.html2canvas = html2canvas;
+    //console.log("this.html2canvas:",this.html2canvas);
     this.m_ConsoleState = new moConsoleState();
     this.m_EffectManager = new moEffectManager();
     this.m_MoldeoObjects = [];
@@ -200,7 +205,7 @@ export class moConsole extends moMoldeoObject {
       if (options.constructor)
         if ("name" in options.constructor) {
           if (options.constructor.name == "moFile") {
-            console.log("moConsole.Init > Loading moFile >", options);
+            //console.log("moConsole.Init > Loading moFile >", options);
             //this.m_Config.LoadConfig( options );
             var p_F: moFile = options;
             this.SetConfigName(options.m_CompletePath);
@@ -217,7 +222,7 @@ export class moConsole extends moMoldeoObject {
     //RUNNING MOLDEO OBJECT INIT for loading base
     super.Init((result) => {
       var File : moFile = new moFile(this.GetConfigName());
-      console.log("Config Loaded!", File.GetFileName());
+      //console.log("Config Loaded!", File.GetFileName());
 
       var res_ok = this.InitResources({
         "apppath": EXEDIR,
@@ -634,7 +639,7 @@ export class moConsole extends moMoldeoObject {
   LoadObject( MobDef : moMobDefinition ) : any {
 
     var pobject : any = undefined;
-    console.log("LoadObject", MobDef);
+    //console.log("LoadObject", MobDef);
 
     var n : any = MobDef.GetLabelName();
     MobDef.SetLabelName( this.GetValidLabelName( MobDef.GetLabelName() ) );
@@ -716,7 +721,7 @@ export class moConsole extends moMoldeoObject {
 
   UnloadObject( MobDef : moMobDefinition ): void {
     var pobject : any = undefined;
-    console.log("UnloadObject", MobDef);
+    //console.log("UnloadObject", MobDef);
 
 
     switch( MobDef.m_Type ) {
@@ -1211,7 +1216,7 @@ export class moConsole extends moMoldeoObject {
     */
 
     ///GEOMETRY
-    if (v_options["sphere_animation"]) {
+    if (v_options["sphere_animation"]==3) {
 
       //console.log("Rendering sphere_animation");
       //console.log( RMan.m_Renderer.info );
@@ -1262,7 +1267,7 @@ export class moConsole extends moMoldeoObject {
     }
 
 
-    if (v_options["image_animation"]) {
+    if (v_options["image_animation"]==3) {
       //console.log( RMan.m_Renderer.info );
       var Mat2: moMaterialBasic = new moMaterialBasic();
       var id2: MOint = TMan.GetTextureMOId("moldeotrans");
@@ -1382,4 +1387,58 @@ export class moConsole extends moMoldeoObject {
     return super.Finish();
   }
 
+  GetObject( label_name : string ) : moMoldeoObject {
+    //this.GetObjectId();
+    var founded = false;
+    var ret_mObj = null;
+    this.m_MoldeoObjects.forEach( function( mObj, i) {
+      if ( mObj.GetMobDefinition().GetLabelName() == label_name ) {
+        //using numeral for titles... mmm no, maybe using numerals for preconfig like
+        // reference to noname_1#3 = fx noname_1 fixed on preconfig 3
+        founded = true;
+        ret_mObj = mObj;
+        return ret_mObj;
+      }
+    });
+    return ret_mObj;
+  }
+
+  GetObjectId( label_name : string ) : number {
+    var founded = false;
+    var ret_id = -1;
+    this.m_MoldeoObjects.forEach( function( mObj, i) {
+      if ( mObj.GetMobDefinition().GetLabelName() == label_name ) {
+        //using numeral for titles... mmm no, maybe using numerals for preconfig like
+        // reference to noname_1#3 = fx noname_1 fixed on preconfig 3
+        founded = true;
+        ret_id = mObj.GetId();
+        return ret_id;
+      }
+    });
+    return ret_id;
+  }
+
+  Screenshot( delay : any = 0) : void {
+    //console.log("Console.Screenshot(delay)",delay)
+    if (this.Script.Screenshot) {
+      this.Script.Screenshot(delay);
+    } else {
+      //console.log("default > Console.Screenshot(delay) ",delay)
+      this.m_pResourceManager.MORenderMan.Screenshot(delay);
+    }
+  }
+
+  StartScreenCapture( options : any, callback : any = null ) {
+    //console.log("Console.StartScreenCapture()",options)
+    if (this.Script.StartScreenCapture) {
+      return this.Script.StartScreenCapture( options );
+    } else {
+      //console.log("default > Console.ScreenCapture()",options)
+      return this.m_pResourceManager.MORenderMan.StartScreenCapture( options, callback );
+    }
+  }
+
+  StopScreenCapture() {
+    this.m_pResourceManager.MORenderMan.StopScreenCapture();
+  }
 };

@@ -1,8 +1,103 @@
 
+
 .logo {
   max-height: 22px;
 }
 
+#map-canvas, #pano {
+  height: 300px;
+}
+
+#videocap2 {
+  display: block;
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 120px;
+  height: 80px;
+  border: solid 0px grey;
+}
+
+#screenshotcap {
+  display: block;
+  position: absolute;
+  left: 120px;
+  bottom: 0px;
+  width: 120px;
+  height: 80px;
+  border: solid 0px grey;
+}
+
+#mapsmask {
+  display: block;
+  position: fixed;
+  background-color: rgba(0,0,0,1.0);
+  bottom: 0px;
+  height: 75px;
+  width: 100%;
+  z-index: 20000;
+  /*position: ;*/
+}
+
+.logo-ait {
+  display: block;
+  position: fixed;
+  right: 20px;
+  bottom: -25px;
+  z-index: 22000;
+  background-color: rgba(0,0,0,0.0);
+  width: 128px;
+  height: 128px;
+  margin: 0px;
+  padding: 0px;
+  border-radius: 8px;
+}
+.logo-ait img {
+  width: 128px;
+  height: 128px;
+}
+
+.logo-ait-2 {
+  display: none;
+  position: fixed;
+  right: 200px;
+  bottom: 40px;
+  z-index: 20000;
+  background-color: rgba(0,0,0,0.5);
+  width: 128px;
+  height: 128px;
+  margin: 0px;
+  padding: 0px;
+  border-radius: 8px;
+}
+
+.logo-ait-3 {
+  display: none;
+  position: fixed;
+  right: 400px;
+  bottom: 40px;
+  z-index: 20000;
+  background-color: rgba(0,0,0,0.5);
+  width: 128px;
+  height: 128px;
+  margin: 0px;
+  padding: 0px;
+  border-radius: 8px;
+}
+
+.logo-ait-4 {
+  display: none;
+  position: fixed;
+  right: 600px;
+  bottom: 40px;
+  z-index: 20000;
+  background-color: rgba(0,0,0,0.5);
+  width: 128px;
+  height: 128px;
+  margin: 0px;
+  padding: 0px;
+  border-radius: 8px;
+}
 .chat_msg_rec {
   height: 300px;
 
@@ -162,4 +257,148 @@ body, *, div, span, li, a {
 .navbar-nav li a:active {
   padding: 5px 10px 5px 10px !important;
   border: 1px solid #EEEEEE !important;
+}
+
+
+
+
+.modal-dialog {
+  margin-top: 20%;
+}
+
+.template_warning.modal-content {
+  min-height: 300px;
+  background-position: 0% 0%;
+  background-size: 100% 100%;
+  background-image: url(/assets/molrepos/moldeoorg/ait/bodypix/AtencionPopUp.png);
+  background-color: rgba(0,0,0,0.0);
+}
+
+.modal-header {
+  min-height: 112px;
+  border-bottom: 0px !important;
+}
+
+.modal-header .close {
+  min-width: 60px;
+  min-height: 60px;
+}
+
+.modal-body {
+  min-height: 100px;
+}
+
+.modal-footer {
+  min-height: 50px;
+  border-top: 0px !important;
+}
+
+.modal-ok {
+  min-width: 100%;
+  min-height: 50px;
+}
+
+.template_help * {
+  font-family: Roboto;
+}
+
+.template_help .close {
+  font-size: 24px;
+  line-height: 24px;
+  color: white !important;
+  position: absolute;
+  display: block;
+  right: 0px;
+  top: 0px;
+  opacity: 0.75;
+}
+.template_help .close span {
+  font-size: 24px;
+
+}
+
+
+.template_help .modal-content {
+  background-image: none !important;
+  background-color: rgba(0,0,0,0.95);
+  font-size: 12px;
+  font-family: Roboto;
+}
+
+.template_help .modal-header {
+  min-height: auto !important;
+  height: auto !important;
+  border-bottom: solid 1px white !important;
+}
+.template_help .modal-header h1 {
+  font-size: 24px;
+  line-height: 24px;
+}
+
+.template_help .modal-body {
+  min-height: 50px !important;
+  height: 50px !important;
+}
+.template_help .modal-footer {
+  /*border-top: solid 1px white !important;*/
+  min-height: auto !important;
+  height: auto !important;
+}
+
+
+.template_share .close {
+  font-size: 24px;
+  line-height: 24px;
+  color: white !important;
+  position: absolute;
+  display: block;
+  right: 0px;
+  top: 0px;
+  opacity: 0.75;
+}
+.template_share .close span {
+  font-size: 24px;
+
+}
+.template_share.modal-content {
+  background-image: none !important;
+  background-color: rgba(0,0,0,0.95);
+  font-size: 12px;
+  font-family: Roboto;
+}
+
+.template_share.modal-content .input-group-addon,
+.template_share.modal-content .form-control {
+  color: black !important;
+}
+
+.template_share .modal-footer {
+  /*border-top: solid 1px white !important;*/
+  min-height: auto !important;
+  height: auto !important;
+}
+
+.template_share .modal-footer button {
+
+}
+
+.template_share .row {
+  margin: 0px;
+  margin-bottom: 5px;
+}
+
+.col-form-label {
+  display: block;
+  float: left;
+  width: 30%;
+}
+.col-6 {
+  display: block;
+  float: left;
+  width: 70%;
+}
+
+
+.template_share .modal-header {
+    min-height: 0px !important;
 }

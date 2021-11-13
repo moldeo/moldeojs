@@ -249,7 +249,7 @@ export class moEffectPlane extends MO.moEffect {
     p_configdefinition.Add( "scalex", MO.moParamType.MO_PARAM_SCALEX, moPlaneParamIndex.PLANE_SCALEX, new MO.moValue( "1.0", "FUNCTION" ) );
     p_configdefinition.Add( "scaley", MO.moParamType.MO_PARAM_SCALEY, moPlaneParamIndex.PLANE_SCALEY, new MO.moValue( "1.0", "FUNCTION" ) );
     p_configdefinition.Add( "scalez", MO.moParamType.MO_PARAM_SCALEZ, moPlaneParamIndex.PLANE_SCALEZ, new MO.moValue( "1.0", "FUNCTION" ) );
-    console.log("moEffectPlane.GetDefinition Plane",p_configdefinition);
+    //console.log("moEffectPlane.GetDefinition Plane",p_configdefinition);
 
     return this.m_Config.GetConfigDefinition();
   }
