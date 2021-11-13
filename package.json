@@ -79,7 +79,7 @@
     "@types/node": "^12.11.1",
     "@types/three": "^0.103.2",
     "codelyzer": "^6.0.0",
-    "electron": "^9.4.4",
+    "electron": "^11.5.0",
     "electron-packager": "^14.2.1",
     "jasmine": "^3.5.0",
     "jasmine-core": "~3.6.0",
