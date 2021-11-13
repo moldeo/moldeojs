@@ -70,6 +70,7 @@ Button with tooltip
 <!--<ng-template #dynamic></ng-template>-->
 <moldeojs-interface
   id="moldeojsinterface"
+  class="hideme"
   #moldeojsinterface
   [mol]="this.sample"
   [moldeojsview]="this.moldeojsview"></moldeojs-interface>
@@ -113,7 +114,7 @@ Button with tooltip
   (loaded)="this.sampleLoaded($event)"
   (onscreenshot)="this.screenshotTaken($event)"
   (help)="this.showHelp($event)"
-  style="display: none;"
+  style="display: block;"
   ></moldeojs-view>
 
 
@@ -123,10 +124,10 @@ Button with tooltip
     <canvas id="videoscreenshot_canvas" style="display: none;" width="1280" height="720"></canvas>
     <span id="tooltipscreenshot" tooltip="Click para abrir y compartir" data-html2canvas-ignore>
         <img #screenshotcap id="screenshotcap" border="0" src="" (click)="this.shareImage($event)"/>
-        <a id="screenshotcap_download" href="" download="AIT_Captura.png"></a>
+        <a id="screenshotcap_download" href="" download="MoldeoJS_Captura.png"></a>
     </span>
-    <div class="logo-ait">
-        <img src="./assets/molrepos/moldeoorg/ait/bodypix/logos/GIF/ES/AIT-128-B.gif" class="imglogo"/>
+    <div class="logo-moldeo">
+        <img src="./assets/data/icons/moldeo_logo_2020_M@_512_blanco_bblanco.png" class="imglogo"/>
     </div>
   </div>
 
@@ -150,24 +151,24 @@ Button with tooltip
 <ng-template #template_help >
   <div class="modal-content template_warning template_help">
     <div class="modal-header">
-      <h1>AIT Instrucciones para la teletransportacion</h1>
+      <h1>Instrucciones para este proyecto</h1>
       <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
     <div class="modal-body">
       <p>
-      Ud se encuentra a punto de atravesar el umbral cuántico - donde los átomos se transforman en bits y los cuerpos se “desmaterializan”- lo cual hace posible la teletransportacion.
+      Instrucciones para jugar a Moldeo.
       </p>
       <br/>
       <p>
-      Para realizar el viaje. presione:<br/><br/>
-      1- viajar > aceptar el aviso de advertencia<br/>
-      2- esperar mientras se enciende la camara y se define el fondo<br/>
-      3- recorrer el espacio en 360 grados<br/>
-      4. sacar foto selfie > elegir "pestaña o ventana AIT" viajar > guardar<br/>
-      5- compartir en redes<br/>
-      6- nuevo destino > girar el mundo > elegir ciudad > doble click > nuevo street view<br/>
+      Pasos a seguir:<br/><br/>
+      1- Seleccionar el proyecto<br/>
+      2- Espere mientras se carga el proyecto<br/>
+      3- Explorar y moldear el sistema a su gusto<br/>
+      4. Tomar una imagen o un video<br/>
+      5- Compartir<br/>
+      6- Seleccionar nuevo proyecto<br/>
       </p>
     </div>
     <div class="modal-footer">
@@ -181,7 +182,7 @@ Button with tooltip
 <ng-template #template_share >
   <div class="modal-content template_warningx template_helpx template_share">
     <div class="modal-header">
-      <h1>Crear postal y compartir</h1>
+      <h1>Crear imagen y compartir</h1>
       <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -202,13 +203,13 @@ Button with tooltip
           </div>
     	</div>
       <div class="form-group row">
-    			<label class="col-4 col-form-label">T&iacute;tulo de la postal</label>
+    			<label class="col-4 col-form-label">T&iacute;tulo de la imagen</label>
           <div class="col-6">
     			     <input id="share_title" type="text" class="form-control" aria-describedby="sizing-addon1">
           </div>
     	</div>
       <div class="form-group row">
-  			<label class="col-4 col-form-label">Descripci&oacute;n de la postal</label>
+  			<label class="col-4 col-form-label">Descripci&oacute;n de la imagen</label>
         <div class="col-6">
     			<textarea id="share_description" type="text" class="form-control" aria-describedby="sizing-addon1">
     			</textarea>
@@ -227,4 +228,3 @@ Button with tooltip
     </div>
   </div>
 </ng-template>
-

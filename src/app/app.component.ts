@@ -107,10 +107,10 @@ export class AppComponent implements OnInit {
     //this.samples.push("molrepos/basic/08p_CameraParticles/08p_CameraParticles.mol");
     //this.MoldeoCS.Init({ "consoleconfig": "./assets/molrepos/basic/01_Icon/01_Icon.mol" } );"
 
-    this.samples.push("molrepos/moldeoorg/fabri/Musas/MusasRojo.mol");
-    this.samples.push("molrepos/moldeoorg/fabri/Musas/MusasVerde.mol");
-    this.samples.push("molrepos/moldeoorg/fabri/Musas/MusasAzul.mol");
-    this.samples.push("molrepos/moldeoorg/fabri/Musas/MusasAmarillo.mol");
+    //this.samples.push("molrepos/moldeoorg/fabri/Musas/MusasRojo.mol");
+    //this.samples.push("molrepos/moldeoorg/fabri/Musas/MusasVerde.mol");
+    //this.samples.push("molrepos/moldeoorg/fabri/Musas/MusasAzul.mol");
+    //this.samples.push("molrepos/moldeoorg/fabri/Musas/MusasAmarillo.mol");
 
     this.viewservice = service;
     this.viewservice.setRootViewContainerRef(viewContainerRef);
@@ -239,7 +239,7 @@ export class AppComponent implements OnInit {
 
 
 
-      this.openModal( this.template_warning );
+      /*this.openModal( this.template_warning );*/
   }
 
   showHelp( event : any ) {

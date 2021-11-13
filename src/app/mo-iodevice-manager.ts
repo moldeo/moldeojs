@@ -90,8 +90,8 @@ export class moIODeviceManager extends moAbstract {
 
       window.addEventListener('mousemove', (event) => { return this.ProcessEvent(event) }, false);
       window.addEventListener('touchmove', (event) => { return this.ProcessEvent(event) }, false);
-      window.addEventListener('mouseclick', (event) => { return this.ProcessEvent(event) }, false);
-      window.addEventListener('click', (event) => { return this.ProcessEvent(event) }, false);
+      //window.addEventListener('mouseclick', (event) => { return this.ProcessEvent(event) }, false);
+      //window.addEventListener('click', (event) => { return this.ProcessEvent(event) }, false);
       window.addEventListener('touchstart', (event) => { return this.ProcessEvent(event); }, false);
       window.addEventListener('touchend', (event) => { return this.ProcessEvent(event); }, false);
       window.addEventListener('touchcancel', (event) => { return this.ProcessEvent(event) }, false);

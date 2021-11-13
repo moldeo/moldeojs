@@ -39,22 +39,22 @@
   /*position: ;*/
 }
 
-.logo-ait {
+.logo-moldeo {
   display: block;
   position: fixed;
   right: 20px;
-  bottom: -25px;
+  bottom: 0px;
   z-index: 22000;
   background-color: rgba(0,0,0,0.0);
   width: 128px;
-  height: 128px;
+  /*height: 128px;*/
   margin: 0px;
   padding: 0px;
   border-radius: 8px;
 }
-.logo-ait img {
+.logo-moldeo img {
   width: 128px;
-  height: 128px;
+  /*height: 128px;*/
 }
 
 .logo-ait-2 {
@@ -270,7 +270,7 @@ body, *, div, span, li, a {
   min-height: 300px;
   background-position: 0% 0%;
   background-size: 100% 100%;
-  background-image: url(/assets/molrepos/moldeoorg/ait/bodypix/AtencionPopUp.png);
+  background-image: url(/assets/data/icons/AtencionPopUp.png);
   background-color: rgba(0,0,0,0.0);
 }
 

@@ -378,13 +378,20 @@ export class MoldeojsInterfaceComponent implements OnInit {
       if (changes["moldeojsview"]) {
         console.log("moldeojsview:", changes["moldeojsview"].currentValue);
         this.moldeojsview.loaded.subscribe( (evt) => {
-          console.log('View Sample Loaded!', evt, this.moldeojsview.GetConsole().GetConfigName())
-          this.loadedSample();
+          if (evt=="effects_loaded") {
+
+          }
+          if (evt=="effects_started") {
+            //TODO: start reading in real time some values please
+            console.log('View Sample Loaded!', evt, this.moldeojsview.GetConsole().GetConfigName())
+            this.loadedSample();
+          }
         } );
       }
   }
 
   public loadedSample() : void {
+    console.log("moldeojs-interface loadedSample!")
     this.m_Console = this.moldeojsview.GetConsole();
     this.moFileName = this.m_Console.GetConfigName();
     this.loadMobNodes();
