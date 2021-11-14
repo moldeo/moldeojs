@@ -69,7 +69,8 @@ export class MoDefaultComponent implements OnInit {
     /*Global Listener*/
     this.globalClick = this.renderer.listen("document", 'click', (e) => {
       //this_.toggle = false;
-      //TODO: check events console.log(e.target);
+      //TODO: check events
+      console.log(e.target);
       //if(e.target.className !== "moParams" && e.target.className !== "moParamsContent"){
       if (e.target.getAttribute("id") === "moConnect") {
         this_.toggle = false;

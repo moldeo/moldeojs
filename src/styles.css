@@ -279,7 +279,7 @@ h3{
 /**********OBJECTS**********/
 
 svg{
-  /*position: fixed;*/
+  position: fixed;
 }
 
 .moContainer{
