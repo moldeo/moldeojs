@@ -1,4 +1,4 @@
-<div #moCanvas id="moCanvas" (mouseenter)="moWheelDisplay=false;"></div>
+<div #moCanvas id="moCanvas"  class="hideme" (mouseenter)="moWheelDisplay=false;"></div>
 
 <div #moWheel id="moWheel" [hidden]="!moWheelDisplay">
   <div class="circle moWheelAni"></div>
@@ -12,7 +12,7 @@
   </div>
 </div>
 
-<div id="moConfig" #moConfig (mouseenter)="moWheelDisplay=false;">
+<div id="moConfig" #moConfig (mouseenter)="moWheelDisplay=false;" class="hideme">
 </div>
 
 <header class="moHeader" (mouseenter)="moToolDisplay=false;">

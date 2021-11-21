@@ -27,6 +27,7 @@ import { PluginsDefinitionsMap, PluginsDefinitions, PluginsDefinitionsMapType,
 import { moMoldeoObjectType, moMoldeoObjectTypeToText } from '../mo-moldeo-object-type.enum';
 
 //import { moConsoleState } from '../mo-console-state';
+import { moFile } from '../mo-file-manager';
 import { moDisplay } from '../mo-render-manager';
 import { ConsoleService } from "../console.service";
 import { MoldeojsViewComponent } from '../moldeojs-view/moldeojs-view.component';
@@ -393,7 +394,9 @@ export class MoldeojsInterfaceComponent implements OnInit {
   public loadedSample() : void {
     console.log("moldeojs-interface loadedSample!")
     this.m_Console = this.moldeojsview.GetConsole();
-    this.moFileName = this.m_Console.GetConfigName();
+    let cName : any = this.m_Console.GetConfigName();
+    let cFile : moFile = new moFile(cName);
+    this.moFileName = cFile.GetFileName();
     this.loadMobNodes();
 
     //activate mob by type to show on interface other views to same objects
