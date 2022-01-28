@@ -1,0 +1,8 @@
+Warning! Extra parameters must be defined at the end of config file. "__console__"
+Warning! <moConsole>[__console__]::Init()_moDefineParamIndex > Config parameter "videoshots"  warning. Bad indexation could cause errors.
+Error! particlessimple > 1.00.3 :Unexpected value ".3 " found at position 3
+Error! moMoldeoObject::CreateConnectors > function couldn't be defined: 1.00.3 object: particlessimple config: particlessimple label:particlessimple
+Error! moConsole::ProcessMoldeoAPIMessage > MO_ACTION_PRECONFIG_SET > preconfig index [0] not found!
+Error! moConsole::ProcessMoldeoAPIMessage > MO_ACTION_PRECONFIG_SET > preconfig index [0] not found!
+Error! moConsole::ProcessMoldeoAPIMessage > MO_ACTION_PRECONFIG_SET > preconfig index [0] not found!
+Error! moConsole::ProcessMoldeoAPIMessage > MO_ACTION_PRECONFIG_SET > preconfig index [0] not found!

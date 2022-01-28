@@ -1,0 +1,1466 @@
+Joystick events:1
+moGLManager::Init > GL VERSION: 4.6.0 NVIDIA 470.82.01
+moGLManager::Init > GL_MAJOR_VERSION: 4
+moGLManager::Init > GL_MINOR_VERSION: 6
+moGLManager::Init > GPU VENDOR STRING is NVIDIA Corporation
+moGLManager::Init > GPU RENDERER STRING is NVIDIA GeForce GTX 1660 Ti/PCIe/SSE2
+moResourceManager::Init > Initializing Embedded Resources.
+moResourceManager::Init > Initializing Debug Man Resource.
+moResourceManager::Init > Initializing Net Man Resource.
+moResourceManager::Init > Initializing File Man Resource.
+moResourceManager::Init > Initializing Data Man Resource.
+ moDataSessionConfig() > m_AppPath empty, setting to Work Path: /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02 p_Port: 0 p_Address: 0
+ moDataSessionConfig() > m_AppPath: /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02
+ moDataSessionConfig() > m_ConsoleConfigName: 
+ moDataSessionConfig() > m_ConsoleConfigName fixed to: /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/
+ moDataSessionConfig() > m_SessionFileName fixed to: /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/sesion.mos
+moDataSessionConfig > Loaded /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/sesion.mos
+ moDataSessionConfig() > m_DataPath: /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02
+File founded
+libmoldeo_erase
+libmoldeo_mirror
+libmoldeo_mirrorg
+File founded
+libmoldeo_camera
+libmoldeo_cubemap
+libmoldeo_grid
+libmoldeo_icon
+libmoldeo_icon3d
+libmoldeo_image
+libmoldeo_imageflow
+libmoldeo_imageflow3d
+libmoldeo_livedrawing2
+libmoldeo_movie
+libmoldeo_particlesfractal
+libmoldeo_particlessimple
+libmoldeo_plane
+libmoldeo_sound
+libmoldeo_sound3d
+libmoldeo_soundfaust
+libmoldeo_text
+libmoldeo_text3d
+libmoldeo_tunel
+File founded
+libmoldeo_calibrationgrid
+libmoldeo_debug
+libmoldeo_deformationgrid
+libmoldeo_postprocess2d
+libmoldeo_videowall
+libmoldeo_videowallmorphing
+File founded
+libmoldeo_channel
+libmoldeo_ligia
+libmoldeo_masterchannel
+libmoldeo_panel
+libmoldeo_presetpanel
+File founded
+libmoldeo_trackerklt
+File founded
+libmoldeo_keyboard
+libmoldeo_kinect
+libmoldeo_midi
+libmoldeo_mixer
+libmoldeo_mouse
+libmoldeo_netoscin
+libmoldeo_netoscout
+libmoldeo_nettuioin
+libmoldeo_serial
+libmoldeo_tablet
+moResourceManager::Init > Initializing Filter Man Resource.
+moResourceManager::Init > Initializing Time Man Resource.
+moResourceManager::Init > Initializing GL Man Resource.
+moGLManager::Init > GL VERSION: 4.6.0 NVIDIA 470.82.01
+moGLManager::Init > GL_MAJOR_VERSION: 4
+moGLManager::Init > GL_MINOR_VERSION: 6
+moGLManager::Init > GPU VENDOR STRING is NVIDIA Corporation
+moGLManager::Init > GPU RENDERER STRING is NVIDIA GeForce GTX 1660 Ti/PCIe/SSE2
+moResourceManager::Init > Initializing FrameBuffer Man Resource.
+moResourceManager::Init > Initializing Texture Man Resource.
+ moTexture::CalculateSize  of texture: preview_texture from 1024x1024 to 1024x1024
+ moTexture::CalculateSize  of texture: default from 256x256 to 256x256
+moTextureManager::Init > loading default file:/usr/share/moldeo/data/icons/moldeologo.png
+default bpp: 32 colortype:4 image_type:1 pitch:1024 > blue_mask: 255 green_mask:65280 red_mask:16711680
+ moTexture::CalculateSize  of texture: default from 256x256 to 256x256
+ moTexture::CalculateSize  of texture: moldeonegro from 1800x600 to 2048x1024
+moTextureManager::Init > loading logo file:/usr/share/moldeo/data/icons/moldeonegro.png
+ moTexture::CalculateSize  of texture: moldeotrans from 1800x600 to 2048x1024
+moTextureManager::Init > loading logo file:/usr/share/moldeo/data/icons/moldeotrans.png
+moldeotrans bpp: 32 colortype:4 image_type:1 pitch:8192 > blue_mask: 255 green_mask:65280 red_mask:16711680
+ moTexture::CalculateSize  of texture: moldeotrans from 2048x1024 to 2048x1024
+moResourceManager::Init > Initializing Decoder Manager Resource.
+moResourceManager::Init > Initializing Render Man Resource.
+moRenderManager::Init > Setting Render Manager Mode to:0
+moRenderManager::Init > Setting Render Manager for Render: 320x240 for Screen: 512x512
+moRenderManager::Init > Initializing glew.
+moRenderManager::Init > glew initialized succesfully!
+moRenderManager::Init > Using GLEW 2.0.0
+moRenderManager::Init >       glActiveTextureARB: 140737245855968
+moRenderManager::Init >       glMultiTexCoord2fARB: 140737245908064
+moRenderManager::Init >       GLEW_ARB_texture_non_power_of_two: 1
+moRenderManager::Init >       GLEW_ARB_color_buffer_float: 1
+moRenderManager::Init >       GLEW_ARB_multitexture: 1
+moRenderManager::Init >       GL_EXT_gpu_shader4: 1
+moRenderManager::Init >       GLEW_EXT_geometry_shader4: 1
+moRenderManager::Init >       GLEW_ARB_imaging: 1
+moRenderManager::Init >       GLEW_ARB_shading_language_100: 1
+moRenderManager::Init >       GLEW_EXT_framebuffer_object: 1
+moRenderManager::Init >       GL_MAX_FRAGMENT_UNIFORM_COMPONENTS_ARB: 35657
+moRenderManager::Init >       GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB: 35661
+moRenderManager::Init >       GL_MAX_COLOR_ATTACHMENTS: 36063
+moRenderManager::Init >       Max Texture Size: 32768
+moRenderManager::Init >       Max Texture Rectangle Size: 32768
+moRenderManager::Init >       Max Texture Buffer Size: 134217728
+moRenderManager::Init > Using framebuffer_object: creating one fbo per predefined textures (4). 
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moResourceManager::Init > Initializing Shader Man Resource.
+No shadermanager configuration file defined. Continue.
+moShaderManager::Init > Creating basic Render Shader...
+Vertex Shader compile log:()ðÊVUU
+moShaderManager::Init > m_RenderShader Attrib IDs, position:0 normal:4 color:1 opacity:3 t_coord:3 t_coordedge:-1
+moShaderManager::Init > m_RenderShader Uniform IDs, projmatrix:4 wireframe_width:6 wseg:7 hseg:2 a_light:0 t_image:5
+moResourceManager::Init > Initializing Math Man Resource.
+moResourceManager::Init > Initializing Font Man Resource.
+moResourceManager::Init > Initializing GUI Man Resource.
+moResourceManager::Init > Initializing Sound Man Resource.
+No soundmanager configuration file defined. Continue.
+moResourceManager::Init > Initializing Video Man Resource.
+No videomanager configuration file defined. Continue.
+moResourceManager::Init > Initializing Model Man Resource.
+moResourceManager::Init > Initializing Script Man Resource.
+moLuaResourceManager constructor > L: 93824995882384
+moResourceManager:: Embedded Resources Ready.
+moConsole:: Initializing IODevice's Manager.
+moConsole::Init > Initializing Effects Manager.
+*****Initializing __console__ *****
+RegisterFunction > m_iMethodBase: 1for: PushDebugString
+RegisterFunction > m_iMethodBase: 37for: Play
+*****moMoldeoObject::Init > for plugin: __console__ config: 05_ParticlesSimple.mol label: __console__ is OK!
+moConsole::Init > mol project opening....success 
+moConsole::Init > Initializing Resource Manager.  app path: /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02 data path:  config: 05_ParticlesSimple.mol render mode: 0 screen size: 512x512 render size: 512x512
+moResourceManager::Init > Initializing Embedded Resources.
+moResourceManager::Init > Initializing Debug Man Resource.
+moResourceManager::Init > Initializing Net Man Resource.
+moResourceManager::Init > Initializing File Man Resource.
+moResourceManager::Init > Initializing Data Man Resource.
+ moDataSessionConfig() > m_AppPath: /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02
+ moDataSessionConfig() > m_ConsoleConfigName: 05_ParticlesSimple.mol
+ moDataSessionConfig() > m_ConsoleConfigName fixed to: /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/05_ParticlesSimple.mol
+ moDataSessionConfig() > m_SessionFileName fixed to: /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/sesion.mos
+moDataSessionConfig > Loaded /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/sesion.mos
+ moDataSessionConfig() > m_DataPath: /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02
+File founded
+libmoldeo_erase
+libmoldeo_mirror
+libmoldeo_mirrorg
+File founded
+libmoldeo_camera
+libmoldeo_cubemap
+libmoldeo_grid
+libmoldeo_icon
+libmoldeo_icon3d
+libmoldeo_image
+libmoldeo_imageflow
+libmoldeo_imageflow3d
+libmoldeo_livedrawing2
+libmoldeo_movie
+libmoldeo_particlesfractal
+libmoldeo_particlessimple
+libmoldeo_plane
+libmoldeo_sound
+libmoldeo_sound3d
+libmoldeo_soundfaust
+libmoldeo_text
+libmoldeo_text3d
+libmoldeo_tunel
+File founded
+libmoldeo_calibrationgrid
+libmoldeo_debug
+libmoldeo_deformationgrid
+libmoldeo_postprocess2d
+libmoldeo_videowall
+libmoldeo_videowallmorphing
+File founded
+libmoldeo_channel
+libmoldeo_ligia
+libmoldeo_masterchannel
+libmoldeo_panel
+libmoldeo_presetpanel
+File founded
+libmoldeo_trackerklt
+File founded
+libmoldeo_keyboard
+libmoldeo_kinect
+libmoldeo_midi
+libmoldeo_mixer
+libmoldeo_mouse
+libmoldeo_netoscin
+libmoldeo_netoscout
+libmoldeo_nettuioin
+libmoldeo_serial
+libmoldeo_tablet
+moResourceManager::Init > Initializing Filter Man Resource.
+moResourceManager::Init > Initializing Time Man Resource.
+moResourceManager::Init > Initializing GL Man Resource.
+moGLManager::Init > GL VERSION: 4.6.0 NVIDIA 470.82.01
+moGLManager::Init > GL_MAJOR_VERSION: 4
+moGLManager::Init > GL_MINOR_VERSION: 6
+moGLManager::Init > GPU VENDOR STRING is NVIDIA Corporation
+moGLManager::Init > GPU RENDERER STRING is NVIDIA GeForce GTX 1660 Ti/PCIe/SSE2
+moResourceManager::Init > Initializing FrameBuffer Man Resource.
+moResourceManager::Init > Initializing Texture Man Resource.
+moTextureManager::Init > loading default file:/usr/share/moldeo/data/icons/moldeologo.png
+default bpp: 32 colortype:4 image_type:1 pitch:1024 > blue_mask: 255 green_mask:65280 red_mask:16711680
+moTextureManager::Init > loading logo file:/usr/share/moldeo/data/icons/moldeonegro.png
+moTextureManager::Init > loading logo file:/usr/share/moldeo/data/icons/moldeotrans.png
+moldeotrans bpp: 32 colortype:4 image_type:1 pitch:7200 > blue_mask: 255 green_mask:65280 red_mask:16711680
+moResourceManager::Init > Initializing Decoder Manager Resource.
+moResourceManager::Init > Initializing Render Man Resource.
+moRenderManager::Init > Setting Render Manager Mode to:0
+moRenderManager::Init > Setting Render Manager for Render: 512x512 for Screen: 512x512
+moRenderManager::Init > Initializing glew.
+moRenderManager::Init > glew initialized succesfully!
+moRenderManager::Init > Using GLEW 2.0.0
+moRenderManager::Init >       glActiveTextureARB: 140737245855968
+moRenderManager::Init >       glMultiTexCoord2fARB: 140737245908064
+moRenderManager::Init >       GLEW_ARB_texture_non_power_of_two: 1
+moRenderManager::Init >       GLEW_ARB_color_buffer_float: 1
+moRenderManager::Init >       GLEW_ARB_multitexture: 1
+moRenderManager::Init >       GL_EXT_gpu_shader4: 1
+moRenderManager::Init >       GLEW_EXT_geometry_shader4: 1
+moRenderManager::Init >       GLEW_ARB_imaging: 1
+moRenderManager::Init >       GLEW_ARB_shading_language_100: 1
+moRenderManager::Init >       GLEW_EXT_framebuffer_object: 1
+moRenderManager::Init >       GL_MAX_FRAGMENT_UNIFORM_COMPONENTS_ARB: 35657
+moRenderManager::Init >       GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB: 35661
+moRenderManager::Init >       GL_MAX_COLOR_ATTACHMENTS: 36063
+moRenderManager::Init >       Max Texture Size: 32768
+moRenderManager::Init >       Max Texture Rectangle Size: 32768
+moRenderManager::Init >       Max Texture Buffer Size: 134217728
+moRenderManager::Init > Using framebuffer_object: creating one fbo per predefined textures (4). 
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moFBO::CheckStatus > Framebuffer status: 
+moFBO::CheckStatus > GL_FRAMEBUFFER_COMPLETE_EXT
+moResourceManager::Init > Initializing Shader Man Resource.
+No shadermanager configuration file defined. Continue.
+moShaderManager::Init > Creating basic Render Shader...
+Vertex Shader compile log:()@W€UUU
+moShaderManager::Init > m_RenderShader Attrib IDs, position:0 normal:4 color:1 opacity:3 t_coord:3 t_coordedge:-1
+moShaderManager::Init > m_RenderShader Uniform IDs, projmatrix:4 wireframe_width:6 wseg:7 hseg:2 a_light:0 t_image:5
+moResourceManager::Init > Initializing Math Man Resource.
+moResourceManager::Init > Initializing Font Man Resource.
+moResourceManager::Init > Initializing GUI Man Resource.
+moResourceManager::Init > Initializing Sound Man Resource.
+No soundmanager configuration file defined. Continue.
+moResourceManager::Init > Initializing Video Man Resource.
+No videomanager configuration file defined. Continue.
+moResourceManager::Init > Initializing Model Man Resource.
+moResourceManager::Init > Initializing Script Man Resource.
+moLuaResourceManager constructor > L: 93824995882384
+moResourceManager:: Embedded Resources Ready.
+moMoldeoObject::CreateConnectors > Calling once. object: __console__ config: 05_ParticlesSimple.mol label:__console__
+moMoldeoObject::CreateConnectors > Init param type INLET name: inlet
+moMoldeoObject::CreateConnectors > Init param type OUTLET name: outlet
+moMoldeoObject::CreateConnectors > Init param type SCRIPT name: script
+moMoldeoObject::CreateConnectors > Init param type MOLDEOOBJECT name: devices
+moMoldeoObject::CreateConnectors > Init param type MOLDEOOBJECT name: preeffect
+moMoldeoObject::CreateConnectors > Init param type MOLDEOOBJECT name: effect
+moMoldeoObject::CreateConnectors > Init param type MOLDEOOBJECT name: posteffect
+moMoldeoObject::CreateConnectors > Init param type MOLDEOOBJECT name: mastereffect
+moMoldeoObject::CreateConnectors > Init param type MOLDEOOBJECT name: resources
+moMoldeoObject::CreateConnectors > Init param type NUM name: mastereffects_on
+moMoldeoObject::CreateConnectors > Init param type NUM name: fulldebug
+moMoldeoObject::CreateConnectors > Init param type TEXT name: outputmode
+moMoldeoObject::CreateConnectors > Init param type TEXT name: outputresolution
+moMoldeoObject::CreateConnectors > Init param type TEXT name: rendermode
+moMoldeoObject::CreateConnectors > Init param type TEXT name: renderresolution
+moMoldeoObject::CreateConnectors > Init param type TEXT name: clip1
+moMoldeoObject::CreateConnectors > Init param type TEXT name: clip2
+moMoldeoObject::CreateConnectors > Init param type TEXT name: clip3
+moMoldeoObject::CreateConnectors > Init param type NUM name: screenshots
+moMoldeoObject::CreateConnectors > Init param type NUM name: videoshots
+moMoldeoObject::CreateConnectors > loaded params & values for Object: __console__ config:05_ParticlesSimple.mol label:__console__
+moMoldeoObject::CreateConnectors > OK! Object: __console__ config:05_ParticlesSimple.mol label: __console__
+Warning! Extra parameters must be defined at the end of config file. "__console__"
+{'objectname': '__console__','objectclass': 'moConsole'}
+Warning! <moConsole>[__console__]::Init()_moDefineParamIndex > Config parameter "videoshots"  warning. Bad indexation could cause errors.
+moConsole::LoadIODevices > IODevices loaded.
+*****Initializing netoscin *****
+RegisterFunction > m_iMethodBase: 1for: PushDebugString
+*****moMoldeoObject::Init > for plugin: netoscin config: moldeoapioscin label: moldeoapioscin is OK!
+moMoldeoObject::CreateConnectors > Calling once. object: netoscin config: moldeoapioscin label:moldeoapioscin
+moMoldeoObject::CreateConnectors > Init param type INLET name: inlet
+moMoldeoObject::CreateConnectors > Init param type OUTLET name: outlet
+moMoldeoObject::CreateConnectors > Init param type SCRIPT name: script
+moMoldeoObject::CreateConnectors > Init param type TEXT name: hosts
+moMoldeoObject::CreateConnectors > Init param type NUM name: port
+moMoldeoObject::CreateConnectors > Init param type NUM name: receive_events
+moMoldeoObject::CreateConnectors > Init param type NUM name: debug
+moMoldeoObject::CreateConnectors > Init param type NUM name: process_moldeo_api
+moMoldeoObject::CreateConnectors > loaded params & values for Object: netoscin config:moldeoapioscin label:moldeoapioscin
+moMoldeoObject::CreateConnectors > OK! Object: netoscin config:moldeoapioscin label: moldeoapioscin
+*****Initializing netoscin *****
+RegisterFunction > m_iMethodBase: 37for: PushDebugString
+*****moMoldeoObject::Init > for plugin: netoscin config: moldeoapioscin label: moldeoapioscin is OK!
+ NETOSCIN hosts: HOST NAME:127.0.0.1 PORT:0
+ NETOSCIN port 0: trying default port parameter PORT:3334
+Set listener
+NetOSCIn listening to OSC messages on UDP port 
+*****Initializing netoscout *****
+RegisterFunction > m_iMethodBase: 1for: PushDebugString
+*****moMoldeoObject::Init > for plugin: netoscout config: moldeoapioscout label: moldeoapioscout is OK!
+moMoldeoObject::CreateConnectors > Calling once. object: netoscout config: moldeoapioscout label:moldeoapioscout
+moMoldeoObject::CreateConnectors > Init param type INLET name: inlet
+moMoldeoObject::CreateConnectors > Init param type OUTLET name: outlet
+moMoldeoObject::CreateConnectors > Init param type SCRIPT name: script
+moMoldeoObject::CreateConnectors > Init param type TEXT name: hosts
+moMoldeoObject::CreateConnectors > Init param type NUM name: port
+moMoldeoObject::CreateConnectors > Init param type TEXT name: devices
+moMoldeoObject::CreateConnectors > Init param type NUM name: latency
+moMoldeoObject::CreateConnectors > Init param type NUM name: max_events
+moMoldeoObject::CreateConnectors > Init param type NUM name: send_events
+moMoldeoObject::CreateConnectors > Init param type NUM name: delete_events
+moMoldeoObject::CreateConnectors > Init param type NUM name: send_moldeo_api
+moMoldeoObject::CreateConnectors > Init param type NUM name: debug
+moMoldeoObject::CreateConnectors > loaded params & values for Object: netoscout config:moldeoapioscout label:moldeoapioscout
+moMoldeoObject::CreateConnectors > OK! Object: netoscout config:moldeoapioscout label: moldeoapioscout
+keyboard
+NetOSCOut UdptransmitSocket Created at127.0.0.1:3335
+moConsole::LoadResources > Resources Plugin loaded !
+moConsole::LoadPreEffects > Loading PreEffects configs...
+moConsole::LoadPreEffects > Pre-Effects number: 1
+*****Initializing erase *****
+RegisterFunction > m_iMethodBase: 1for: PushDebugString
+RegisterFunction > m_iMethodBase: 37for: Play
+*****moMoldeoObject::Init > for plugin: erase config: erase label: erase is OK!
+moMoldeoObject::CreateConnectors > Calling once. object: erase config: erase label:erase
+moMoldeoObject::CreateConnectors > Init param type INLET name: inlet
+moMoldeoObject::CreateConnectors > Init param type OUTLET name: outlet
+moMoldeoObject::CreateConnectors > Init param type SCRIPT name: script
+moMoldeoObject::CreateConnectors > Init param type ALPHA name: alpha
+moMoldeoObject::CreateConnectors > Init param type COLOR name: color
+moMoldeoObject::CreateConnectors > Init param type SYNC name: syncro
+moMoldeoObject::CreateConnectors > Init param type PHASE name: phase
+moMoldeoObject::CreateConnectors > loaded params & values for Object: erase config:erase label:erase
+moMoldeoObject::CreateConnectors > OK! Object: erase config:erase label: erase
+moEffect::PreInit > OK! for object: erase config: erase label: erase
+moConsole::LoadPreEffects > Erase initialized
+moConsole::LoadPreEffects > Pre-Effects loaded !
+moConsole::LoadPostEffects > Loading PostEffects configs...
+moConsole::LoadPostEffects > Post Effects number: 0
+moConsole::LoadPostEffects > Post Effects loaded !
+moConsole::LoadEffects > Loading Effects configs...
+moConsole::LoadEffects > Effects number: 1
+moConsole::LoadingEffect > /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/particlessimple.cfg
+moConsole::LoadEffects > Effects loaded !
+moConsole::LoadMasterEffects > Loading MasterEffects configs...
+moConsole::LoadMasterEffects > Master Effects number: 0
+moConsole::LoadMasterEffects > Master-Effects loaded.
+moConsole::Init > calling VideoManager update function.
+moConsole::Init > InitializeAllEffects.
+*****Initializing particlessimple *****
+RegisterFunction > m_iMethodBase: 1for: PushDebugString
+RegisterFunction > m_iMethodBase: 37for: GetDelta
+*****moMoldeoObject::Init > for plugin: particlessimple config: particlessimple label: particlessimple is OK!
+moMoldeoObject::CreateConnectors > Calling once. object: particlessimple config: particlessimple label:particlessimple
+moMoldeoObject::CreateConnectors > Init param type INLET name: inlet
+moMoldeoObject::CreateConnectors > Init param type OUTLET name: outlet
+moMoldeoObject::CreateConnectors > Init param type ALPHA name: alpha
+moMoldeoObject::CreateConnectors > Init param type COLOR name: color
+moMoldeoObject::CreateConnectors > Init param type SYNC name: syncro
+moMoldeoObject::CreateConnectors > Init param type PHASE name: phase
+moMoldeoObject::CreateConnectors > Init param type COLOR name: particlecolor
+moParserFunction::Init > assigning variable [particleindex] to inlet with the same name. Inlet index is: 1
+moParserFunction::Init > assigning variable [particleindex] to inlet with the same name. Inlet index is: 1
+moParserFunction::Init > assigning variable [particleindex] to inlet with the same name. Inlet index is: 1
+moMoldeoObject::CreateConnectors > Init param type FONT name: font
+moMoldeoObject::CreateConnectors > Init param type TEXT name: text
+moMoldeoObject::CreateConnectors > Init param type NUM name: ortho
+moMoldeoObject::CreateConnectors > Init param type TEXTURE name: texture
+wave.png bpp: 8 colortype:1 image_type:1 pitch:256 > blue_mask: 0 green_mask:0 red_mask:0
+moMoldeoObject::CreateConnectors > Init param type TEXTUREFOLDER name: folders
+moMoldeoObject::CreateConnectors > Init param type NUM name: texture_mode
+moMoldeoObject::CreateConnectors > Init param type BLENDING name: blending
+moMoldeoObject::CreateConnectors > Init param type NUM name: width
+moMoldeoObject::CreateConnectors > Init param type NUM name: height
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: sizex
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: sizey
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: sizez
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: gravity
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: viscosity
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: maxage
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: emitionperiod
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: emitionrate
+moMoldeoObject::CreateConnectors > Init param type NUM name: deathperiod
+moMoldeoObject::CreateConnectors > Init param type SCRIPT name: particlescript
+moMoldeoObject::CreateConnectors > Init param type NUM name: randommethod
+moMoldeoObject::CreateConnectors > Init param type NUM name: creationmethod
+moMoldeoObject::CreateConnectors > Init param type NUM name: orientationmode
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: fadein
+Error! particlessimple > 1.00.3 :Unexpected value ".3 " found at position 3
+Error! moMoldeoObject::CreateConnectors > function couldn't be defined: 1.00.3 object: particlessimple config: particlessimple label:particlessimple
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: fadeout
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: sizein
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: sizeout
+moMoldeoObject::CreateConnectors > Init param type NUM name: attractortype
+moMoldeoObject::CreateConnectors > Init param type NUM name: attractormode
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: attractorvectorx
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: attractorvectory
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: attractorvectorz
+moMoldeoObject::CreateConnectors > Init param type NUM name: emittertype
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: emittervectorx
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: emittervectory
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: emittervectorz
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: randomposition
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: randompositionx
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: randompositiony
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: randompositionz
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: randomvelocity
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: randomvelocityx
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: randomvelocityy
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: randomvelocityz
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: randommotion
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: randommotionx
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: randommotiony
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: randommotionz
+moMoldeoObject::CreateConnectors > Init param type ROTATEX name: rotatex_particle
+moMoldeoObject::CreateConnectors > Init param type ROTATEY name: rotatey_particle
+moMoldeoObject::CreateConnectors > Init param type ROTATEZ name: rotatez_particle
+moMoldeoObject::CreateConnectors > Init param type SCALEX name: scalex_particle
+moMoldeoObject::CreateConnectors > Init param type SCALEY name: scaley_particle
+moParserFunction::Init > assigning variable [scalex_particle to parameter with the same name.
+moParserFunction::Init > assigning variable [scalex_particle] to inlet with the same name. Inlet index is: 86
+moMoldeoObject::CreateConnectors > Init param type SCALEZ name: scalez_particle
+moMoldeoObject::CreateConnectors > Init param type NUM name: time_to_revelation
+moMoldeoObject::CreateConnectors > Init param type NUM name: time_of_revelation
+moMoldeoObject::CreateConnectors > Init param type NUM name: time_to_restoration
+moMoldeoObject::CreateConnectors > Init param type NUM name: time_of_restoration
+moMoldeoObject::CreateConnectors > Init param type NUM name: drawing_features
+moMoldeoObject::CreateConnectors > Init param type TRANSLATEX name: translatex
+moMoldeoObject::CreateConnectors > Init param type TRANSLATEY name: translatey
+moMoldeoObject::CreateConnectors > Init param type TRANSLATEZ name: translatez
+moMoldeoObject::CreateConnectors > Init param type ROTATEX name: rotatex
+moMoldeoObject::CreateConnectors > Init param type ROTATEY name: rotatey
+moMoldeoObject::CreateConnectors > Init param type ROTATEZ name: rotatez
+moMoldeoObject::CreateConnectors > Init param type SCALEX name: scalex
+moMoldeoObject::CreateConnectors > Init param type SCALEY name: scaley
+moParserFunction::Init > assigning variable [scalex to parameter with the same name.
+moParserFunction::Init > assigning variable [scalex] to inlet with the same name. Inlet index is: 100
+moMoldeoObject::CreateConnectors > Init param type SCALEZ name: scalez
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: eyex
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: eyey
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: eyez
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: viewx
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: viewy
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: viewz
+moMoldeoObject::CreateConnectors > Init param type SCRIPT name: script
+moMoldeoObject::CreateConnectors > Init param type NUM name: guides
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: upviewx
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: upviewy
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: upviewz
+moMoldeoObject::CreateConnectors > Init param type NUM name: orderingmode
+moMoldeoObject::CreateConnectors > Init param type NUM name: lightmode
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: lightx
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: lighty
+moMoldeoObject::CreateConnectors > Init param type FUNCTION name: lightz
+moMoldeoObject::CreateConnectors > Init param type TRANSLATEX name: deltax_particle
+moMoldeoObject::CreateConnectors > Init param type TRANSLATEY name: deltay_particle
+moMoldeoObject::CreateConnectors > Init param type TRANSLATEZ name: deltaz_particle
+moMoldeoObject::CreateConnectors > loaded params & values for Object: particlessimple config:particlessimple label:particlessimple
+moMoldeoObject::CreateConnectors > OK! Object: particlessimple config:particlessimple label: particlessimple
+moEffect::PreInit > OK! for object: particlessimple config: particlessimple label: particlessimple
+moConsole::Init > StartMasterEffects.
+moConsole::Init > LoadConnections.
+moConsole::Init > ScriptExeInit.
+MO_ACTION_CONSOLE_GET_PLUGINS
+44
+{'effectstate': {'activated': '1','selected': '-1','tempo': {'tempo': '0.010053','syncro': '1.000000','delta': '1.000000','duration': '23','state': 'playing','started': '1','factor': '1.000000','globaltimer_state': 'playing','globaltimer_duration': '23'},'on': '-1','synchronized': '1','enabled': '1','magnitude': '1.000000','amplitude': '1.000000','alpha': '1.000000','tint': '1.000000','tintr': '1.000000','tintg': '1.000000','tintb': '1.000000','tintc': '0.000000','tints': '0.000000','stereo': '-1','stereoside': '0','fulldebug': '-1','mousex': '0.000000','mousey': '0.000000','mousefactor': '0.000000'},'object': {'objectstate': {'activated': 1,'selected': -1},'objecttypeid': '-1','objectdefinition': {'moldeoid': '121','name': 'erase','labelname': 'erase','configname': 'erase','type': 'moPreEffect','console_param_index': '4','console_value_index': '0','description': '','moldeofatherid': '-1','fatherlabelname': '','activate': '1','key': 'L'}}}
+{ 'objectconfig': {'configdefinition': {'objectname': 'erase','objectclass': 'moPreEffect'},'currentpreconfig':-1,'parameters': {'script': {},'alpha': {},'color': {},'syncro': {},'phase': {}},'preconfigs': []}}
+Error! moConsole::ProcessMoldeoAPIMessage > MO_ACTION_PRECONFIG_SET > preconfig index [0] not found!
+Error! moConsole::ProcessMoldeoAPIMessage > MO_ACTION_PRECONFIG_SET > preconfig index [0] not found!
+moConsole::ConsoleRenderSession
+moConsole::ConsoleModeUpdate > START RENDER session: absolute tickis: 41 tickis(moldeo): 0
+moConsole::ConsoleModeUpdate > START RENDER session: m_StartTimeCode: 93825012298832
+moConsole::Processing > Console Render Session (quality): PNGALPHA
+moConsole::Processing > Console Render Session (rendered_folder): /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/temp_render044
+moConsole::Processing > Console Render Session: {'consolestate': {'mode': 'rendersession','effectstate':{'activated': '-1','selected': '-1','tempo': {'tempo': '11.736990','syncro': '1.000000','delta': '1.000000','duration': '0','state': 'playing','started': '1','factor': '1.000000','globaltimer_state': 'playing','globaltimer_duration': '0'},'on': '-1','synchronized': '1','enabled': '1','magnitude': '1.000000','amplitude': '1.000000','alpha': '1.000000','tint': '1.000000','tintr': '1.000000','tintg': '1.000000','tintb': '1.000000','tintc': '0.000000','tints': '0.000000','stereo': '-1','stereoside': '0','fulldebug': '-1','mousex': '0.000000','mousey': '0.000000','mousefactor': '0.000000'}},'session': {'rendered_folder': '/media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/temp_render044'}}
+moConsole::ConsoleModeUpdate > render session: 82
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 41
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 123
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 82
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 164
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 123
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 205
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 164
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 246
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 205
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 287
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 246
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 328
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 287
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 369
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 328
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 410
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 369
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 451
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 410
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 492
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 451
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 533
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 492
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 574
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 533
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 615
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 574
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 656
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 615
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 697
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 656
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 738
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 697
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 779
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 738
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 820
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 779
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 861
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 820
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 902
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 861
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 943
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 902
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 984
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 943
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1025
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 984
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1066
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1025
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1107
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1066
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1148
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1107
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1189
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1148
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1230
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1189
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1271
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1230
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1312
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1271
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1353
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1312
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1394
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1353
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1435
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1394
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1476
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1435
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1517
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1476
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1558
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1517
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1599
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1558
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1640
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1599
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1681
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1640
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1722
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1681
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1763
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1722
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1804
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1763
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1845
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1804
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1886
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1845
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1927
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1886
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1968
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1927
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2009
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1968
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2050
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2009
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2091
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2050
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2132
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2091
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2173
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2132
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2214
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2173
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2255
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2214
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2296
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2255
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2337
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2296
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2378
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2337
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2419
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2378
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2460
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2419
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2501
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2460
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2542
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2501
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2583
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2542
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2624
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2583
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2665
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2624
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2706
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2665
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2747
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2706
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2788
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2747
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2829
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2788
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2870
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2829
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2911
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2870
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2952
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2911
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2993
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2952
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3034
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2993
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3075
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3034
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3116
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3075
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3157
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3116
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3198
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3157
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3239
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3198
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3280
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3239
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3321
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3280
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3362
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3321
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3403
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3362
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3444
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3403
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3485
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3444
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3526
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3485
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3567
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3526
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3608
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3567
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3649
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3608
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3690
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3649
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3731
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3690
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3772
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3731
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3813
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3772
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3854
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3813
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3895
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3854
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3936
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3895
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3977
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3936
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4018
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3977
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4059
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4018
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4100
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4059
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4141
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4100
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4182
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4141
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4223
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4182
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4264
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4223
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4305
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4264
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4346
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4305
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4387
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4346
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4428
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4387
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4469
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4428
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4510
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4469
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4551
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4510
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4592
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4551
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4633
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4592
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4674
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4633
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4715
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4674
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4756
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4715
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4797
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4756
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4838
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4797
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4879
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4838
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4920
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4879
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 4961
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4920
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5002
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 4961
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5043
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5002
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5084
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5043
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5125
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5084
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5166
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5125
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5207
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5166
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5248
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5207
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5289
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5248
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5330
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5289
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5371
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5330
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5412
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5371
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5453
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5412
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5494
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5453
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5535
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5494
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5576
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5535
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5617
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5576
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5658
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5617
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5699
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5658
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5740
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5699
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5781
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5740
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5822
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5781
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5863
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5822
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5904
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5863
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5945
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5904
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 5986
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5945
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 6027
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 5986
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 6068
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 6027
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 6109
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 6068
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 6150
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 6109
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 6191
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 6150
+ftransparent:1
+ffic:4
+moConsole::ConsoleRenderSession
+moDataSession::StopRender > m_EndTimeCode:93825012298832 zero:0
+moConsole::Processing > Console Render Session (quality): PNGALPHA
+moConsole::Processing > Console Render Session (rendered_folder): /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/temp_render044
+moConsole::Processing > Console Render Session: {'consolestate': {'mode': 'live','effectstate':{'activated': '-1','selected': '-1','tempo': {'tempo': '3.864159','syncro': '1.000000','delta': '1.000000','duration': '38447849','state': 'playing','started': '1','factor': '1.000000','globaltimer_state': 'playing','globaltimer_duration': '38447849'},'on': '-1','synchronized': '1','enabled': '1','magnitude': '1.000000','amplitude': '1.000000','alpha': '1.000000','tint': '1.000000','tintr': '1.000000','tintg': '1.000000','tintb': '1.000000','tintc': '0.000000','tints': '0.000000','stereo': '-1','stereoside': '0','fulldebug': '-1','mousex': '0.000000','mousey': '0.000000','mousefactor': '0.000000'}},'session': {'rendered_folder': '/media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/temp_render044'}}
+{'effectstate': {'activated': '1','selected': '-1','tempo': {'tempo': '24195.078283','syncro': '1.000000','delta': '1.000000','duration': '38507669','state': 'playing','started': '1','factor': '1.000000','globaltimer_state': 'playing','globaltimer_duration': '38507669'},'on': '-1','synchronized': '1','enabled': '1','magnitude': '1.000000','amplitude': '1.000000','alpha': '1.000000','tint': '1.000000','tintr': '1.000000','tintg': '1.000000','tintb': '1.000000','tintc': '0.000000','tints': '0.000000','stereo': '-1','stereoside': '0','fulldebug': '-1','mousex': '0.000000','mousey': '0.000000','mousefactor': '0.000000'},'object': {'objectstate': {'activated': 1,'selected': -1},'objecttypeid': '-1','objectdefinition': {'moldeoid': '121','name': 'erase','labelname': 'erase','configname': 'erase','type': 'moPreEffect','console_param_index': '4','console_value_index': '0','description': '','moldeofatherid': '-1','fatherlabelname': '','activate': '1','key': 'L'}}}
+{ 'objectconfig': {'configdefinition': {'objectname': 'erase','objectclass': 'moPreEffect'},'currentpreconfig':-1,'parameters': {'script': {},'alpha': {},'color': {},'syncro': {},'phase': {}},'preconfigs': []}}
+Error! moConsole::ProcessMoldeoAPIMessage > MO_ACTION_PRECONFIG_SET > preconfig index [0] not found!
+Error! moConsole::ProcessMoldeoAPIMessage > MO_ACTION_PRECONFIG_SET > preconfig index [0] not found!
+erase
+Search Param:alpha
+Search Param not found
+MO_ACTION_VALUE_SET settings: arg1Text (param):alpha arg2Text (preconf): [0] arg2Int: 0 arg3Text (val): 0 VB( subvalue: 0 ): MO_DATA_FUNCTION)
+valueget [{'d':{'t': 'FUNCTION'},'v':'0'}]
+moConsole::ConsoleRenderSession
+moConsole::ConsoleModeUpdate > START RENDER session: absolute tickis: 41 tickis(moldeo): 0
+moConsole::ConsoleModeUpdate > START RENDER session: m_StartTimeCode: 93825012298832
+moConsole::Processing > Console Render Session (quality): PNGALPHA
+moConsole::Processing > Console Render Session (rendered_folder): /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/temp_render045
+moConsole::Processing > Console Render Session: {'consolestate': {'mode': 'rendersession','effectstate':{'activated': '-1','selected': '-1','tempo': {'tempo': '24204.990008','syncro': '1.000000','delta': '1.000000','duration': '0','state': 'playing','started': '1','factor': '1.000000','globaltimer_state': 'playing','globaltimer_duration': '0'},'on': '-1','synchronized': '1','enabled': '1','magnitude': '1.000000','amplitude': '1.000000','alpha': '1.000000','tint': '1.000000','tintr': '1.000000','tintg': '1.000000','tintb': '1.000000','tintc': '0.000000','tints': '0.000000','stereo': '-1','stereoside': '0','fulldebug': '-1','mousex': '0.000000','mousey': '0.000000','mousefactor': '0.000000'}},'session': {'rendered_folder': '/media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/temp_render045'}}
+moConsole::ConsoleModeUpdate > render session: 82
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 41
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 123
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 82
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 164
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 123
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 205
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 164
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 246
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 205
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 287
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 246
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 328
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 287
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 369
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 328
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 410
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 369
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 451
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 410
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 492
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 451
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 533
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 492
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 574
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 533
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 615
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 574
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 656
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 615
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 697
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 656
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 738
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 697
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 779
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 738
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 820
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 779
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 861
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 820
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 902
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 861
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 943
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 902
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 984
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 943
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1025
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 984
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1066
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1025
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1107
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1066
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1148
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1107
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1189
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1148
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1230
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1189
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1271
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1230
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1312
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1271
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1353
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1312
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1394
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1353
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1435
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1394
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1476
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1435
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1517
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1476
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1558
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1517
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1599
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1558
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1640
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1599
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1681
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1640
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1722
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1681
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1763
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1722
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1804
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1763
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1845
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1804
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1886
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1845
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1927
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1886
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 1968
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1927
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2009
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 1968
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2050
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2009
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2091
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2050
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2132
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2091
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2173
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2132
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2214
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2173
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2255
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2214
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2296
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2255
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2337
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2296
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2378
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2337
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2419
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2378
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2460
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2419
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2501
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2460
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2542
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2501
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2583
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2542
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2624
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2583
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2665
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2624
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2706
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2665
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2747
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2706
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2788
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2747
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2829
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2788
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2870
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2829
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2911
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2870
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2952
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2911
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 2993
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2952
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3034
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 2993
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3075
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3034
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3116
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3075
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3157
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3116
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3198
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3157
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3239
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3198
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3280
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3239
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3321
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3280
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3362
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3321
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3403
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3362
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3444
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3403
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3485
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3444
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3526
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3485
+ftransparent:1
+ffic:4
+moConsole::ConsoleModeUpdate > render session: 3567
+moConsole::ConsoleModeUpdate > render session: m_ConsoleState.tempo.Duration: 3526
+ftransparent:1
+ffic:4
+moConsole::ConsoleRenderSession
+moDataSession::StopRender > m_EndTimeCode:93825012298832 zero:0
+moConsole::Processing > Console Render Session (quality): PNGALPHA
+moConsole::Processing > Console Render Session (rendered_folder): /media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/temp_render045
+moConsole::Processing > Console Render Session: {'consolestate': {'mode': 'live','effectstate':{'activated': '-1','selected': '-1','tempo': {'tempo': '2.215451','syncro': '1.000000','delta': '1.000000','duration': '38526650','state': 'playing','started': '1','factor': '1.000000','globaltimer_state': 'playing','globaltimer_duration': '38526650'},'on': '-1','synchronized': '1','enabled': '1','magnitude': '1.000000','amplitude': '1.000000','alpha': '1.000000','tint': '1.000000','tintr': '1.000000','tintg': '1.000000','tintb': '1.000000','tintc': '0.000000','tints': '0.000000','stereo': '-1','stereoside': '0','fulldebug': '-1','mousex': '0.000000','mousey': '0.000000','mousefactor': '0.000000'}},'session': {'rendered_folder': '/media/DATA/0_DEV/0_MOLDEO/1_Projects/Myshmup Moldeo/explo_02/temp_render045'}}
