@@ -209,6 +209,21 @@ h3{
   background:#ddd;
 }
 
+/*** CONTROL ***/
+
+#moControl {
+  display: block;
+  margin:0;
+  padding:0;
+  width:auto;
+  height:auto;
+  background:transparent;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  z-index: 102;
+}
+
 /**********OBJECTS**********/
 
 #moConfig svg {
@@ -465,6 +480,9 @@ h3{
   opacity:0.5;
 }
 /***********END CSS FOR INTERFACE************/
+
+#mo
+
 
 /*************OTHER ANIMATIONS***************/
 @keyframes moFadeIn {

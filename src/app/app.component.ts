@@ -30,7 +30,11 @@ export class AppComponent implements OnInit {
   //sample: string = "molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.mol";
   //sample: string = "molrepos/basic/07_ParticlesSimple/07_ParticlesSimple.Sphere.mol";
   //assets/molrepos/basic/07_ParticlesSimple/images
-  sample: string = "molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsfera.mol";
+
+  //sample: string = "molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsfera.mol";
+  sample: string = "molrepos/myshmup/explo_01b/explo_01.mol";
+  //sample: string = "molrepos/myshmup/explo_02b/explo_02.mol";
+
   //sample: string = "molrepos/moldeoorg/siif/entrelineas/EntreLineas.mol";
   //sample: string = "molrepos/moldeoorg/dante/pajarosdefuego/pajaros_de_fuegoX.mol";
   samples: string[] = [];
@@ -639,8 +643,9 @@ export class AppComponent implements OnInit {
 
     console.log("sharePostcard");
 
-    var backoffice_url : any = "https://www.teleportation.com.ar/";
+    //var backoffice_url : any = "https://www.teleportation.com.ar/";
     //var backoffice_url : any = "http://odoo14.moldeo.local/";
+    var backoffice_url : any = "https://odoo14.moldeo.org/";
     var share_name : any = document.getElementById("share_name");
     var share_email : any = document.getElementById("share_email");
     var share_title : any = document.getElementById("share_title");

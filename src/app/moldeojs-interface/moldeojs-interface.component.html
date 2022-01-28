@@ -1,4 +1,4 @@
-<div #moCanvas id="moCanvas"  class="hideme" (mouseenter)="moWheelDisplay=false;"></div>
+<div #moCanvas id="moCanvas"   [class.hideme]="moEditDisplay==false" [class.showme]="moEditDisplay==true" (mouseenter)="moWheelDisplay=false;"></div>
 
 <div #moWheel id="moWheel" [hidden]="!moWheelDisplay">
   <div class="circle moWheelAni"></div>
@@ -12,12 +12,27 @@
   </div>
 </div>
 
-<div id="moConfig" #moConfig (mouseenter)="moWheelDisplay=false;" class="hideme">
+<!--
+<div id="moControl" #moControl (mouseenter)="moWheelDisplay=false;"  [class.hideme]="moControlDisplay==false" [class.showme]="moControlDisplay==true">
+  <h1>CONTROL</h1>
 </div>
+-->
+<mo-control
+  id="moControl"
+  #moControl
+  [class.hideme]="moControlDisplay==false" [class.showme]="moControlDisplay==true"
+  >
+</mo-control>
+
+<div id="moConfig" #moConfig (mouseenter)="moWheelDisplay=false;" [class.hideme]="moEditDisplay==false" [class.showme]="moEditDisplay==true">
+</div>
+
+
 
 <header class="moHeader" (mouseenter)="moToolDisplay=false;">
   <div class="moldeoicon"></div>
   <div class="moldeofile">{{moFileName}}</div>
-  <button class="moldeobutton" (click)="showmoView();" type="button" name="moButton" title="Moldeojs View">Edit</button>
+  <button class="moldeobutton" (click)="showmoEditView();" type="button" name="moButton" title="Moldeojs Edit View">Edit</button>
+  <button class="moldeobutton" (click)="showmoControlView();" type="button" name="moButton" title="Moldeojs Control View">Control</button>
   <button class="moldeobutton" type="button" name="auto" title="Auto Layout" (click)="autoLayout()">auto</button>
 </header>

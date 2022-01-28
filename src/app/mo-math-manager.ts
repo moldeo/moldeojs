@@ -54,11 +54,11 @@ function sin( val : number ) : number {
 function cos( val : number ) : number {
   return Math.cos(val);
 }
-/*
+
 function abs(val: number): number {
   return Math.abs(val);
 }
-*/
+
 export class moMathVariable {
   /**
      * Almacena el nombre de la variable.
@@ -476,6 +476,7 @@ export class moParserFunction extends moMathFunction {
 
     var customFunctions = {
       UnitRandom: function(seed) {
+        //console.log("UnitRandom");
         return Math.random();
       },
       SymmetricRandom: function(seed) {
@@ -483,6 +484,13 @@ export class moParserFunction extends moMathFunction {
       },
       IntervalRandom: function(seed) {
         return Math.random();
+      },
+      sign: function(val) {
+        //console.log("sign");
+        return Math.sign(val);
+      },
+      abs: function(val) {
+        return Math.abs(val);
       }
     };
     this.m_Scope = Object.assign(this.m_Scope, customFunctions);
@@ -562,6 +570,8 @@ export class moParserFunction extends moMathFunction {
     if (this.m_ParserCode) {
       try {
         this.m_Scope = this.m_VarFactory.ToScope();
+        this.AddMathFunctions();
+        this.AddMathConstants();
         //console.log("Eval Parser with variables", this.m_Expression, this.m_Variables_Map, this.m_Scope );
 
         this.m_LastEval = this.m_ParserCode.evaluate(this.m_Scope);
@@ -626,7 +636,7 @@ export class moMathManager extends moResource {
   m_functions : moMathFunctionArray = [];
   m_functions_str: any = {};
   math : any;
-  
+
   constructor() {
     super();
     this.SetName("_mathmanager_");

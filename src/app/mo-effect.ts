@@ -1,5 +1,6 @@
 import { moEffectState } from "./mo-effect-state";
 export { moEffectState } from "./mo-effect-state";
+import * as THREE from 'three';
 import {
   moConfig, moConfigDefinition,
   MO_PARAM_NOT_FOUND, MO_PARAM_NOT_SEL, MO_SELECTED,
@@ -7,6 +8,8 @@ import {
 } from "./mo-config";
 import { moMoldeoObject, moMobState, MO_IODEVICE_KEYBOARD, MO_IODEVICE_MOUSE, MO_IODEVICE_MOBILE } from "./mo-moldeo-object";
 import { moMoldeoObjectType } from "./mo-moldeo-object-type.enum";
+import { moBlendingModes, moBlendingModesStr, moBlendingModesToText } from "./mo-blending-modes.enum";
+import { moMaterialBasic } from "./mo-gui-manager";
 import { moEffectManager } from "./mo-effect-manager";
 import { moIODeviceManager, moIODeviceCode, moIODeviceMobileCode } from "./mo-iodevice-manager";
 import { moConsoleState } from "./mo-console-state";
@@ -27,6 +30,8 @@ import { moEvent, moEventList } from "./mo-event-list";
 export class moEffect extends moMoldeoObject {
 
   m_EffectState: moEffectState;
+
+  Mat: moMaterialBasic;
 
   InletTime: moInlet;
   InletTimems: moInlet;
@@ -335,6 +340,93 @@ export class moEffect extends moMoldeoObject {
       return true;
   }
 */
+
+  SetBlending( p_blending: moBlendingModes ) {
+
+    //m_Effect3D.m_Material.m_Blending = p_blending;
+
+    //glEnable (GL_BLEND);
+  	switch(p_blending) {
+  		//ALPHA DEPENDENT
+  		case moBlendingModes.MO_BLENDING_TRANSPARENCY:
+  			//TRANSPARENCY [Rs * As] + [Rd *(1 -As)] = As*(Rs-Rd) + Rd
+  			//glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        //glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        this.Mat.blending = THREE.NormalBlending;
+        //console.log("normal blending");
+  			break;
+  		case moBlendingModes.MO_BLENDING_ADDITIVEALPHA:
+  			//ADDITIVE WITH TRANSPARENCY: Rs*As + Rd*Ad
+  			/** DOESNT WORK NICELY BECAUSE DST_ALPHA DOESNT AFFECT FINAL FRAMEBUFFER */
+  			//glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
+        //glBlendFuncSeparate( GL_SRC_ALPHA, GL_DST_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
+              /** THIS WORKS LIKE A CHARM*/
+  			//ADDITIVE WITH SRC TRANSPARENCY: Rs*As + Rd
+  			//glBlendFunc(GL_SRC_ALPHA,GL_ONE);
+
+        this.Mat.blending = THREE.AdditiveBlending;
+        //console.log("additive blending");
+  			break;
+
+  		//NON ALPHA
+  		case moBlendingModes.MO_BLENDING_MIXING:
+  			//MIXING [Rs *( 1 - Rd )] + [ Rd * 1] = Rs + Rd - Rs*Rd
+  			//additive without saturation
+  			//glBlendFunc( GL_ONE_MINUS_DST_COLOR, GL_ONE );
+        this.Mat.blending = THREE.CustomBlending;
+  			break;
+  		case moBlendingModes.MO_BLENDING_MULTIPLY:
+  			//MULTIPLY: [Rs * Rd] + [Rd * 0] = Rs * Rd
+  			//glBlendFunc( GL_DST_COLOR, GL_ZERO );
+        //glBlendFuncSeparate( GL_DST_COLOR, GL_ZERO, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        this.Mat.blending = THREE.MultiplyBlending;
+  			break;
+  		case moBlendingModes.MO_BLENDING_EXCLUSION:
+  			//EXCLUSION: [Rs *(1 - Rd)] + [Rd *(1 - Rs)] = Rs + Rd - 2*Rs*Rd
+  			//glBlendFunc( GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_COLOR);//
+        this.Mat.blending = THREE.CustomBlending;
+  			break;
+  		case moBlendingModes.MO_BLENDING_ADDITIVE:
+  			//ADDITIVE Rs+Rd
+  			//glBlendFunc( GL_ONE, GL_ONE );
+        this.Mat.blending = THREE.AdditiveBlending;
+  			break;
+  		case moBlendingModes.MO_BLENDING_OVERLAY:
+  			//OVERLAY: 2*Rs*Rd
+  			//glBlendFunc( GL_DST_COLOR, GL_SRC_COLOR );
+        this.Mat.blending = THREE.CustomBlending;
+  			break;
+  		case moBlendingModes.MO_BLENDING_SUBSTRACTIVE:
+  			//SUBSTRACTIVE [Rs *( 1 - Rd )] + [ Rd * 0] = Rs - Rs*Rd
+  			//substractive
+  			//glBlendFunc( GL_ONE_MINUS_DST_COLOR, GL_ZERO );
+        this.Mat.blending = THREE.SubtractiveBlending;
+  			break;
+  		case moBlendingModes.MO_BLENDING_SATURATE:
+  			// [Rs * min(As,1-Ad) ] + [ Rd * Ad]
+  			//
+  			//glBlendFunc( GL_SRC_ALPHA_SATURATE,  GL_DST_ALPHA);
+        this.Mat.blending = THREE.CustomBlending;
+  			break;
+  			//Multiply mode:(a*b)
+  			//Average mode:(a+b)/2
+  			//Screen mode:  f(a,b) = 1 -(1-a) *(1-b)
+  			//Difference mode:  f(a,b) = |a - b|
+  			//Negation mode:  f(a,b) = 1 - |1 - a - b|
+  			//Exclusion mode f(a,b) = a + b - 2ab or f(a,b) = average(difference(a,b),negation(a,b))
+  			//Overlay mode f(a,b) =   	2ab(for a < ) 1 - 2 *(1 - a) *(1 - b)(else)
+  			//Color dodge mode:  f(a,b) = a /(1 - b)
+  			//Color burn mode:  f(a,b) = 1 -(1 - a) / b
+  			//Inverse color dodge mode:  f(a,b) = b /(1 - a)
+  			//Inverse color burn mode:  f(a,b) = 1 -(1 - b) / a
+  		default: //alpha transparent
+        this.Mat.blending = THREE.NormalBlending;
+  			//glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  			break;
+  	}
+
+}
+
 /*
   Activate() : void {
       var mobstate : moMobState = this.GetState();

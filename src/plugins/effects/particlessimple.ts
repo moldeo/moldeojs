@@ -2626,8 +2626,10 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
               orderedindex+= 1;
               var part_timer : number;
               if (pPar) {
-                if (pPar.Material)
+                if (pPar.Material) {
                   pPar.Material.visible = pPar.Visible;
+                  //pPar.Material.blending = this.Mat.blending;
+                }
 
                 if (pPar.Visible) {
 
@@ -2729,6 +2731,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
 
                     case ORIMODE.PARTICLES_ORIENTATIONMODE_MOTION:
                       // TODO: fix this
+                      //console.log("fix this");
                       if (pPar.Velocity.length() > 0) U = pPar.Velocity;
                       U.normalize();
                       if (U.length() < 0.5) {
@@ -2840,16 +2843,27 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                       }
                     }
                     /*
-                    pPar.Geometry = new THREE.Geometry();
-                    pPar.Geometry.vertices.push(new THREE.Vector3(A.x, A.y, A.z));
-                    pPar.Geometry.vertices.push(new THREE.Vector3(B.x, B.y, B.z));
-                    pPar.Geometry.vertices.push(new THREE.Vector3(C.x, C.y, C.z));
-                    pPar.Geometry.vertices.push(new THREE.Vector3(D.x, D.y, D.z));
-                    pPar.Geometry.faces.push(new THREE.Face3(0, 1, 2)); // counter-clockwise winding order
-                    pPar.Geometry.faces.push(new THREE.Face3(0, 2, 3));
+                    pPar.Geometry = new THREE.Geometry();*/
+                    pPar.Geometry.vertices[0].x = A.x;
+                    pPar.Geometry.vertices[0].y = A.y;
+                    pPar.Geometry.vertices[0].z = A.z;
+
+                    pPar.Geometry.vertices[1].x = B.x;
+                    pPar.Geometry.vertices[1].y = B.y;
+                    pPar.Geometry.vertices[1].z = B.z;
+
+                    pPar.Geometry.vertices[3].x = C.x;
+                    pPar.Geometry.vertices[3].y = C.y;
+                    pPar.Geometry.vertices[3].z = C.z;
+
+                    pPar.Geometry.vertices[2].x = D.x;
+                    pPar.Geometry.vertices[2].y = D.y;
+                    pPar.Geometry.vertices[2].z = D.z;
+                    //pPar.Geometry.faces.push(new THREE.Face3(0, 1, 2)); // counter-clockwise winding order
+                    //pPar.Geometry.faces.push(new THREE.Face3(0, 2, 3));
                     pPar.Geometry.computeFaceNormals();
                     pPar.Geometry.computeVertexNormals();
-                    */
+
                     if (pPar.Material == undefined) {
                       pPar.Material = new MO.moMaterialBasic({
                         /*color: 0xffffff,*/
@@ -2861,6 +2875,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
                         opacity: rgba.a * pPar.Alpha * this.m_EffectState.alpha
                       });
                       pPar.Material.color = new moColor(rgba.r, rgba.g, rgba.b);
+                      pPar.Material.blending = this.Mat.blending;
                     }
                     //if (i == 0 && j == 0) console.log("col", rgba);
                     pPar.Mesh = new MO.moMesh(pPar.Geometry, pPar.Material);
@@ -3145,6 +3160,7 @@ ParticlesSimpleAnimation( tempogral : moTempo, parentstate : moEffectState ) : v
       this.Mat.side = MO.three.DoubleSide;
       this.Mat.wireframe = false;
       this.Mat.opacity = this.m_Config.Eval("alpha")*rgba.a;
+      this.SetBlending( this.m_Config.Int("blending") );
     }
 
     //Mat2.m_MapGLId = Mat2.m_Map->GetGLId();

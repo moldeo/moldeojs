@@ -103,7 +103,6 @@ export const MOUndefinedTex = new moTexParam(
     wrap_t: MO_UNDEFINED /// modo de repetición en el orden vertical
 });
 
-
 export function IntToStr( num : number, nzeros?: number ) : string
 {
 /*

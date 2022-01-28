@@ -15,6 +15,7 @@ import {
 import { HttpClientModule } from '@angular/common/http';
 import { HtmlContainer } from './htmlcontainer';
 import { MoConfigService } from './services/mo-config.service';
+import { MoControlService } from './services/mo-control.service';
 import { MoDefaultComponent } from './mo-objects/mo-default/mo-default.component';
 import { MoErase } from './mo-objects/mo-erase.component';
 import { MoIcon } from './mo-objects/mo-icon.component';
@@ -31,6 +32,7 @@ import { moFile } from '../mo-file-manager';
 import { moDisplay } from '../mo-render-manager';
 import { ConsoleService } from "../console.service";
 import { MoldeojsViewComponent } from '../moldeojs-view/moldeojs-view.component';
+import { MoControl } from './mo-control/mo-control.component';
 
 
 @Component({
@@ -66,11 +68,18 @@ export class MoldeojsInterfaceComponent implements OnInit {
   /////////////////////////////////////////////
   /*- moConfig definitions, for save Components -*/
   @ViewChild('moConfig') moConfig: ElementRef;
+  public moEditDisplay:boolean = false;
+  /////////////////////////////////////////////
+  /*- moControl definitions, for control -*/
+  //@ViewChild('moControl') moControl: ElementRef;
+  public moControlDisplay:boolean = false;
   containers: HtmlContainer[] = [];
   /////////////////////////////////////////////
   public moFileName: any = "No File (.MOL)";
 
   @ViewChild('moCanvas') moCanvas: ElementRef;
+
+  @ViewChild(MoControl) moControlComp : MoControl;
   /////////////////////////////////////////////
   //- Listeners -//
   public configDblClick: () => void;
@@ -81,7 +90,8 @@ export class MoldeojsInterfaceComponent implements OnInit {
     private factory: ComponentFactoryResolver,
     private injector: Injector,
     private appRef: ApplicationRef,
-    private config: MoConfigService
+    private config: MoConfigService,
+    private control: MoControlService
   ){}
 
   public ngOnInit(): void {
@@ -134,16 +144,27 @@ export class MoldeojsInterfaceComponent implements OnInit {
     });
   }
 
-  public showmoView(e:any=false) : void {
-    console.log("showmoView");
-
-    if (this.moCanvas && this.moCanvas.nativeElement.getAttribute("class")=="hideme" ) {
+  public showmoEditView(e:any=false) : void {
+    console.log("showmoEditView");
+    this.moEditDisplay = !this.moEditDisplay;
+    /*if (this.moCanvas && this.moCanvas.nativeElement.getAttribute("class")=="hideme" ) {
       this.moCanvas.nativeElement.setAttribute("class","showme");
       this.moConfig.nativeElement.setAttribute("class","showme");
     } else {
       this.moCanvas.nativeElement.setAttribute("class","hideme");
       this.moConfig.nativeElement.setAttribute("class","hideme");
-    }
+    }*/
+  }
+
+  public showmoControlView(e:any=false) : void {
+    console.log("showmoControlView");
+    this.moControlDisplay = !this.moControlDisplay;
+    //this.moControlComp.toggleShow();
+    /*if (this.moControl && this.moControl.nativeElement.getAttribute("class")=="hideme" ) {
+      this.moControl.nativeElement.setAttribute("class","showme");
+    } else {
+      this.moControl.nativeElement.setAttribute("class","hideme");
+    }*/
   }
 
   public newMOObject(c: string, x:number, y:number, n:string, p:any, k:string): void {

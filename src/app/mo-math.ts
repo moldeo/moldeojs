@@ -32,6 +32,7 @@ export class moMathDouble extends moAbstract {
   }
 
   UnitRandom( seed?: number ) : number {
+    //console.log("moMathDouble UnitRandom");
     return Math.random();
   }
 
@@ -78,5 +79,3 @@ export const moMathd = new moMathDouble();
 export function FMod(a: MOfloat, b: MOfloat) : MOdouble {
   return 0.0;
 }
-
-

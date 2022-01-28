@@ -21,6 +21,7 @@ import { PopoverModule } from 'ngx-bootstrap/popover';
 
 import { MoldeojsInterfaceComponent } from './moldeojs-interface/moldeojs-interface.component';
 //Moldeo Components
+import { MoControl } from './moldeojs-interface/mo-control/mo-control.component';
 import { MoDefaultComponent } from './moldeojs-interface/mo-objects/mo-default/mo-default.component';
 import { MoErase } from './moldeojs-interface/mo-objects/mo-erase.component';
 import { MoIcon } from './moldeojs-interface/mo-objects/mo-icon.component';
@@ -29,6 +30,7 @@ import { MoIcon } from './moldeojs-interface/mo-objects/mo-icon.component';
 import { ConnectionsService } from './moldeojs-interface/services/connections.service';
 import { ParamsService } from './moldeojs-interface/services/params.service';
 import { MoConfigService } from './moldeojs-interface/services/mo-config.service';
+import { MoControlService } from './moldeojs-interface/services/mo-control.service';
 //Directives - Pipes
 import { DraggableDirective } from './moldeojs-interface/draggable.directive';
 
@@ -69,6 +71,7 @@ import { faStackOverflow, faGithub, faMedium } from '@fortawesome/free-brands-sv
     MoldeojsViewComponent,
     PageNotFoundComponent,
     MoldeojsInterfaceComponent,
+    MoControl,
     DraggableDirective,
     MoDefaultComponent,
     MoErase,
@@ -101,12 +104,14 @@ RouterModule.forRoot(appRoutes, { relativeLinkResolution: 'legacy' })
     ConnectionsService,
     ParamsService,
     MoConfigService,
+    MoControlService,
     CollaborativeService,
     SocketOne
   ],
   entryComponents: [
     MoldeojsViewComponent,
     PageNotFoundComponent,
+    MoControl,
     MoDefaultComponent,
     MoErase,
     MoIcon
