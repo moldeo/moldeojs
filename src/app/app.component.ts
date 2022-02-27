@@ -32,8 +32,8 @@ export class AppComponent implements OnInit {
   //assets/molrepos/basic/07_ParticlesSimple/images
 
   //sample: string = "molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsfera.mol";
-  sample: string = "molrepos/myshmup/explo_01b/explo_01.mol";
-  //sample: string = "molrepos/myshmup/explo_02b/explo_02.mol";
+  //sample: string = "molrepos/myshmup/explo_01b/explo_01.mol";
+  sample: string = "molrepos/myshmup/explo_02b/explo_02.mol";
 
   //sample: string = "molrepos/moldeoorg/siif/entrelineas/EntreLineas.mol";
   //sample: string = "molrepos/moldeoorg/dante/pajarosdefuego/pajaros_de_fuegoX.mol";
