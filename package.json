@@ -60,7 +60,7 @@
     "rxjs-compat": "^6.4.0",
     "stream": "0.0.2",
     "string_decoder": "^1.3.0",
-    "three": "0.110.0",
+    "three": "0.125.0",
     "three-trackballcontrols": "0.0.8",
     "tone": "^13.8.25",
     "ts-helpers": "^1.1.2",
