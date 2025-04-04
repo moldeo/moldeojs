@@ -80,7 +80,7 @@ curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 2) Install [NPM](https://docs.npmjs.com/getting-started/installing-node) > 3.0
-3) Install [Angular-CLI](https://angular.io/guide/quickstart)  desde tu terminal usando el comando:
+3) Install [Angular-CLI](https://angular.io/guide/quickstart) from your terminal using this command:
 
 ```sh
 $ npm install -g @angular/cli
@@ -97,7 +97,7 @@ $ npm install
 $ npm start
 ```
 
-#Build to deploy later in a site
+# Build to deploy later in a site
 ```sh
 $ npm run buildsite
 ```
