@@ -33,7 +33,16 @@ export class AppComponent implements OnInit {
 
   //sample: string = "molrepos/moldeoorg/fabri/EsferaEspiral/EspiralEsfera.mol";
   //sample: string = "molrepos/myshmup/explo_01b/explo_01.mol";
-  sample: string = "molrepos/myshmup/explo_02b/explo_02.mol";
+  sample: string = AppComponent.sampleFromUrl("molrepos/myshmup/explo_02b/explo_02.mol");
+
+  /** ?mol=<ruta relativa a assets, ej. molrepos/basic/02_Plane/02_Plane.mol> — sin '..' ni esquema */
+  static sampleFromUrl(def: string): string {
+    try {
+      const m = new URLSearchParams(window.location.search).get("mol");
+      if (m && /^[\w\-./]+\.mol$/.test(m) && m.indexOf("..") < 0) return m;
+    } catch (e) {}
+    return def;
+  }
 
   //sample: string = "molrepos/moldeoorg/siif/entrelineas/EntreLineas.mol";
   //sample: string = "molrepos/moldeoorg/dante/pajarosdefuego/pajaros_de_fuegoX.mol";
