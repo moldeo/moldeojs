@@ -170,6 +170,7 @@ export class moConfig extends moAbstract {
   m_PresetDuration : number = 1.0;              /** segundos; 0 = salto */
   m_PresetCurve : string = "ease";              /** ease · linear · step */
   private m_TransFrom : any = {};               /** nombre del param ⇒ índice de VAL de donde viene */
+  private m_TransFromNum : any = {};            /** nombre ⇒ [números por sub-valor]: si se cortó una transición a medias */
   private m_TransStart : number = 0;
 
   /** 0..1 de la transición en curso (1 = terminada) */
@@ -187,10 +188,13 @@ export class moConfig extends moAbstract {
     const from = this.m_TransFrom[name];
     if (from === undefined) return null;
     const k = this.TransitionK();
-    if (k >= 1) { delete this.m_TransFrom[name]; return null; }
+    if (k >= 1) { delete this.m_TransFrom[name]; delete this.m_TransFromNum[name]; return null; }
     const vFrom = Param.m_Values[from], vTo = Param.GetValue();
-    if (!vFrom || !vTo || !vFrom.GetSubValue(sub) || !vTo.GetSubValue(sub)) return null;
-    const a = Number(vFrom.GetSubValue(sub).Eval()), b = Number(vTo.GetSubValue(sub).Eval());
+    if (!vTo || !vTo.GetSubValue(sub)) return null;
+    const nums = this.m_TransFromNum[name];
+    const a = (nums && nums[sub] !== undefined) ? nums[sub]
+      : (vFrom && vFrom.GetSubValue(sub) ? Number(vFrom.GetSubValue(sub).Eval()) : NaN);
+    const b = Number(vTo.GetSubValue(sub).Eval());
     if (isNaN(a) || isNaN(b)) return null;
     return a + (b - a) * k;
   }
@@ -770,12 +774,26 @@ export class moConfig extends moAbstract {
     {
       /* #918 E1.6: recordar de dónde viene cada param que cambia, para interpolar */
       if (p_duration !== undefined) this.m_PresetDuration = p_duration;
+      /* si había una transición a medias, la nueva arranca de lo que se VE ahora (no del destino anterior) */
+      const midway: any = {};
+      if (this.TransitionK() < 1) {
+        for (const name of Object.keys(this.m_TransFrom)) {
+          const P = this.m_ParamsByName[name]; if (!P || !P.GetValue()) continue;
+          const n = P.GetValue().GetSubValueCount(), arr: number[] = [];
+          for (let i = 0; i < n; i++) { const m = this.TransMix(P, i); arr.push(m !== null ? m : Number(P.GetValue().GetSubValue(i).Eval())); }
+          midway[name] = arr;
+        }
+      }
       this.m_TransFrom = {};
+      this.m_TransFromNum = {};
       this.m_TransStart = performance.now();
       for (const pi of this.m_PreConfigs[p_actual].m_PreconfIndexes) {
         if (pi.m_ParamIndex < 0) continue;
         const P = this.m_Params[pi.m_ParamIndex];
-        if (P && P.GetIndexValue() != pi.m_ValueIndex) this.m_TransFrom["" + P.GetName()] = P.GetIndexValue();
+        if (!P) continue;
+        const nm = "" + P.GetName();
+        if (midway[nm]) { this.m_TransFrom[nm] = P.GetIndexValue(); this.m_TransFromNum[nm] = midway[nm]; }
+        else if (P.GetIndexValue() != pi.m_ValueIndex) this.m_TransFrom[nm] = P.GetIndexValue();
       }
 		  for( var i=0; i<this.m_PreConfigs[p_actual].m_PreconfIndexes.length; i++) {
 			  var Val : moPreconfigParamIndex = this.m_PreConfigs[p_actual].m_PreconfIndexes[i]; /* #918 E1: antes [p_actual][i] = undefined */
