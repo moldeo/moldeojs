@@ -1,0 +1,13 @@
+{
+  "name": "moldeo-director",
+  "version": "0.1.0",
+  "description": "Moldeo Director (inPhini): el editor/player moldeojs como app de escritorio, sobre una carpeta de proyecto local",
+  "main": "main.js",
+  "license": "GPL-3.0",
+  "scripts": {
+    "start": "electron . --ozone-platform-hint=auto"
+  },
+  "devDependencies": {
+    "electron": "33.4.11"
+  }
+}
