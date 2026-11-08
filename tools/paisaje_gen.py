@@ -7,6 +7,9 @@ Cada lección agrega una capa al MISMO paisaje. Este script arma las capas hecha
   P3 sol     (image)  presets: quieto · arco · pulso · eclipse        (detrás de la montaña: se pone)
   P4 luna    (image)  presets: llena · creciente · menguante · nueva  (4 texturas: la fase cambia la imagen)
   P5 agua    (image)  presets: calma · viento · reflejo · seca         (delante de la montaña, transparente)
+  P6 lluvia  (image)  presets: despejado · llovizna · lluvia · tormenta
+             una capa de trazos que cae en loop (time %): las partículas (particlessimple) del ejemplo C++
+             Rain_Particles no encuadran en moldeojs todavía ⇒ deuda del motor, ver plan #918
 Las imágenes se dibujan acá (propias, sin licencias de terceros). Base de los .cfg: los de basic/00_Image.
 Uso:  python3 tools/paisaje_gen.py
 """
@@ -122,6 +125,20 @@ def agua():
     return im
 
 
+def lluvia(w=800, h=1000):
+    """trazos de lluvia que se repiten: la mitad de abajo = la de arriba (loop sin costura)"""
+    half = Image.new('RGBA', (w, h // 2), (0, 0, 0, 0))
+    d = ImageDraw.Draw(half)
+    rng = random.Random(6)
+    for _ in range(140):
+        x, y, L = rng.uniform(0, w), rng.uniform(0, h // 2), rng.uniform(18, 46)
+        for dy in (0, -h // 2, h // 2):                      # que los trazos del borde se repitan del otro lado
+            d.line((x, y + dy, x - L * 0.18, y + dy + L), fill=(215, 230, 255, 210), width=3)
+    im = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    im.paste(half, (0, 0)); im.paste(half, (0, h // 2))
+    return im
+
+
 def setvals(xml, pname, vals):
     def vxml(v):
         ds = ''.join('\n                <D type="%s"%s>%s</D>' % (t, (' code="%s"' % c) if c else '', x) for t, c, x in v)
@@ -205,6 +222,18 @@ def main():
     t = setvals(t, 'alt_cuad_y', [F('0.30'), F('0.30+0.012*sin(time*2.7)'), F('0.30'), F('0.18')])
     wr('agua.cfg', set_pre(t, pres(['calma', 'viento', 'reflejo', 'seca'], P)))
 
+    # P6 lluvia — capa de trazos 2 pantallas de alto que baja en loop: y = 0.3125 - ((time*v) % 0.625)
+    lluvia().save(os.path.join(DST, 'lluvia.png'), optimize=True)
+    t = rd('image.cfg')
+    t = setvals(t, 'texture', [[('TXT', '', 'lluvia.png')]])
+    t = setvals(t, 'alpha', [F('0.0'), F('0.35'), F('0.7'), F('0.95')])
+    t = setvals(t, 'color', [col('1.0', '1.0', '1.0'), col('1.0', '1.0', '1.0'), col('0.9', '0.95', '1.0'), col('0.8', '0.85', '0.95')])
+    t = setvals(t, 'pos_cuad_x', [F('0.0'), F('0.0'), F('0.0'), F('0.03*sin(time*0.7)')])
+    t = setvals(t, 'pos_cuad_y', [F('0.3125'), F('0.3125-((time*0.25)%0.625)'), F('0.3125-((time*0.6)%0.625)'), F('0.3125-((time*1.1)%0.625)')])
+    t = setvals(t, 'anc_cuad_x', [F('1.05')] * 4)
+    t = setvals(t, 'alt_cuad_y', [F('2.0')] * 4)
+    wr('lluvia.cfg', set_pre(t, pres(['despejado', 'llovizna', 'lluvia', 'tormenta'], P)))
+
     # consola: cielo (pre-efecto) + sol, luna, montaña, agua (efectos, en ese orden: lo primero queda atrás)
     mol = rd('00_Image.mol')
     mol = re.sub(r'<PARAM name="devices" type="MOLDEOOBJECT" >.*?</PARAM>', '<PARAM name="devices" type="MOLDEOOBJECT" />', mol, flags=re.S)
@@ -214,7 +243,7 @@ def main():
         return ('<VAL>\n                <D type="TXT">%s</D>\n                <D type="TXT">%s</D>\n                <D type="TXT">%s</D>\n'
                 '                <D type="NUM">0</D>\n                <D type="NUM">1</D>\n                <D type="TXT">%s</D>\n            </VAL>') % (plugin, name, name, key)
     efectos = '\n            '.join([mob('image', 'sol', 'S'), mob('image', 'luna', 'L'), mob('image', 'montana', 'M'),
-                                     mob('image', 'agua', 'A')])
+                                     mob('image', 'agua', 'A'), mob('image', 'lluvia', 'R')])
     mol = re.sub(r'(<PARAM name="effect" type="MOLDEOOBJECT">\s*)<VAL>.*?</VAL>', lambda m: m.group(1) + efectos, mol, count=1, flags=re.S)
     assert '<D type="TXT">cielo</D>' in mol and '<D type="TXT">montana</D>' in mol and '<D type="TXT">luna</D>' in mol
     wr('Paisaje.mol', mol)
