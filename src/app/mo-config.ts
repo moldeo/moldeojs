@@ -159,6 +159,13 @@ export class moConfig extends moAbstract {
   m_MinorVersion : MOint = 0;
   m_FileName : moText;
 
+  /** #918 E0 — lo que el XML original traía y el modelo no guarda, para que SaveConfig no pierda nada */
+  m_XmlHeader : string = '<?xml version="1.0" encoding="ISO-8859-1" ?>';
+  m_XmlDefinition : any = null;   /** atributos de <DEFINITION> */
+  m_XmlHasUpdate : boolean = false;
+  m_XmlHasPreconfigs : boolean = false;
+  m_LastSavedXml : string = "";
+
   m_CurrentParam : MOint = 0;// el indice que indica cual es el parametro actual.
   m_PreconfParamNum : MOint = 0;
   m_PreconfActual: MOint = 0;
@@ -312,8 +319,15 @@ export class moConfig extends moAbstract {
         var xml_text_value = "_text";
 
         this.m_ParamsByName = {};
+        var hdr = configtext.match(/^\s*(<\?xml[^>]*\?>)/);
+        if (hdr) this.m_XmlHeader = hdr[1];
         if (typeof result == "object")
         if ("MOCONFIG" in result) {
+          var MC0 = result["MOCONFIG"][0];
+          if (MC0["DEFINITION"] && MC0["DEFINITION"][0] && MC0["DEFINITION"][0][attr_sym])
+            this.m_XmlDefinition = Object.assign({}, MC0["DEFINITION"][0][attr_sym]);
+          this.m_XmlHasUpdate = ("UPDATE" in MC0);
+          this.m_XmlHasPreconfigs = ("PRECONFIGS" in MC0);
           if (result["MOCONFIG"][0][attr_sym]) {
             this.m_MajorVersion = result["MOCONFIG"][0][attr_sym]["majorversion"];
             this.m_MinorVersion = result["MOCONFIG"][0][attr_sym]["minorversion"];
@@ -343,6 +357,7 @@ export class moConfig extends moAbstract {
                       PARAM[attr_sym]["options"]
                     );
                     var p_param = new moParam(p_param_def);
+                    (p_param as any).m_XmlAttributes = Object.assign({}, PARAM[attr_sym]);
                     this.m_Params.push(p_param);
                     this.m_ParamsByName["" + p_param.m_ParamDefinition.m_Name] = p_param;
                     var PARAMVALS = [];
@@ -366,6 +381,11 @@ export class moConfig extends moAbstract {
                             var subvaluetype: moText = SUBVAL[attr_sym]["type"];
 
                             newValue.AddSubValue(subvalue, subvaluetype);
+                            if (newValue.m_List.length) {
+                              var lastvb : any = newValue.m_List[newValue.m_List.length - 1];
+                              lastvb.m_XmlText = "" + subvalue;
+                              lastvb.m_XmlAttributes = Object.assign({}, SUBVAL[attr_sym]);
+                            }
                             //console.log("newValue:", newValue);
                             //var subvaluedata: moText = SUBVAL[0];
                             if (newValue.m_List.length) {
@@ -404,21 +424,26 @@ export class moConfig extends moAbstract {
               if (PRES.length>0) {
                 for (var PRE_I in PRES) {
                   var PRECONF = PRES[PRE_I];
-                  var preconf_name = "preconf_" + PRE_I;
-                  if (PRECONF[attr_sym]) preconf_name = PRECONF["$"]["name"];
+                  var preconf_name = "";
+                  if (PRECONF[attr_sym] && PRECONF[attr_sym]["name"]) preconf_name = PRECONF[attr_sym]["name"];
                   if (typeof PRECONF == "object") {
                     var PREPARAMS = PRECONF["P"];
                     var Pcfg: moPreconfig = new moPreconfig();
-                    //console.log(PREPARAMS);
-                    if (PREPARAMS.length > 0) {
+                    Pcfg.m_Name = preconf_name;
+                    if (PREPARAMS && PREPARAMS.length > 0) {
                       for (var P_I in PREPARAMS) {
                         var P = PREPARAMS[P_I];
                         var name = "" + P_I;
                         if (P[attr_sym]) if (P[attr_sym]["name"]) name = P[attr_sym]["name"];
-                        var value = P[xml_text_value][0];
-                        //console.log(name, value);
+                        var value = (P[xml_text_value] ? P[xml_text_value][0] : "0");
+                        var pidx: moPreconfigParamIndex = new moPreconfigParamIndex();
+                        pidx.m_ParamName = name;
+                        pidx.m_ParamIndex = this.GetParamIndex(name);
+                        pidx.m_ValueIndex = Number(value);
+                        Pcfg.m_PreconfIndexes.push(pidx);
                       }
                     }
+                    this.m_PreConfigs.push(Pcfg);
                   }
                 }
               }
@@ -434,12 +459,69 @@ export class moConfig extends moAbstract {
     return MO_CONFIGFILE_NOT_FOUND;
   }
 
+  /** #918 E0 — serializa el config completo al XML MOCONFIG del 1.0 (lo lee el player C++).
+   *  Lo que no cambió se escribe con el texto original (p. ej. "0.0" no pasa a ser "0"). */
+  ToXML() : string {
+    const esc = (t: any) => ("" + (t === undefined || t === null ? "" : t))
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const attrs = (o: any) => Object.keys(o).filter(k => o[k] !== undefined && o[k] !== null)
+      .map(k => " " + k + '="' + esc(o[k]).replace(/"/g, "&quot;") + '"').join("");
+    const NUMERIC = ["NUM", "CHAR", "INT", "LONG", "FLOAT", "DOUBLE"];
+    let x = this.m_XmlHeader + "\n";
+    x += "<MOCONFIG" + attrs({ majorversion: this.m_MajorVersion, minorversion: this.m_MinorVersion }) + ">\n";
+    const def = this.m_XmlDefinition || { name: this.GetObjectName(), class: this.GetObjectClass() };
+    x += "    <DEFINITION" + attrs(def) + " />\n";
+    if (this.m_XmlHasUpdate) x += "    <UPDATE />\n";
+    x += "    <CONFIGPARAMS>\n";
+    for (const param of this.m_Params) {
+      const pd: any = param.m_ParamDefinition;
+      const pa: any = Object.assign({}, (param as any).m_XmlAttributes || {});
+      pa["name"] = pd.m_Name;
+      if (pa["type"] === undefined) pa["type"] = pd.m_TypeStr;
+      if (pd.m_Property) pa["property"] = pd.m_Property; else delete pa["property"];
+      if (pd.m_OptionsStr) pa["options"] = pd.m_OptionsStr;
+      const vals = param.GetValues();
+      if (!vals || vals.length == 0) { x += "        <PARAM" + attrs(pa) + " />\n"; continue; }
+      x += "        <PARAM" + attrs(pa) + ">\n";
+      for (const val of vals) {
+        x += "            <VAL>\n";
+        for (const vb of (val.m_List as any[])) {
+          const da: any = Object.assign({}, vb.m_XmlAttributes || {});
+          if (da["type"] === undefined) da["type"] = vb.GetTypeStr();
+          const cn = vb.GetCodeName(); if (cn) da["code"] = cn;
+          const t = "" + da["type"];
+          let text: any;
+          if (NUMERIC.indexOf(t) >= 0) {
+            text = (vb.m_XmlText !== undefined && Number(vb.m_XmlText) == vb.m_Number) ? vb.m_XmlText : "" + vb.m_Number;
+          } else {
+            text = vb.m_Text;
+          }
+          x += "                <D" + attrs(da) + ">" + esc(text) + "</D>\n";
+        }
+        x += "            </VAL>\n";
+      }
+      x += "        </PARAM>\n";
+    }
+    x += "    </CONFIGPARAMS>\n";
+    if (this.m_PreConfigs.length) {
+      x += "    <PRECONFIGS>\n";
+      for (const pre of this.m_PreConfigs) {
+        x += "        <PRE" + (pre.m_Name ? attrs({ name: pre.m_Name }) : "") + ">\n";
+        for (const pi of pre.m_PreconfIndexes)
+          x += "            <P" + attrs({ name: pi.m_ParamName }) + ">" + pi.m_ValueIndex + "</P>\n";
+        x += "        </PRE>\n";
+      }
+      x += "    </PRECONFIGS>\n";
+    } else if (this.m_XmlHasPreconfigs) {
+      x += "    <PRECONFIGS />\n";
+    }
+    x += "</MOCONFIG>\n";
+    return x;
+  }
+
   SaveConfig( p_filename? : moText ) : MOint  {
-    var resultjs : Object = {};
-
-    //this.m_MajorVersion;
-    //this.m_MinorVersion;
-
+    this.m_LastSavedXml = this.ToXML();
+    if (p_filename) this.m_FileName = p_filename;
     return MO_CONFIG_OK;
   }
 
