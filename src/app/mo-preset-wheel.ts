@@ -15,6 +15,11 @@ export class moPresetWheel {
   private current: number = 0;
   onCall: (layer: any, preset: number) => void = null;
   history: any = null;            /** #918 H1 */
+  /** modo de cambio, override del performer (FCA: "en vivo es fundamental el corte duro").
+   *  proyecto = la duración/curva del proyecto (default) · corte = 0 s · lento = 3 s.  Shift+tocar = corte puntual. */
+  mode: string = "proyecto";
+  private static MODES: { [m: string]: number } = { proyecto: null, corte: 0, lento: 3 };
+  onMode: (mode: string) => void = null;
 
   constructor(private console: any) {
     this.collect();
@@ -57,15 +62,24 @@ export class moPresetWheel {
     this.render();
   }
 
-  call(i: number) {
+  call(i: number, hardCut: boolean = false) {
     const fx = this.layer(); if (!fx) return;
     if (this.history) this.history.record(fx, "preset " + (fx.GetConfig().m_PreConfigs[i].m_Name || i + 1));
-    fx.GetConfig().SetCurrentPreConf(i);
+    const d = hardCut ? 0 : moPresetWheel.MODES[this.mode];
+    fx.GetConfig().SetCurrentPreConf(i, d === null ? undefined : d);
     if (this.onCall) this.onCall(fx, i);
     this.render();
   }
 
   onCapture: (layer: any, preset: number) => void = null;
+  private shiftDown: boolean = false;
+
+  nextMode() {
+    const ms = Object.keys(moPresetWheel.MODES);
+    this.mode = ms[(ms.indexOf(this.mode) + 1) % ms.length];
+    if (this.onMode) this.onMode(this.mode);
+    this.render();
+  }
 
   /** mantener apretado: el estado actual queda guardado en ese preset */
   capture(i: number) {
@@ -87,6 +101,7 @@ export class moPresetWheel {
         "padding:8px 10px;border:2px solid #fff;" + (active ? "background:#fff;color:#0a0c18;" : "background:rgba(10,12,24,.8);color:#fff;") + css;
       b.addEventListener("pointerdown", (e) => {
         e.preventDefault(); e.stopPropagation();
+        this.shiftDown = e.shiftKey;
         if (!hold) { fn(); return; }
         let held = false;
         const timer = setTimeout(() => { held = true; b.style.boxShadow = "0 0 0 6px rgba(255,255,255,.6)"; hold(); }, 700);
@@ -101,6 +116,11 @@ export class moPresetWheel {
     const c = btn(fx ? "" + fx.GetLabelName() : "sin presets", "left:50%;top:50%;transform:translate(-50%,-50%);max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;",
       () => this.nextLayer());
     c.title = "Tocar: pasar a la siguiente capa";
+    /* modo de cambio: arriba a la izquierda del círculo */
+    const label = { proyecto: "≈ proyecto", corte: "✂ corte", lento: "∿ lento" }[this.mode] || this.mode;
+    const mb = btn(label, "left:2px;top:2px;padding:5px 8px;font-size:11px;" + (this.mode != "proyecto" ? "background:#ffd36b;color:#0a0c18;border-color:#ffd36b;" : ""),
+      () => this.nextMode());
+    mb.title = "Cómo cambian los presets: proyecto (su duración) · corte (0 s) · lento (3 s). Shift+tocar = corte puntual";
     if (!fx) return;
     /* anillo: los presets, empezando arriba y en sentido horario */
     const cfg = fx.GetConfig(), n = cfg.GetPreConfCount(), cur = cfg.GetCurrentPreConf();
@@ -109,7 +129,7 @@ export class moPresetWheel {
       const a = -Math.PI / 2 + (2 * Math.PI * i) / n;
       const x = 125 + R * Math.cos(a), y = 125 + R * Math.sin(a);
       const name = ("" + (cfg.m_PreConfigs[i].m_Name || (i + 1))).replace(/_/g, " ");
-      btn(name, `left:${x}px;top:${y}px;transform:translate(-50%,-50%);max-width:86px;white-space:normal;`, () => this.call(i), i == cur, () => this.capture(i));
+      btn(name, `left:${x}px;top:${y}px;transform:translate(-50%,-50%);max-width:86px;white-space:normal;`, () => this.call(i, this.shiftDown), i == cur, () => this.capture(i));
     }
   }
 }

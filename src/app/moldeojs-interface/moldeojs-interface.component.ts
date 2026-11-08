@@ -477,6 +477,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
       this.presetWheel.onCapture = (fx, i) => this.touchEdit && this.touchEdit.log("capture", { fx: "" + fx.GetLabelName(), i, name: "" + fx.GetConfig().m_PreConfigs[i].m_Name });
       (window as any).moPresetWheel = this.presetWheel;
       this.presetWheel.history = this.history;
+      this.presetWheel.onMode = (m) => this.touchEdit && this.touchEdit.log("mode", { mode: m });
       this.touchEdit.history = this.history;
       (window as any).moHistory = this.history;
       window.addEventListener("keydown", (e: KeyboardEvent) => {

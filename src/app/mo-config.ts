@@ -172,11 +172,12 @@ export class moConfig extends moAbstract {
   private m_TransFrom : any = {};               /** nombre del param ⇒ índice de VAL de donde viene */
   private m_TransFromNum : any = {};            /** nombre ⇒ [números por sub-valor]: si se cortó una transición a medias */
   private m_TransStart : number = 0;
+  private m_TransDuration : number = 1.0;        /** duración de ESTA transición (el override del performer no se guarda) */
 
   /** 0..1 de la transición en curso (1 = terminada) */
   TransitionK() : number {
-    if (!this.m_PresetDuration || this.m_PresetDuration <= 0) return 1;
-    const k = Math.min(1, Math.max(0, (performance.now() - this.m_TransStart) / (this.m_PresetDuration * 1000)));
+    if (!this.m_TransDuration || this.m_TransDuration <= 0) return 1;
+    const k = Math.min(1, Math.max(0, (performance.now() - this.m_TransStart) / (this.m_TransDuration * 1000)));
     if (this.m_PresetCurve == "linear") return k;
     if (this.m_PresetCurve == "step") return k < 1 ? 0 : 1;
     return k * k * (3 - 2 * k); /* ease */
@@ -773,7 +774,8 @@ export class moConfig extends moAbstract {
     if(0<=p_actual && p_actual<this.m_PreConfigs.length )
     {
       /* #918 E1.6: recordar de dónde viene cada param que cambia, para interpolar */
-      if (p_duration !== undefined) this.m_PresetDuration = p_duration;
+      /* p_duration = override de la interfaz para ESTE cambio (corte duro = 0); si no, la del proyecto */
+      const durThis = (p_duration !== undefined && p_duration !== null) ? p_duration : this.m_PresetDuration;
       /* si había una transición a medias, la nueva arranca de lo que se VE ahora (no del destino anterior) */
       const midway: any = {};
       if (this.TransitionK() < 1) {
@@ -787,6 +789,7 @@ export class moConfig extends moAbstract {
       this.m_TransFrom = {};
       this.m_TransFromNum = {};
       this.m_TransStart = performance.now();
+      this.m_TransDuration = durThis;
       for (const pi of this.m_PreConfigs[p_actual].m_PreconfIndexes) {
         if (pi.m_ParamIndex < 0) continue;
         const P = this.m_Params[pi.m_ParamIndex];
