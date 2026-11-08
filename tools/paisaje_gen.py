@@ -6,6 +6,7 @@ Cada lección agrega una capa al MISMO paisaje. Este script arma las capas hecha
   P2 montana (image)  presets: lejos · cerca · niebla · silueta
   P3 sol     (image)  presets: quieto · arco · pulso · eclipse        (detrás de la montaña: se pone)
   P4 luna    (image)  presets: llena · creciente · menguante · nueva  (4 texturas: la fase cambia la imagen)
+  P5 agua    (image)  presets: calma · viento · reflejo · seca         (delante de la montaña, transparente)
 Las imágenes se dibujan acá (propias, sin licencias de terceros). Base de los .cfg: los de basic/00_Image.
 Uso:  python3 tools/paisaje_gen.py
 """
@@ -97,6 +98,30 @@ def luna(fase, n=512):
     return im
 
 
+def agua():
+    """una laguna: elipse con líneas de onda, como el río del cuaderno"""
+    w, h = 1600, 420
+    im = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    mask = Image.new('L', (w, h), 0)
+    ImageDraw.Draw(mask).ellipse((40, 60, w - 40, h - 20), fill=255)
+    body = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    db = ImageDraw.Draw(body)
+    for y in range(h):                                   # más claro arriba (refleja el cielo), más hondo abajo
+        k = y / h
+        db.line((0, y, w, y), fill=(int(150 - 60 * k), int(190 - 60 * k), int(225 - 40 * k), 255))
+    im.paste(body, (0, 0), mask)
+    d = ImageDraw.Draw(im)
+    rng = random.Random(5)
+    for i in range(14):                                  # ondas de lapicera
+        y = 110 + i * 20 + rng.uniform(-4, 4)
+        x0 = rng.uniform(180, 600); x1 = x0 + rng.uniform(250, 700)
+        pts = [(x, y + 4 * math.sin(x / 38.0)) for x in range(int(x0), int(min(x1, w - 200)), 12)]
+        if len(pts) > 1:
+            d.line(pts, fill=(235, 245, 255, 200), width=3)
+    d.ellipse((40, 60, w - 40, h - 20), outline=(25, 45, 70, 255), width=5)
+    return im
+
+
 def setvals(xml, pname, vals):
     def vxml(v):
         ds = ''.join('\n                <D type="%s"%s>%s</D>' % (t, (' code="%s"' % c) if c else '', x) for t, c, x in v)
@@ -168,7 +193,19 @@ def main():
     t = setvals(t, 'alt_cuad_y', [F('0.224')] * 4)
     wr('luna.cfg', set_pre(t, pres(fases, ['texture'] + P)))
 
-    # consola: cielo (pre-efecto) + sol, luna, montaña (efectos, en ese orden: lo primero queda atrás)
+    # P5 agua — delante de la montaña; transparencia y ondas
+    agua().save(os.path.join(DST, 'agua.png'), optimize=True)
+    t = rd('image.cfg')
+    t = setvals(t, 'texture', [[('TXT', '', 'agua.png')]])
+    t = setvals(t, 'alpha', [F('0.9'), F('0.9'), F('0.75'), F('0.18')])
+    t = setvals(t, 'color', [col('1.0', '1.0', '1.0'), col('0.9', '0.95', '1.0'), col('1.0', '0.72', '0.6'), col('0.7', '0.55', '0.4')])
+    t = setvals(t, 'pos_cuad_x', [F('0.0'), F('0.006*sin(time*2.3)'), F('0.0'), F('0.0')])
+    t = setvals(t, 'pos_cuad_y', [F('-0.19'), F('-0.19'), F('-0.19'), F('-0.21')])
+    t = setvals(t, 'anc_cuad_x', [F('0.85'), F('0.85+0.01*sin(time*3.1)'), F('0.85'), F('0.6')])
+    t = setvals(t, 'alt_cuad_y', [F('0.30'), F('0.30+0.012*sin(time*2.7)'), F('0.30'), F('0.18')])
+    wr('agua.cfg', set_pre(t, pres(['calma', 'viento', 'reflejo', 'seca'], P)))
+
+    # consola: cielo (pre-efecto) + sol, luna, montaña, agua (efectos, en ese orden: lo primero queda atrás)
     mol = rd('00_Image.mol')
     mol = re.sub(r'<PARAM name="devices" type="MOLDEOOBJECT" >.*?</PARAM>', '<PARAM name="devices" type="MOLDEOOBJECT" />', mol, flags=re.S)
     mol = mol.replace('<D type="TXT">erase</D>\n                <D type="TXT">erase</D>\n                <D type="TXT">erase</D>',
@@ -176,7 +213,8 @@ def main():
     def mob(plugin, name, key):
         return ('<VAL>\n                <D type="TXT">%s</D>\n                <D type="TXT">%s</D>\n                <D type="TXT">%s</D>\n'
                 '                <D type="NUM">0</D>\n                <D type="NUM">1</D>\n                <D type="TXT">%s</D>\n            </VAL>') % (plugin, name, name, key)
-    efectos = '\n            '.join([mob('image', 'sol', 'S'), mob('image', 'luna', 'L'), mob('image', 'montana', 'M')])
+    efectos = '\n            '.join([mob('image', 'sol', 'S'), mob('image', 'luna', 'L'), mob('image', 'montana', 'M'),
+                                     mob('image', 'agua', 'A')])
     mol = re.sub(r'(<PARAM name="effect" type="MOLDEOOBJECT">\s*)<VAL>.*?</VAL>', lambda m: m.group(1) + efectos, mol, count=1, flags=re.S)
     assert '<D type="TXT">cielo</D>' in mol and '<D type="TXT">montana</D>' in mol and '<D type="TXT">luna</D>' in mol
     wr('Paisaje.mol', mol)

@@ -50,6 +50,14 @@
                 <D type="NUM">1</D>
                 <D type="TXT">M</D>
             </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">agua</D>
+                <D type="TXT">agua</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">A</D>
+            </VAL>
         </PARAM>
         <PARAM name="posteffect" type="MOLDEOOBJECT" />
         <PARAM name="mastereffect" type="MOLDEOOBJECT" />
