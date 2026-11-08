@@ -47,7 +47,7 @@
   <div *ngIf="versionsMsg" class="moVersionsMsg">{{ versionsMsg }}</div>
   <div *ngFor="let v of versions" class="moVersionRow">
     <span class="moVersionNum">v{{ v.number }}</span>
-    <span class="moVersionInfo">{{ v.date }} · {{ v.user }}<br/><i>{{ v.note }}</i></span>
+    <span class="moVersionInfo">{{ versionDate(v.date) }} · {{ v.user }}<br/><i>{{ v.note }}</i></span>
     <button class="moldeobutton" type="button" (click)="restoreVersion(v)">Restaurar</button>
   </div>
 </div>

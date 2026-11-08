@@ -134,6 +134,11 @@ export class MoldeojsInterfaceComponent implements OnInit {
       body: JSON.stringify({ jsonrpc: "2.0", method: "call", params }) })
       .then((r) => r.json()).then((j) => (j && j.result) || { ok: false, error: (j && j.error && j.error.message) || "error" });
   }
+  /** el Lab manda UTC "AAAA-MM-DD hh:mm:ss"; el Director, ISO con huso */
+  public versionDate(d: string): string {
+    try { const t = new Date(d.indexOf("T") < 0 ? d.replace(" ", "T") + "Z" : d);
+      return isNaN(t.getTime()) ? d : t.toLocaleString(); } catch (e) { return d; }
+  }
   public toggleVersions(): void {
     this.versionsOpen = !this.versionsOpen;
     if (!this.versionsOpen) return;
