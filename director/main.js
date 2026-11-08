@@ -10,7 +10,7 @@
  *
  * Uso: npm start -- /ruta/a/la/carpeta   (sin ruta: se abre un diálogo)
  */
-const { app, BrowserWindow, protocol, dialog } = require('electron');
+const { app, BrowserWindow, protocol, dialog, screen } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { execFileSync } = require('child_process');
@@ -103,7 +103,27 @@ app.whenReady().then(async () => {
     width: 1280, height: 800, title: 'Moldeo Director — ' + path.basename(projDir),
     webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
   });
-  win.loadURL(`moldeo://app/index.html?mol=${encodeURIComponent('/proj/' + main)}&save=${encodeURIComponent('/proj-save')}`);
+  const base = `moldeo://app/index.html?mol=${encodeURIComponent('/proj/' + main)}`;
+  win.loadURL(`${base}&save=${encodeURIComponent('/proj-save')}`);
+
+  /* D2 — PLAYER: 2ª ventana a pantalla completa en el último monitor (proyector), sin interfaz.
+     Recibe todo lo que se hace en el Control por BroadcastChannel (mismo origen moldeo://app). */
+  const displays = screen.getAllDisplays();
+  const prim = screen.getPrimaryDisplay();
+  const out = displays.filter((d) => d.id !== prim.id).pop();
+  let player = null;
+  if (out || process.env.MOLDEO_PLAYER) {
+    const b = (out || prim).bounds;
+    player = new BrowserWindow({
+      x: b.x, y: b.y, width: b.width, height: b.height, fullscreen: !!out, frame: !out, title: 'Moldeo Player',
+      webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
+    });
+    player.loadURL(`${base}&role=player`);
+    log('player en', out ? `monitor ${out.id} (${b.width}x${b.height} @ ${b.x},${b.y})` : 'ventana (un solo monitor)');
+    player.on('closed', () => { player = null; });
+  } else {
+    log('un solo monitor: sin ventana Player (MOLDEO_PLAYER=1 la fuerza en ventana)');
+  }
 
   /* MOLDEO_SELFTEST=1: abre, llama un preset de la imagen, Guarda y sale (verificación sin manos) */
   if (process.env.MOLDEO_SELFTEST) {
@@ -120,6 +140,12 @@ app.whenReady().then(async () => {
         return 'ok preset=' + fx.GetConfig().GetCurrentPreConf() + ' boton=' + btn.textContent.trim();
       })()`);
       log('selftest', r);
+      if (player) {
+        const p = await player.webContents.executeJavaScript(`(() => { const PS = window.moProjectStates;
+          const f = PS && PS.layerByLabel('image'); return 'player rol=' + (document.body.classList.contains('mo-player') ? 'player' : '?') +
+          (f ? ' image.preset=' + f.GetConfig().GetCurrentPreConf() : ''); })()`);
+        log('selftest', p);
+      }
       setTimeout(() => app.quit(), 500);
     }, 6000);
   }

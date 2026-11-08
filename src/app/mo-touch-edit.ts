@@ -23,6 +23,8 @@ export class moTouchEdit {
   selected: any = null;          /** el efecto elegido */
   onSelect: (fx: any) => void = null;
   history: any = null;            /** #918 H1: moHistory (foto antes de cada gesto) */
+  channel: any = null;            /** #918 D2 */
+  applying: boolean = false;
   private recorded: boolean = false;
 
   private dragId: number = null;
@@ -111,6 +113,7 @@ export class moTouchEdit {
     const sub = param.m_Values[idx].m_List[0];
     sub.SetVal("" + Number(v.toFixed(4)));
     fx.ResolveValue(param, idx);
+    if (this.channel && !this.applying) this.channel.send({ verb: "valueset", label: "" + fx.GetLabelName(), param: pname, value: Number(v.toFixed(4)) });
   }
 
   private down(e: PointerEvent) {

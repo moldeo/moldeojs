@@ -26,6 +26,7 @@ import { moPresetWheel } from '../mo-preset-wheel';
 import { moHistory } from '../mo-history';
 import { moProjectStates } from '../mo-project-states';
 import { moSetObjectScope } from '../mo-math-manager';
+import { moChannel } from '../mo-channel';
 import { moMobDefinition } from '../mo-moldeo-object';
 import { PluginsDefinitionsMap, PluginsDefinitions, PluginsDefinitionsMapType,
   PluginsDefinitionsMapTypeArray, PluginsDefinitionsMapTypes,
@@ -77,14 +78,17 @@ export class MoldeojsInterfaceComponent implements OnInit {
   public touchEdit: moTouchEdit = null;
   public presetWheel: moPresetWheel = null;
   public projectStates: moProjectStates = null;
+  public channel: moChannel = null;
   /** #918 H1 — deshacer / rehacer */
   public history: moHistory = new moHistory();
   public undoLabel: string = "";
   public doUndo(): void {
+    if (this.channel) this.channel.send({ verb: "undo" });
     const w = this.history.undo();
     if (w) { this.undoLabel = "↶ " + w; if (this.touchEdit) this.touchEdit.log("undo", { what: w }); if (this.presetWheel) this.presetWheel.render(); setTimeout(() => this.undoLabel = "", 2000); }
   }
   public doRedo(): void {
+    if (this.channel) this.channel.send({ verb: "redo" });
     const w = this.history.redo();
     if (w) { this.undoLabel = "↷ " + w; if (this.touchEdit) this.touchEdit.log("redo", { what: w }); if (this.presetWheel) this.presetWheel.render(); setTimeout(() => this.undoLabel = "", 2000); }
   }
@@ -484,6 +488,31 @@ export class MoldeojsInterfaceComponent implements OnInit {
       this.presetWheel.onCapture = (fx, i) => this.touchEdit && this.touchEdit.log("capture", { fx: "" + fx.GetLabelName(), i, name: "" + fx.GetConfig().m_PreConfigs[i].m_Name });
       (window as any).moPresetWheel = this.presetWheel;
       this.presetWheel.history = this.history;
+      /* #918 D2: canal Control → Player */
+      const ch = new moChannel();
+      this.channel = ch;
+      this.presetWheel.channel = ch; this.projectStates.channel = ch; this.touchEdit.channel = ch;
+      if (ch.isPlayer()) {
+        document.body.classList.add("mo-player");
+        const W = this.presetWheel, PS = this.projectStates, TE = this.touchEdit;
+        ch.onMessage = (m: any) => {
+          if (!m || !m.verb) return;
+          if (m.verb == "mode") { W.mode = m.mode; return; }
+          if (m.verb == "undo") { this.doUndo(); return; }
+          if (m.verb == "redo") { this.doRedo(); return; }
+          if (m.verb == "play") { if (!PS.playing) PS.play(); return; }
+          if (m.verb == "pause") { PS.pause(); return; }
+          if ((m.verb == "preconfigset" || m.verb == "preconfigsave") && W.selectByLabel(m.label)) {
+            if (m.mode) W.mode = m.mode;
+            if (m.verb == "preconfigset") W.call(m.i, !!m.hard); else W.capture(m.i);
+            return;
+          }
+          if (m.verb == "valueset") {
+            const fx = this.m_Console.m_EffectManager.m_AllEffects.find((e: any) => ("" + e.GetLabelName()) == m.label);
+            if (fx) { if (this.history) this.history.record(fx, "mover"); TE.applying = true; TE.setNumber(fx, m.param, m.value); TE.applying = false; }
+          }
+        };
+      }
       this.presetWheel.onMode = (m) => this.touchEdit && this.touchEdit.log("mode", { mode: m });
       this.touchEdit.history = this.history;
       (window as any).moHistory = this.history;

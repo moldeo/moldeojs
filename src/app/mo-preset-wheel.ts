@@ -22,6 +22,13 @@ export class moPresetWheel {
   onMode: (mode: string) => void = null;
 
   project: any = null;            /** #918 P7: moProjectStates (estados del paisaje + línea de tiempo) */
+  channel: any = null;            /** #918 D2: moChannel (Control → Player) */
+  /** el Player aplica por acá lo que manda el Control */
+  selectByLabel(label: string): boolean {
+    const i = this.layers.findIndex((f: any) => ("" + f.GetLabelName()) == label);
+    if (i < 0) return false;
+    this.current = i; return true;
+  }
 
   constructor(private console: any, project: any = null) {
     this.project = project;
@@ -72,6 +79,7 @@ export class moPresetWheel {
     if (this.history) this.history.record(fx.isProject ? this.project.layers() : fx, "preset " + (fx.GetConfig().m_PreConfigs[i].m_Name || i + 1));
     const d = hardCut ? 0 : moPresetWheel.MODES[this.mode];
     fx.GetConfig().SetCurrentPreConf(i, d === null ? undefined : d);
+    if (this.channel) this.channel.send({ verb: "preconfigset", label: "" + fx.GetLabelName(), i, hard: hardCut, mode: this.mode });
     if (this.onCall) this.onCall(fx, i);
     this.render();
   }
@@ -82,6 +90,7 @@ export class moPresetWheel {
   nextMode() {
     const ms = Object.keys(moPresetWheel.MODES);
     this.mode = ms[(ms.indexOf(this.mode) + 1) % ms.length];
+    if (this.channel) this.channel.send({ verb: "mode", mode: this.mode });
     if (this.onMode) this.onMode(this.mode);
     this.render();
   }
@@ -92,6 +101,7 @@ export class moPresetWheel {
     const cfg = fx.GetConfig();
     if (this.history && !fx.isProject) this.history.record(fx, "guardar preset " + (cfg.m_PreConfigs[i].m_Name || i + 1));
     for (const [pidx, vidx] of cfg.CapturePreConf(i)) fx.ResolveValue(cfg.m_Params[pidx], vidx);
+    if (this.channel) this.channel.send({ verb: "preconfigsave", label: "" + fx.GetLabelName(), i });
     if (this.onCapture) this.onCapture(fx, i);
     setTimeout(() => this.render(), 250);
   }

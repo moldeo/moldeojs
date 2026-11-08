@@ -11,6 +11,7 @@
 export class moProjectStates {
 
   playing: boolean = false;
+  channel: any = null;            /** #918 D2 */
   onChange: () => void = null;
   private timer: any = null;
   private cur: number = -1;
@@ -76,7 +77,10 @@ export class moProjectStates {
     if (this.onChange) this.onChange();
   }
   pause() { this.playing = false; clearTimeout(this.timer); if (this.onChange) this.onChange(); }
-  toggle() { this.playing ? this.pause() : this.play(); }
+  toggle() {
+    this.playing ? this.pause() : this.play();
+    if (this.channel) this.channel.send({ verb: this.playing ? "play" : "pause" });
+  }
 
   /** adaptador para la rueda */
   asLayer(): any {
