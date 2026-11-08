@@ -63,15 +63,34 @@ export class moPresetWheel {
     this.render();
   }
 
+  onCapture: (layer: any, preset: number) => void = null;
+
+  /** mantener apretado: el estado actual queda guardado en ese preset */
+  capture(i: number) {
+    const fx = this.layer(); if (!fx) return;
+    const cfg = fx.GetConfig();
+    for (const [pidx, vidx] of cfg.CapturePreConf(i)) fx.ResolveValue(cfg.m_Params[pidx], vidx);
+    if (this.onCapture) this.onCapture(fx, i);
+    setTimeout(() => this.render(), 250);
+  }
+
   render() {
     const r = this.root; r.innerHTML = "";
     const fx = this.layer();
-    const btn = (label: string, css: string, fn: () => void, active = false) => {
+    const btn = (label: string, css: string, fn: () => void, active = false, hold: () => void = null) => {
       const b = document.createElement("button");
       b.type = "button"; b.textContent = label;
       b.style.cssText = "position:absolute;touch-action:none;cursor:pointer;border-radius:999px;font:600 12px/1.1 monospace;" +
         "padding:8px 10px;border:2px solid #fff;" + (active ? "background:#fff;color:#0a0c18;" : "background:rgba(10,12,24,.8);color:#fff;") + css;
-      b.addEventListener("pointerdown", (e) => { e.preventDefault(); e.stopPropagation(); fn(); });
+      b.addEventListener("pointerdown", (e) => {
+        e.preventDefault(); e.stopPropagation();
+        if (!hold) { fn(); return; }
+        let held = false;
+        const timer = setTimeout(() => { held = true; b.style.boxShadow = "0 0 0 6px rgba(255,255,255,.6)"; hold(); }, 700);
+        const end = () => { clearTimeout(timer); b.removeEventListener("pointerup", end); b.removeEventListener("pointercancel", cancel); if (!held) fn(); };
+        const cancel = () => { clearTimeout(timer); b.removeEventListener("pointerup", end); b.removeEventListener("pointercancel", cancel); };
+        b.addEventListener("pointerup", end); b.addEventListener("pointercancel", cancel);
+      });
       r.appendChild(b);
       return b;
     };
@@ -87,7 +106,7 @@ export class moPresetWheel {
       const a = -Math.PI / 2 + (2 * Math.PI * i) / n;
       const x = 125 + R * Math.cos(a), y = 125 + R * Math.sin(a);
       const name = ("" + (cfg.m_PreConfigs[i].m_Name || (i + 1))).replace(/_/g, " ");
-      btn(name, `left:${x}px;top:${y}px;transform:translate(-50%,-50%);max-width:86px;white-space:normal;`, () => this.call(i), i == cur);
+      btn(name, `left:${x}px;top:${y}px;transform:translate(-50%,-50%);max-width:86px;white-space:normal;`, () => this.call(i), i == cur, () => this.capture(i));
     }
   }
 }

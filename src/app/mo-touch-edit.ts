@@ -103,7 +103,9 @@ export class moTouchEdit {
     const cfg = fx.GetConfig();
     const param = cfg.GetParam(cfg.GetParamIndex(pname));
     if (!param) return;
-    const idx = Math.max(0, param.GetIndexValue());
+    const before = Math.max(0, param.GetIndexValue());
+    const idx = cfg.ForkForEdit ? cfg.ForkForEdit(param) : before;   /* #918 E1.7: no mover otros presets */
+    if (idx != before) { fx.ResolveValue(param, idx); this.log("fork", { param: pname, from: before, to: idx }); }
     const sub = param.m_Values[idx].m_List[0];
     sub.SetVal("" + Number(v.toFixed(4)));
     fx.ResolveValue(param, idx);

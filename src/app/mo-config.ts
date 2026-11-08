@@ -709,6 +709,62 @@ export class moConfig extends moAbstract {
 	  return this.m_PreconfActual;
   }
 
+  /** #918 E1.7 — copia un VAL al final de la lista del param (texto, tipo, code y atributos originales) */
+  CloneValue( P: moParam, idx: number ) : number {
+    const src: any = P.m_Values[idx];
+    if (!src) return -1;
+    const nv: moValue = new moValue();
+    for (const vb of (src.m_List as any[])) {
+      const t = (vb.m_XmlAttributes && vb.m_XmlAttributes["type"]) || vb.GetTypeStr();
+      const txt = (vb.GetDataType && vb.m_DataType !== undefined && ["NUM","CHAR","INT","LONG","FLOAT","DOUBLE"].indexOf(""+t) >= 0) ? "" + vb.m_Number : "" + vb.m_Text;
+      nv.AddSubValue(txt, t);
+      const nb: any = nv.m_List[nv.m_List.length - 1];
+      if (vb.GetCodeName && vb.GetCodeName()) nb.SetCodeName(vb.GetCodeName());
+      nb.m_XmlAttributes = Object.assign({}, vb.m_XmlAttributes || {});
+    }
+    P.AddValue(nv);
+    return P.m_Values.length - 1;
+  }
+
+  /** ¿algún OTRO preset apunta a este VAL de este param? */
+  ValueShared( P: moParam, idx: number ) : boolean {
+    const name = "" + P.GetName();
+    return this.m_PreConfigs.some((pre, i) => i != this.m_PreconfActual &&
+      pre.m_PreconfIndexes.some(pi => ("" + pi.m_ParamName) == name && pi.m_ValueIndex == idx));
+  }
+
+  /** antes de editar a mano: si el VAL activo es compartido, el preset activo pasa a tener su copia.
+   *  Devuelve el índice a editar (hay que ResolveValue si cambió). */
+  ForkForEdit( P: moParam ) : number {
+    const cur = Math.max(0, P.GetIndexValue());
+    if (!this.ValueShared(P, cur)) return cur;
+    const ni = this.CloneValue(P, cur);
+    if (ni < 0) return cur;
+    const pre = this.m_PreConfigs[this.m_PreconfActual];
+    if (pre) for (const pi of pre.m_PreconfIndexes) if (("" + pi.m_ParamName) == ("" + P.GetName())) pi.m_ValueIndex = ni;
+    P.SetIndexValue(ni);
+    return ni;
+  }
+
+  /** mantener apretado un preset: guarda en él el estado actual. Por cada param del PRE, copia el VAL activo
+   *  a uno nuevo y el PRE apunta ahí (no pisa VALs compartidos). Devuelve [paramIndex, valueIndex] a resolver. */
+  CapturePreConf( p_index: MOint ) : number[][] {
+    const pre = this.m_PreConfigs[p_index];
+    const out: number[][] = [];
+    if (!pre) return out;
+    for (const pi of pre.m_PreconfIndexes) {
+      if (pi.m_ParamIndex < 0) continue;
+      const P = this.m_Params[pi.m_ParamIndex];
+      const ni = this.CloneValue(P, Math.max(0, P.GetIndexValue()));
+      if (ni >= 0) { pi.m_ValueIndex = ni; out.push([pi.m_ParamIndex, ni]); }
+    }
+    this.m_PreconfActual = p_index;
+    this.m_TransFrom = {};
+    for (const pi of pre.m_PreconfIndexes) if (pi.m_ParamIndex >= 0) this.m_Params[pi.m_ParamIndex].SetIndexValue(pi.m_ValueIndex);
+    this.SaveConfig();
+    return out;
+  }
+
   SetCurrentPreConf( p_actual : MOint, p_duration? : number ) : void {
     if(0<=p_actual && p_actual<this.m_PreConfigs.length )
     {
