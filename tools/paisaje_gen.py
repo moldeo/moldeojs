@@ -4,6 +4,8 @@
 Cada lección agrega una capa al MISMO paisaje. Este script arma las capas hechas hasta ahora:
   P1 cielo   (erase)  presets: amanecer · dia · atardecer · noche
   P2 montana (image)  presets: lejos · cerca · niebla · silueta
+  P3 sol     (image)  presets: quieto · arco · pulso · eclipse        (detrás de la montaña: se pone)
+  P4 luna    (image)  presets: llena · creciente · menguante · nueva  (4 texturas: la fase cambia la imagen)
 Las imágenes se dibujan acá (propias, sin licencias de terceros). Base de los .cfg: los de basic/00_Image.
 Uso:  python3 tools/paisaje_gen.py
 """
@@ -48,6 +50,50 @@ def montana():
             for (x, y) in pts[::6]:
                 if y < y0 - amp * 0.6:
                     d.polygon([(x - 28, y + 34), (x, y), (x + 28, y + 34)], fill=(235, 240, 248, 255))
+    return im
+
+
+def sol(n=512):
+    im = Image.new('RGBA', (n, n), (0, 0, 0, 0))
+    c = n / 2
+    halo = Image.new('L', (n, n), 0)
+    dh = ImageDraw.Draw(halo)
+    for r in range(int(c), 0, -2):                       # halo que se apaga hacia afuera
+        dh.ellipse((c - r, c - r, c + r, c + r), fill=int(255 * (1 - r / c) ** 1.6))
+    im.paste((255, 214, 120, 255), (0, 0), halo)
+    d = ImageDraw.Draw(im)
+    R = n * 0.2
+    d.ellipse((c - R, c - R, c + R, c + R), fill=(255, 226, 140, 255), outline=(120, 70, 20, 255), width=5)
+    for k in range(12):                                   # rayos de lapicera, como en el cuaderno
+        a = k * math.pi / 6
+        d.line((c + math.cos(a) * R * 1.25, c + math.sin(a) * R * 1.25,
+                c + math.cos(a) * R * 1.75, c + math.sin(a) * R * 1.75), fill=(120, 70, 20, 255), width=5)
+    return im
+
+
+def luna(fase, n=512):
+    """fase: llena · creciente (iluminada a la derecha) · menguante (izquierda) · nueva"""
+    c, R = n / 2, n * 0.42
+    disc = Image.new('L', (n, n), 0)
+    ImageDraw.Draw(disc).ellipse((c - R, c - R, c + R, c + R), fill=255)
+    lit = disc.copy()
+    if fase in ('creciente', 'menguante'):
+        off = -R * 0.9 if fase == 'creciente' else R * 0.9
+        sombra = Image.new('L', (n, n), 0)
+        ImageDraw.Draw(sombra).ellipse((c - R + off, c - R, c + R + off, c + R), fill=255)
+        lit = Image.composite(Image.new('L', (n, n), 0), lit, sombra)
+    if fase == 'nueva':
+        lit = Image.new('L', (n, n), 0)
+    im = Image.new('RGBA', (n, n), (0, 0, 0, 0))
+    im.paste((60, 66, 90, 150), (0, 0), disc)             # la parte en sombra apenas se ve
+    im.paste((236, 238, 228, 255), (0, 0), lit)
+    d = ImageDraw.Draw(im)
+    rng = random.Random(7)
+    for _ in range(9):                                    # cráteres
+        x, y, r = c + rng.uniform(-R * .6, R * .6), c + rng.uniform(-R * .6, R * .6), rng.uniform(R * .06, R * .16)
+        if lit.getpixel((int(x), int(y))) > 0:
+            d.ellipse((x - r, y - r, x + r, y + r), fill=(205, 208, 200, 255))
+    d.ellipse((c - R, c - R, c + R, c + R), outline=(70, 70, 90, 255), width=5)
     return im
 
 
@@ -96,14 +142,43 @@ def main():
     P = ['alpha', 'color', 'pos_cuad_x', 'pos_cuad_y', 'anc_cuad_x', 'alt_cuad_y']
     wr('montana.cfg', set_pre(m, pres(['lejos', 'cerca', 'niebla', 'silueta'], P)))
 
-    # consola: cielo (pre-efecto) + montaña (efecto); sin dispositivos OSC
+    # P3 sol — un cuadrado en pantalla: alto = ancho * aspecto (1.6)
+    sol().save(os.path.join(DST, 'sol.png'), optimize=True)
+    t = rd('image.cfg')
+    t = setvals(t, 'texture', [[('TXT', '', 'sol.png')]])
+    t = setvals(t, 'alpha', [F('1.0'), F('1.0'), F('1.0'), F('1.0')])
+    t = setvals(t, 'color', [col('1.0', '1.0', '1.0'), col('1.0', '1.0', '1.0'), col('1.0', '0.95', '0.85'), col('0.25', '0.18', '0.18')])
+    t = setvals(t, 'pos_cuad_x', [F('0.25'), F('-0.45*cos(time*0.15)'), F('0.25'), F('0.0')])
+    t = setvals(t, 'pos_cuad_y', [F('0.17'), F('0.30*sin(time*0.15)-0.10'), F('0.17'), F('0.15')])
+    t = setvals(t, 'anc_cuad_x', [F('0.22'), F('0.22'), F('0.22*(1+0.12*sin(time*3))'), F('0.22')])
+    t = setvals(t, 'alt_cuad_y', [F('0.352'), F('0.352'), F('0.352*(1+0.12*sin(time*3))'), F('0.352')])
+    wr('sol.cfg', set_pre(t, pres(['quieto', 'arco', 'pulso', 'eclipse'], P)))
+
+    # P4 luna — la fase es la TEXTURA (no se interpola: cambia al empezar la transición)
+    fases = ['llena', 'creciente', 'menguante', 'nueva']
+    for f in fases:
+        luna(f).save(os.path.join(DST, 'luna_%s.png' % f), optimize=True)
+    t = rd('image.cfg')
+    t = setvals(t, 'texture', [[('TXT', '', 'luna_%s.png' % f)] for f in fases])
+    t = setvals(t, 'alpha', [F('1.0'), F('1.0'), F('1.0'), F('1.0')])
+    t = setvals(t, 'color', [col('1.0', '1.0', '1.0')] * 4)
+    t = setvals(t, 'pos_cuad_x', [F('-0.30')] * 4)
+    t = setvals(t, 'pos_cuad_y', [F('0.19')] * 4)
+    t = setvals(t, 'anc_cuad_x', [F('0.14')] * 4)
+    t = setvals(t, 'alt_cuad_y', [F('0.224')] * 4)
+    wr('luna.cfg', set_pre(t, pres(fases, ['texture'] + P)))
+
+    # consola: cielo (pre-efecto) + sol, luna, montaña (efectos, en ese orden: lo primero queda atrás)
     mol = rd('00_Image.mol')
     mol = re.sub(r'<PARAM name="devices" type="MOLDEOOBJECT" >.*?</PARAM>', '<PARAM name="devices" type="MOLDEOOBJECT" />', mol, flags=re.S)
     mol = mol.replace('<D type="TXT">erase</D>\n                <D type="TXT">erase</D>\n                <D type="TXT">erase</D>',
                       '<D type="TXT">erase</D>\n                <D type="TXT">cielo</D>\n                <D type="TXT">cielo</D>')
-    mol = mol.replace('<D type="TXT">image</D>\n                <D type="TXT">image</D>\n                <D type="TXT">image</D>',
-                      '<D type="TXT">image</D>\n                <D type="TXT">montana</D>\n                <D type="TXT">montana</D>')
-    assert '<D type="TXT">cielo</D>' in mol and '<D type="TXT">montana</D>' in mol
+    def mob(plugin, name, key):
+        return ('<VAL>\n                <D type="TXT">%s</D>\n                <D type="TXT">%s</D>\n                <D type="TXT">%s</D>\n'
+                '                <D type="NUM">0</D>\n                <D type="NUM">1</D>\n                <D type="TXT">%s</D>\n            </VAL>') % (plugin, name, name, key)
+    efectos = '\n            '.join([mob('image', 'sol', 'S'), mob('image', 'luna', 'L'), mob('image', 'montana', 'M')])
+    mol = re.sub(r'(<PARAM name="effect" type="MOLDEOOBJECT">\s*)<VAL>.*?</VAL>', lambda m: m.group(1) + efectos, mol, count=1, flags=re.S)
+    assert '<D type="TXT">cielo</D>' in mol and '<D type="TXT">montana</D>' in mol and '<D type="TXT">luna</D>' in mol
     wr('Paisaje.mol', mol)
     print('ok', DST, sorted(os.listdir(DST)))
 

@@ -28,11 +28,27 @@
         <PARAM name="effect" type="MOLDEOOBJECT">
             <VAL>
                 <D type="TXT">image</D>
+                <D type="TXT">sol</D>
+                <D type="TXT">sol</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">S</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">luna</D>
+                <D type="TXT">luna</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">L</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
                 <D type="TXT">montana</D>
                 <D type="TXT">montana</D>
                 <D type="NUM">0</D>
                 <D type="NUM">1</D>
-                <D type="TXT">W</D>
+                <D type="TXT">M</D>
             </VAL>
         </PARAM>
         <PARAM name="posteffect" type="MOLDEOOBJECT" />
