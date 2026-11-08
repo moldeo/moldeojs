@@ -84,6 +84,27 @@ export class moTouchEdit {
     try { return Number(cfg.Eval(name)); } catch (x) { return 0; }
   }
 
+  private alphaCache: Map<any, { w: number, h: number, data: Uint8ClampedArray }> = new Map();
+  /** alfa (0..1) de la textura de la capa en (u, v) — v de arriba hacia abajo; null si no se puede leer */
+  private pixelAlpha(cfg: any, u: number, v: number): number {
+    try {
+      const t: any = cfg.Texture("texture");
+      const img: any = t && t._texture && t._texture.image;
+      if (!img || !img.width) return null;
+      let c = this.alphaCache.get(img);
+      if (!c) {
+        const k = Math.min(1, 512 / Math.max(img.width, img.height));
+        const cv = document.createElement("canvas");
+        cv.width = Math.max(1, Math.round(img.width * k)); cv.height = Math.max(1, Math.round(img.height * k));
+        const g = cv.getContext("2d"); g.drawImage(img, 0, 0, cv.width, cv.height);
+        c = { w: cv.width, h: cv.height, data: g.getImageData(0, 0, cv.width, cv.height).data };
+        this.alphaCache.set(img, c);
+      }
+      const x = Math.min(c.w - 1, Math.max(0, Math.floor(u * c.w))), y = Math.min(c.h - 1, Math.max(0, Math.floor(v * c.h)));
+      return c.data[(y * c.w + x) * 4 + 3] / 255;
+    } catch (e) { return null; }
+  }
+
   /** la capa de más arriba que contiene el punto (coordenadas de mundo: x -0.5..0.5, y según el aspecto) */
   pick(p: { x: number, y: number }): any {
     const a = this.aspect();
@@ -97,7 +118,14 @@ export class moTouchEdit {
       const cfg = fx.GetConfig();
       const px = this.val(cfg, hp[0]), py = this.val(cfg, hp[1]);
       const w = this.val(cfg, hp[2]), h = this.val(cfg, hp[3]) / a;
-      if (Math.abs(wx - px) <= w / 2 && Math.abs(wy - py) <= h / 2) return fx;
+      if (!(Math.abs(wx - px) <= w / 2 && Math.abs(wy - py) <= h / 2)) continue;
+      /* P9-T1: una capa invisible (lluvia en «despejado») o un píxel transparente (el cielo de la pradera) no se
+         agarran: el toque sigue a la capa de abajo. Sin imagen legible, vale la caja como antes. */
+      const la = this.val(cfg, "alpha");
+      if (la < 0.05) continue;
+      const pa = this.pixelAlpha(cfg, (wx - px) / w + 0.5, 0.5 - (wy - py) / h);
+      if (pa !== null && pa * Math.min(1, la) < 0.3) continue;      /* casi transparente (bruma, borde): pasa de largo */
+      return fx;
     }
     return null;
   }
