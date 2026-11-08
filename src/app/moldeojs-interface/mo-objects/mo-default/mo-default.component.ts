@@ -252,6 +252,8 @@ export class MoDefaultComponent implements OnInit {
       //this_.params[currentPar][1][indexPar] = e.target.value;
       //this_.params[currentPar][1][indexPar] = e.target.value;
       //this_.Params[currentPar].m_List[indexPar] = e.target.value;
+      const hist: any = (window as any).moHistory;   /* #918 H1 */
+      if (hist) hist.record(this_.Mob, "editar " + this_.Params[currentPar].GetName());
       this_.Params[currentPar].m_Values[preconf_index].m_List[indexPar].SetVal( e.target.value );
       this_.Mob.ResolveValue( this.Params[currentPar], preconf_index );
 

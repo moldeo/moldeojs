@@ -23,6 +23,7 @@ import { MoIcon } from './mo-objects/mo-icon.component';
 import { moConsole } from '../mo-console';
 import { moTouchEdit } from '../mo-touch-edit';
 import { moPresetWheel } from '../mo-preset-wheel';
+import { moHistory } from '../mo-history';
 import { moMobDefinition } from '../mo-moldeo-object';
 import { PluginsDefinitionsMap, PluginsDefinitions, PluginsDefinitionsMapType,
   PluginsDefinitionsMapTypeArray, PluginsDefinitionsMapTypes,
@@ -73,6 +74,17 @@ export class MoldeojsInterfaceComponent implements OnInit {
   public moEditDisplay:boolean = false;
   public touchEdit: moTouchEdit = null;
   public presetWheel: moPresetWheel = null;
+  /** #918 H1 — deshacer / rehacer */
+  public history: moHistory = new moHistory();
+  public undoLabel: string = "";
+  public doUndo(): void {
+    const w = this.history.undo();
+    if (w) { this.undoLabel = "↶ " + w; if (this.touchEdit) this.touchEdit.log("undo", { what: w }); if (this.presetWheel) this.presetWheel.render(); setTimeout(() => this.undoLabel = "", 2000); }
+  }
+  public doRedo(): void {
+    const w = this.history.redo();
+    if (w) { this.undoLabel = "↷ " + w; if (this.touchEdit) this.touchEdit.log("redo", { what: w }); if (this.presetWheel) this.presetWheel.render(); setTimeout(() => this.undoLabel = "", 2000); }
+  }
   /** #918 L2 — ?save=<ruta del Lab> ⇒ botón Guardar: manda el XML de la consola y de cada .cfg */
   public saveUrl: string = (() => { try { const v = new URLSearchParams(window.location.search).get("save");
     return (v && v.charAt(0) == "/" && v.indexOf("//") < 0) ? v : ""; } catch (e) { return ""; } })();
@@ -464,6 +476,15 @@ export class MoldeojsInterfaceComponent implements OnInit {
       this.touchEdit.onSelect = (fx) => { if (fx) this.presetWheel.setLayer(fx); };
       this.presetWheel.onCapture = (fx, i) => this.touchEdit && this.touchEdit.log("capture", { fx: "" + fx.GetLabelName(), i, name: "" + fx.GetConfig().m_PreConfigs[i].m_Name });
       (window as any).moPresetWheel = this.presetWheel;
+      this.presetWheel.history = this.history;
+      this.touchEdit.history = this.history;
+      (window as any).moHistory = this.history;
+      window.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (!(e.ctrlKey || e.metaKey) || (e.key != "z" && e.key != "Z" && e.key != "y")) return;
+        const t: any = e.target; if (t && (t.tagName == "INPUT" || t.tagName == "TEXTAREA")) return;
+        e.preventDefault();
+        if (e.key == "y" || e.shiftKey) this.doRedo(); else this.doUndo();
+      });
     }
     let cName : any = this.m_Console.GetConfigName();
     let cFile : moFile = new moFile(cName);

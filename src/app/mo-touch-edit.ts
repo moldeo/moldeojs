@@ -22,6 +22,8 @@ export class moTouchEdit {
   pointers: { [id: number]: moPointer } = {};
   selected: any = null;          /** el efecto elegido */
   onSelect: (fx: any) => void = null;
+  history: any = null;            /** #918 H1: moHistory (foto antes de cada gesto) */
+  private recorded: boolean = false;
 
   private dragId: number = null;
   private last: { x: number, y: number } = null;
@@ -122,7 +124,7 @@ export class moTouchEdit {
     this.selected = fx;
     if (this.onSelect) this.onSelect(fx);
     if (fx) {
-      this.dragId = e.pointerId; this.last = p;
+      this.dragId = e.pointerId; this.last = p; this.recorded = false;
       try { (e.target as HTMLElement).setPointerCapture(e.pointerId); } catch (x) {}
       e.preventDefault();
     }
@@ -134,6 +136,7 @@ export class moTouchEdit {
     if (this.dragId !== e.pointerId || !this.selected) return;
     const hp = HIT_PARAMS["" + this.selected.GetName()];
     const cfg = this.selected.GetConfig();
+    if (!this.recorded) { if (this.history) this.history.record(this.selected, "mover"); this.recorded = true; }
     const a = this.aspect();
     const dx = p.x - this.last.x, dy = -(p.y - this.last.y) / a;
     this.setNumber(this.selected, hp[0], this.val(cfg, hp[0]) + dx);

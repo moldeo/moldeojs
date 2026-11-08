@@ -14,6 +14,7 @@ export class moPresetWheel {
   private layers: any[] = [];
   private current: number = 0;
   onCall: (layer: any, preset: number) => void = null;
+  history: any = null;            /** #918 H1 */
 
   constructor(private console: any) {
     this.collect();
@@ -58,6 +59,7 @@ export class moPresetWheel {
 
   call(i: number) {
     const fx = this.layer(); if (!fx) return;
+    if (this.history) this.history.record(fx, "preset " + (fx.GetConfig().m_PreConfigs[i].m_Name || i + 1));
     fx.GetConfig().SetCurrentPreConf(i);
     if (this.onCall) this.onCall(fx, i);
     this.render();
@@ -69,6 +71,7 @@ export class moPresetWheel {
   capture(i: number) {
     const fx = this.layer(); if (!fx) return;
     const cfg = fx.GetConfig();
+    if (this.history) this.history.record(fx, "guardar preset " + (cfg.m_PreConfigs[i].m_Name || i + 1));
     for (const [pidx, vidx] of cfg.CapturePreConf(i)) fx.ResolveValue(cfg.m_Params[pidx], vidx);
     if (this.onCapture) this.onCapture(fx, i);
     setTimeout(() => this.render(), 250);
