@@ -13,8 +13,10 @@ Cada lección agrega una capa al MISMO paisaje. Este script arma las capas hecha
 Las imágenes se dibujan acá (propias, sin licencias de terceros). Base de los .cfg: los de basic/00_Image.
 Uso:  python3 tools/paisaje_gen.py
 """
-import math, os, random, re
+import math, os, random, re, sys
 from PIL import Image, ImageDraw, ImageFilter
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import paisaje_arte as arte
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPOS = os.path.join(HERE, '..', 'src', 'assets', 'molrepos')
@@ -164,77 +166,83 @@ def wr(n, s): open(os.path.join(DST, n), 'w', encoding='latin-1').write(s)
 
 def main():
     os.makedirs(DST, exist_ok=True)
-    montana().save(os.path.join(DST, 'montana.png'), optimize=True)
+    for f in os.listdir(DST):
+        os.remove(os.path.join(DST, f))
+    P = ['alpha', 'color', 'pos_cuad_x', 'pos_cuad_y', 'anc_cuad_x', 'alt_cuad_y']
+    def capa(nombre, png, presets, alpha, color, px, py, anc, alt, texturas=None):
+        t = rd('image.cfg')
+        t = setvals(t, 'texture', [[('TXT', '', x)] for x in (texturas or [png])])
+        for pn, v in (('alpha', alpha), ('color', color), ('pos_cuad_x', px), ('pos_cuad_y', py), ('anc_cuad_x', anc), ('alt_cuad_y', alt)):
+            t = setvals(t, pn, [F(x) if isinstance(x, str) else x for x in v])
+        wr(nombre + '.cfg', set_pre(t, pres(presets, (['texture'] if texturas else []) + P)))
 
-    # P1 cielo
+    # P1 cielo (color de fondo)
     cielo = rd('erase.cfg').replace('name="erase" class', 'name="cielo" class', 1)
-    cielo = setvals(cielo, 'color', [col('0.95', '0.62', '0.45'), col('0.45', '0.70', '0.95'),
-                                      col('0.85', '0.35', '0.30'), col('0.03', '0.04', '0.12')])
+    cielo = setvals(cielo, 'color', [col('0.99', '0.78', '0.62'), col('0.50', '0.78', '0.93'), col('0.97', '0.55', '0.42'), col('0.08', '0.10', '0.24')])
     wr('cielo.cfg', set_pre(cielo, pres(['amanecer', 'dia', 'atardecer', 'noche'], ['color'])))
 
-    # P2 montaña
-    m = rd('image.cfg')
-    m = setvals(m, 'texture', [[('TXT', '', 'montana.png')]])
-    m = setvals(m, 'alpha', [F('1.0'), F('1.0'), F('0.55+0.1*sin(time*0.3)'), F('1.0')])
-    m = setvals(m, 'color', [col('0.78', '0.84', '0.95'), col('1.0', '1.0', '1.0'), col('0.92', '0.94', '0.97'), col('0.06', '0.05', '0.10')])
-    m = setvals(m, 'pos_cuad_x', [F('0.0'), F('0.0'), F('0.0'), F('0.0')])
-    m = setvals(m, 'pos_cuad_y', [F('-0.03'), F('-0.10'), F('-0.03'), F('-0.03')])
-    m = setvals(m, 'anc_cuad_x', [F('1.0'), F('1.25'), F('1.0'), F('1.0')])
-    m = setvals(m, 'alt_cuad_y', [F('1.0'), F('1.25'), F('1.0'), F('1.0')])
-    P = ['alpha', 'color', 'pos_cuad_x', 'pos_cuad_y', 'anc_cuad_x', 'alt_cuad_y']
-    wr('montana.cfg', set_pre(m, pres(['lejos', 'cerca', 'niebla', 'silueta'], P)))
+    # cada capa vibra un poco por defecto ("todo tiene que vibrar")
+    arte.sol().save(os.path.join(DST, 'sol.png'), optimize=True)
+    capa('sol', 'sol.png', ['quieto', 'arco', 'pulso', 'eclipse'],
+         ['1.0'] * 3 + ['1.0'],
+         [col('1', '1', '1'), col('1', '1', '1'), col('1', '0.95', '0.85'), col('0.35', '0.28', '0.32')],
+         ['0.25', '-0.45*cos(time*0.15)', '0.25', '0.0'], ['0.17', '0.30*sin(time*0.15)-0.10', '0.17', '0.15'],
+         ['0.30*(1+0.02*sin(time*1.3))', '0.30*(1+0.02*sin(time*1.3))', '0.30*(1+0.14*sin(time*3))', '0.30'],
+         ['0.48*(1+0.02*sin(time*1.3))', '0.48*(1+0.02*sin(time*1.3))', '0.48*(1+0.14*sin(time*3))', '0.48'])
 
-    # P3 sol — un cuadrado en pantalla: alto = ancho * aspecto (1.6)
-    sol().save(os.path.join(DST, 'sol.png'), optimize=True)
-    t = rd('image.cfg')
-    t = setvals(t, 'texture', [[('TXT', '', 'sol.png')]])
-    t = setvals(t, 'alpha', [F('1.0'), F('1.0'), F('1.0'), F('1.0')])
-    t = setvals(t, 'color', [col('1.0', '1.0', '1.0'), col('1.0', '1.0', '1.0'), col('1.0', '0.95', '0.85'), col('0.25', '0.18', '0.18')])
-    t = setvals(t, 'pos_cuad_x', [F('0.25'), F('-0.45*cos(time*0.15)'), F('0.25'), F('0.0')])
-    t = setvals(t, 'pos_cuad_y', [F('0.17'), F('0.30*sin(time*0.15)-0.10'), F('0.17'), F('0.15')])
-    t = setvals(t, 'anc_cuad_x', [F('0.22'), F('0.22'), F('0.22*(1+0.12*sin(time*3))'), F('0.22')])
-    t = setvals(t, 'alt_cuad_y', [F('0.352'), F('0.352'), F('0.352*(1+0.12*sin(time*3))'), F('0.352')])
-    wr('sol.cfg', set_pre(t, pres(['quieto', 'arco', 'pulso', 'eclipse'], P)))
-
-    # P4 luna — la fase es la TEXTURA (no se interpola: cambia al empezar la transición)
     fases = ['llena', 'creciente', 'menguante', 'nueva']
     for f in fases:
-        luna(f).save(os.path.join(DST, 'luna_%s.png' % f), optimize=True)
-    t = rd('image.cfg')
-    t = setvals(t, 'texture', [[('TXT', '', 'luna_%s.png' % f)] for f in fases])
-    t = setvals(t, 'alpha', [F('1.0'), F('1.0'), F('1.0'), F('1.0')])
-    t = setvals(t, 'color', [col('1.0', '1.0', '1.0')] * 4)
-    t = setvals(t, 'pos_cuad_x', [F('-0.30')] * 4)
-    t = setvals(t, 'pos_cuad_y', [F('0.19')] * 4)
-    t = setvals(t, 'anc_cuad_x', [F('0.14')] * 4)
-    t = setvals(t, 'alt_cuad_y', [F('0.224')] * 4)
-    wr('luna.cfg', set_pre(t, pres(fases, ['texture'] + P)))
+        arte.luna(f).save(os.path.join(DST, 'luna_%s.png' % f), optimize=True)
+    capa('luna', None, fases, ['0.95+0.05*sin(time*0.9)'] * 4, [col('1', '1', '1')] * 4, ['-0.30'] * 4, ['0.19+0.004*sin(time*0.6)'] * 4,
+         ['0.20'] * 4, ['0.32'] * 4, texturas=['luna_%s.png' % f for f in fases])
 
-    # P5 agua — delante de la montaña; transparencia y ondas
-    agua().save(os.path.join(DST, 'agua.png'), optimize=True)
-    t = rd('image.cfg')
-    t = setvals(t, 'texture', [[('TXT', '', 'agua.png')]])
-    t = setvals(t, 'alpha', [F('0.9'), F('0.9'), F('0.75'), F('0.18')])
-    t = setvals(t, 'color', [col('1.0', '1.0', '1.0'), col('0.9', '0.95', '1.0'), col('1.0', '0.72', '0.6'), col('0.7', '0.55', '0.4')])
-    t = setvals(t, 'pos_cuad_x', [F('0.0'), F('0.006*sin(time*2.3)'), F('0.0'), F('0.0')])
-    t = setvals(t, 'pos_cuad_y', [F('-0.19'), F('-0.19'), F('-0.19'), F('-0.21')])
-    t = setvals(t, 'anc_cuad_x', [F('0.85'), F('0.85+0.01*sin(time*3.1)'), F('0.85'), F('0.6')])
-    t = setvals(t, 'alt_cuad_y', [F('0.30'), F('0.30+0.012*sin(time*2.7)'), F('0.30'), F('0.18')])
-    wr('agua.cfg', set_pre(t, pres(['calma', 'viento', 'reflejo', 'seca'], P)))
+    arte.nubes().save(os.path.join(DST, 'nubes.png'), optimize=True)
+    capa('nubes', 'nubes.png', ['pocas', 'cumulos', 'tormenta', 'arrebol'],
+         ['0.55', '1.0', '1.0', '1.0'],
+         [col('1', '1', '1'), col('1', '1', '1'), col('0.55', '0.56', '0.66'), col('1.0', '0.78', '0.74')],
+         ['0.06*sin(time*0.05)'] * 4, ['0.004*sin(time*0.4)'] * 4, ['1.08'] * 4, ['1.0'] * 4)
 
-    # P6 lluvia — capa de trazos 2 pantallas de alto que baja en loop: y = 0.3125 - ((time*v) % 0.625)
-    lluvia().save(os.path.join(DST, 'lluvia.png'), optimize=True)
-    t = rd('image.cfg')
-    t = setvals(t, 'texture', [[('TXT', '', 'lluvia.png')]])
-    t = setvals(t, 'alpha', [F('0.0'), F('0.35'), F('0.7'), F('0.95')])
-    t = setvals(t, 'color', [col('1.0', '1.0', '1.0'), col('1.0', '1.0', '1.0'), col('0.9', '0.95', '1.0'), col('0.8', '0.85', '0.95')])
-    t = setvals(t, 'pos_cuad_x', [F('0.0'), F('0.0'), F('0.0'), F('0.03*sin(time*0.7)')])
-    t = setvals(t, 'pos_cuad_y', [F('0.3125'), F('0.3125-((time*0.25)%0.625)'), F('0.3125-((time*0.6)%0.625)'), F('0.3125-((time*1.1)%0.625)')])
-    t = setvals(t, 'anc_cuad_x', [F('1.05')] * 4)
-    t = setvals(t, 'alt_cuad_y', [F('2.0')] * 4)
-    wr('lluvia.cfg', set_pre(t, pres(['despejado', 'llovizna', 'lluvia', 'tormenta'], P)))
+    arte.montana().save(os.path.join(DST, 'montana.png'), optimize=True)
+    capa('montana', 'montana.png', ['lejos', 'cerca', 'niebla', 'silueta'],
+         ['1.0', '1.0', '0.55+0.08*sin(time*0.3)', '1.0'],
+         [col('1', '1', '1'), col('0.92', '0.96', '1.0'), col('0.96', '0.97', '1.0'), col('0.16', '0.14', '0.26')],
+         ['0.0'] * 4, ['0.0', '-0.04', '0.0', '0.0'], ['1.0', '1.15', '1.0', '1.0'], ['1.0', '1.15', '1.0', '1.0'])
 
-    # consola: cielo (pre-efecto) + sol, luna, montaña, agua (efectos, en ese orden: lo primero queda atrás)
+    arte.horizonte().save(os.path.join(DST, 'horizonte.png'), optimize=True)
+    capa('horizonte', 'horizonte.png', ['claro', 'bruma', 'dorado', 'noche'],
+         ['0.55+0.04*sin(time*0.5)', '0.95+0.04*sin(time*0.5)', '0.85+0.04*sin(time*0.5)', '0.45'],
+         [col('1', '1', '1'), col('1', '1', '1'), col('1.0', '0.82', '0.58'), col('0.35', '0.40', '0.70')],
+         ['0.0'] * 4, ['0.0'] * 4, ['1.0'] * 4, ['1.0'] * 4)
+
+    arte.colinas().save(os.path.join(DST, 'colinas.png'), optimize=True)
+    capa('colinas', 'colinas.png', ['verano', 'primavera', 'otono', 'invierno'],
+         ['1.0'] * 4,
+         [col('1', '1', '1'), col('0.95', '1.0', '0.9'), col('1.0', '0.78', '0.52'), col('0.82', '0.88', '1.0')],
+         ['0.0'] * 4, ['0.002*sin(time*0.7)'] * 4, ['1.0'] * 4, ['1.0'] * 4)
+
+    arte.agua().save(os.path.join(DST, 'agua.png'), optimize=True)
+    capa('agua', 'agua.png', ['calma', 'viento', 'reflejo', 'seca'],
+         ['0.88+0.06*sin(time*2.1)', '0.85+0.1*sin(time*4.3)', '0.8+0.06*sin(time*2.1)', '0.18'],
+         [col('1', '1', '1'), col('0.92', '0.96', '1.0'), col('1.0', '0.78', '0.66'), col('0.7', '0.55', '0.4')],
+         ['0.10+0.003*sin(time*1.1)', '0.10+0.008*sin(time*2.3)', '0.10+0.003*sin(time*1.1)', '0.10'], ['-0.175'] * 3 + ['-0.18'],
+         ['0.62', '0.62+0.01*sin(time*3.1)', '0.62', '0.45'], ['0.20', '0.20+0.01*sin(time*2.7)', '0.20', '0.12'])
+
+    arte.pradera().save(os.path.join(DST, 'pradera.png'), optimize=True)
+    capa('pradera', 'pradera.png', ['brisa', 'viento', 'quieta', 'florida'],
+         ['1.0'] * 4,
+         [col('1', '1', '1'), col('0.96', '1.0', '0.94'), col('1', '1', '1'), col('1.05', '1.0', '1.05')],
+         ['0.004*sin(time*1.7)', '0.012*sin(time*3.1)', '0.0', '0.004*sin(time*1.7)'], ['0.0'] * 4,
+         ['1.03', '1.04', '1.03', '1.03'], ['1.0'] * 4)
+
+    arte.lluvia().save(os.path.join(DST, 'lluvia.png'), optimize=True)
+    capa('lluvia', 'lluvia.png', ['despejado', 'llovizna', 'lluvia', 'tormenta'],
+         ['0.0', '0.35', '0.7', '0.95'],
+         [col('1', '1', '1'), col('1', '1', '1'), col('0.9', '0.95', '1.0'), col('0.8', '0.85', '0.95')],
+         ['0.0', '0.0', '0.0', '0.03*sin(time*0.7)'],
+         ['0.3125', '0.3125-((time*0.25)%0.625)', '0.3125-((time*0.6)%0.625)', '0.3125-((time*1.1)%0.625)'],
+         ['1.05'] * 4, ['2.0'] * 4)
+
+    # consola: cielo (pre-efecto) + capas de atrás hacia adelante
     mol = rd('00_Image.mol')
     mol = re.sub(r'<PARAM name="devices" type="MOLDEOOBJECT" >.*?</PARAM>', '<PARAM name="devices" type="MOLDEOOBJECT" />', mol, flags=re.S)
     mol = mol.replace('<D type="TXT">erase</D>\n                <D type="TXT">erase</D>\n                <D type="TXT">erase</D>',
@@ -242,12 +250,13 @@ def main():
     def mob(plugin, name, key):
         return ('<VAL>\n                <D type="TXT">%s</D>\n                <D type="TXT">%s</D>\n                <D type="TXT">%s</D>\n'
                 '                <D type="NUM">0</D>\n                <D type="NUM">1</D>\n                <D type="TXT">%s</D>\n            </VAL>') % (plugin, name, name, key)
-    efectos = '\n            '.join([mob('image', 'sol', 'S'), mob('image', 'luna', 'L'), mob('image', 'montana', 'M'),
-                                     mob('image', 'agua', 'A'), mob('image', 'lluvia', 'R')])
+    orden = [('sol', 'S'), ('luna', 'L'), ('nubes', 'N'), ('montana', 'M'), ('horizonte', 'H'), ('colinas', 'C'),
+             ('agua', 'A'), ('pradera', 'P'), ('lluvia', 'R')]
+    efectos = '\n            '.join(mob('image', n, k) for n, k in orden)
     mol = re.sub(r'(<PARAM name="effect" type="MOLDEOOBJECT">\s*)<VAL>.*?</VAL>', lambda m: m.group(1) + efectos, mol, count=1, flags=re.S)
-    assert '<D type="TXT">cielo</D>' in mol and '<D type="TXT">montana</D>' in mol and '<D type="TXT">luna</D>' in mol
+    assert '<D type="TXT">cielo</D>' in mol and all('<D type="TXT">%s</D>' % n in mol for n, _ in orden)
     wr('Paisaje.mol', mol)
-    print('ok', DST, sorted(os.listdir(DST)))
+    print('ok', sorted(os.listdir(DST)))
 
 
 if __name__ == '__main__':

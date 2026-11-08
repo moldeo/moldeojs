@@ -44,6 +44,14 @@
             </VAL>
             <VAL>
                 <D type="TXT">image</D>
+                <D type="TXT">nubes</D>
+                <D type="TXT">nubes</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">N</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
                 <D type="TXT">montana</D>
                 <D type="TXT">montana</D>
                 <D type="NUM">0</D>
@@ -52,11 +60,35 @@
             </VAL>
             <VAL>
                 <D type="TXT">image</D>
+                <D type="TXT">horizonte</D>
+                <D type="TXT">horizonte</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">H</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">colinas</D>
+                <D type="TXT">colinas</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">C</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
                 <D type="TXT">agua</D>
                 <D type="TXT">agua</D>
                 <D type="NUM">0</D>
                 <D type="NUM">1</D>
                 <D type="TXT">A</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">pradera</D>
+                <D type="TXT">pradera</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">P</D>
             </VAL>
             <VAL>
                 <D type="TXT">image</D>
