@@ -169,12 +169,13 @@ def main():
     for f in os.listdir(DST):
         os.remove(os.path.join(DST, f))
     P = ['alpha', 'color', 'pos_cuad_x', 'pos_cuad_y', 'anc_cuad_x', 'alt_cuad_y']
-    def capa(nombre, png, presets, alpha, color, px, py, anc, alt, texturas=None):
+    def capa(nombre, png, presets, alpha, color, px, py, anc, alt, texturas=None, tex_en_preset=True):
         t = rd('image.cfg')
         t = setvals(t, 'texture', [[('TXT', '', x)] for x in (texturas or [png])])
         for pn, v in (('alpha', alpha), ('color', color), ('pos_cuad_x', px), ('pos_cuad_y', py), ('anc_cuad_x', anc), ('alt_cuad_y', alt)):
             t = setvals(t, pn, [F(x) if isinstance(x, str) else x for x in v])
-        wr(nombre + '.cfg', set_pre(t, pres(presets, (['texture'] if texturas else []) + P)))
+        # P9: si la textura la elige OTRO eje (la estación), los presets de la capa no la tocan
+        wr(nombre + '.cfg', set_pre(t, pres(presets, (['texture'] if texturas and tex_en_preset else []) + P)))
 
     # P1 cielo (color de fondo)
     cielo = rd('erase.cfg').replace('name="erase" class', 'name="cielo" class', 1)
@@ -220,11 +221,16 @@ def main():
          [col('1', '1', '1'), col('1', '1', '1'), col('1.0', '0.82', '0.58'), col('0.35', '0.40', '0.70')],
          ['0.0'] * 4, ['0.0'] * 4, ['1.0'] * 4, ['1.0'] * 4)
 
-    arte.colinas().save(os.path.join(DST, 'colinas.png'), optimize=True)
-    capa('colinas', 'colinas.png', ['verano', 'primavera', 'otono', 'invierno', 'noche'],
+    # P9 — estaciones = TEXTURA (índice 0 verano · 1 primavera · 2 otoño · 3 invierno); la luz del día = presets de color
+    EST = ['verano', 'primavera', 'otono', 'invierno']
+    for e in EST:
+        arte.colinas(e).save(os.path.join(DST, 'colinas_%s.png' % e), optimize=True)
+        arte.pradera(e).save(os.path.join(DST, 'pradera_%s.png' % e), optimize=True)
+    capa('colinas', None, ['dia', 'manana', 'atardecer', 'frio', 'noche'],
          ['1.0'] * 5,
          [col('1', '1', '1'), col('0.95', '1.0', '0.9'), col('1.0', '0.78', '0.52'), col('0.82', '0.88', '1.0'), col('0.30', '0.36', '0.58')],
-         ['0.0'] * 5, ['0.002*sin(time*0.7)'] * 5, ['1.0'] * 5, ['1.0'] * 5)
+         ['0.0'] * 5, ['0.002*sin(time*0.7)'] * 5, ['1.0'] * 5, ['1.0'] * 5,
+         texturas=['colinas_%s.png' % e for e in EST], tex_en_preset=False)
 
     arte.agua().save(os.path.join(DST, 'agua.png'), optimize=True)
     capa('agua', 'agua.png', ['calma', 'viento', 'reflejo', 'seca', 'noche'],
@@ -233,12 +239,12 @@ def main():
          ['0.10+0.003*sin(time*1.1)', '0.10+0.008*sin(time*2.3)', '0.10+0.003*sin(time*1.1)', '0.10', '0.10+0.003*sin(time*1.1)'], ['-0.175'] * 3 + ['-0.18', '-0.175'],
          ['0.62', '0.62+0.01*sin(time*3.1)', '0.62', '0.45', '0.62'], ['0.20', '0.20+0.01*sin(time*2.7)', '0.20', '0.12', '0.20'])
 
-    arte.pradera().save(os.path.join(DST, 'pradera.png'), optimize=True)
-    capa('pradera', 'pradera.png', ['brisa', 'viento', 'atardecer', 'noche'],
+    capa('pradera', None, ['brisa', 'viento', 'atardecer', 'noche'],
          ['1.0'] * 4,
          [col('1', '1', '1'), col('0.96', '1.0', '0.94'), col('1.0', '0.74', '0.56'), col('0.26', '0.32', '0.52')],
          ['0.004*sin(time*1.7)', '0.012*sin(time*3.1)', '0.004*sin(time*1.7)', '0.002*sin(time*1.1)'], ['0.0'] * 4,
-         ['1.03', '1.04', '1.03', '1.03'], ['1.0'] * 4)
+         ['1.03', '1.04', '1.03', '1.03'], ['1.0'] * 4,
+         texturas=['pradera_%s.png' % e for e in EST], tex_en_preset=False)
 
     arte.lluvia().save(os.path.join(DST, 'lluvia.png'), optimize=True)
     capa('lluvia', 'lluvia.png', ['despejado', 'llovizna', 'lluvia', 'tormenta'],
@@ -264,17 +270,25 @@ def main():
     # P7 — presets de PROYECTO (estado = qué preset usa cada capa) + tiempo de cada estado y de la transición.
     # Van en los PRECONFIGS de la consola: <P name="<capa>">; el player C++ ignora lo que no es un param suyo.
     estados = [
-        ('amanecer',  8, 4, dict(cielo=0, sol=0, luna=3, nubes=3, montana=0, horizonte=2, colinas=1, agua=2, pradera=2, lluvia=0)),
-        ('dia',       8, 4, dict(cielo=1, sol=1, luna=3, nubes=1, montana=0, horizonte=0, colinas=0, agua=0, pradera=0, lluvia=0)),
-        ('atardecer', 8, 4, dict(cielo=2, sol=2, luna=1, nubes=3, montana=3, horizonte=2, colinas=2, agua=2, pradera=2, lluvia=0)),
-        ('noche',     8, 4, dict(cielo=3, sol=3, luna=0, nubes=2, montana=3, horizonte=3, colinas=4, agua=4, pradera=3, lluvia=0)),
+        ('amanecer',  8, 4, dict(cielo=0, sol=0, luna=3, nubes=3, montana=0, horizonte=2, colinas=1, agua=2, pradera=2)),
+        ('dia',       8, 4, dict(cielo=1, sol=1, luna=3, nubes=1, montana=0, horizonte=0, colinas=0, agua=0, pradera=0)),
+        ('atardecer', 8, 4, dict(cielo=2, sol=2, luna=1, nubes=3, montana=3, horizonte=2, colinas=2, agua=2, pradera=2)),
+        ('noche',     8, 4, dict(cielo=3, sol=3, luna=0, nubes=2, montana=3, horizonte=3, colinas=4, agua=4, pradera=3)),
         # P8: el sol anda solo (arco) y el cielo lo sigue por conexión — el día pasa sin línea de tiempo
-        ('sol_vivo', 40, 3, dict(cielo=4, sol=4, luna=3, nubes=1, montana=0, horizonte=0, colinas=0, agua=0, pradera=0, lluvia=0)),
+        ('sol_vivo', 40, 3, dict(cielo=4, sol=4, luna=3, nubes=1, montana=0, horizonte=0, colinas=0, agua=0, pradera=0)),
+    ]
+    # P9 — estaciones: otro eje. Fijan la TEXTURA de colinas y pradera (param suelto, `capa.param`) y la lluvia;
+    # no tocan la luz, así «invierno» + «noche» = nieve con luz de noche. `group` separa los ejes en la línea de tiempo.
+    estados = [(n, d, tr, idx, 'dia') for n, d, tr, idx in estados] + [
+        ('primavera', 12, 2, {'colinas.texture': 1, 'pradera.texture': 1, 'lluvia': 1}, 'estacion'),
+        ('verano',    12, 2, {'colinas.texture': 0, 'pradera.texture': 0, 'lluvia': 0}, 'estacion'),
+        ('otono',     12, 2, {'colinas.texture': 2, 'pradera.texture': 2, 'lluvia': 1}, 'estacion'),
+        ('invierno',  12, 2, {'colinas.texture': 3, 'pradera.texture': 3, 'lluvia': 0}, 'estacion'),
     ]
     pre = '<PRECONFIGS>' + ''.join(
-        '\n        <PRE name="%s" duration="%d" transition="%d">' % (n, d, tr) +
+        '\n        <PRE name="%s" duration="%d" transition="%d" group="%s">' % (n, d, tr, g) +
         ''.join('\n            <P name="%s">%d</P>' % (k, v) for k, v in idx.items()) + '\n        </PRE>'
-        for n, d, tr, idx in estados) + '\n    </PRECONFIGS>'
+        for n, d, tr, idx, g in estados) + '\n    </PRECONFIGS>'
     mol = re.sub(r'<PRECONFIGS>.*?</PRECONFIGS>|<PRECONFIGS\s*/>', pre, mol, flags=re.S)
     wr('Paisaje.mol', mol)
     print('ok', sorted(os.listdir(DST)))

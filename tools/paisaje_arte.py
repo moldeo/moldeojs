@@ -143,12 +143,45 @@ def montana():
     return im.filter(ImageFilter.GaussianBlur(0.8))
 
 
-def arbol(d, x, y, s, rng):
+# P9 — paleta por estación: (copa, copa sombra, copa luz, loma lejana arriba/abajo, loma cercana arriba/abajo)
+ESTACIONES = {
+    'verano':    dict(copa=(46, 110, 60), sombra=(40, 98, 54), luz=(106, 176, 92),
+                      far=((120, 176, 120), (92, 150, 96)), near=((104, 172, 86), (60, 128, 64)),
+                      pasto=[(70, 140, 60), (96, 170, 70), (124, 190, 84), (58, 120, 52)],
+                      suelo=((96, 168, 76), (54, 116, 52)), flores=140),
+    'primavera': dict(copa=(70, 140, 70), sombra=(58, 124, 62), luz=(150, 206, 110),
+                      far=((140, 194, 128), (104, 166, 104)), near=((122, 190, 96), (72, 146, 70)),
+                      pasto=[(90, 168, 70), (120, 196, 84), (150, 214, 100), (72, 146, 60)],
+                      suelo=((116, 190, 86), (62, 132, 58)), flores=320),
+    'otono':     dict(copa=(196, 110, 46), sombra=(162, 78, 40), luz=(232, 170, 70),
+                      far=((176, 160, 104), (146, 128, 84)), near=((182, 150, 82), (130, 104, 60)),
+                      pasto=[(170, 140, 70), (196, 160, 80), (150, 120, 60), (120, 100, 56)],
+                      suelo=((176, 146, 76), (112, 92, 52)), flores=24),
+    'invierno':  dict(copa=(52, 92, 74), sombra=(44, 80, 66), luz=(90, 130, 110),
+                      far=((222, 230, 240), (196, 208, 222)), near=((232, 238, 246), (200, 212, 226)),
+                      pasto=[(150, 160, 150), (176, 184, 176), (200, 208, 204), (130, 140, 134)],
+                      suelo=((226, 234, 242), (196, 206, 220)), flores=0),
+}
+
+
+def arbol(d, x, y, s, rng, est='verano'):
+    e = ESTACIONES[est]
     d.rectangle((x - 3 * s, y, x + 3 * s, y + 22 * s), fill=(92, 70, 52, 255))
-    for k, (ox, oy, r, col) in enumerate(((0, -10, 24, (46, 110, 60)), (-14, 2, 18, (40, 98, 54)), (14, 2, 18, (40, 98, 54)),
-                                          (-6, -18, 13, (106, 176, 92)))):
+    for k, (ox, oy, r, col) in enumerate(((0, -10, 24, e['copa']), (-14, 2, 18, e['sombra']), (14, 2, 18, e['sombra']),
+                                          (-6, -18, 13, e['luz']))):
         r = r * s
         d.ellipse((x + ox * s - r, y + oy * s - r, x + ox * s + r, y + oy * s + r), fill=col + (255,))
+    # adornos con su propio azar (no corre el rng de la geometría: las 4 estaciones tienen los mismos árboles)
+    deco = random.Random(int(x * 7 + y * 13))
+    if est == 'primavera':                                    # flores en la copa
+        for _ in range(int(14 * s)):
+            fx, fy = x + deco.uniform(-26, 26) * s, y + deco.uniform(-34, 8) * s
+            r = deco.uniform(2, 3.6) * s
+            d.ellipse((fx - r, fy - r, fx + r, fy + r), fill=deco.choice([(255, 196, 214), (255, 236, 242), (246, 160, 196)]) + (255,))
+    elif est == 'invierno':                                   # nieve sobre la copa
+        for ox, oy, r in ((0, -10, 24), (-14, 2, 18), (14, 2, 18)):
+            r = r * s
+            d.chord((x + ox * s - r, y + oy * s - r, x + ox * s + r, y + oy * s + r * 0.2), 180, 360, fill=(248, 250, 255, 255))
 
 
 def molino(d, x, y, h):
@@ -162,25 +195,27 @@ def molino(d, x, y, h):
     d.ellipse((hx - 5, hy - 5, hx + 5, hy + 5), fill=(220, 226, 232, 255))
 
 
-def colinas():
-    """lomas verdes con árboles, molinos y una casita con techo verde e invernadero"""
+def colinas(est='verano'):
+    """lomas con árboles, molinos y una casita con techo verde e invernadero. P9: misma geometría, otra estación"""
+    e = ESTACIONES[est]
     im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     rng = random.Random(42)
     far = ridge_pts(rng, 700, 70, freqs=(1.7, 3.9, 8.1))
-    fill_mask(im, poly_mask(far), vgrad(W, H, [(0.6, (120, 176, 120, 255)), (0.9, (92, 150, 96, 255))]))
+    fill_mask(im, poly_mask(far), vgrad(W, H, [(0.6, e['far'][0] + (255,)), (0.9, e['far'][1] + (255,))]))
     near = ridge_pts(rng, 800, 60, freqs=(1.3, 3.1, 6.7))
-    fill_mask(im, poly_mask(near), vgrad(W, H, [(0.7, (104, 172, 86, 255)), (1.0, (60, 128, 64, 255))]))
+    fill_mask(im, poly_mask(near), vgrad(W, H, [(0.7, e['near'][0] + (255,)), (1.0, e['near'][1] + (255,))]))
     d = ImageDraw.Draw(im)
     for x, y, h in ((1180, 668, 150), (1290, 690, 120), (1385, 700, 95)):    # molinos en la loma lejana
         molino(d, x, y, h)
     for i in range(26):                                                       # bosquecitos sobre las lomas
         x = rng.uniform(30, 1570)
         yy = min(p[1] for p in far if abs(p[0] - x) < 25) if rng.random() < 0.5 else min(p[1] for p in near if abs(p[0] - x) < 25)
-        arbol(d, x, yy - 6, rng.uniform(0.7, 1.3), rng)
+        arbol(d, x, yy - 6, rng.uniform(0.7, 1.3), rng, est)
     # casita solarpunk: paredes crema, techo verde vivo, cúpula de invernadero
     hx, hy = 180, min(p[1] for p in near if abs(p[0] - 180) < 25) - 4
     d.rectangle((hx - 40, hy - 46, hx + 40, hy), fill=(246, 236, 214, 255))
-    d.polygon([(hx - 52, hy - 44), (hx, hy - 82), (hx + 52, hy - 44)], fill=(84, 150, 74, 255))
+    d.polygon([(hx - 52, hy - 44), (hx, hy - 82), (hx + 52, hy - 44)],
+              fill=(240, 244, 250, 255) if est == 'invierno' else (84, 150, 74, 255))
     d.rectangle((hx - 10, hy - 26, hx + 10, hy), fill=(150, 104, 72, 255))
     d.rectangle((hx + 20, hy - 34, hx + 32, hy - 22), fill=(170, 214, 236, 255))
     dome = Image.new('RGBA', (W, H), (0, 0, 0, 0))
@@ -213,15 +248,16 @@ def agua():
     return im
 
 
-def pradera():
-    """primer plano: pastos curvos y flores; el preset lo mece"""
+def pradera(est='verano'):
+    """primer plano: pastos curvos y flores; el preset lo mece. P9: misma geometría, otra estación"""
+    e = ESTACIONES[est]
     im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     base = Image.new('L', (W, H), 0)
     ImageDraw.Draw(base).polygon(ridge_pts(random.Random(3), 815, 26, freqs=(2.2, 6.1, 13)) + [(W, H), (0, H)], fill=255)
-    fill_mask(im, base.filter(ImageFilter.GaussianBlur(2)), vgrad(W, H, [(0.78, (96, 168, 76, 255)), (1.0, (54, 116, 52, 255))]))
+    fill_mask(im, base.filter(ImageFilter.GaussianBlur(2)), vgrad(W, H, [(0.78, e['suelo'][0] + (255,)), (1.0, e['suelo'][1] + (255,))]))
     d = ImageDraw.Draw(im)
     rng = random.Random(9)
-    greens = [(70, 140, 60), (96, 170, 70), (124, 190, 84), (58, 120, 52)]
+    greens = e['pasto']
     for _ in range(1400):
         x = rng.uniform(-10, W + 10)
         y = rng.uniform(805, H + 10)
@@ -229,7 +265,8 @@ def pradera():
         bend = rng.uniform(-14, 14)
         col = rng.choice(greens) + (255,)
         d.polygon([(x - 2.5, y), (x + bend, y - L), (x + 2.5, y)], fill=col)
-    for _ in range(140):
+    rng = random.Random(10)                                # flores aparte: cada estación tiene su cantidad
+    for _ in range(e['flores']):
         x, y = rng.uniform(0, W), rng.uniform(815, H - 8)
         col = rng.choice([(250, 216, 92), (244, 150, 186), (255, 250, 245), (176, 150, 232)])
         r = rng.uniform(3, 6)
@@ -237,6 +274,16 @@ def pradera():
             a = k * 2 * math.pi / 5
             d.ellipse((x + math.cos(a) * r - r * .7, y + math.sin(a) * r - r * .7, x + math.cos(a) * r + r * .7, y + math.sin(a) * r + r * .7), fill=col + (255,))
         d.ellipse((x - r * .5, y - r * .5, x + r * .5, y + r * .5), fill=(250, 196, 70, 255))
+    if est == 'otono':                                       # hojas caídas
+        for _ in range(260):
+            x, y = rng.uniform(0, W), rng.uniform(820, H - 4)
+            r = rng.uniform(3, 6)
+            d.ellipse((x - r, y - r * .55, x + r, y + r * .55), fill=rng.choice([(214, 112, 44), (232, 160, 60), (180, 72, 40)]) + (255,))
+    elif est == 'invierno':                                  # escarcha
+        for _ in range(900):
+            x, y = rng.uniform(0, W), rng.uniform(805, H)
+            r = rng.uniform(1, 2.6)
+            d.ellipse((x - r, y - r, x + r, y + r), fill=(250, 252, 255, 230))
     return im
 
 

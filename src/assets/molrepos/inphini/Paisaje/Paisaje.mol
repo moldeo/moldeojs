@@ -159,7 +159,7 @@
         </PARAM>
     </CONFIGPARAMS>
     <PRECONFIGS>
-        <PRE name="amanecer" duration="8" transition="4">
+        <PRE name="amanecer" duration="8" transition="4" group="dia">
             <P name="cielo">0</P>
             <P name="sol">0</P>
             <P name="luna">3</P>
@@ -169,9 +169,8 @@
             <P name="colinas">1</P>
             <P name="agua">2</P>
             <P name="pradera">2</P>
-            <P name="lluvia">0</P>
         </PRE>
-        <PRE name="dia" duration="8" transition="4">
+        <PRE name="dia" duration="8" transition="4" group="dia">
             <P name="cielo">1</P>
             <P name="sol">1</P>
             <P name="luna">3</P>
@@ -181,9 +180,8 @@
             <P name="colinas">0</P>
             <P name="agua">0</P>
             <P name="pradera">0</P>
-            <P name="lluvia">0</P>
         </PRE>
-        <PRE name="atardecer" duration="8" transition="4">
+        <PRE name="atardecer" duration="8" transition="4" group="dia">
             <P name="cielo">2</P>
             <P name="sol">2</P>
             <P name="luna">1</P>
@@ -193,9 +191,8 @@
             <P name="colinas">2</P>
             <P name="agua">2</P>
             <P name="pradera">2</P>
-            <P name="lluvia">0</P>
         </PRE>
-        <PRE name="noche" duration="8" transition="4">
+        <PRE name="noche" duration="8" transition="4" group="dia">
             <P name="cielo">3</P>
             <P name="sol">3</P>
             <P name="luna">0</P>
@@ -205,9 +202,8 @@
             <P name="colinas">4</P>
             <P name="agua">4</P>
             <P name="pradera">3</P>
-            <P name="lluvia">0</P>
         </PRE>
-        <PRE name="sol_vivo" duration="40" transition="3">
+        <PRE name="sol_vivo" duration="40" transition="3" group="dia">
             <P name="cielo">4</P>
             <P name="sol">4</P>
             <P name="luna">3</P>
@@ -217,6 +213,25 @@
             <P name="colinas">0</P>
             <P name="agua">0</P>
             <P name="pradera">0</P>
+        </PRE>
+        <PRE name="primavera" duration="12" transition="2" group="estacion">
+            <P name="colinas.texture">1</P>
+            <P name="pradera.texture">1</P>
+            <P name="lluvia">1</P>
+        </PRE>
+        <PRE name="verano" duration="12" transition="2" group="estacion">
+            <P name="colinas.texture">0</P>
+            <P name="pradera.texture">0</P>
+            <P name="lluvia">0</P>
+        </PRE>
+        <PRE name="otono" duration="12" transition="2" group="estacion">
+            <P name="colinas.texture">2</P>
+            <P name="pradera.texture">2</P>
+            <P name="lluvia">1</P>
+        </PRE>
+        <PRE name="invierno" duration="12" transition="2" group="estacion">
+            <P name="colinas.texture">3</P>
+            <P name="pradera.texture">3</P>
             <P name="lluvia">0</P>
         </PRE>
     </PRECONFIGS>

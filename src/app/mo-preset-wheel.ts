@@ -106,6 +106,11 @@ export class moPresetWheel {
     setTimeout(() => this.render(), 250);
   }
 
+  /** P9 — con varios grupos de estados (día / estaciones) la rueda muestra uno por vez */
+  projGroup: string = null;
+  private static GROUP_LABEL: { [g: string]: string } = { dia: "día", estacion: "estaciones", "": "estados" };
+  private groupLabel(g: string): string { return moPresetWheel.GROUP_LABEL[g] || g; }
+
   render() {
     const r = this.root; r.innerHTML = "";
     const fx = this.layer();
@@ -137,17 +142,31 @@ export class moPresetWheel {
       () => this.nextMode());
     mb.title = "Cómo cambian los presets: proyecto (su duración) · corte (0 s) · lento (3 s). Shift+tocar = corte puntual";
     /* línea de tiempo del proyecto (arriba a la derecha) */
-    if (this.project && this.project.states().length) {
-      const tb = btn(this.project.playing ? "⏸ día" : "▶ día", "right:2px;top:2px;padding:5px 8px;font-size:11px;" +
-        (this.project.playing ? "background:#9be38b;color:#0a0c18;border-color:#9be38b;" : ""), () => this.project.toggle());
-      tb.title = "Línea de tiempo: recorre los estados del proyecto en loop (cada uno con su duración)";
+    const groups: string[] = (this.project && this.project.states().length) ? this.project.groups() : [];
+    if (groups.length && (this.projGroup === null || groups.indexOf(this.projGroup) < 0)) this.projGroup = this.project.currentGroup();
+    if (groups.length) {
+      const pg = this.project.playing ? this.project.currentGroup() : this.projGroup;
+      const tb = btn((this.project.playing ? "⏸ " : "▶ ") + this.groupLabel(pg), "right:2px;top:2px;padding:5px 8px;font-size:11px;" +
+        (this.project.playing ? "background:#9be38b;color:#0a0c18;border-color:#9be38b;" : ""), () => { this.project.toggle(this.projGroup); this.render(); });
+      tb.title = "Línea de tiempo: recorre en loop los estados del grupo que muestra la rueda (cada uno con su duración)";
     }
     if (!fx) return;
     /* anillo: los presets, empezando arriba y en sentido horario */
-    const cfg = fx.GetConfig(), n = cfg.GetPreConfCount(), cur = cfg.GetCurrentPreConf();
-    const R = 84;
-    for (let i = 0; i < n; i++) {
-      const a = -Math.PI / 2 + (2 * Math.PI * i) / n;
+    const cfg = fx.GetConfig(), cur = cfg.GetCurrentPreConf();
+    let shown: number[] = [];
+    for (let i = 0; i < cfg.GetPreConfCount(); i++) shown.push(i);
+    if (fx.isProject && groups.length > 1) {
+      shown = shown.filter((i) => this.project.group(cfg.m_PreConfigs[i]) == this.projGroup);
+      /* abajo: cambiar de grupo */
+      const other = groups[(groups.indexOf(this.projGroup) + 1) % groups.length];
+      const gb = btn("⇄ " + this.groupLabel(other), "left:2px;bottom:2px;padding:5px 8px;font-size:11px;",
+        () => { this.projGroup = other; this.render(); });
+      gb.title = "La rueda muestra un grupo de estados por vez: día o estaciones (son ejes independientes)";
+    }
+    const n = shown.length, R = 84;
+    for (let k = 0; k < n; k++) {
+      const i = shown[k];
+      const a = -Math.PI / 2 + (2 * Math.PI * k) / n;
       const x = 125 + R * Math.cos(a), y = 125 + R * Math.sin(a);
       const name = ("" + (cfg.m_PreConfigs[i].m_Name || (i + 1))).replace(/_/g, " ");
       btn(name, `left:${x}px;top:${y}px;transform:translate(-50%,-50%);max-width:86px;white-space:normal;`, () => this.call(i, this.shiftDown), i == cur, () => this.capture(i));

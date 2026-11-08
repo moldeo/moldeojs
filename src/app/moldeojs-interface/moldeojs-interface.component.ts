@@ -533,7 +533,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
           if (m.verb == "mode") { W.mode = m.mode; return; }
           if (m.verb == "undo") { this.doUndo(); return; }
           if (m.verb == "redo") { this.doRedo(); return; }
-          if (m.verb == "play") { if (!PS.playing) PS.play(); return; }
+          if (m.verb == "play") { if (!PS.playing) PS.play(m.group); return; }
           if (m.verb == "pause") { PS.pause(); return; }
           if ((m.verb == "preconfigset" || m.verb == "preconfigsave") && W.selectByLabel(m.label)) {
             if (m.mode) W.mode = m.mode;
