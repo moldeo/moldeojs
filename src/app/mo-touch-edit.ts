@@ -26,7 +26,28 @@ export class moTouchEdit {
   private dragId: number = null;
   private last: { x: number, y: number } = null;
 
+  /** ?log=1 ⇒ cada evento va a un registrador local (http://<host>:8899) para ver la sesión de prueba */
+  logOn: boolean = /[?&]log=1/.test(window.location.search);
+  /** botón «Log» de la interfaz */
+  toggleLog(): boolean {
+    this.logOn = !this.logOn;
+    if (this.logOn) this.log("start", { ua: navigator.userAgent, w: window.innerWidth, h: window.innerHeight, touch: navigator.maxTouchPoints, edit: this.enabled });
+    return this.logOn;
+  }
+  private logBuf: any[] = [];
+  log(ev: string, data: any = {}) {
+    if (!this.logOn) return;
+    this.logBuf.push(Object.assign({ t: Math.round(performance.now()), ev }, data));
+    if (this.logBuf.length == 1) setTimeout(() => this.flush(), 400);
+  }
+  private flush() {
+    const b = this.logBuf; this.logBuf = [];
+    try { fetch("http://" + window.location.hostname + ":8899/log", { method: "POST", body: JSON.stringify(b) }).catch(() => {}); } catch (x) {}
+  }
+
   constructor(private console: any, private surface: () => HTMLElement[]) {
+    window.addEventListener("lostpointercapture", (e: PointerEvent) => this.log("lostcapture", { id: e.pointerId }));
+    this.log("start", { ua: navigator.userAgent, w: window.innerWidth, h: window.innerHeight, touch: navigator.maxTouchPoints });
     window.addEventListener("pointerdown", (e) => this.down(e), { passive: false });
     window.addEventListener("pointermove", (e) => this.move(e), { passive: false });
     window.addEventListener("pointerup", (e) => this.up(e));
@@ -91,8 +112,11 @@ export class moTouchEdit {
   private down(e: PointerEvent) {
     const p = this.norm(e);
     this.pointers[e.pointerId] = { id: e.pointerId, type: e.pointerType, x: p.x, y: p.y };
+    const t = e.target as HTMLElement;
+    this.log("down", { id: e.pointerId, type: e.pointerType, x: +p.x.toFixed(3), y: +p.y.toFixed(3), target: t && (t.id || t.tagName), edit: this.enabled, surface: this.onSurface(e), n: this.count() });
     if (!this.enabled || !this.onSurface(e)) return;
     const fx = this.pick(p);
+    this.log("pick", { fx: fx ? "" + fx.GetLabelName() : null });
     this.selected = fx;
     if (this.onSelect) this.onSelect(fx);
     if (fx) {
@@ -113,10 +137,16 @@ export class moTouchEdit {
     this.setNumber(this.selected, hp[0], this.val(cfg, hp[0]) + dx);
     this.setNumber(this.selected, hp[1], this.val(cfg, hp[1]) + dy);
     this.last = p;
+    this.moves++;
+    if (this.moves % 10 == 0) this.log("drag", { x: +this.val(cfg, hp[0]).toFixed(3), y: +this.val(cfg, hp[1]).toFixed(3) });
     e.preventDefault();
   }
+  private moves: number = 0;
 
   private up(e: PointerEvent) {
+    if (this.dragId === e.pointerId || e.type == "pointercancel")
+      this.log(e.type == "pointercancel" ? "CANCEL" : "up", { id: e.pointerId, moves: this.moves, type: e.pointerType });
+    if (this.dragId === e.pointerId) this.moves = 0;
     delete this.pointers[e.pointerId];
     if (this.dragId === e.pointerId) { this.dragId = null; this.last = null; }
   }

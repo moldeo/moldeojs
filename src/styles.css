@@ -578,4 +578,4 @@ h3{
 }
 
 /* #918 E1: el lienzo y la capa de edición reciben los dedos (sin scroll ni zoom del navegador) */
-canvas, #moCanvas { touch-action: none; }
+canvas, #moCanvas, #moConnect, mo-default { touch-action: none; }
