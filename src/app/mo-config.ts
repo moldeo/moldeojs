@@ -166,6 +166,35 @@ export class moConfig extends moAbstract {
   m_XmlHasPreconfigs : boolean = false;
   m_LastSavedXml : string = "";
 
+  /** #918 E1.6 — transición entre presets (duda de diseño = parámetro: duración y curva) */
+  m_PresetDuration : number = 1.0;              /** segundos; 0 = salto */
+  m_PresetCurve : string = "ease";              /** ease · linear · step */
+  private m_TransFrom : any = {};               /** nombre del param ⇒ índice de VAL de donde viene */
+  private m_TransStart : number = 0;
+
+  /** 0..1 de la transición en curso (1 = terminada) */
+  TransitionK() : number {
+    if (!this.m_PresetDuration || this.m_PresetDuration <= 0) return 1;
+    const k = Math.min(1, Math.max(0, (performance.now() - this.m_TransStart) / (this.m_PresetDuration * 1000)));
+    if (this.m_PresetCurve == "linear") return k;
+    if (this.m_PresetCurve == "step") return k < 1 ? 0 : 1;
+    return k * k * (3 - 2 * k); /* ease */
+  }
+
+  /** el valor del param mezclado si está en transición; null si no */
+  private TransMix( Param: moParam, sub: number ) : any {
+    const name = "" + Param.GetName();
+    const from = this.m_TransFrom[name];
+    if (from === undefined) return null;
+    const k = this.TransitionK();
+    if (k >= 1) { delete this.m_TransFrom[name]; return null; }
+    const vFrom = Param.m_Values[from], vTo = Param.GetValue();
+    if (!vFrom || !vTo || !vFrom.GetSubValue(sub) || !vTo.GetSubValue(sub)) return null;
+    const a = Number(vFrom.GetSubValue(sub).Eval()), b = Number(vTo.GetSubValue(sub).Eval());
+    if (isNaN(a) || isNaN(b)) return null;
+    return a + (b - a) * k;
+  }
+
   m_CurrentParam : MOint = 0;// el indice que indica cual es el parametro actual.
   m_PreconfParamNum : MOint = 0;
   m_PreconfActual: MOint = 0;
@@ -680,9 +709,18 @@ export class moConfig extends moAbstract {
 	  return this.m_PreconfActual;
   }
 
-  SetCurrentPreConf( p_actual : MOint ) : void {
+  SetCurrentPreConf( p_actual : MOint, p_duration? : number ) : void {
     if(0<=p_actual && p_actual<this.m_PreConfigs.length )
     {
+      /* #918 E1.6: recordar de dónde viene cada param que cambia, para interpolar */
+      if (p_duration !== undefined) this.m_PresetDuration = p_duration;
+      this.m_TransFrom = {};
+      this.m_TransStart = performance.now();
+      for (const pi of this.m_PreConfigs[p_actual].m_PreconfIndexes) {
+        if (pi.m_ParamIndex < 0) continue;
+        const P = this.m_Params[pi.m_ParamIndex];
+        if (P && P.GetIndexValue() != pi.m_ValueIndex) this.m_TransFrom["" + P.GetName()] = P.GetIndexValue();
+      }
 		  for( var i=0; i<this.m_PreConfigs[p_actual].m_PreconfIndexes.length; i++) {
 			  var Val : moPreconfigParamIndex = this.m_PreConfigs[p_actual].m_PreconfIndexes[i]; /* #918 E1: antes [p_actual][i] = undefined */
         if (Val.m_ParamIndex >= 0 && Val.m_ValueIndex < this.GetValuesCount(Val.m_ParamIndex))
@@ -784,7 +822,8 @@ export class moConfig extends moAbstract {
     if (Param) {
       var vb: moValue = Param.GetValue();
       if (vb) {
-        f = vb.GetSubValue(0).Eval()
+        const m = this.TransMix(Param, 0);
+        f = (m !== null) ? m : vb.GetSubValue(0).Eval();
       }
     }
     return f;
@@ -796,10 +835,11 @@ export class moConfig extends moAbstract {
     if (Param) {
       var vb: moValue = Param.GetValue();
       if (vb) {
-        rgba.r = vb.GetSubValue(0).Eval();
-        rgba.g = vb.GetSubValue(1).Eval();
-        rgba.b = vb.GetSubValue(2).Eval();
-        rgba.a = vb.GetSubValue(3).Eval();
+        const mix = (i: number) => { const m = this.TransMix(Param, i); return (m !== null) ? m : vb.GetSubValue(i).Eval(); };
+        rgba.r = mix(0);
+        rgba.g = mix(1);
+        rgba.b = mix(2);
+        rgba.a = mix(3);
         //this.mr_Color.setRGB(r,g,b);
       }
     }
