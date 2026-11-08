@@ -21,6 +21,7 @@ import { MoErase } from './mo-objects/mo-erase.component';
 import { MoIcon } from './mo-objects/mo-icon.component';
 
 import { moConsole } from '../mo-console';
+import { moTouchEdit } from '../mo-touch-edit';
 import { moMobDefinition } from '../mo-moldeo-object';
 import { PluginsDefinitionsMap, PluginsDefinitions, PluginsDefinitionsMapType,
   PluginsDefinitionsMapTypeArray, PluginsDefinitionsMapTypes,
@@ -69,6 +70,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
   /*- moConfig definitions, for save Components -*/
   @ViewChild('moConfig') moConfig: ElementRef;
   public moEditDisplay:boolean = false;
+  public touchEdit: moTouchEdit = null;
   /////////////////////////////////////////////
   /*- moControl definitions, for control -*/
   //@ViewChild('moControl') moControl: ElementRef;
@@ -147,6 +149,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
   public showmoEditView(e:any=false) : void {
     console.log("showmoEditView");
     this.moEditDisplay = !this.moEditDisplay;
+    if (this.touchEdit) this.touchEdit.enabled = this.moEditDisplay;
     /*if (this.moCanvas && this.moCanvas.nativeElement.getAttribute("class")=="hideme" ) {
       this.moCanvas.nativeElement.setAttribute("class","showme");
       this.moConfig.nativeElement.setAttribute("class","showme");
@@ -415,6 +418,12 @@ export class MoldeojsInterfaceComponent implements OnInit {
   public loadedSample() : void {
     console.log("moldeojs-interface loadedSample!")
     this.m_Console = this.moldeojsview.GetConsole();
+    /* #918 E1: tocar/arrastrar capas sobre la pantalla en modo edición */
+    if (!this.touchEdit) {
+      this.touchEdit = new moTouchEdit(this.m_Console, () => [this.moCanvas && this.moCanvas.nativeElement]);
+      this.touchEdit.enabled = this.moEditDisplay;
+      (window as any).moTouchEdit = this.touchEdit;
+    }
     let cName : any = this.m_Console.GetConfigName();
     let cFile : moFile = new moFile(cName);
     this.moFileName = cFile.GetFileName();

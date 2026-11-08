@@ -248,11 +248,11 @@ export class MoDefaultComponent implements OnInit {
         }
       }
 
-      let preconf_index = 0;
+      let preconf_index = Math.max(0, this_.Params[currentPar].GetIndexValue()); /* #918 E1: edita el VAL del preset activo */
       //this_.params[currentPar][1][indexPar] = e.target.value;
       //this_.params[currentPar][1][indexPar] = e.target.value;
       //this_.Params[currentPar].m_List[indexPar] = e.target.value;
-      this_.Params[currentPar].m_Values[0].m_List[indexPar].SetVal( e.target.value );
+      this_.Params[currentPar].m_Values[preconf_index].m_List[indexPar].SetVal( e.target.value );
       this_.Mob.ResolveValue( this.Params[currentPar], preconf_index );
 
       /**

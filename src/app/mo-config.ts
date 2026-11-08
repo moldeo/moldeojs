@@ -684,8 +684,9 @@ export class moConfig extends moAbstract {
     if(0<=p_actual && p_actual<this.m_PreConfigs.length )
     {
 		  for( var i=0; i<this.m_PreConfigs[p_actual].m_PreconfIndexes.length; i++) {
-			  var Val : moPreconfigParamIndex = this.m_PreConfigs[p_actual][i];
-        this.SetCurrentValueIndex( Val.m_ParamIndex, Val.m_ValueIndex);
+			  var Val : moPreconfigParamIndex = this.m_PreConfigs[p_actual].m_PreconfIndexes[i]; /* #918 E1: antes [p_actual][i] = undefined */
+        if (Val.m_ParamIndex >= 0 && Val.m_ValueIndex < this.GetValuesCount(Val.m_ParamIndex))
+          this.SetCurrentValueIndex( Val.m_ParamIndex, Val.m_ValueIndex);
 		  }
       this.m_PreconfActual = p_actual;
     }

@@ -576,3 +576,6 @@ h3{
 .popover * {
   color: black;
 }
+
+/* #918 E1: el lienzo y la capa de edición reciben los dedos (sin scroll ni zoom del navegador) */
+canvas, #moCanvas { touch-action: none; }
