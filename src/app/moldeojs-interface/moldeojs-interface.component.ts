@@ -117,11 +117,39 @@ export class MoldeojsInterfaceComponent implements OnInit {
       .then((r) => r.json())
       .then((j) => {
         const ok = j && j.result && j.result.ok;
-        this.saveState = ok ? "Guardado ✓" : ("No se guardó: " + ((j && j.result && j.result.error) || (j && j.error && j.error.message) || "error"));
+        const v = ok && j.result.version != null ? " v" + j.result.version : "";
+        this.saveState = ok ? "Guardado ✓" + v : ("No se guardó: " + ((j && j.result && j.result.error) || (j && j.error && j.error.message) || "error"));
         if (this.touchEdit) this.touchEdit.log("save", { ok: !!ok, n: Object.keys(files).length });
         setTimeout(() => { this.saveState = ""; }, 4000);
       })
       .catch((e) => { this.saveState = "No se guardó (sin conexión)"; });
+  }
+  /** #918 H2 — versiones: mismo contrato en el Lab (/e/<slug>/mol-versions) y en el Director (/proj-versions) */
+  public versionsOpen: boolean = false;
+  public versions: any[] = [];
+  public versionsMsg: string = "";
+  private versionUrl(kind: string): string { return this.saveUrl.replace(/-save$/, "-" + kind); }
+  private rpc(url: string, params: any): Promise<any> {
+    return fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
+      body: JSON.stringify({ jsonrpc: "2.0", method: "call", params }) })
+      .then((r) => r.json()).then((j) => (j && j.result) || { ok: false, error: (j && j.error && j.error.message) || "error" });
+  }
+  public toggleVersions(): void {
+    this.versionsOpen = !this.versionsOpen;
+    if (!this.versionsOpen) return;
+    this.versionsMsg = "Cargando…"; this.versions = [];
+    this.rpc(this.versionUrl("versions"), {}).then((r) => {
+      this.versions = r.ok ? (r.versions || []) : [];
+      this.versionsMsg = r.ok ? (this.versions.length ? "" : "Todavía no hay versiones: cada Guardar deja una.") : ("No se pudo: " + r.error);
+    }).catch(() => this.versionsMsg = "Sin conexión");
+  }
+  public restoreVersion(v: any): void {
+    if (!window.confirm("¿Volver a la versión v" + v.number + "? Lo actual queda guardado en el historial sólo si lo guardaste antes.")) return;
+    this.versionsMsg = "Restaurando v" + v.number + "…";
+    this.rpc(this.versionUrl("restore"), { version: v.number }).then((r) => {
+      if (r.ok) { if (this.touchEdit) this.touchEdit.log("restore", { from: v.number }); window.location.reload(); }
+      else this.versionsMsg = "No se restauró: " + r.error;
+    }).catch(() => this.versionsMsg = "Sin conexión");
   }
   /////////////////////////////////////////////
   /*- moControl definitions, for control -*/

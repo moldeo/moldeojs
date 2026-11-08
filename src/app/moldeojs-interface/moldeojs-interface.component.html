@@ -39,5 +39,15 @@
   <button class="moldeobutton" type="button" name="redo" title="Rehacer (Ctrl+Shift+Z)" [disabled]="!history.canRedo()" (click)="doRedo()">↷</button>
   <span *ngIf="undoLabel" class="moldeobutton" style="pointer-events:none">{{ undoLabel }}</span>
   <button *ngIf="saveUrl" class="moldeobutton" type="button" name="save" title="Guardar el proyecto en el MoldeoLab" (click)="saveProject()">{{ saveState || 'Guardar' }}</button>
+  <button *ngIf="saveUrl" class="moldeobutton" type="button" name="versions" title="Versiones guardadas del proyecto" (click)="toggleVersions()">Versiones</button>
   <button class="moldeobutton" type="button" name="log" title="Registrar los toques (para depurar)" (click)="touchEdit && touchEdit.toggleLog()">{{ touchEdit && touchEdit.logOn ? 'Log ●' : 'Log' }}</button>
 </header>
+<div *ngIf="versionsOpen" class="moVersions">
+  <div class="moVersionsHead">Versiones <span class="moVersionsClose" (click)="versionsOpen=false">✕</span></div>
+  <div *ngIf="versionsMsg" class="moVersionsMsg">{{ versionsMsg }}</div>
+  <div *ngFor="let v of versions" class="moVersionRow">
+    <span class="moVersionNum">v{{ v.number }}</span>
+    <span class="moVersionInfo">{{ v.date }} · {{ v.user }}<br/><i>{{ v.note }}</i></span>
+    <button class="moldeobutton" type="button" (click)="restoreVersion(v)">Restaurar</button>
+  </div>
+</div>

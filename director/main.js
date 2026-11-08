@@ -6,6 +6,8 @@
  *   moldeo://app/<archivo>          → el build de moldeojs (MOLDEO_APP_DIR o ./app)
  *   moldeo://app/proj/<ruta>        → archivos de la carpeta del proyecto        (Lab: /e/<slug>/mol/<ruta>)
  *   POST moldeo://app/proj-save     → escribe .mol/.cfg en la carpeta (+ commit) (Lab: /e/<slug>/mol-save)
+ *   POST moldeo://app/proj-versions → historial = git log del proyecto        (Lab: /e/<slug>/mol-versions)
+ *   POST moldeo://app/proj-restore  → repone los .mol/.cfg de un commit + commit nuevo (Lab: /e/<slug>/mol-restore)
  * Si la carpeta es un repo git, cada Guardar es un commit: el historial del proyecto son sus versiones.
  *
  * Uso: npm start -- /ruta/a/la/carpeta   (sin ruta: se abre un diálogo)
@@ -51,6 +53,25 @@ function gitCommit(n) {
   }
 }
 
+/* H2 — versiones = commits que tocan .mol/.cfg; number = el sha corto (el Lab usa enteros, el editor no lo interpreta) */
+function gitVersions() {
+  if (!fs.existsSync(path.join(projDir, '.git'))) return { ok: false, error: 'la carpeta no es un repo git: no hay historial' };
+  const out = execFileSync('git', ['log', '-n', '200', '--format=%h%x09%aI%x09%an%x09%s', '--', '*.mol', '*.cfg'], { cwd: projDir }).toString();
+  const versions = out.split('\n').filter(Boolean).map((l) => { const [h, d, a, s] = l.split('\t'); return { number: h, date: d, user: a, note: s }; });
+  return { ok: true, versions };
+}
+function gitRestore(sha) {
+  if (!/^[0-9a-f]{4,40}$/.test('' + sha)) return { ok: false, error: 'versión inválida' };
+  if (!fs.existsSync(path.join(projDir, '.git'))) return { ok: false, error: 'la carpeta no es un repo git' };
+  execFileSync('git', ['checkout', sha, '--', '*.mol', '*.cfg'], { cwd: projDir });
+  try { execFileSync('git', ['commit', '-q', '-m', `moldeo: restaurada desde ${sha}`], { cwd: projDir }); }
+  catch (e) { if (!(('' + (e.stdout || '')) + (e.stderr || '')).includes('nothing to commit')) throw e; }
+  return { ok: true, version: execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: projDir }).toString().trim(), from: sha };
+}
+function rpcReply(res) {
+  return new Response(JSON.stringify({ jsonrpc: '2.0', id: null, result: res }), { headers: { 'content-type': 'application/json' } });
+}
+
 async function handle(req) {
   const u = new URL(req.url);
   const p = decodeURIComponent(u.pathname);
@@ -69,12 +90,20 @@ async function handle(req) {
       }
       const commit = gitCommit(names.length);
       log('guardado', names.length, 'archivos', commit ? 'commit ' + commit : '(sin git)');
-      res = { ok: true, n: names.length, commit };
+      res = { ok: true, n: names.length, commit, version: commit };
     } catch (e) {
       log('guardar falló:', e.message);
       res = { ok: false, error: e.message };
     }
     return new Response(JSON.stringify({ jsonrpc: '2.0', id: null, result: res }), { headers: { 'content-type': 'application/json' } });
+  }
+  if ((p === '/proj-versions' || p === '/proj-restore') && req.method === 'POST') {
+    try {
+      const params = (JSON.parse((await req.text()) || '{}').params) || {};
+      const res = p === '/proj-versions' ? gitVersions() : gitRestore(params.version);
+      if (p === '/proj-restore') log('restaurar', params.version, '→', res.version || res.error);
+      return rpcReply(res);
+    } catch (e) { return rpcReply({ ok: false, error: e.message.split('\n')[0] }); }
   }
   if (p.startsWith('/proj/')) return serveFile(inside(projDir, p.slice('/proj/'.length)));
   return serveFile(inside(APP_DIR, p === '/' ? 'index.html' : p.slice(1)));
@@ -137,7 +166,13 @@ app.whenReady().then(async () => {
         W.setLayer(fx); W.call(2); await wait(300); W.capture(3); await wait(400);
         const btn = document.querySelector('button[name=save]'); if (!btn) return 'sin boton Guardar';
         btn.click(); await wait(1500);
-        return 'ok preset=' + fx.GetConfig().GetCurrentPreConf() + ' boton=' + btn.textContent.trim();
+        const saved = btn.textContent.trim();
+        const vb = document.querySelector('button[name=versions]'); if (vb) { vb.click(); await wait(1200); }
+        const rows = document.querySelectorAll('.moVersionRow').length;
+        const rs = ${JSON.stringify(process.env.MOLDEO_SELFTEST_RESTORE || '')};
+        if (rs) { const j = await (await fetch('/proj-restore', { method: 'POST', body: JSON.stringify({ params: { version: rs } }) })).json();
+          return 'restaurar ' + JSON.stringify(j.result); }
+        return 'ok preset=' + fx.GetConfig().GetCurrentPreConf() + ' boton=' + saved + ' versiones=' + rows;
       })()`);
       log('selftest', r);
       if (player) {

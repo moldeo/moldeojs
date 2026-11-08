@@ -493,3 +493,14 @@ h3{
   from {opacity:1;}
   to {opacity:0;}
 }
+
+/* #918 H2 — panel de versiones */
+.moVersions{ position:fixed; top:48px; right:12px; z-index:1000; width:340px; max-width:calc(100vw - 24px);
+  max-height:70vh; overflow:auto; background:rgba(20,20,24,.95); color:#eee; border:1px solid #555;
+  border-radius:6px; padding:8px; font-size:13px; }
+.moVersionsHead{ font-weight:bold; margin-bottom:6px; }
+.moVersionsClose{ float:right; cursor:pointer; padding:0 4px; }
+.moVersionsMsg{ opacity:.8; margin:4px 0; }
+.moVersionRow{ display:flex; align-items:center; gap:8px; padding:6px 0; border-top:1px solid #333; }
+.moVersionNum{ font-weight:bold; min-width:34px; }
+.moVersionInfo{ flex:1; line-height:1.25; }
