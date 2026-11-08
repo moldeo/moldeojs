@@ -73,6 +73,37 @@ export class MoldeojsInterfaceComponent implements OnInit {
   public moEditDisplay:boolean = false;
   public touchEdit: moTouchEdit = null;
   public presetWheel: moPresetWheel = null;
+  /** #918 L2 — ?save=<ruta del Lab> ⇒ botón Guardar: manda el XML de la consola y de cada .cfg */
+  public saveUrl: string = (() => { try { const v = new URLSearchParams(window.location.search).get("save");
+    return (v && v.charAt(0) == "/" && v.indexOf("//") < 0) ? v : ""; } catch (e) { return ""; } })();
+  public saveState: string = "";
+
+  public saveProject(): void {
+    if (!this.saveUrl || !this.m_Console) return;
+    const files: any = {};
+    const mol = new URLSearchParams(window.location.search).get("mol") || "";
+    const molName = mol.split("/").pop();
+    const cc: any = this.m_Console.m_Config;
+    if (cc && cc.ToXML && molName) files[molName] = cc.ToXML();
+    for (const fx of this.m_Console.m_EffectManager.m_AllEffects) {
+      try {
+        const cfg: any = fx.GetConfig();
+        const name = "" + fx.GetMobDefinition().GetConfigName();
+        if (cfg && cfg.ToXML && name) files[name + ".cfg"] = cfg.ToXML();
+      } catch (e) {}
+    }
+    this.saveState = "Guardando…";
+    fetch(this.saveUrl, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
+      body: JSON.stringify({ jsonrpc: "2.0", method: "call", params: { files } }) })
+      .then((r) => r.json())
+      .then((j) => {
+        const ok = j && j.result && j.result.ok;
+        this.saveState = ok ? "Guardado ✓" : ("No se guardó: " + ((j && j.result && j.result.error) || (j && j.error && j.error.message) || "error"));
+        if (this.touchEdit) this.touchEdit.log("save", { ok: !!ok, n: Object.keys(files).length });
+        setTimeout(() => { this.saveState = ""; }, 4000);
+      })
+      .catch((e) => { this.saveState = "No se guardó (sin conexión)"; });
+  }
   /////////////////////////////////////////////
   /*- moControl definitions, for control -*/
   //@ViewChild('moControl') moControl: ElementRef;

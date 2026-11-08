@@ -39,7 +39,8 @@ export class AppComponent implements OnInit {
   static sampleFromUrl(def: string): string {
     try {
       const m = new URLSearchParams(window.location.search).get("mol");
-      if (m && /^[\w\-./]+\.mol$/.test(m) && m.indexOf("..") < 0) return m;
+      /* relativa a assets/ (ej. molrepos/...) o absoluta del MISMO servidor (ej. /e/<slug>/mol/x.mol, la sirve el Lab) */
+      if (m && /^\/?[\w\-./]+\.mol$/.test(m) && m.indexOf("..") < 0 && m.indexOf("//") < 0) return m;
     } catch (e) {}
     return def;
   }

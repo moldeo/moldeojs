@@ -35,5 +35,6 @@
   <button class="moldeobutton" (click)="showmoEditView();" type="button" name="moButton" title="Moldeojs Edit View">Edit</button>
   <button class="moldeobutton" (click)="showmoControlView();" type="button" name="moButton" title="Moldeojs Control View">Control</button>
   <button class="moldeobutton" type="button" name="auto" title="Auto Layout" (click)="autoLayout()">auto</button>
+  <button *ngIf="saveUrl" class="moldeobutton" type="button" name="save" title="Guardar el proyecto en el MoldeoLab" (click)="saveProject()">{{ saveState || 'Guardar' }}</button>
   <button class="moldeobutton" type="button" name="log" title="Registrar los toques (para depurar)" (click)="touchEdit && touchEdit.toggleLog()">{{ touchEdit && touchEdit.logOn ? 'Log ●' : 'Log' }}</button>
 </header>

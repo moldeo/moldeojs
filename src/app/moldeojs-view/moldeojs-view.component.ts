@@ -157,7 +157,7 @@ export class MoldeojsViewComponent implements OnInit {
 
         if (mol.firstChange) {
           this.MoldeoCS.Init({
-              "consoleconfig": this.baseref+mol.currentValue ,
+              "consoleconfig": ((""+mol.currentValue).charAt(0)=="/" ? "" : this.baseref)+mol.currentValue /* #918 L2: ruta absoluta = proyecto servido por el Lab */ ,
               "effects_loaded": (result) => {
                 this.loaded.emit('effects_loaded');
               },
@@ -175,7 +175,7 @@ export class MoldeojsViewComponent implements OnInit {
           if (this.MoldeoCS.m_Console.Initialized()) {
             this.MoldeoCS.Finish();
             this.MoldeoCS.Init( {
-                "consoleconfig": this.baseref+mol.currentValue,
+                "consoleconfig": ((""+mol.currentValue).charAt(0)=="/" ? "" : this.baseref)+mol.currentValue /* #918 L2: ruta absoluta = proyecto servido por el Lab */,
                 "effects_loaded": (result) => {
                   this.loaded.emit('effects_loaded');
                 },
@@ -189,7 +189,7 @@ export class MoldeojsViewComponent implements OnInit {
             } );
           } else {
             this.MoldeoCS.Init({
-                "consoleconfig": this.baseref+mol.currentValue,
+                "consoleconfig": ((""+mol.currentValue).charAt(0)=="/" ? "" : this.baseref)+mol.currentValue /* #918 L2: ruta absoluta = proyecto servido por el Lab */,
                 "effects_loaded": (result) => {
                   this.loaded.emit('effects_loaded');
                 },
