@@ -13,6 +13,7 @@ export type moPreconfigIndexes = moPreconfigParamIndex[];
 export class moPreconfig extends moAbstract {
 
   m_Name : moText = "";
+  m_XmlAttributes : any = null;   /** #918 P7: atributos extra del <PRE> (duration, transition…) que hay que conservar */
   m_PreconfIndexes : moPreconfigIndexes = [];
   m_pindex : moPreconfigParamIndex;
 

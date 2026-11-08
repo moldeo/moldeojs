@@ -464,6 +464,7 @@ export class moConfig extends moAbstract {
                     var PREPARAMS = PRECONF["P"];
                     var Pcfg: moPreconfig = new moPreconfig();
                     Pcfg.m_Name = preconf_name;
+                    if (PRECONF[attr_sym]) Pcfg.m_XmlAttributes = Object.assign({}, PRECONF[attr_sym]);
                     if (PREPARAMS && PREPARAMS.length > 0) {
                       for (var P_I in PREPARAMS) {
                         var P = PREPARAMS[P_I];
@@ -540,7 +541,9 @@ export class moConfig extends moAbstract {
     if (this.m_PreConfigs.length) {
       x += "    <PRECONFIGS>\n";
       for (const pre of this.m_PreConfigs) {
-        x += "        <PRE" + (pre.m_Name ? attrs({ name: pre.m_Name }) : "") + ">\n";
+        const pa: any = Object.assign({}, pre.m_XmlAttributes || {});
+        if (pre.m_Name) pa["name"] = pre.m_Name; else delete pa["name"];
+        x += "        <PRE" + attrs(pa) + ">\n";
         for (const pi of pre.m_PreconfIndexes)
           x += "            <P" + attrs({ name: pi.m_ParamName }) + ">" + pi.m_ValueIndex + "</P>\n";
         x += "        </PRE>\n";

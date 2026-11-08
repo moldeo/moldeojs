@@ -183,12 +183,13 @@ def main():
 
     # cada capa vibra un poco por defecto ("todo tiene que vibrar")
     arte.sol().save(os.path.join(DST, 'sol.png'), optimize=True)
-    capa('sol', 'sol.png', ['quieto', 'arco', 'pulso', 'eclipse'],
-         ['1.0'] * 3 + ['1.0'],
-         [col('1', '1', '1'), col('1', '1', '1'), col('1', '0.95', '0.85'), col('0.35', '0.28', '0.32')],
-         ['0.25', '-0.45*cos(time*0.15)', '0.25', '0.0'], ['0.17', '0.30*sin(time*0.15)-0.10', '0.17', '0.15'],
-         ['0.30*(1+0.02*sin(time*1.3))', '0.30*(1+0.02*sin(time*1.3))', '0.30*(1+0.14*sin(time*3))', '0.30'],
-         ['0.48*(1+0.02*sin(time*1.3))', '0.48*(1+0.02*sin(time*1.3))', '0.48*(1+0.14*sin(time*3))', '0.48'])
+    B = '*(1+0.02*sin(time*1.3))'                       # el sol respira
+    capa('sol', 'sol.png', ['amanecer', 'mediodia', 'atardecer', 'oculto', 'arco'],
+         ['1.0'] * 5,
+         [col('1', '0.9', '0.8'), col('1', '1', '1'), col('1', '0.85', '0.7'), col('1', '0.8', '0.7'), col('1', '1', '1')],
+         ['-0.34', '0.05', '0.34', '0.36', '-0.45*cos(time*0.15)'],
+         ['-0.02', '0.20', '-0.03', '-0.26', '0.30*sin(time*0.15)-0.10'],
+         ['0.30' + B] * 5, ['0.48' + B] * 5)
 
     fases = ['llena', 'creciente', 'menguante', 'nueva']
     for f in fases:
@@ -215,23 +216,23 @@ def main():
          ['0.0'] * 4, ['0.0'] * 4, ['1.0'] * 4, ['1.0'] * 4)
 
     arte.colinas().save(os.path.join(DST, 'colinas.png'), optimize=True)
-    capa('colinas', 'colinas.png', ['verano', 'primavera', 'otono', 'invierno'],
-         ['1.0'] * 4,
-         [col('1', '1', '1'), col('0.95', '1.0', '0.9'), col('1.0', '0.78', '0.52'), col('0.82', '0.88', '1.0')],
-         ['0.0'] * 4, ['0.002*sin(time*0.7)'] * 4, ['1.0'] * 4, ['1.0'] * 4)
+    capa('colinas', 'colinas.png', ['verano', 'primavera', 'otono', 'invierno', 'noche'],
+         ['1.0'] * 5,
+         [col('1', '1', '1'), col('0.95', '1.0', '0.9'), col('1.0', '0.78', '0.52'), col('0.82', '0.88', '1.0'), col('0.30', '0.36', '0.58')],
+         ['0.0'] * 5, ['0.002*sin(time*0.7)'] * 5, ['1.0'] * 5, ['1.0'] * 5)
 
     arte.agua().save(os.path.join(DST, 'agua.png'), optimize=True)
-    capa('agua', 'agua.png', ['calma', 'viento', 'reflejo', 'seca'],
-         ['0.88+0.06*sin(time*2.1)', '0.85+0.1*sin(time*4.3)', '0.8+0.06*sin(time*2.1)', '0.18'],
-         [col('1', '1', '1'), col('0.92', '0.96', '1.0'), col('1.0', '0.78', '0.66'), col('0.7', '0.55', '0.4')],
-         ['0.10+0.003*sin(time*1.1)', '0.10+0.008*sin(time*2.3)', '0.10+0.003*sin(time*1.1)', '0.10'], ['-0.175'] * 3 + ['-0.18'],
-         ['0.62', '0.62+0.01*sin(time*3.1)', '0.62', '0.45'], ['0.20', '0.20+0.01*sin(time*2.7)', '0.20', '0.12'])
+    capa('agua', 'agua.png', ['calma', 'viento', 'reflejo', 'seca', 'noche'],
+         ['0.88+0.06*sin(time*2.1)', '0.85+0.1*sin(time*4.3)', '0.8+0.06*sin(time*2.1)', '0.18', '0.8+0.08*sin(time*1.7)'],
+         [col('1', '1', '1'), col('0.92', '0.96', '1.0'), col('1.0', '0.78', '0.66'), col('0.7', '0.55', '0.4'), col('0.32', '0.38', '0.62')],
+         ['0.10+0.003*sin(time*1.1)', '0.10+0.008*sin(time*2.3)', '0.10+0.003*sin(time*1.1)', '0.10', '0.10+0.003*sin(time*1.1)'], ['-0.175'] * 3 + ['-0.18', '-0.175'],
+         ['0.62', '0.62+0.01*sin(time*3.1)', '0.62', '0.45', '0.62'], ['0.20', '0.20+0.01*sin(time*2.7)', '0.20', '0.12', '0.20'])
 
     arte.pradera().save(os.path.join(DST, 'pradera.png'), optimize=True)
-    capa('pradera', 'pradera.png', ['brisa', 'viento', 'quieta', 'florida'],
+    capa('pradera', 'pradera.png', ['brisa', 'viento', 'atardecer', 'noche'],
          ['1.0'] * 4,
-         [col('1', '1', '1'), col('0.96', '1.0', '0.94'), col('1', '1', '1'), col('1.05', '1.0', '1.05')],
-         ['0.004*sin(time*1.7)', '0.012*sin(time*3.1)', '0.0', '0.004*sin(time*1.7)'], ['0.0'] * 4,
+         [col('1', '1', '1'), col('0.96', '1.0', '0.94'), col('1.0', '0.74', '0.56'), col('0.26', '0.32', '0.52')],
+         ['0.004*sin(time*1.7)', '0.012*sin(time*3.1)', '0.004*sin(time*1.7)', '0.002*sin(time*1.1)'], ['0.0'] * 4,
          ['1.03', '1.04', '1.03', '1.03'], ['1.0'] * 4)
 
     arte.lluvia().save(os.path.join(DST, 'lluvia.png'), optimize=True)
@@ -255,6 +256,19 @@ def main():
     efectos = '\n            '.join(mob('image', n, k) for n, k in orden)
     mol = re.sub(r'(<PARAM name="effect" type="MOLDEOOBJECT">\s*)<VAL>.*?</VAL>', lambda m: m.group(1) + efectos, mol, count=1, flags=re.S)
     assert '<D type="TXT">cielo</D>' in mol and all('<D type="TXT">%s</D>' % n in mol for n, _ in orden)
+    # P7 — presets de PROYECTO (estado = qué preset usa cada capa) + tiempo de cada estado y de la transición.
+    # Van en los PRECONFIGS de la consola: <P name="<capa>">; el player C++ ignora lo que no es un param suyo.
+    estados = [
+        ('amanecer',  8, 4, dict(cielo=0, sol=0, luna=3, nubes=3, montana=0, horizonte=2, colinas=1, agua=2, pradera=2, lluvia=0)),
+        ('dia',       8, 4, dict(cielo=1, sol=1, luna=3, nubes=1, montana=0, horizonte=0, colinas=0, agua=0, pradera=0, lluvia=0)),
+        ('atardecer', 8, 4, dict(cielo=2, sol=2, luna=1, nubes=3, montana=3, horizonte=2, colinas=2, agua=2, pradera=2, lluvia=0)),
+        ('noche',     8, 4, dict(cielo=3, sol=3, luna=0, nubes=2, montana=3, horizonte=3, colinas=4, agua=4, pradera=3, lluvia=0)),
+    ]
+    pre = '<PRECONFIGS>' + ''.join(
+        '\n        <PRE name="%s" duration="%d" transition="%d">' % (n, d, tr) +
+        ''.join('\n            <P name="%s">%d</P>' % (k, v) for k, v in idx.items()) + '\n        </PRE>'
+        for n, d, tr, idx in estados) + '\n    </PRECONFIGS>'
+    mol = re.sub(r'<PRECONFIGS>.*?</PRECONFIGS>|<PRECONFIGS\s*/>', pre, mol, flags=re.S)
     wr('Paisaje.mol', mol)
     print('ok', sorted(os.listdir(DST)))
 

@@ -22,8 +22,8 @@ function subText(vb: any): string {
 
 export class moHistory {
 
-  private undoStack: CfgPhoto[] = [];
-  private redoStack: CfgPhoto[] = [];
+  private undoStack: CfgPhoto[][] = [];   /** cada paso = fotos de una o varias capas */
+  private redoStack: CfgPhoto[][] = [];
   max: number = 200;
   onChange: () => void = null;
 
@@ -42,10 +42,11 @@ export class moHistory {
     };
   }
 
-  /** llamar ANTES de cambiar algo */
+  /** llamar ANTES de cambiar algo. `fx` puede ser una capa o varias (un estado de proyecto = un solo paso) */
   record(fx: any, what: string) {
-    if (!fx || !fx.GetConfig || !fx.GetConfig()) return;
-    this.undoStack.push(this.photo(fx, what));
+    const fxs = (Array.isArray(fx) ? fx : [fx]).filter((f: any) => f && f.GetConfig && f.GetConfig() && f.GetConfig().m_Params);
+    if (!fxs.length) return;
+    this.undoStack.push(fxs.map((f: any) => this.photo(f, what)));
     if (this.undoStack.length > this.max) this.undoStack.shift();
     this.redoStack = [];
     if (this.onChange) this.onChange();
@@ -76,22 +77,22 @@ export class moHistory {
   }
 
   undo(): string {
-    const ph = this.undoStack.pop(); if (!ph) return "";
-    this.redoStack.push(this.photo(ph.fx, ph.what));
-    this.restore(ph);
+    const st = this.undoStack.pop(); if (!st) return "";
+    this.redoStack.push(st.map((ph) => this.photo(ph.fx, ph.what)));
+    st.forEach((ph) => this.restore(ph));
     if (this.onChange) this.onChange();
-    return ph.what;
+    return st[0].what;
   }
 
   redo(): string {
-    const ph = this.redoStack.pop(); if (!ph) return "";
-    this.undoStack.push(this.photo(ph.fx, ph.what));
-    this.restore(ph);
+    const st = this.redoStack.pop(); if (!st) return "";
+    this.undoStack.push(st.map((ph) => this.photo(ph.fx, ph.what)));
+    st.forEach((ph) => this.restore(ph));
     if (this.onChange) this.onChange();
-    return ph.what;
+    return st[0].what;
   }
 
   canUndo(): boolean { return this.undoStack.length > 0; }
   canRedo(): boolean { return this.redoStack.length > 0; }
-  lastWhat(): string { const p = this.undoStack[this.undoStack.length - 1]; return p ? p.label + ": " + p.what : ""; }
+  lastWhat(): string { const st = this.undoStack[this.undoStack.length - 1]; return st ? (st.length > 1 ? "proyecto" : st[0].label) + ": " + st[0].what : ""; }
 }

@@ -21,7 +21,11 @@ export class moPresetWheel {
   private static MODES: { [m: string]: number } = { proyecto: null, corte: 0, lento: 3 };
   onMode: (mode: string) => void = null;
 
-  constructor(private console: any) {
+  project: any = null;            /** #918 P7: moProjectStates (estados del paisaje + línea de tiempo) */
+
+  constructor(private console: any, project: any = null) {
+    this.project = project;
+    if (project) project.onChange = () => this.render();
     this.collect();
     this.build();
     this.render();
@@ -32,6 +36,7 @@ export class moPresetWheel {
     const em = this.console.m_EffectManager;
     const all = [].concat(em.PreEffects() || [], em.Effects() || [], em.PostEffects() || [], em.MasterEffects() || []);
     this.layers = all.filter((fx) => fx && fx.GetConfig && fx.GetConfig() && fx.GetConfig().GetPreConfCount() > 0);
+    if (this.project && this.project.states().length) this.layers.unshift(this.project.asLayer());   /* el proyecto va primero */
   }
 
   private build() {
@@ -64,7 +69,7 @@ export class moPresetWheel {
 
   call(i: number, hardCut: boolean = false) {
     const fx = this.layer(); if (!fx) return;
-    if (this.history) this.history.record(fx, "preset " + (fx.GetConfig().m_PreConfigs[i].m_Name || i + 1));
+    if (this.history) this.history.record(fx.isProject ? this.project.layers() : fx, "preset " + (fx.GetConfig().m_PreConfigs[i].m_Name || i + 1));
     const d = hardCut ? 0 : moPresetWheel.MODES[this.mode];
     fx.GetConfig().SetCurrentPreConf(i, d === null ? undefined : d);
     if (this.onCall) this.onCall(fx, i);
@@ -85,7 +90,7 @@ export class moPresetWheel {
   capture(i: number) {
     const fx = this.layer(); if (!fx) return;
     const cfg = fx.GetConfig();
-    if (this.history) this.history.record(fx, "guardar preset " + (cfg.m_PreConfigs[i].m_Name || i + 1));
+    if (this.history && !fx.isProject) this.history.record(fx, "guardar preset " + (cfg.m_PreConfigs[i].m_Name || i + 1));
     for (const [pidx, vidx] of cfg.CapturePreConf(i)) fx.ResolveValue(cfg.m_Params[pidx], vidx);
     if (this.onCapture) this.onCapture(fx, i);
     setTimeout(() => this.render(), 250);
@@ -121,6 +126,12 @@ export class moPresetWheel {
     const mb = btn(label, "left:2px;top:2px;padding:5px 8px;font-size:11px;" + (this.mode != "proyecto" ? "background:#ffd36b;color:#0a0c18;border-color:#ffd36b;" : ""),
       () => this.nextMode());
     mb.title = "Cómo cambian los presets: proyecto (su duración) · corte (0 s) · lento (3 s). Shift+tocar = corte puntual";
+    /* línea de tiempo del proyecto (arriba a la derecha) */
+    if (this.project && this.project.states().length) {
+      const tb = btn(this.project.playing ? "⏸ día" : "▶ día", "right:2px;top:2px;padding:5px 8px;font-size:11px;" +
+        (this.project.playing ? "background:#9be38b;color:#0a0c18;border-color:#9be38b;" : ""), () => this.project.toggle());
+      tb.title = "Línea de tiempo: recorre los estados del proyecto en loop (cada uno con su duración)";
+    }
     if (!fx) return;
     /* anillo: los presets, empezando arriba y en sentido horario */
     const cfg = fx.GetConfig(), n = cfg.GetPreConfCount(), cur = cfg.GetCurrentPreConf();

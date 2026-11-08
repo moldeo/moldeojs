@@ -24,6 +24,7 @@ import { moConsole } from '../mo-console';
 import { moTouchEdit } from '../mo-touch-edit';
 import { moPresetWheel } from '../mo-preset-wheel';
 import { moHistory } from '../mo-history';
+import { moProjectStates } from '../mo-project-states';
 import { moMobDefinition } from '../mo-moldeo-object';
 import { PluginsDefinitionsMap, PluginsDefinitions, PluginsDefinitionsMapType,
   PluginsDefinitionsMapTypeArray, PluginsDefinitionsMapTypes,
@@ -74,6 +75,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
   public moEditDisplay:boolean = false;
   public touchEdit: moTouchEdit = null;
   public presetWheel: moPresetWheel = null;
+  public projectStates: moProjectStates = null;
   /** #918 H1 — deshacer / rehacer */
   public history: moHistory = new moHistory();
   public undoLabel: string = "";
@@ -471,7 +473,9 @@ export class MoldeojsInterfaceComponent implements OnInit {
     }
     /* #918 E1.5: rueda de presets (borrador) */
     if (!this.presetWheel) {
-      this.presetWheel = new moPresetWheel(this.m_Console);
+      this.projectStates = new moProjectStates(this.m_Console);
+      (window as any).moProjectStates = this.projectStates;
+      this.presetWheel = new moPresetWheel(this.m_Console, this.projectStates);
       this.presetWheel.onCall = (fx, i) => this.touchEdit && this.touchEdit.log("preset", { fx: "" + fx.GetLabelName(), i, name: "" + fx.GetConfig().m_PreConfigs[i].m_Name });
       this.touchEdit.onSelect = (fx) => { if (fx) this.presetWheel.setLayer(fx); };
       this.presetWheel.onCapture = (fx, i) => this.touchEdit && this.touchEdit.log("capture", { fx: "" + fx.GetLabelName(), i, name: "" + fx.GetConfig().m_PreConfigs[i].m_Name });

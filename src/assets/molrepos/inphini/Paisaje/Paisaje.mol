@@ -158,5 +158,54 @@
             </VAL>
         </PARAM>
     </CONFIGPARAMS>
-    <PRECONFIGS />
+    <PRECONFIGS>
+        <PRE name="amanecer" duration="8" transition="4">
+            <P name="cielo">0</P>
+            <P name="sol">0</P>
+            <P name="luna">3</P>
+            <P name="nubes">3</P>
+            <P name="montana">0</P>
+            <P name="horizonte">2</P>
+            <P name="colinas">1</P>
+            <P name="agua">2</P>
+            <P name="pradera">2</P>
+            <P name="lluvia">0</P>
+        </PRE>
+        <PRE name="dia" duration="8" transition="4">
+            <P name="cielo">1</P>
+            <P name="sol">1</P>
+            <P name="luna">3</P>
+            <P name="nubes">1</P>
+            <P name="montana">0</P>
+            <P name="horizonte">0</P>
+            <P name="colinas">0</P>
+            <P name="agua">0</P>
+            <P name="pradera">0</P>
+            <P name="lluvia">0</P>
+        </PRE>
+        <PRE name="atardecer" duration="8" transition="4">
+            <P name="cielo">2</P>
+            <P name="sol">2</P>
+            <P name="luna">1</P>
+            <P name="nubes">3</P>
+            <P name="montana">3</P>
+            <P name="horizonte">2</P>
+            <P name="colinas">2</P>
+            <P name="agua">2</P>
+            <P name="pradera">2</P>
+            <P name="lluvia">0</P>
+        </PRE>
+        <PRE name="noche" duration="8" transition="4">
+            <P name="cielo">3</P>
+            <P name="sol">3</P>
+            <P name="luna">0</P>
+            <P name="nubes">2</P>
+            <P name="montana">3</P>
+            <P name="horizonte">3</P>
+            <P name="colinas">4</P>
+            <P name="agua">4</P>
+            <P name="pradera">3</P>
+            <P name="lluvia">0</P>
+        </PRE>
+    </PRECONFIGS>
 </MOCONFIG>
