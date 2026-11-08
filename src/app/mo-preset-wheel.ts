@@ -1,0 +1,93 @@
+/**
+ * #918 E1.5 — borrador de la RUEDA DE PRESETS (esquina inferior derecha del boceto de FCA).
+ *
+ *  - centro  = la capa en foco (tocar ⇒ pasa a la siguiente capa que tenga presets)
+ *  - anillo  = sus presets, repartidos en círculo (4 ⇒ N·E·S·O); tocar ⇒ se llama (SetCurrentPreConf, salto inmediato)
+ *  - si en modo Edit se toca una capa en la pantalla, la rueda la toma (setLayer)
+ *
+ * DOM propio, sin componente Angular: es un borrador para probar el gesto en la tablet.
+ */
+
+export class moPresetWheel {
+
+  root: HTMLDivElement;
+  private layers: any[] = [];
+  private current: number = 0;
+  onCall: (layer: any, preset: number) => void = null;
+
+  constructor(private console: any) {
+    this.collect();
+    this.build();
+    this.render();
+  }
+
+  /** capas con presets, en el orden de la consola: pre-efectos, efectos, post, master */
+  private collect() {
+    const em = this.console.m_EffectManager;
+    const all = [].concat(em.PreEffects() || [], em.Effects() || [], em.PostEffects() || [], em.MasterEffects() || []);
+    this.layers = all.filter((fx) => fx && fx.GetConfig && fx.GetConfig() && fx.GetConfig().GetPreConfCount() > 0);
+  }
+
+  private build() {
+    const r = document.createElement("div");
+    r.id = "moPresetWheel";
+    r.setAttribute("data-html2canvas-ignore", "");
+    r.style.cssText = [
+      "position:fixed", "z-index:2147483000", "width:250px", "height:250px", "border-radius:50%",
+      "right:calc(16px + env(safe-area-inset-right, 0px))", "bottom:calc(16px + env(safe-area-inset-bottom, 0px))",
+      "background:rgba(10,12,24,.55)", "border:2px solid rgba(255,255,255,.55)", "backdrop-filter:blur(4px)",
+      "touch-action:none", "user-select:none", "-webkit-user-select:none", "font-family:monospace",
+    ].join(";");
+    document.body.appendChild(r);
+    this.root = r;
+  }
+
+  layer(): any { return this.layers[this.current]; }
+
+  /** la capa tocada en la pantalla pasa a ser la de la rueda */
+  setLayer(fx: any) {
+    const i = this.layers.indexOf(fx);
+    if (i >= 0) { this.current = i; this.render(); }
+  }
+
+  private nextLayer() {
+    if (!this.layers.length) return;
+    this.current = (this.current + 1) % this.layers.length;
+    this.render();
+  }
+
+  call(i: number) {
+    const fx = this.layer(); if (!fx) return;
+    fx.GetConfig().SetCurrentPreConf(i);
+    if (this.onCall) this.onCall(fx, i);
+    this.render();
+  }
+
+  render() {
+    const r = this.root; r.innerHTML = "";
+    const fx = this.layer();
+    const btn = (label: string, css: string, fn: () => void, active = false) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.textContent = label;
+      b.style.cssText = "position:absolute;touch-action:none;cursor:pointer;border-radius:999px;font:600 12px/1.1 monospace;" +
+        "padding:8px 10px;border:2px solid #fff;" + (active ? "background:#fff;color:#0a0c18;" : "background:rgba(10,12,24,.8);color:#fff;") + css;
+      b.addEventListener("pointerdown", (e) => { e.preventDefault(); e.stopPropagation(); fn(); });
+      r.appendChild(b);
+      return b;
+    };
+    /* centro: la capa */
+    const c = btn(fx ? "" + fx.GetLabelName() : "sin presets", "left:50%;top:50%;transform:translate(-50%,-50%);max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;",
+      () => this.nextLayer());
+    c.title = "Tocar: pasar a la siguiente capa";
+    if (!fx) return;
+    /* anillo: los presets, empezando arriba y en sentido horario */
+    const cfg = fx.GetConfig(), n = cfg.GetPreConfCount(), cur = cfg.GetCurrentPreConf();
+    const R = 84;
+    for (let i = 0; i < n; i++) {
+      const a = -Math.PI / 2 + (2 * Math.PI * i) / n;
+      const x = 125 + R * Math.cos(a), y = 125 + R * Math.sin(a);
+      const name = ("" + (cfg.m_PreConfigs[i].m_Name || (i + 1))).replace(/_/g, " ");
+      btn(name, `left:${x}px;top:${y}px;transform:translate(-50%,-50%);max-width:86px;white-space:normal;`, () => this.call(i), i == cur);
+    }
+  }
+}

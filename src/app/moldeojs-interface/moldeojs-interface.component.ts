@@ -22,6 +22,7 @@ import { MoIcon } from './mo-objects/mo-icon.component';
 
 import { moConsole } from '../mo-console';
 import { moTouchEdit } from '../mo-touch-edit';
+import { moPresetWheel } from '../mo-preset-wheel';
 import { moMobDefinition } from '../mo-moldeo-object';
 import { PluginsDefinitionsMap, PluginsDefinitions, PluginsDefinitionsMapType,
   PluginsDefinitionsMapTypeArray, PluginsDefinitionsMapTypes,
@@ -71,6 +72,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
   @ViewChild('moConfig') moConfig: ElementRef;
   public moEditDisplay:boolean = false;
   public touchEdit: moTouchEdit = null;
+  public presetWheel: moPresetWheel = null;
   /////////////////////////////////////////////
   /*- moControl definitions, for control -*/
   //@ViewChild('moControl') moControl: ElementRef;
@@ -423,6 +425,13 @@ export class MoldeojsInterfaceComponent implements OnInit {
       this.touchEdit = new moTouchEdit(this.m_Console, () => [this.moCanvas && this.moCanvas.nativeElement]);
       this.touchEdit.enabled = this.moEditDisplay;
       (window as any).moTouchEdit = this.touchEdit;
+    }
+    /* #918 E1.5: rueda de presets (borrador) */
+    if (!this.presetWheel) {
+      this.presetWheel = new moPresetWheel(this.m_Console);
+      this.presetWheel.onCall = (fx, i) => this.touchEdit && this.touchEdit.log("preset", { fx: "" + fx.GetLabelName(), i, name: "" + fx.GetConfig().m_PreConfigs[i].m_Name });
+      this.touchEdit.onSelect = (fx) => { if (fx) this.presetWheel.setLayer(fx); };
+      (window as any).moPresetWheel = this.presetWheel;
     }
     let cName : any = this.m_Console.GetConfigName();
     let cFile : moFile = new moFile(cName);
