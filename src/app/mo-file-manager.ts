@@ -287,6 +287,11 @@ export class moFile extends moAbstract {
 			fullget = ff;
 			fullpath = ""+p_FileName;
 		}
+		/* #918 L2: ruta absoluta del mismo servidor (proyecto servido por el Lab: /e/<slug>/mol/...) */
+		if ( (""+p_FileName).charAt(0) == "/" ) {
+			fullget = window.location.origin;
+			fullpath = ""+p_FileName;
+		}
 
     fullget = fullget.replace("index.html","");
     //console.log("fullget:",fullget);
@@ -691,6 +696,11 @@ export class moFileManager extends moResource {
 		var ff : string = window.location.origin+window.location.pathname;
 		if ( ff != fullget+"/" ) {
 			fullget = ff;
+			fullpath = ""+p_FileName;
+		}
+		/* #918 L2: ruta absoluta del mismo servidor (proyecto servido por el Lab: /e/<slug>/mol/...) */
+		if ( (""+p_FileName).charAt(0) == "/" ) {
+			fullget = window.location.origin;
 			fullpath = ""+p_FileName;
 		}
 
