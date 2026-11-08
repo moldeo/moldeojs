@@ -299,6 +299,33 @@ export class moMathVariableFactory extends moAbstract
 }
 
 
+/**
+ * #918 P8 — conexiones simples: en cualquier expresión se puede leer otra capa por su etiqueta,
+ * `sol.pos_cuad_y`, `luna.alpha`. Antes de compilar, `capa.param` se reescribe como `_mo("capa","param")`
+ * (el texto que el usuario ve y guarda NO cambia). Ciclos (A lee B y B lee A): se usa el último valor de ese par.
+ */
+const moObjectsByLabel: any = {};
+const _moEvalStack: any = {};
+const _moLastVal: any = {};
+export function moSetObjectScope(objects: any[]) {
+  for (const k of Object.keys(moObjectsByLabel)) delete moObjectsByLabel[k];
+  for (const fx of objects) if (fx && fx.GetLabelName) moObjectsByLabel["" + fx.GetLabelName()] = fx;
+}
+export function moObjectValue(label: string, prop: string): number {
+  const fx = moObjectsByLabel[label];
+  const cfg = fx && fx.GetConfig ? fx.GetConfig() : null;
+  if (!cfg || !cfg.m_ParamsByName || !cfg.m_ParamsByName[prop]) return 0;
+  const key = label + "." + prop;
+  if (_moEvalStack[key]) return _moLastVal[key] || 0;
+  _moEvalStack[key] = true;
+  try { const v = Number(cfg.Eval(prop)); if (!isNaN(v)) _moLastVal[key] = v; }
+  catch (e) { } finally { delete _moEvalStack[key]; }
+  return _moLastVal[key] || 0;
+}
+export function moRewriteObjectRefs(expr: string): string {
+  return ("" + expr).replace(/(^|[^\w.])([A-Za-z_]\w*)\.([A-Za-z_]\w*)\b/g, '$1_mo("$2","$3")');
+}
+
 export class moMathFunction extends moAbstract {
 
   m_VarFactory: moMathVariableFactory;
@@ -389,7 +416,7 @@ export class moParserFunction extends moMathFunction {
     try {
       //Parser.parse(this.m_Expression);
       //Parser.compile();
-      this.m_ParserNode = math.parse("" + this.m_Expression);
+      this.m_ParserNode = math.parse(moRewriteObjectRefs("" + this.m_Expression));   /* #918 P8 */
       //console.log("moParserFunction:Init > m_ParserNode:", this.m_ParserNode, this.m_Expression);
       this.m_VarFactory.CreateVariables( this.m_ParserNode );
       this.m_ParserCode = this.m_ParserNode.compile();
@@ -491,6 +518,9 @@ export class moParserFunction extends moMathFunction {
       },
       abs: function(val) {
         return Math.abs(val);
+      },
+      _mo: function(label, prop) {   /* #918 P8: otra capa, p. ej. sol.pos_cuad_y */
+        return moObjectValue("" + label, "" + prop);
       }
     };
     this.m_Scope = Object.assign(this.m_Scope, customFunctions);

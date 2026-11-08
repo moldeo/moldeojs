@@ -178,8 +178,13 @@ def main():
 
     # P1 cielo (color de fondo)
     cielo = rd('erase.cfg').replace('name="erase" class', 'name="cielo" class', 1)
-    cielo = setvals(cielo, 'color', [col('0.99', '0.78', '0.62'), col('0.50', '0.78', '0.93'), col('0.97', '0.55', '0.42'), col('0.08', '0.10', '0.24')])
-    wr('cielo.cfg', set_pre(cielo, pres(['amanecer', 'dia', 'atardecer', 'noche'], ['color'])))
+    # P8 — «sigue al sol»: el color sale de la altura del sol (conexión simple: sol.pos_cuad_y)
+    k = 'min(1,max(0,(sol.pos_cuad_y+0.26)/0.46))'                 # 0 = sol oculto … 1 = mediodía
+    w = 'max(0,1-abs(sol.pos_cuad_y+0.02)/0.14)'                   # cerca del horizonte = cálido
+    sigue = [('FUNCTION', 'RED', '0.08+0.42*%s+0.5*%s' % (k, w)), ('FUNCTION', 'GREEN', '0.10+0.68*%s+0.12*%s' % (k, w)),
+             ('FUNCTION', 'BLUE', '0.24+0.69*%s-0.12*%s' % (k, w)), ('FUNCTION', 'ALPHA', '1.0')]
+    cielo = setvals(cielo, 'color', [col('0.99', '0.78', '0.62'), col('0.50', '0.78', '0.93'), col('0.97', '0.55', '0.42'), col('0.08', '0.10', '0.24'), sigue])
+    wr('cielo.cfg', set_pre(cielo, pres(['amanecer', 'dia', 'atardecer', 'noche', 'sigue_al_sol'], ['color'])))
 
     # cada capa vibra un poco por defecto ("todo tiene que vibrar")
     arte.sol().save(os.path.join(DST, 'sol.png'), optimize=True)
@@ -263,6 +268,8 @@ def main():
         ('dia',       8, 4, dict(cielo=1, sol=1, luna=3, nubes=1, montana=0, horizonte=0, colinas=0, agua=0, pradera=0, lluvia=0)),
         ('atardecer', 8, 4, dict(cielo=2, sol=2, luna=1, nubes=3, montana=3, horizonte=2, colinas=2, agua=2, pradera=2, lluvia=0)),
         ('noche',     8, 4, dict(cielo=3, sol=3, luna=0, nubes=2, montana=3, horizonte=3, colinas=4, agua=4, pradera=3, lluvia=0)),
+        # P8: el sol anda solo (arco) y el cielo lo sigue por conexión — el día pasa sin línea de tiempo
+        ('sol_vivo', 40, 3, dict(cielo=4, sol=4, luna=3, nubes=1, montana=0, horizonte=0, colinas=0, agua=0, pradera=0, lluvia=0)),
     ]
     pre = '<PRECONFIGS>' + ''.join(
         '\n        <PRE name="%s" duration="%d" transition="%d">' % (n, d, tr) +

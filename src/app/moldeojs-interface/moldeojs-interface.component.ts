@@ -25,6 +25,7 @@ import { moTouchEdit } from '../mo-touch-edit';
 import { moPresetWheel } from '../mo-preset-wheel';
 import { moHistory } from '../mo-history';
 import { moProjectStates } from '../mo-project-states';
+import { moSetObjectScope } from '../mo-math-manager';
 import { moMobDefinition } from '../mo-moldeo-object';
 import { PluginsDefinitionsMap, PluginsDefinitions, PluginsDefinitionsMapType,
   PluginsDefinitionsMapTypeArray, PluginsDefinitionsMapTypes,
@@ -465,6 +466,8 @@ export class MoldeojsInterfaceComponent implements OnInit {
   public loadedSample() : void {
     console.log("moldeojs-interface loadedSample!")
     this.m_Console = this.moldeojsview.GetConsole();
+    /* #918 P8: las capas se pueden leer desde expresiones: sol.pos_cuad_y */
+    moSetObjectScope(this.m_Console.m_EffectManager.m_AllEffects);
     /* #918 E1: tocar/arrastrar capas sobre la pantalla en modo edición */
     if (!this.touchEdit) {
       this.touchEdit = new moTouchEdit(this.m_Console, () => [this.moCanvas && this.moCanvas.nativeElement]);

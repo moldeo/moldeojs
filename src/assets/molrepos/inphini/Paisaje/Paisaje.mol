@@ -207,5 +207,17 @@
             <P name="pradera">3</P>
             <P name="lluvia">0</P>
         </PRE>
+        <PRE name="sol_vivo" duration="40" transition="3">
+            <P name="cielo">4</P>
+            <P name="sol">4</P>
+            <P name="luna">3</P>
+            <P name="nubes">1</P>
+            <P name="montana">0</P>
+            <P name="horizonte">0</P>
+            <P name="colinas">0</P>
+            <P name="agua">0</P>
+            <P name="pradera">0</P>
+            <P name="lluvia">0</P>
+        </PRE>
     </PRECONFIGS>
 </MOCONFIG>
