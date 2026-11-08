@@ -156,7 +156,7 @@ h3{
   color:#010101;
 }
 .moldeoicon{
-  background-image: url('assets/mojs-interface-data/moldeo-white.svg');
+  background-image: url('assets/mojs-interface-data/moldeo.svg') /* 918: moldeo-white.svg nunca existio (404) */;
   background-size: 90%;
   background-repeat:   no-repeat;
   background-position: center center;
