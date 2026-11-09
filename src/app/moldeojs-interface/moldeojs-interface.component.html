@@ -40,6 +40,11 @@
   <span *ngIf="undoLabel" class="moldeobutton" style="pointer-events:none">{{ undoLabel }}</span>
   <button *ngIf="saveUrl" class="moldeobutton" type="button" name="save" title="Guardar el proyecto en el MoldeoLab" (click)="saveProject()">{{ saveState || 'Guardar' }}</button>
   <button *ngIf="saveUrl" class="moldeobutton" type="button" name="versions" title="Versiones guardadas del proyecto" (click)="toggleVersions()">Versiones</button>
+  <select *ngIf="personas.length" class="moldeobutton moPersona" name="persona" title="La carta de una persona mueve el sol y la luna" [value]="personaId" (change)="choosePersona($event.target.value)">
+    <option value="">Persona…</option>
+    <option *ngFor="let p of personas" [value]="p.id">{{ p.alias }} · {{ p.id }}</option>
+  </select>
+  <span *ngIf="personaMsg" class="moPersonaMsg">{{ personaMsg }}</span>
   <button class="moldeobutton" type="button" name="log" title="Registrar los toques (para depurar)" (click)="touchEdit && touchEdit.toggleLog()">{{ touchEdit && touchEdit.logOn ? 'Log ●' : 'Log' }}</button>
 </header>
 <div *ngIf="versionsOpen" class="moVersions">

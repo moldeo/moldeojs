@@ -156,6 +156,49 @@ export class MoldeojsInterfaceComponent implements OnInit {
       else this.versionsMsg = "No se restauró: " + r.error;
     }).catch(() => this.versionsMsg = "Sin conexión");
   }
+  /** #918 P10 — «la persona»: la carta LDP de una persona (servida por el Lab en /e/<slug>/mol-io) mueve
+   *  sol y luna. El Lab calcula los params (un solo lugar del mapeo); acá sólo se aplican y viajan al Player. */
+  public personaUrl: string = (() => { try { const m = new URLSearchParams(window.location.search).get("mol") || "";
+    const r = /^(\/e\/[^\/?#]+)\/mol\//.exec(m); return r ? r[1] + "/mol-io" : ""; } catch (e) { return ""; } })();
+  public personas: any[] = [];
+  public personaId: string = "";
+  public personaMsg: string = "";
+  private loadPersonas(): void {
+    if (!this.personaUrl || (this.channel && this.channel.isPlayer())) return;
+    this.rpc(this.personaUrl, {}).then((r) => { this.personas = (r.ok && r.personas) || []; }).catch(() => {});
+  }
+  public choosePersona(id: string): void {
+    this.personaId = id;
+    if (!id) return;
+    this.personaMsg = "…";
+    this.rpc(this.personaUrl, { persona: Number(id) }).then((r) => {
+      if (!r.ok) { this.personaMsg = "No se pudo: " + r.error; return; }
+      this.applyPersonaParams(r.params || {});
+      if (this.channel) this.channel.send({ verb: "persona", params: r.params || {} });
+      if (this.touchEdit) this.touchEdit.log("persona", { id: r.persona && r.persona.id });
+      this.personaMsg = ""; if (this.presetWheel) this.presetWheel.render();
+    }).catch(() => this.personaMsg = "Sin conexión");
+  }
+  /** {"sol.pos_cuad_x": n, "luna.texture": i, …}: los números van al VAL del preset activo (como el touch);
+   *  `texture` es un índice (las texturas no interpolan, igual que en los estados de proyecto). */
+  public applyPersonaParams(params: any): void {
+    if (!this.m_Console) return;
+    const TE = this.touchEdit, seen: any[] = [];
+    if (TE) TE.applying = true;          /* un solo mensaje «persona» al Player, no un valueset por param */
+    try {
+      for (const k of Object.keys(params)) {
+        const i = k.indexOf("."); if (i < 0) continue;
+        const label = k.slice(0, i), pname = k.slice(i + 1), v = Number(params[k]);
+        const fx = this.m_Console.m_EffectManager.m_AllEffects.find((e: any) => ("" + e.GetLabelName()) == label);
+        if (!fx || isNaN(v)) continue;
+        if (this.history && seen.indexOf(fx) < 0) { this.history.record(fx, "persona"); seen.push(fx); }
+        if (pname == "texture") {
+          const P = fx.GetConfig().m_ParamsByName[pname];
+          if (P && v >= 0 && v < P.GetValuesCount()) P.SetIndexValue(v);
+        } else if (TE) TE.setNumber(fx, pname, v);
+      }
+    } finally { if (TE) TE.applying = false; }
+  }
   /////////////////////////////////////////////
   /*- moControl definitions, for control -*/
   //@ViewChild('moControl') moControl: ElementRef;
@@ -540,6 +583,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
             if (m.verb == "preconfigset") W.call(m.i, !!m.hard); else W.capture(m.i);
             return;
           }
+          if (m.verb == "persona") { this.applyPersonaParams(m.params || {}); return; }
           if (m.verb == "valueset") {
             const fx = this.m_Console.m_EffectManager.m_AllEffects.find((e: any) => ("" + e.GetLabelName()) == m.label);
             if (fx) { if (this.history) this.history.record(fx, "mover"); TE.applying = true; TE.setNumber(fx, m.param, m.value); TE.applying = false; }
@@ -547,6 +591,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
         };
       }
       this.presetWheel.onMode = (m) => this.touchEdit && this.touchEdit.log("mode", { mode: m });
+      this.loadPersonas();
       this.touchEdit.history = this.history;
       (window as any).moHistory = this.history;
       window.addEventListener("keydown", (e: KeyboardEvent) => {
