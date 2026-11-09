@@ -173,16 +173,22 @@ export class MoldeojsInterfaceComponent implements OnInit {
     this.personaMsg = "…";
     this.rpc(this.personaUrl, { persona: Number(id) }).then((r) => {
       if (!r.ok) { this.personaMsg = "No se pudo: " + r.error; return; }
-      this.applyPersonaParams(r.params || {});
-      if (this.channel) this.channel.send({ verb: "persona", params: r.params || {} });
+      this.applyPersonaParams(r.params || {}, r.estado);
+      if (this.channel) this.channel.send({ verb: "persona", params: r.params || {}, estado: r.estado || "" });
       if (this.touchEdit) this.touchEdit.log("persona", { id: r.persona && r.persona.id });
       this.personaMsg = ""; if (this.presetWheel) this.presetWheel.render();
     }).catch(() => this.personaMsg = "Sin conexión");
   }
   /** {"sol.pos_cuad_x": n, "luna.texture": i, …}: los números van al VAL del preset activo (como el touch);
    *  `texture` es un índice (las texturas no interpolan, igual que en los estados de proyecto). */
-  public applyPersonaParams(params: any): void {
+  public applyPersonaParams(params: any, estado?: string): void {
     if (!this.m_Console) return;
+    /* L7 — «el cielo acompaña al sol» (opcional, lo decide el binding): primero el estado de día, con corte duro
+       para que su transición no arrastre las posiciones; después los valores de la carta encima. */
+    if (estado && this.projectStates) {
+      const i = this.projectStates.states().findIndex((st: any) => ("" + st.m_Name) == estado);
+      if (i >= 0) this.projectStates.call(i, 0);
+    }
     const TE = this.touchEdit, seen: any[] = [];
     if (TE) TE.applying = true;          /* un solo mensaje «persona» al Player, no un valueset por param */
     try {
@@ -583,7 +589,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
             if (m.verb == "preconfigset") W.call(m.i, !!m.hard); else W.capture(m.i);
             return;
           }
-          if (m.verb == "persona") { this.applyPersonaParams(m.params || {}); return; }
+          if (m.verb == "persona") { this.applyPersonaParams(m.params || {}, m.estado); return; }
           if (m.verb == "valueset") {
             const fx = this.m_Console.m_EffectManager.m_AllEffects.find((e: any) => ("" + e.GetLabelName()) == m.label);
             if (fx) { if (this.history) this.history.record(fx, "mover"); TE.applying = true; TE.setNumber(fx, m.param, m.value); TE.applying = false; }
