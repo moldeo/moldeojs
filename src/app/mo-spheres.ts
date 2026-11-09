@@ -192,9 +192,13 @@ export class moParamsSphere extends moSphere {
         () => { this.page = (this.page + 1) % pages; this.render(); this.flash("parámetros " + (this.page + 1) + "/" + pages); });
     }
     const shown = names.slice(this.page * per, (this.page + 1) * per);
-    const pos = this.ringPos(shown.length);
+    const pos = this.ringPos(shown.length), used: { [g: string]: boolean } = {};
     shown.forEach((nm, k) => {
-      const b = this.btn(moParamsSphere.glyph(nm), nm, nm == this.param ? "on" : "", pos[k].x, pos[k].y,
+      let g = moParamsSphere.glyph(nm);
+      if (used[g]) { const c = nm.replace(/[^a-z0-9]/gi, ""); g = (c[0] + c[c.length - 1]).toLowerCase(); }   /* sin glifos repetidos */
+      if (used[g]) g = g[0] + (k + 1);
+      used[g] = true;
+      const b = this.btn(g, nm, nm == this.param ? "on" : "", pos[k].x, pos[k].y,
         () => { this.param = nm; this.render(); this.flash(nm + " " + fmt(this.value(nm))); });
       b.title = nm + " = " + fmt(this.value(nm)) + " — tocar: elegir · después arrastrá en la esfera (o rueda del mouse)";
     });

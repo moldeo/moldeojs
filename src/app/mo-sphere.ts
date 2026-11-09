@@ -42,13 +42,21 @@ export class moSphere {
     this.applyHelp();
     this.place();
     window.addEventListener("resize", () => this.place());
+    setTimeout(() => this.place(), 1500);   /* el header termina de armarse después (personas, versiones) */
   }
 
-  /** arriba: debajo del header (se mide en vivo, en celular ocupa dos filas) */
+  /** arriba: debajo de lo que ocupe su columna (header —que en celular se parte en dos filas— y la barra 📷 del lienzo) */
   place() {
     if (this.corner[0] != "t") return;
-    const h: any = document.querySelector("header.moHeader");
-    const b = h ? h.getBoundingClientRect().bottom : 0;
+    const vw = window.innerWidth, w = moSphere.SIZE + 14;
+    const x0 = this.corner == "tl" ? 0 : vw - w, x1 = this.corner == "tl" ? w : vw;
+    let b = 0;
+    document.querySelectorAll("header.moHeader, header.moHeader *, #moldeobuttons, #moldeobuttons *").forEach((el: any) => {
+      const r = el.getBoundingClientRect();
+      if (!r.height || !r.width || r.top > window.innerHeight * 0.4) return;
+      if (r.right < x0 || r.left > x1) return;
+      b = Math.max(b, r.bottom);
+    });
     this.root.style.top = Math.max(14, Math.round(b + 10)) + "px";
   }
 
@@ -112,6 +120,7 @@ export class moSphere {
 
   render() {
     if (!this.ring) return;
+    this.place();
     this.ring.innerHTML = "";
     this.root.classList.toggle("mo-sphere-closed", !this.open);
     if (!this.open) {
