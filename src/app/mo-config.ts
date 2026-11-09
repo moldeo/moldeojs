@@ -508,6 +508,14 @@ export class moConfig extends moAbstract {
     x += "    <DEFINITION" + attrs(def) + " />\n";
     if (this.m_XmlHasUpdate) x += "    <UPDATE />\n";
     x += "    <CONFIGPARAMS>\n";
+    /* #918 F15: las lentes propuestas sin elegir no se guardan, ni sus VAL ⇒ se reindexan los <P> */
+    const pres = this.m_PreConfigs.filter((pre: any) => !pre.m_Proposed);
+    const remap: { [name: string]: number[] } = {};
+    for (const param of this.m_Params) {
+      const nm = "" + param.m_ParamDefinition.m_Name, used: { [i: number]: boolean } = {};
+      for (const pre of pres) for (const pi of pre.m_PreconfIndexes) if (("" + pi.m_ParamName) == nm) used[pi.m_ValueIndex] = true;
+      let k = 0; remap[nm] = (param.GetValues() || []).map((v: any, i: number) => (v.m_Proposed && !used[i] && i > 0) ? -1 : k++);
+    }
     for (const param of this.m_Params) {
       const pd: any = param.m_ParamDefinition;
       const pa: any = Object.assign({}, (param as any).m_XmlAttributes || {});
@@ -518,7 +526,10 @@ export class moConfig extends moAbstract {
       const vals = param.GetValues();
       if (!vals || vals.length == 0) { x += "        <PARAM" + attrs(pa) + " />\n"; continue; }
       x += "        <PARAM" + attrs(pa) + ">\n";
-      for (const val of vals) {
+      const rm = remap["" + pd.m_Name] || [];
+      for (let vi = 0; vi < vals.length; vi++) {
+        const val: any = vals[vi];
+        if (rm[vi] === -1) continue;
         x += "            <VAL>\n";
         for (const vb of (val.m_List as any[])) {
           const da: any = Object.assign({}, vb.m_XmlAttributes || {});
@@ -538,14 +549,15 @@ export class moConfig extends moAbstract {
       x += "        </PARAM>\n";
     }
     x += "    </CONFIGPARAMS>\n";
-    if (this.m_PreConfigs.length) {
+    if (pres.length) {
       x += "    <PRECONFIGS>\n";
-      for (const pre of this.m_PreConfigs) {
+      for (const pre of pres) {
         const pa: any = Object.assign({}, pre.m_XmlAttributes || {});
         if (pre.m_Name) pa["name"] = pre.m_Name; else delete pa["name"];
         x += "        <PRE" + attrs(pa) + ">\n";
         for (const pi of pre.m_PreconfIndexes)
-          x += "            <P" + attrs({ name: pi.m_ParamName }) + ">" + pi.m_ValueIndex + "</P>\n";
+          x += "            <P" + attrs({ name: pi.m_ParamName }) + ">" +
+            ((remap["" + pi.m_ParamName] && remap["" + pi.m_ParamName][pi.m_ValueIndex] >= 0) ? remap["" + pi.m_ParamName][pi.m_ValueIndex] : pi.m_ValueIndex) + "</P>\n";
         x += "        </PRE>\n";
       }
       x += "    </PRECONFIGS>\n";

@@ -11,7 +11,7 @@
  */
 
 interface ParamPhoto { n: number; cur: number; texts: string[][]; }
-interface CfgPhoto { fx: any; label: string; what: string; preActual: number; params: ParamPhoto[]; pres: number[][]; }
+interface CfgPhoto { fx: any; label: string; what: string; preActual: number; params: ParamPhoto[]; pres: number[][]; npre?: number; }
 
 const NUMERIC = ["NUM", "CHAR", "INT", "LONG", "FLOAT", "DOUBLE"];
 
@@ -39,6 +39,7 @@ export class moHistory {
         texts: P.m_Values.map((v: any) => v.m_List.map((vb: any) => subText(vb))),
       })),
       pres: cfg.m_PreConfigs.map((pre: any) => pre.m_PreconfIndexes.map((pi: any) => pi.m_ValueIndex)),
+      npre: cfg.m_PreConfigs.length,
     };
   }
 
@@ -55,6 +56,7 @@ export class moHistory {
   /** vuelve la capa a la foto */
   private restore(ph: CfgPhoto) {
     const fx = ph.fx, cfg = fx.GetConfig();
+    if (ph.npre !== undefined && Array.isArray(cfg.m_PreConfigs) && cfg.m_PreConfigs.length > ph.npre) cfg.m_PreConfigs.length = ph.npre;   /* F15: lentes agregadas después */
     cfg.m_PreConfigs.forEach((pre: any, i: number) => {
       const idx = ph.pres[i]; if (!idx) return;
       pre.m_PreconfIndexes.forEach((pi: any, j: number) => { if (idx[j] !== undefined) pi.m_ValueIndex = idx[j]; });

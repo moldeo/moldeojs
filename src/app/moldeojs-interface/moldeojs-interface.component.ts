@@ -23,6 +23,7 @@ import { MoIcon } from './mo-objects/mo-icon.component';
 import { moConsole } from '../mo-console';
 import { moTouchEdit } from '../mo-touch-edit';
 import { moPresetWheel } from '../mo-preset-wheel';
+import { moObjectsSphere, moParamsSphere, moTimeSphere } from '../mo-spheres';
 import { moHistory } from '../mo-history';
 import { moProjectStates } from '../mo-project-states';
 import { moSetObjectScope } from '../mo-math-manager';
@@ -77,6 +78,9 @@ export class MoldeojsInterfaceComponent implements OnInit {
   public moEditDisplay:boolean = false;
   public touchEdit: moTouchEdit = null;
   public presetWheel: moPresetWheel = null;
+  public objectsSphere: moObjectsSphere = null;
+  public paramsSphere: moParamsSphere = null;
+  public timeSphere: moTimeSphere = null;
   public projectStates: moProjectStates = null;
   public channel: moChannel = null;
   /** #918 H1 — deshacer / rehacer */
@@ -85,12 +89,12 @@ export class MoldeojsInterfaceComponent implements OnInit {
   public doUndo(): void {
     if (this.channel) this.channel.send({ verb: "undo" });
     const w = this.history.undo();
-    if (w) { this.undoLabel = "↶ " + w; if (this.touchEdit) this.touchEdit.log("undo", { what: w }); if (this.presetWheel) this.presetWheel.render(); setTimeout(() => this.undoLabel = "", 2000); }
+    if (w) { this.undoLabel = "↶ " + w; if (this.touchEdit) this.touchEdit.log("undo", { what: w }); if (this.presetWheel) this.presetWheel.render(); if (this.paramsSphere) this.paramsSphere.render(); setTimeout(() => this.undoLabel = "", 2000); }
   }
   public doRedo(): void {
     if (this.channel) this.channel.send({ verb: "redo" });
     const w = this.history.redo();
-    if (w) { this.undoLabel = "↷ " + w; if (this.touchEdit) this.touchEdit.log("redo", { what: w }); if (this.presetWheel) this.presetWheel.render(); setTimeout(() => this.undoLabel = "", 2000); }
+    if (w) { this.undoLabel = "↷ " + w; if (this.touchEdit) this.touchEdit.log("redo", { what: w }); if (this.presetWheel) this.presetWheel.render(); if (this.paramsSphere) this.paramsSphere.render(); setTimeout(() => this.undoLabel = "", 2000); }
   }
   /** #918 L2 — ?save=<ruta del Lab> ⇒ botón Guardar: manda el XML de la consola y de cada .cfg */
   public saveUrl: string = (() => { try { const v = new URLSearchParams(window.location.search).get("save");
@@ -268,6 +272,35 @@ export class MoldeojsInterfaceComponent implements OnInit {
       this.moConfig.nativeElement.children[i].children[0].style.left = posX[i]+"px";
     }
     console.log("Automatic LayOut Ended");
+  }
+
+  /** #918 D2/F15 — aplica un mensaje del canal por los mismos caminos que la interfaz (Player y reproducir toma) */
+  applyRemote(m: any) {
+    const W = this.presetWheel, PS = this.projectStates, TE = this.touchEdit;
+    if (!m || !m.verb || !W) return;
+    const byLabel = (l: string) => this.m_Console.m_EffectManager.m_AllEffects.find((e: any) => ("" + e.GetLabelName()) == l);
+    if (m.verb == "mode") { W.mode = m.mode; return; }
+    if (m.verb == "undo") { this.doUndo(); return; }
+    if (m.verb == "redo") { this.doRedo(); return; }
+    if (m.verb == "play") { if (!PS.playing) PS.play(m.group); return; }
+    if (m.verb == "pause") { PS.pause(); return; }
+    if ((m.verb == "preconfigset" || m.verb == "preconfigsave") && W.selectByLabel(m.label)) {
+      if (m.mode) W.mode = m.mode;
+      if (m.verb == "preconfigset") W.call(m.i, !!m.hard); else W.capture(m.i);
+      return;
+    }
+    if (m.verb == "propose" && W.selectByLabel(m.label)) { W.propose(m.seed); return; }
+    if (m.verb == "proposekeep" && W.selectByLabel(m.label)) { W.keepProposal(m.i); return; }
+    if (m.verb == "proposedrop" && W.selectByLabel(m.label)) { W.dropProposals(); return; }
+    if (m.verb == "objectenable" || m.verb == "objectdisable") {
+      const fx = byLabel(m.label); if (fx) { if (m.verb == "objectenable") fx.Activate(); else fx.Deactivate(); }
+      return;
+    }
+    if (m.verb == "persona") { this.applyPersonaParams(m.params || {}, m.estado); return; }
+    if (m.verb == "valueset") {
+      const fx = byLabel(m.label);
+      if (fx) { if (this.history) this.history.record(fx, "mover"); TE.applying = true; TE.setNumber(fx, m.param, m.value); TE.applying = false; }
+    }
   }
 
   public showWheel(e:any): void {
@@ -574,27 +607,39 @@ export class MoldeojsInterfaceComponent implements OnInit {
       const ch = new moChannel();
       this.channel = ch;
       this.presetWheel.channel = ch; this.projectStates.channel = ch; this.touchEdit.channel = ch;
+      /* #918 F15: las otras tres esferas + REC (el canal pasa por la toma) */
+      const W = this.presetWheel, PS = this.projectStates, TE = this.touchEdit;
+      this.objectsSphere = new moObjectsSphere(this.m_Console);
+      this.paramsSphere = new moParamsSphere();
+      this.timeSphere = new moTimeSphere(PS);
+      this.objectsSphere.channel = ch;
+      this.paramsSphere.touchEdit = TE; this.paramsSphere.history = this.history;
+      this.timeSphere.wheel = W;
+      (window as any).moSpheres = { objects: this.objectsSphere, params: this.paramsSphere, time: this.timeSphere };
+      const focus = (fx: any) => {
+        if (!fx || fx.isProject) return;
+        W.setLayer(fx); this.objectsSphere.setFocus(fx); this.paramsSphere.setFocus(fx);
+      };
+      this.objectsSphere.onFocus = focus;
+      this.touchEdit.onSelect = (fx) => focus(fx);
+      W.onLayer = (fx) => { if (fx && !fx.isProject) { this.objectsSphere.setFocus(fx); this.paramsSphere.setFocus(fx); } };
+      const f0 = W.layer() && !W.layer().isProject ? W.layer() : (this.m_Console.m_EffectManager.Effects() || [])[0];
+      if (f0) { this.objectsSphere.setFocus(f0); this.paramsSphere.setFocus(f0); }
+      const prevChange = PS.onChange;
+      PS.onChange = () => { if (prevChange) prevChange(); this.timeSphere.render(); };
+      const rawSend = ch.send.bind(ch);
+      let mute = false;
+      ch.send = (m: any) => { if (mute) return; this.timeSphere.tap(m); rawSend(m); };
+      /* reproducir la toma: se aplica acá en silencio y se manda UNA vez al Player tal cual se grabó */
+      this.timeSphere.apply = (m: any) => {
+        mute = true;
+        try { this.applyRemote(m); } finally { mute = false; }
+        rawSend(m);
+        W.render(); this.paramsSphere.render(); this.objectsSphere.render();
+      };
       if (ch.isPlayer()) {
         document.body.classList.add("mo-player");
-        const W = this.presetWheel, PS = this.projectStates, TE = this.touchEdit;
-        ch.onMessage = (m: any) => {
-          if (!m || !m.verb) return;
-          if (m.verb == "mode") { W.mode = m.mode; return; }
-          if (m.verb == "undo") { this.doUndo(); return; }
-          if (m.verb == "redo") { this.doRedo(); return; }
-          if (m.verb == "play") { if (!PS.playing) PS.play(m.group); return; }
-          if (m.verb == "pause") { PS.pause(); return; }
-          if ((m.verb == "preconfigset" || m.verb == "preconfigsave") && W.selectByLabel(m.label)) {
-            if (m.mode) W.mode = m.mode;
-            if (m.verb == "preconfigset") W.call(m.i, !!m.hard); else W.capture(m.i);
-            return;
-          }
-          if (m.verb == "persona") { this.applyPersonaParams(m.params || {}, m.estado); return; }
-          if (m.verb == "valueset") {
-            const fx = this.m_Console.m_EffectManager.m_AllEffects.find((e: any) => ("" + e.GetLabelName()) == m.label);
-            if (fx) { if (this.history) this.history.record(fx, "mover"); TE.applying = true; TE.setNumber(fx, m.param, m.value); TE.applying = false; }
-          }
-        };
+        ch.onMessage = (m: any) => this.applyRemote(m);
       }
       this.presetWheel.onMode = (m) => this.touchEdit && this.touchEdit.log("mode", { mode: m });
       this.loadPersonas();
