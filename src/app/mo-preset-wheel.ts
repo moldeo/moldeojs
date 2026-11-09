@@ -86,7 +86,7 @@ export class moPresetWheel {
 #moPresetWheel .mw-center{width:50px;height:50px;font-size:13px;letter-spacing:.04em;
  border-color:rgba(255,94,216,.85);box-shadow:0 0 12px rgba(255,94,216,.45)}
 #moPresetWheel .mw-mini{width:26px;height:26px;font-size:13px}
-#moPresetWheel .mw-t{display:none;font:600 8px/1 system-ui,sans-serif;margin-top:2px;max-width:44px;
+#moPresetWheel .mw-t{display:none;font:600 8px/1 system-ui,sans-serif;margin-top:2px;max-width:58px;
  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.85}
 #moPresetWheel.mw-help .mw-b{width:44px;height:44px;font-size:15px}
 #moPresetWheel.mw-help .mw-t{display:block}
@@ -269,12 +269,15 @@ export class moPresetWheel {
         () => { this.projGroup = other; this.render(); this.flash(this.groupLabel(other)); });
       gb.title = "La rueda muestra un grupo de estados por vez: día o estaciones (son ejes independientes)";
     }
-    const n = shown.length, R = 58;
+    const n = shown.length, R = 58, used: { [g: string]: boolean } = {};
     for (let k = 0; k < n; k++) {
       const i = shown[k];
       const a = -Math.PI / 2 + (2 * Math.PI * k) / n;
       const name = ("" + (cfg.m_PreConfigs[i].m_Name || (i + 1))).replace(/_/g, " ");
-      const b = btn(moPresetWheel.glyph(name, i), name, i == cur ? "on" : "", corner(C + R * Math.cos(a), C + R * Math.sin(a)),
+      let g = moPresetWheel.glyph(name, i);
+      if (used[g]) { const m = name.match(/[a-záéíóúñ0-9]/i); g = m ? m[0].toUpperCase() : "" + (i + 1); }   /* sin glifos repetidos */
+      used[g] = true;
+      const b = btn(g, name, i == cur ? "on" : "", corner(C + R * Math.cos(a), C + R * Math.sin(a)),
         () => this.call(i, this.shiftDown), () => this.capture(i));
       b.title = name + " — tocar: llamar · mantener: guardar el estado actual";
     }
