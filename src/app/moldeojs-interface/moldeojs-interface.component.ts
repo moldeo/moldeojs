@@ -299,7 +299,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
     if (m.verb == "persona") { this.applyPersonaParams(m.params || {}, m.estado); return; }
     if (m.verb == "valueset") {
       const fx = byLabel(m.label);
-      if (fx) { if (this.history) this.history.record(fx, "mover"); TE.applying = true; TE.setNumber(fx, m.param, m.value); TE.applying = false; }
+      if (fx) { if (this.history && m.rec !== false) this.history.record(fx, "mover"); TE.applying = true; TE.setNumber(fx, m.param, m.value); TE.applying = false; }
     }
   }
 

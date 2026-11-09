@@ -152,6 +152,7 @@ export class moParamsSphere extends moSphere {
     if (!this.open || !this.param || (e.target as HTMLElement).closest(".mw-b")) return;
     e.preventDefault(); e.stopPropagation();
     if (this.history) this.history.record(this.focus, "mover " + this.param);
+    if (this.touchEdit) this.touchEdit.recNext = true;
     this.drag = { id: e.pointerId, y: e.clientY, v: this.value(this.param) };
     try { this.root.setPointerCapture(e.pointerId); } catch (x) { }
     const move = (ev: PointerEvent) => {
@@ -171,7 +172,7 @@ export class moParamsSphere extends moSphere {
   private wheelMove(e: WheelEvent) {
     if (!this.open || !this.param) return;
     e.preventDefault();
-    if (!this.wheelTimer && this.history) this.history.record(this.focus, "mover " + this.param);
+    if (!this.wheelTimer) { if (this.history) this.history.record(this.focus, "mover " + this.param); if (this.touchEdit) this.touchEdit.recNext = true; }
     const v = this.value(this.param);
     this.set(v - Math.sign(e.deltaY) * this.step(v) * 10);
     clearTimeout(this.wheelTimer);

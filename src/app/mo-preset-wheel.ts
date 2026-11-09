@@ -216,7 +216,7 @@ export class moPresetWheel extends moSphere {
     const cfg = fx.GetConfig(), pre: any = cfg.m_PreConfigs[i];
     if (!pre || !pre.m_Proposed) return;
     pre.m_Proposed = false;
-    pre.m_Name = "lente " + cfg.m_PreConfigs.filter((p: any) => !p.m_Proposed).length;
+    pre.m_Name = "lente " + (cfg.m_PreConfigs.filter((p: any) => !p.m_Proposed && /^lente \d+$/.test("" + p.m_Name)).length + 1);
     for (const pi of pre.m_PreconfIndexes) { const v: any = cfg.m_Params[pi.m_ParamIndex] && cfg.m_Params[pi.m_ParamIndex].m_Values[pi.m_ValueIndex]; if (v) v.m_Proposed = false; }
     cfg.SaveConfig();
     if (this.channel) this.channel.send({ verb: "proposekeep", label: "" + fx.GetLabelName(), i });

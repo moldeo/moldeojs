@@ -26,6 +26,8 @@ export class moTouchEdit {
   channel: any = null;            /** #918 D2 */
   applying: boolean = false;
   private recorded: boolean = false;
+  /** F15: el primer valueset de un gesto lleva rec:true ⇒ el Player hace UNA foto por gesto, como el Control */
+  recNext: boolean = false;
 
   private dragId: number = null;
   private last: { x: number, y: number } = null;
@@ -141,7 +143,7 @@ export class moTouchEdit {
     const sub = param.m_Values[idx].m_List[0];
     sub.SetVal("" + Number(v.toFixed(4)));
     fx.ResolveValue(param, idx);
-    if (this.channel && !this.applying) this.channel.send({ verb: "valueset", label: "" + fx.GetLabelName(), param: pname, value: Number(v.toFixed(4)) });
+    if (this.channel && !this.applying) { this.channel.send({ verb: "valueset", label: "" + fx.GetLabelName(), param: pname, value: Number(v.toFixed(4)), rec: this.recNext }); this.recNext = false; }
   }
 
   private down(e: PointerEvent) {
@@ -167,7 +169,7 @@ export class moTouchEdit {
     if (this.dragId !== e.pointerId || !this.selected) return;
     const hp = HIT_PARAMS["" + this.selected.GetName()];
     const cfg = this.selected.GetConfig();
-    if (!this.recorded) { if (this.history) this.history.record(this.selected, "mover"); this.recorded = true; }
+    if (!this.recorded) { if (this.history) this.history.record(this.selected, "mover"); this.recorded = true; this.recNext = true; }
     const a = this.aspect();
     const dx = p.x - this.last.x, dy = -(p.y - this.last.y) / a;
     this.setNumber(this.selected, hp[0], this.val(cfg, hp[0]) + dx);
