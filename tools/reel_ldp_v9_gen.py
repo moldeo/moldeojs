@@ -23,10 +23,11 @@ W, H = 1080, 1920             # lienzo del guion (9:16)
 ESC = 0.6                     # las texturas se guardan al 60 % (peso web); la posición se calcula a tamaño real
 DEF = dict(orden_b=[24, 16, 27, 15, 22, 20, 18], extra=[], t_b=0.6, t_extra=(0.42, 0.12), b_in=5.5, b_out=16.3,
            ancho=0.86, dy=560, mosaico=[], vitral_alpha=0.55, logo_png='', logo_y=130, logo_w=820, rot=6, borde=14, seed=7,
-           fondo_png='', vitral_png='')
+           fondo_png='', vitral_png='', violeta=(120, 18, 216), gochi='', hook_texto='peroo\nyo no sé\ndibujar!')
 # hook: el dibujo ENTERO en 2 s (línea 0,9 · contorno 0,5 · real 0,6), ancho de pantalla, sin paneo
 HOOK = dict(vel_linea=1 / 0.9, vel_contorno=1 / 0.5, vel_cierre=1 / 0.6, t_entrada=0.0, t_sosten=0.0,
-            paneo_desde=0.5, paneo_hasta=0.5, escala_alto=0.42)
+            paneo_desde=0.5, paneo_hasta=0.5, escala_alto=0.42, hook_y=-(900 + 403 - H / 2) / H)
+# (escala 0,42 = 806 px de alto y hook_y = centro en y 1303 px: la palmera del clip de Canva ×1,12 pegada en y 900)
 GOLPE, T_GOLPE = 0.14, 4 / 30
 
 
@@ -61,6 +62,17 @@ def fondo(P):
     return f.convert('RGB')
 
 
+def banda(P):
+    """La banda violeta del hook de Canva con «peroo yo no sé dibujar!» (Gochi Hand amarillo, rotado 4°), en una textura RGBA."""
+    from PIL import ImageDraw, ImageFont
+    c = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(c).polygon([(0, 0), (W, 0), (W, 560), (0, 760)], fill=tuple(P['violeta']) + (255,))
+    lay = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(lay).multiline_text((80, 110), P['hook_texto'], font=ImageFont.truetype(P['gochi'], 118), fill=(255, 236, 0), spacing=0)
+    c.alpha_composite(lay.rotate(4, resample=Image.BICUBIC, center=(80, 110)))
+    return c.crop((0, 0, W, 800))
+
+
 def capa(tex, x, y, w, h, alpha, z='1'):
     """image en px del lienzo 9:16 → unidades del Lab (ancho de pantalla = 1, alto = 1/prop()), escala z en el centro."""
     t = rd('image.cfg')
@@ -91,7 +103,7 @@ def main():
     mol_n = 'ReelLDP%s.mol' % hook_id
     reel = rr(dst, 'reel.cfg')
     for k, v in HOOK.items():
-        reel = setvals(reel, k, [F('%.4f' % v)])
+        reel = setvals(reel, k, [F('%.4f' % v)], 'FUNCTION')
     t_ex0, t_ex1 = P['t_extra']
     from_b = nb * P['t_b'] + sum(t_ex0 * (t_ex1 / t_ex0) ** (j / (ne - 1)) for j in range(ne))
     t_bomb = 2.0 + 0.4
@@ -113,11 +125,14 @@ def main():
     for n in ('linea.cfg', 'contorno.cfg', 'real.cfg'):
         c = rr(dst, n)
         m = re.search(r'<PARAM name="alpha"[^>]*>\s*<VAL>\s*<D type="FUNCTION">(.*?)</D>', c, re.S)
-        c = setvals(c, 'alpha', [F('(%s)*reel.hook_on' % m.group(1))]); wr(dst, n, c)
+        c = setvals(c, 'alpha', [F('(%s)*reel.hook_on' % m.group(1))])
+        c = setvals(c, 'pos_cuad_y', [F('reel.hook_y/prop()')]); wr(dst, n, c)
 
     # 2) fondo + 21 papeles
     fondo(P).save(os.path.join(dst, 'fondo.jpg'), quality=88)
-    capas = [('fondo', 'F', capa('fondo.jpg', 0, 0, W, H, CL('(reel.t-reel.t_bomb)*1000')))]
+    banda(P).save(os.path.join(dst, 'banda.png'), optimize=True)
+    capas = [('banda', 'B', capa('banda.png', 0, 0, W, 800, 'reel.hook_on')),
+             ('fondo', 'F', capa('fondo.jpg', 0, 0, W, H, CL('(reel.t-reel.t_bomb)*1000')))]
     random.seed(P['seed'])
     for k, i in enumerate(ids):
         im, x, y = papel(P, FU, i)
