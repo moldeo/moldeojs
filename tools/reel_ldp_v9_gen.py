@@ -2,7 +2,8 @@
 """#918 B5·M4 — el reel LDP v9 como proyecto .mol: HOOK (un dibujo línea → color → real) + BOMBARDEO (21 dibujos que caen
 sobre el fondo vitral con golpe, cada vez más rápido) + PILA (sostén). Todo el ritmo son params PUBLICADOS de la capa `reel`.
 
-    python3 tools/reel_ldp_v9_gen.py <kit/<id del hook>> <dir fuentes (<id>.img)> <p-v9.json> <carpeta destino>
+    python3 tools/reel_ldp_v9_gen.py <kit/<id del hook>> <dir fuentes (<id>.img)> <p-v9.json> <carpeta destino> [extra.json]
+    extra.json: {"carteles_ref": "<export v9 de Canva>.mp4", "carteles_t": [2.9, 4.4, 6.0]} = un cuadro por cartel ya tipeado
 
 Arma primero el hook con reel_ldp_gen.py (M1) y le suma:
   fondo        (image)  vitral + logo pre-compuestos (el vitral SÓLO como fondo, nunca sobre los dibujos)
@@ -73,6 +74,34 @@ def banda(P):
     return c.crop((0, 0, W, 800))
 
 
+def cartel(video, t, dst, nombre):
+    """Un cartel del B tomado del export de Canva (cuadro con el texto ya completo) + su mapa de TIPEO: el violeta aparece
+    primero (255) y el amarillo en orden de lectura (renglón y luego x), con el subrayado al final — como el «revela» de la línea."""
+    import numpy as np
+    raw = subprocess.run(['ffmpeg', '-v', 'error', '-ss', str(t), '-i', video, '-frames:v', '1', '-vf', 'scale=%d:%d' % (W, H),
+                          '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'], capture_output=True, check=True).stdout
+    a = np.frombuffer(raw, np.uint8).reshape(H, W, 3)
+    Image.fromarray(a).save(os.path.join(dst, nombre + '.jpg'), quality=90)
+    f = a.astype(int)
+    tinta = (f[..., 0] > 150) & (f[..., 1] > 130) & (f[..., 2] < 150)            # amarillo (+ subrayado)
+    filas = np.where(tinta.any(1))[0]
+    # renglones = grupos de filas con tinta separados por ≥ 12 px vacíos
+    grupos, ini = [], filas[0]
+    for a0, a1 in zip(filas[:-1], filas[1:]):
+        if a1 - a0 > 12: grupos.append((ini, a0)); ini = a1
+    grupos.append((ini, filas[-1]))
+    orden = np.zeros((H, W), np.float32)
+    ys, xs = np.nonzero(tinta)
+    xmin, xmax = xs.min(), xs.max() + 1
+    for k, (g0, g1) in enumerate(grupos):
+        sel = (ys >= g0) & (ys <= g1)
+        orden[ys[sel], xs[sel]] = (k + (xs[sel] - xmin) / (xmax - xmin)) / len(grupos)
+    rev = np.where(tinta, np.clip(255 * (1 - orden), 1, 254), 255).astype(np.uint8)
+    rev = Image.fromarray(rev, 'L').filter(ImageFilter.MinFilter(5))             # el borde suavizado va con su trazo
+    rev.save(os.path.join(dst, nombre + '_rev.png'))
+    return len(grupos)
+
+
 def capa(tex, x, y, w, h, alpha, z='1'):
     """image en px del lienzo 9:16 → unidades del Lab (ancho de pantalla = 1, alto = 1/prop()), escala z en el centro."""
     t = rd('image.cfg')
@@ -93,6 +122,7 @@ def rr(dst, n): return open(os.path.join(dst, n), encoding='latin-1').read()
 def main():
     kit, FU, guion, dst = sys.argv[1:5]
     P = dict(DEF); P.update(json.load(open(guion)))
+    if len(sys.argv) > 5: P.update(json.load(open(sys.argv[5])))     # ajustes propios del .mol (carteles_ref/carteles_t…)
     hook_id = json.load(open(os.path.join(kit, 'params.json')))['jardin_drawing_id']
     ids = [i for i in P['orden_b'] if i != hook_id] + P['extra']     # el del hook no se repite en la pila
     nb, ne = len([i for i in P['orden_b'] if i != hook_id]), len(P['extra'])
@@ -106,17 +136,18 @@ def main():
         reel = setvals(reel, k, [F('%.4f' % v)], 'FUNCTION')
     t_ex0, t_ex1 = P['t_extra']
     from_b = nb * P['t_b'] + sum(t_ex0 * (t_ex1 / t_ex0) ** (j / (ne - 1)) for j in range(ne))
-    t_bomb = 2.0 + 0.4
-    nuevos = dict(t_bomb=t_bomb, t_b=P['t_b'], t_ex_ini=t_ex0, t_ex_fin=t_ex1, golpe=GOLPE, t_golpe=T_GOLPE,
+    nuevos = dict(t_cartel=P.get('t_cartel', 1.5), t_tipeo=P.get('t_tipeo', 0.7), t_b=P['t_b'], t_ex_ini=t_ex0, t_ex_fin=t_ex1, golpe=GOLPE, t_golpe=T_GOLPE,
                   t_pila=max(1.0, (P['b_out'] - P['b_in']) - from_b))
     for k, v in nuevos.items():
         reel = setvals(reel, k, [F('%.4f' % v)], 'FUNCTION')
     r = 'pow(reel.t_ex_fin/reel.t_ex_ini,1/%d)' % (ne - 1)
     deriv = {
+        't_hook': 'reel.t_entrada+1/reel.vel_linea+1/reel.vel_contorno+1/reel.vel_cierre+reel.t_sosten',
+        't_bomb': 'reel.t_hook+%d*reel.t_cartel' % len(P.get('carteles_t', [])),
         'r_ex': r,
         't_extra0': 'reel.t_bomb+%d*reel.t_b' % nb,
         'dur': 'reel.t_extra0+reel.t_ex_ini*(1-pow(reel.r_ex,%d))/(1-reel.r_ex)+reel.t_pila' % ne,
-        'hook_on': CL('(reel.t_bomb-reel.t)*1000'),
+        'hook_on': CL('(reel.t_hook-reel.t)*1000'),
     }
     for k, v in deriv.items():
         reel = setvals(reel, k, [F(v)], 'FUNCTION')
@@ -133,6 +164,21 @@ def main():
     banda(P).save(os.path.join(dst, 'banda.png'), optimize=True)
     capas = [('banda', 'B', capa('banda.png', 0, 0, W, 800, 'reel.hook_on')),
              ('fondo', 'F', capa('fondo.jpg', 0, 0, W, H, CL('(reel.t-reel.t_bomb)*1000')))]
+    # carteles ES/EN/CA del B entre el hook y el bombardeo (cuadros del export de Canva + tipeo). Debajo, el violeta liso del
+    # cuadro: lo no tipeado del cartel es transparente y si no se vería el papel del hook.
+    if P.get('carteles_t'):
+        c0 = cartel(P['carteles_ref'], P['carteles_t'][0], dst, 'cartel0')
+        vio = Image.open(os.path.join(dst, 'cartel0.jpg')).getpixel((W - 20, H // 2))
+        Image.new('RGB', (64, 64), vio).save(os.path.join(dst, 'violeta.png'))
+        capas.insert(1, ('violeta', '', capa('violeta.png', 0, 0, W, H,
+                                             CL('(reel.t-reel.t_hook)*1000') + '*' + CL('(reel.t_bomb-reel.t)*1000'))))
+    for j, tc in enumerate(P.get('carteles_t', [])):
+        n = 'cartel%d' % j; cartel(P['carteles_ref'], tc, dst, n)
+        t0 = '(reel.t_hook+%d*reel.t_cartel)' % j
+        c = capa(n + '.jpg', 0, 0, W, H, CL('(reel.t-%s)*1000' % t0) + '*' + CL('(%s+reel.t_cartel-reel.t)*1000' % t0))
+        c = setvals(c, 'revela_mapa', [[('TXT', '', n + '_rev.png')]], 'TEXTURE')
+        c = setvals(c, 'revela', [F('0.02+' + CL('(reel.t-%s)/reel.t_tipeo' % t0))], 'FUNCTION')
+        capas.insert(2 + j, (n, '', c))
     random.seed(P['seed'])
     for k, i in enumerate(ids):
         im, x, y = papel(P, FU, i)
@@ -156,8 +202,9 @@ def main():
     os.remove(os.path.join(dst, mol_n))
     wr(dst, 'ReelLDPv9.mol', mol)
     peso = sum(os.path.getsize(os.path.join(dst, f)) for f in os.listdir(dst))
-    print('ok ReelLDPv9 · hook %d · pila %d dibujos (%d B + %d extra) · %.1f MB · dur ≈ %.1f s'
-          % (hook_id, len(ids), nb, ne, peso / 1e6, nuevos['t_bomb'] + from_b + nuevos['t_pila']))
+    print('ok ReelLDPv9 · hook %d · %d carteles · pila %d dibujos (%d B + %d extra) · %.1f MB · dur ≈ %.1f s'
+          % (hook_id, len(P.get('carteles_t', [])), len(ids), nb, ne, peso / 1e6,
+             2.0 + len(P.get('carteles_t', [])) * nuevos['t_cartel'] + from_b + nuevos['t_pila']))
 
 
 if __name__ == '__main__':

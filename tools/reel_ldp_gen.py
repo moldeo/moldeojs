@@ -97,7 +97,7 @@ def main():
     d1, d2, d3 = '(1/reel.vel_linea)', '(1/reel.vel_contorno)', '(1/reel.vel_cierre)'
     deriv = {
         'dur': 'reel.t_entrada+%s+%s+%s+reel.t_sosten' % (d1, d2, d3),
-        't': 'time %% reel.dur',
+        't': 'seconds %% reel.dur',          # ⚠️ `time` es un ÁNGULO (2π cada 10 s), no segundos
         'p_linea': CL('(reel.t-reel.t_entrada)*reel.vel_linea'),
         'p_contorno': CL('(reel.t-reel.t_entrada-%s)*reel.vel_contorno' % d1),
         'p_cierre': CL('(reel.t-reel.t_entrada-%s-%s)*reel.vel_cierre' % (d1, d2)),
