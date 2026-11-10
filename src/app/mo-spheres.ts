@@ -38,10 +38,18 @@ export class moObjectsSphere extends moSphere {
   onFocus: (fx: any) => void = null;
   channel: any = null;
   private page: number = 0;
+  /** null = nivel 0 (sunburst: listas adentro, capas afuera) · "pre"|"fx"|"post"|"master" = zoom a esa lista */
+  private level: string = null;
   static PER_PAGE = 12;
+  static KIND: { [k: string]: { g: string, w: string, c: string } } = {
+    pre: { g: "PR", w: "pre-efectos", c: "#9be38b" }, fx: { g: "FX", w: "efectos", c: "#5ef2ff" },
+    post: { g: "PO", w: "post-efectos", c: "#ffd36b" }, master: { g: "MA", w: "master", c: "#ff5ed8" },
+  };
 
   constructor(private console: any) {
     super("moObjectsSphere", "tl", "⬡", "objetos", true);
+    try { const l = localStorage.getItem("moSphere.objects.level"); this.level = l && moObjectsSphere.KIND[l] ? l : null; } catch (e) { }
+    moObjectsSphere.ensureZoomStyle();
     this.render();
   }
 
@@ -56,28 +64,99 @@ export class moObjectsSphere extends moSphere {
     this.flash((on ? "● " : "○ ") + fx.GetLabelName());
   }
 
+  /** entrar / salir del zoom a una lista; se recuerda por visor */
+  zoom(kind: string) {
+    this.level = kind; this.page = 0;
+    try { localStorage.setItem("moSphere.objects.level", kind || ""); } catch (e) { }
+    this.render();
+    this.ring.classList.remove("mw-zoomin", "mw-zoomout"); void this.ring.offsetWidth;
+    this.ring.classList.add(kind ? "mw-zoomin" : "mw-zoomout");
+    this.flash(kind ? moObjectsSphere.KIND[kind].w : "objetos");
+  }
+
+  /** una piedra-capa: tocar = foco · mantener = prender/apagar (igual en los dos niveles) */
+  private stone(fx: any, kind: string, x: number, y: number, small: boolean) {
+    const name = "" + fx.GetLabelName();
+    const cls = "k-" + kind + (fx === this.focus ? " on" : "") + (fx.Activated() ? "" : " off");
+    const b = this.btn(moSphere.glyphOf(name), name, cls, x, y,
+      () => { this.focus = fx; if (this.onFocus) this.onFocus(fx); this.render(); this.flash(name); },
+      () => this.setActive(fx, !fx.Activated()));
+    b.title = name + " (" + kind.toUpperCase() + ") — tocar: foco · mantener: " + (fx.Activated() ? "apagar" : "prender");
+    if (small) { b.style.width = "28px"; b.style.height = "28px"; b.style.fontSize = "12px"; }
+    return b;
+  }
+
   protected renderOpen() {
     const S = moSphere.SIZE, C = S / 2;
+    const L = allLayers(this.console);
+    if (this.level && !L.some((l) => l.kind == this.level)) this.level = null;   /* la lista se vació */
+    if (this.level) { this.renderZoom(L.filter((l) => l.kind == this.level)); return; }
     this.foldCenter("⬡", "objetos");
-    const L = allLayers(this.console), per = moObjectsSphere.PER_PAGE;
-    const pages = Math.max(1, Math.ceil(L.length / per));
+    const kinds = ["pre", "fx", "post", "master"].filter((k) => L.some((l) => l.kind == k));
+    if (!L.length) return;
+    // cada capa ocupa la misma porción del anillo; cada lista, el arco contiguo de sus capas
+    const n = L.length, step = (2 * Math.PI) / n, a0 = -Math.PI / 2;
+    const Ro = 70, Ri = 44, Ra = 56;
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "mw-arcs"); svg.setAttribute("viewBox", "0 0 " + S + " " + S);
+    let k0 = 0;
+    for (const kind of kinds) {
+      const items = L.filter((l) => l.kind == kind), K = moObjectsSphere.KIND[kind];
+      const from = a0 + k0 * step, to = a0 + (k0 + items.length) * step, mid = (from + to) / 2;
+      if (items.length < n) {   // trazo del arco de la lista (si es la única, el anillo entero ya la dice)
+        const pad = Math.min(0.08, step * 0.2), f = from + pad, t = to - pad;
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const big = t - f > Math.PI ? 1 : 0;
+        path.setAttribute("d", "M " + (C + Ra * Math.cos(f)) + " " + (C + Ra * Math.sin(f)) +
+          " A " + Ra + " " + Ra + " 0 " + big + " 1 " + (C + Ra * Math.cos(t)) + " " + (C + Ra * Math.sin(t)));
+        path.setAttribute("stroke", K.c); svg.appendChild(path);
+      }
+      items.forEach(({ fx }, j) => {
+        const a = from + (j + 0.5) * step;
+        this.stone(fx, kind, C + Ro * Math.cos(a), C + Ro * Math.sin(a), n > 8);
+      });
+      const lb = this.btn(K.g, K.w + " (" + items.length + ")", "mw-mini mw-kind k-" + kind,
+        C + Ri * Math.cos(mid), C + Ri * Math.sin(mid), () => this.zoom(kind));
+      lb.title = K.w + " — " + items.length + " capa" + (items.length == 1 ? "" : "s") + " · tocar: acercar";
+      k0 += items.length;
+    }
+    this.ring.insertBefore(svg, this.ring.firstChild);
+  }
+
+  /** nivel 1: una sola lista en anillo completo; el centro vuelve */
+  private renderZoom(items: { fx: any, kind: string }[]) {
+    const S = moSphere.SIZE, C = S / 2, per = moObjectsSphere.PER_PAGE, K = moObjectsSphere.KIND[this.level];
+    const back = this.btn("‹" + K.g, "volver a objetos", "mw-center k-" + this.level, C, C, () => this.zoom(null));
+    back.title = K.w + " — tocar: volver a todas las listas";
+    const pages = Math.max(1, Math.ceil(items.length / per));
     if (this.page >= pages) this.page = 0;
-    const shown = L.slice(this.page * per, (this.page + 1) * per);
+    const shown = items.slice(this.page * per, (this.page + 1) * per);
     if (pages > 1) {
       const nb = this.btn("»", "más capas " + (this.page + 1) + "/" + pages, "mw-mini", S - 14, 14,
         () => { this.page = (this.page + 1) % pages; this.render(); this.flash("capas " + (this.page + 1) + "/" + pages); });
       nb.title = "Siguiente grupo de capas";
     }
     const pos = this.ringPos(shown.length, shown.length > 8 ? 62 : 58);
-    shown.forEach(({ fx, kind }, k) => {
-      const name = "" + fx.GetLabelName();
-      const cls = "k-" + kind + (fx === this.focus ? " on" : "") + (fx.Activated() ? "" : " off");
-      const b = this.btn(moSphere.glyphOf(name), name, cls, pos[k].x, pos[k].y,
-        () => { this.focus = fx; if (this.onFocus) this.onFocus(fx); this.render(); this.flash(name); },
-        () => this.setActive(fx, !fx.Activated()));
-      b.title = name + " (" + kind.toUpperCase() + ") — tocar: foco · mantener: " + (fx.Activated() ? "apagar" : "prender");
-      if (shown.length > 8) { b.style.width = "30px"; b.style.height = "30px"; b.style.fontSize = "13px"; }
-    });
+    shown.forEach(({ fx, kind }, k) => this.stone(fx, kind, pos[k].x, pos[k].y, shown.length > 8));
+  }
+
+  private static ensureZoomStyle() {
+    if (document.getElementById("moObjectsZoomStyle")) return;
+    const st = document.createElement("style"); st.id = "moObjectsZoomStyle";
+    st.textContent = `
+.mo-sphere .mw-arcs{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.mo-sphere .mw-arcs path{fill:none;stroke-width:5;stroke-linecap:round;opacity:.7;filter:drop-shadow(0 0 3px currentColor)}
+.mo-sphere .mw-b.mw-kind{font-size:10px;letter-spacing:.02em}
+.mo-sphere .mw-b.mw-kind.k-pre{color:#9be38b}.mo-sphere .mw-b.mw-kind.k-fx{color:#5ef2ff}
+.mo-sphere .mw-b.mw-kind.k-post{color:#ffd36b}.mo-sphere .mw-b.mw-kind.k-master{color:#ff5ed8}
+.mo-sphere .mw-center.k-pre{border-color:#9be38b}.mo-sphere .mw-center.k-post{border-color:#ffd36b}
+.mo-sphere .mw-center.k-master{border-color:#ff5ed8}
+.mo-sphere .mw-zoomin,.mo-sphere .mw-zoomout{position:absolute;inset:0;transform-origin:50% 50%}
+.mo-sphere .mw-zoomin{animation:mwZoomIn .22s ease-out}.mo-sphere .mw-zoomout{animation:mwZoomOut .22s ease-out}
+@keyframes mwZoomIn{from{transform:scale(.55);opacity:.2}to{transform:none;opacity:1}}
+@keyframes mwZoomOut{from{transform:scale(1.35);opacity:.2}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.mo-sphere .mw-zoomin,.mo-sphere .mw-zoomout{animation:none}}`;
+    document.head.appendChild(st);
   }
 }
 
