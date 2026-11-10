@@ -136,7 +136,7 @@ def main():
         reel = setvals(reel, k, [F('%.4f' % v)], 'FUNCTION')
     t_ex0, t_ex1 = P['t_extra']
     from_b = nb * P['t_b'] + sum(t_ex0 * (t_ex1 / t_ex0) ** (j / (ne - 1)) for j in range(ne))
-    nuevos = dict(t_cartel=P.get('t_cartel', 1.5), t_tipeo=P.get('t_tipeo', 0.7), t_b=P['t_b'], t_ex_ini=t_ex0, t_ex_fin=t_ex1, golpe=GOLPE, t_golpe=T_GOLPE,
+    nuevos = dict(t_fundido=P.get('t_fundido', 0.4), t_cartel=P.get('t_cartel', 1.5), t_tipeo=P.get('t_tipeo', 0.7), t_b=P['t_b'], t_ex_ini=t_ex0, t_ex_fin=t_ex1, golpe=GOLPE, t_golpe=T_GOLPE,
                   t_pila=max(1.0, (P['b_out'] - P['b_in']) - from_b))
     for k, v in nuevos.items():
         reel = setvals(reel, k, [F('%.4f' % v)], 'FUNCTION')
@@ -189,6 +189,10 @@ def main():
         u = CL('(reel.t-%s)/reel.t_golpe' % tk)
         capas.append(('d%02d' % k, '', capa(tn, x, y, im.width, im.height, CL('(reel.t-%s)*1000' % tk),
                                             '1+reel.golpe*pow(1-%s,2)' % u)))
+    # cierre: el papel del hook tapa la pila en los últimos t_fundido s ⇒ la vuelta empieza sobre el mismo papel, sin salto
+    papel_rgb = tuple(json.load(open(os.path.join(kit, 'params.json'))).get('papel', (250, 248, 242)))
+    Image.new('RGB', (64, 64), papel_rgb).save(os.path.join(dst, 'cierre.png'))
+    capas.append(('cierre', 'Z', capa('cierre.png', 0, 0, W, H, CL('(reel.t-reel.dur+reel.t_fundido)/reel.t_fundido'))))
     for n, _, c in capas:
         wr(dst, n + '.cfg', c)
 
