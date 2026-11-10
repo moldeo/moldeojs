@@ -151,6 +151,8 @@ export class moObjectsSphere extends moSphere {
 .mo-sphere .mw-b.mw-kind.k-post{color:#ffd36b}.mo-sphere .mw-b.mw-kind.k-master{color:#ff5ed8}
 .mo-sphere .mw-center.k-pre{border-color:#9be38b}.mo-sphere .mw-center.k-post{border-color:#ffd36b}
 .mo-sphere .mw-center.k-master{border-color:#ff5ed8}
+.mo-sphere .mw-b.mw-color{border-width:3px;font-size:20px}
+.mo-sphere .mw-center.mw-swatch{color:#06070f;text-shadow:0 0 4px #fff;border-color:#fff}
 .mo-sphere .mw-zoomin,.mo-sphere .mw-zoomout{position:absolute;inset:0;transform-origin:50% 50%}
 .mo-sphere .mw-zoomin{animation:mwZoomIn .22s ease-out}.mo-sphere .mw-zoomout{animation:mwZoomOut .22s ease-out}
 @keyframes mwZoomIn{from{transform:scale(.55);opacity:.2}to{transform:none;opacity:1}}
@@ -165,6 +167,10 @@ export class moObjectsSphere extends moSphere {
 export class moParamsSphere extends moSphere {
   focus: any = null;
   param: string = null;
+  /** B3b: param de color elegido (sub-esfera R·G·B·A) y canal que se mueve (0..3); fuera del color, sub = 0 */
+  color: string = null;
+  sub: number = 0;
+  static CH = [{ g: "R", w: "rojo", c: "#ff5e6c" }, { g: "G", w: "verde", c: "#9be38b" }, { g: "B", w: "azul", c: "#5ea8ff" }, { g: "A", w: "opacidad", c: "#e9fbff" }];
   touchEdit: any = null;      /** moTouchEdit: setNumber ⇒ fork del VAL compartido + canal al Player */
   history: any = null;
   private page: number = 0;
@@ -187,7 +193,7 @@ export class moParamsSphere extends moSphere {
 
   setFocus(fx: any) {
     if (!fx || fx.isProject) return;
-    if (fx !== this.focus) { this.focus = fx; this.param = null; this.page = 0; }
+    if (fx !== this.focus) { this.focus = fx; this.param = null; this.color = null; this.sub = 0; this.page = 0; }
     this.render();
   }
 
@@ -199,18 +205,35 @@ export class moParamsSphere extends moSphere {
       const nm = "" + P.m_ParamDefinition.m_Name;
       if (moParamsSphere.SKIP.indexOf(nm.toLowerCase()) >= 0) continue;
       const v = P.m_Values[Math.max(0, P.GetIndexValue())];
-      if (!v || v.m_List.length != 1 || subNum(v.m_List[0]) === null) continue;
-      out.push(nm);
+      if (!v) continue;
+      if (v.m_List.length == 1 && subNum(v.m_List[0]) !== null) { out.push(nm); continue; }
+      if (moParamsSphere.isColorVal(v)) out.push(nm);
     }
     return out;
   }
 
-  private value(name: string): number {
+  /** un VAL de color = 4 sub-valores numéricos (RED, GREEN, BLUE, ALPHA) */
+  private static isColorVal(v: any): boolean {
+    return !!v && v.m_List.length == 4 && v.m_List.every((d: any) => subNum(d) !== null);
+  }
+  private isColor(name: string): boolean {
+    const P = this.focus && this.focus.GetConfig().m_ParamsByName[name]; if (!P) return false;
+    return moParamsSphere.isColorVal(P.m_Values[Math.max(0, P.GetIndexValue())]);
+  }
+
+  private value(name: string, sub: number = 0): number {
     const P = this.focus && this.focus.GetConfig().m_ParamsByName[name]; if (!P) return 0;
     const v = P.m_Values[Math.max(0, P.GetIndexValue())];
-    const n = v ? subNum(v.m_List[0]) : null;
+    const n = v && v.m_List[sub] ? subNum(v.m_List[sub]) : null;
     return n === null ? 0 : n;
   }
+
+  /** el color actual como CSS (para la piedra y la muestra del centro) */
+  private css(name: string): string {
+    const c = (k: number) => Math.round(Math.max(0, Math.min(1, this.value(name, k))) * 255);
+    return "rgba(" + c(0) + "," + c(1) + "," + c(2) + "," + Math.max(0.15, Math.min(1, this.value(name, 3))).toFixed(2) + ")";
+  }
+  private label(): string { return this.color ? this.param + "." + moParamsSphere.CH[this.sub].w : this.param; }
 
   private static glyph(name: string): string {
     const k = name.toLowerCase();
@@ -219,20 +242,24 @@ export class moParamsSphere extends moSphere {
 
   /* arrastrar (fuera de los botones) o rueda del mouse ⇒ cambia el param elegido */
   private drag: { id: number, y: number, v: number } = null;
-  private step(v: number): number { return Math.max(Math.abs(v), 1) * 0.005; }
+  private step(v: number): number { return this.color ? 0.005 : Math.max(Math.abs(v), 1) * 0.005; }
 
   private set(v: number) {
     if (!this.focus || !this.param || !this.touchEdit) return;
-    this.touchEdit.setNumber(this.focus, this.param, v);
-    if (this.centerEl) this.centerEl.firstChild.textContent = fmt(v);
+    if (this.color) v = Math.max(0, Math.min(1, v));                 /* canales de color: 0..1 */
+    this.touchEdit.setNumber(this.focus, this.param, v, this.sub);
+    if (this.centerEl) {
+      if (this.color) this.centerEl.style.background = this.css(this.param);
+      else this.centerEl.firstChild.textContent = fmt(v);
+    }
   }
 
   private dragStart(e: PointerEvent) {
     if (!this.open || !this.param || (e.target as HTMLElement).closest(".mw-b")) return;
     e.preventDefault(); e.stopPropagation();
-    if (this.history) this.history.record(this.focus, "mover " + this.param);
+    if (this.history) this.history.record(this.focus, "mover " + this.label());
     if (this.touchEdit) this.touchEdit.recNext = true;
-    this.drag = { id: e.pointerId, y: e.clientY, v: this.value(this.param) };
+    this.drag = { id: e.pointerId, y: e.clientY, v: this.value(this.param, this.sub) };
     try { this.root.setPointerCapture(e.pointerId); } catch (x) { }
     const move = (ev: PointerEvent) => {
       if (!this.drag || ev.pointerId != this.drag.id) return;
@@ -242,7 +269,7 @@ export class moParamsSphere extends moSphere {
       if (!this.drag || ev.pointerId != this.drag.id) return;
       this.drag = null;
       this.root.removeEventListener("pointermove", move); this.root.removeEventListener("pointerup", up); this.root.removeEventListener("pointercancel", up);
-      this.flash(this.param + " " + fmt(this.value(this.param)));
+      this.flash(this.label() + " " + fmt(this.value(this.param, this.sub)));
     };
     this.root.addEventListener("pointermove", move); this.root.addEventListener("pointerup", up); this.root.addEventListener("pointercancel", up);
   }
@@ -251,15 +278,36 @@ export class moParamsSphere extends moSphere {
   private wheelMove(e: WheelEvent) {
     if (!this.open || !this.param) return;
     e.preventDefault();
-    if (!this.wheelTimer) { if (this.history) this.history.record(this.focus, "mover " + this.param); if (this.touchEdit) this.touchEdit.recNext = true; }
-    const v = this.value(this.param);
+    if (!this.wheelTimer) { if (this.history) this.history.record(this.focus, "mover " + this.label()); if (this.touchEdit) this.touchEdit.recNext = true; }
+    const v = this.value(this.param, this.sub);
     this.set(v - Math.sign(e.deltaY) * this.step(v) * 10);
     clearTimeout(this.wheelTimer);
-    this.wheelTimer = setTimeout(() => { this.wheelTimer = null; this.flash(this.param + " " + fmt(this.value(this.param))); }, 400);
+    this.wheelTimer = setTimeout(() => { this.wheelTimer = null; this.flash(this.label() + " " + fmt(this.value(this.param, this.sub))); }, 400);
+  }
+
+  /** sub-esfera de un color: 4 canales alrededor, el centro es la muestra y vuelve */
+  private renderColor() {
+    const C = moSphere.SIZE / 2, nm = this.color;
+    const back = this.btn("‹", "volver a los parámetros", "mw-center mw-swatch", C, C, () => {
+      this.color = null; this.param = null; this.sub = 0; this.render(); this.flash("parámetros");
+    });
+    back.style.background = this.css(nm);
+    back.title = nm + " — arrastrá en la esfera para cambiar el canal elegido · tocar: volver";
+    this.centerEl = back;
+    const pos = this.ringPos(4, 60);
+    moParamsSphere.CH.forEach((ch, k) => {
+      const b = this.btn(ch.g, ch.w, (this.param == nm && this.sub == k) ? "on" : "", pos[k].x, pos[k].y,
+        () => { this.param = nm; this.sub = k; this.render(); this.flash(nm + "." + ch.w + " " + fmt(this.value(nm, k))); });
+      b.style.borderColor = ch.c;
+      if (!(this.param == nm && this.sub == k)) b.style.color = ch.c;
+      b.title = ch.w + " = " + fmt(this.value(nm, k)) + " — tocar: elegir · después arrastrá en la esfera (0 a 1)";
+    });
   }
 
   protected renderOpen() {
     const S = moSphere.SIZE, C = S / 2;
+    if (this.color && this.focus && this.isColor(this.color)) { this.renderColor(); return; }
+    this.color = null;
     const names = this.params();
     const v = this.param ? fmt(this.value(this.param)) : (this.focus ? moSphere.glyphOf("" + this.focus.GetLabelName()) : "∿");
     this.centerEl = this.foldCenter(v, this.param ? this.param + " (arrastrá arriba/abajo)" : (this.focus ? "" + this.focus.GetLabelName() : "parámetros"));
@@ -277,8 +325,15 @@ export class moParamsSphere extends moSphere {
       if (used[g]) { const c = nm.replace(/[^a-z0-9]/gi, ""); g = (c[0] + c[c.length - 1]).toLowerCase(); }   /* sin glifos repetidos */
       if (used[g]) g = g[0] + (k + 1);
       used[g] = true;
+      if (this.isColor(nm)) {
+        const b = this.btn("◍", nm, "mw-color", pos[k].x, pos[k].y,
+          () => { this.color = nm; this.param = null; this.sub = 0; this.render(); this.flash(nm); });
+        b.style.borderColor = this.css(nm); b.style.color = this.css(nm);
+        b.title = nm + " (color) — tocar: abrir rojo · verde · azul · opacidad";
+        return;
+      }
       const b = this.btn(g, nm, nm == this.param ? "on" : "", pos[k].x, pos[k].y,
-        () => { this.param = nm; this.render(); this.flash(nm + " " + fmt(this.value(nm))); });
+        () => { this.param = nm; this.sub = 0; this.render(); this.flash(nm + " " + fmt(this.value(nm))); });
       b.title = nm + " = " + fmt(this.value(nm)) + " — tocar: elegir · después arrastrá en la esfera (o rueda del mouse)";
     });
   }

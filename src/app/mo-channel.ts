@@ -4,7 +4,7 @@
  * El Control manda; el Player (?role=player) aplica por los MISMOS caminos que la interfaz, así su
  * historial y sus transiciones son idénticos.
  *   {verb:"preconfigset", label, i, hard}   {verb:"preconfigsave", label, i}
- *   {verb:"valueset", label, param, value}  {verb:"undo"} {verb:"redo"} {verb:"play"} {verb:"pause"} {verb:"mode", mode}
+ *   {verb:"valueset", label, param, value, sub?}  {verb:"undo"} {verb:"redo"} {verb:"play"} {verb:"pause"} {verb:"mode", mode}
  */
 export class moChannel {
   role: string;

@@ -133,17 +133,22 @@ export class moTouchEdit {
   }
 
   /** escribe un número en el VAL del preset activo de ese param (mismo camino que el panel de params) */
-  setNumber(fx: any, pname: string, v: number) {
+  setNumber(fx: any, pname: string, v: number, subIdx: number = 0) {
     const cfg = fx.GetConfig();
     const param = cfg.GetParam(cfg.GetParamIndex(pname));
     if (!param) return;
     const before = Math.max(0, param.GetIndexValue());
     const idx = cfg.ForkForEdit ? cfg.ForkForEdit(param) : before;   /* #918 E1.7: no mover otros presets */
     if (idx != before) { fx.ResolveValue(param, idx); this.log("fork", { param: pname, from: before, to: idx }); }
-    const sub = param.m_Values[idx].m_List[0];
+    const sub = param.m_Values[idx].m_List[subIdx];          /* B3b: color = 4 sub-valores (R,G,B,A) */
+    if (!sub) return;
     sub.SetVal("" + Number(v.toFixed(4)));
     fx.ResolveValue(param, idx);
-    if (this.channel && !this.applying) { this.channel.send({ verb: "valueset", label: "" + fx.GetLabelName(), param: pname, value: Number(v.toFixed(4)), rec: this.recNext }); this.recNext = false; }
+    if (this.channel && !this.applying) {
+      const m: any = { verb: "valueset", label: "" + fx.GetLabelName(), param: pname, value: Number(v.toFixed(4)), rec: this.recNext };
+      if (subIdx) m.sub = subIdx;
+      this.channel.send(m); this.recNext = false;
+    }
   }
 
   private down(e: PointerEvent) {
