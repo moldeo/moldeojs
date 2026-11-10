@@ -350,6 +350,10 @@ export class moTimeSphere extends moSphere {
   private t0: number = 0;
   private playingTake: boolean = false;
   private timers: any[] = [];
+  /** B3c — las tomas viajan con el proyecto en `tomas.take.json` (las guarda el «Guardar» del Lab, entran en Versiones) */
+  static TAKE_FILE = "tomas.take.json";
+  private tomas: { nombre: string, fecha: string, dur_ms: number, gestos: { t: number, m: any }[] }[] = [];
+  dirty: boolean = false;          /** hay una toma nueva que todavía no se guardó */
 
   constructor(project: any) {
     super("moTimeSphere", "bl", "▶", "tiempo", true);
@@ -367,8 +371,35 @@ export class moTimeSphere extends moSphere {
     if (this.playingTake) this.stopTake();
     this.recording = !this.recording;
     if (this.recording) { this.take = []; this.t0 = performance.now(); }
+    if (!this.recording && this.take.length) {
+      const dur = this.take[this.take.length - 1].t;
+      this.tomas.push({ nombre: "toma " + (this.tomas.length + 1), fecha: new Date().toISOString(), dur_ms: Math.round(dur),
+                        gestos: this.take.map((e) => ({ t: Math.round(e.t), m: e.m })) });
+      this.dirty = true;
+    }
     this.render();
-    this.flash(this.recording ? "● grabando" : "■ toma · " + this.take.length + " gestos");
+    this.flash(this.recording ? "● grabando" : "■ toma · " + this.take.length + " gestos" + (this.dirty ? " · sin guardar" : ""));
+  }
+
+  /** contenido de tomas.take.json, o null si no hay tomas */
+  takeJSON(): string | null {
+    return this.tomas.length ? JSON.stringify({ v: 1, tomas: this.tomas }) : null;
+  }
+  markSaved() { if (this.dirty) { this.dirty = false; this.render(); } }
+
+  /** al abrir: la última toma guardada queda lista para ▷ (404 o archivo inválido = sin tomas) */
+  loadTakes(url: string): Promise<number> {
+    return fetch(url, { credentials: "same-origin", cache: "no-store" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((j) => {
+        if (!j || j.v !== 1 || !Array.isArray(j.tomas) || !j.tomas.length) return 0;
+        this.tomas = j.tomas.filter((x: any) => x && Array.isArray(x.gestos));
+        const ult = this.tomas[this.tomas.length - 1];
+        this.take = ult ? ult.gestos.map((e: any) => ({ t: +e.t || 0, m: e.m })) : [];
+        this.dirty = false; this.render();
+        return this.tomas.length;
+      })
+      .catch(() => 0);
   }
 
   playTake() {
@@ -408,7 +439,8 @@ export class moTimeSphere extends moSphere {
           title: "Cambiar el grupo de estados que recorre la línea de tiempo (día / estaciones)" });
       }
     }
-    items.push({ g: this.recording ? "■" : "●", w: this.recording ? "parar toma" : "grabar toma", cls: this.recording ? "rec" : "",
+    items.push({ g: this.recording ? "■" : "●", w: this.recording ? "parar toma" : (this.dirty ? "grabar toma · sin guardar" : "grabar toma"),
+      cls: this.recording ? "rec" : (this.dirty ? "rec" : ""),
       fn: () => this.toggleRec(), title: "REC: graba los gestos del Control (presets, valores, modo, tiempo) con su ritmo" });
     items.push({ g: this.playingTake ? "■" : "▷", w: this.playingTake ? "parar" : "reproducir toma", cls: this.playingTake ? "go" : (this.take.length ? "" : "off"),
       fn: () => this.playTake(), title: "Reproduce la última toma por los mismos caminos (llega al Player)" });

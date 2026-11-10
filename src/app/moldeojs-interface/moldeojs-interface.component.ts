@@ -115,6 +115,9 @@ export class MoldeojsInterfaceComponent implements OnInit {
         if (cfg && cfg.ToXML && name) files[name + ".cfg"] = cfg.ToXML();
       } catch (e) {}
     }
+    // B3c — la toma (REC) viaja con el proyecto
+    const tj = this.timeSphere ? this.timeSphere.takeJSON() : null;
+    if (tj) files[moTimeSphere.TAKE_FILE] = tj;
     this.saveState = "Guardando…";
     fetch(this.saveUrl, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
       body: JSON.stringify({ jsonrpc: "2.0", method: "call", params: { files } }) })
@@ -123,6 +126,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
         const ok = j && j.result && j.result.ok;
         const v = ok && j.result.version != null ? " v" + j.result.version : "";
         this.saveState = ok ? "Guardado ✓" + v : ("No se guardó: " + ((j && j.result && j.result.error) || (j && j.error && j.error.message) || "error"));
+        if (ok && tj && this.timeSphere) this.timeSphere.markSaved();
         if (this.touchEdit) this.touchEdit.log("save", { ok: !!ok, n: Object.keys(files).length });
         setTimeout(() => { this.saveState = ""; }, 4000);
       })
@@ -616,6 +620,10 @@ export class MoldeojsInterfaceComponent implements OnInit {
       this.paramsSphere.touchEdit = TE; this.paramsSphere.history = this.history;
       this.timeSphere.wheel = W;
       (window as any).moSpheres = { objects: this.objectsSphere, params: this.paramsSphere, time: this.timeSphere };
+      { // B3c — tomas guardadas con el proyecto: mismo directorio que el .mol
+        const molp = new URLSearchParams(window.location.search).get("mol") || "";
+        if (molp) this.timeSphere.loadTakes(molp.replace(/[^\/]*$/, "") + moTimeSphere.TAKE_FILE);
+      }
       const focus = (fx: any) => {
         if (!fx || fx.isProject) return;
         W.setLayer(fx); this.objectsSphere.setFocus(fx); this.paramsSphere.setFocus(fx);
