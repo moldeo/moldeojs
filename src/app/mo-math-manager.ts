@@ -519,6 +519,12 @@ export class moParserFunction extends moMathFunction {
       abs: function(val) {
         return Math.abs(val);
       },
+      /* #918 B5: proporción de la pantalla (ancho/alto) — para que una imagen conserve su aspecto en cualquier ventana */
+      prop: function() {
+        try { const c: any = document.querySelector("#moldeojsview canvas") || document.querySelector("canvas");
+              const w = (c && c.clientWidth) || window.innerWidth, h = (c && c.clientHeight) || window.innerHeight;
+              return h ? w / h : 1; } catch (e) { return 1; }
+      },
       _mo: function(label, prop) {   /* #918 P8: otra capa, p. ej. sol.pos_cuad_y */
         return moObjectValue("" + label, "" + prop);
       }

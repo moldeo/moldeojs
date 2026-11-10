@@ -71,6 +71,7 @@ export class moEffectImage extends MO.moEffect {
       this.Mat.transparent = true;
       this.Mat.color = ccolor;
       this.Mat.opacity = this.m_Config.Eval("alpha");
+      this.Revelar();
     }
 
     //Mat2.m_MapGLId = Mat2.m_Map->GetGLId();
@@ -136,6 +137,35 @@ export class moEffectImage extends MO.moEffect {
 
     this.EndDraw();
 
+  }
+
+  /**
+   * #918 B5 — «revelar»: params OPCIONALES del image (si no están, nada cambia).
+   *   revela_mapa (TEXTURE) — mapa en gris: blanco = aparece primero, negro = aparece último (p. ej. el orden de los trazos)
+   *   revela      (FUNCTION 0..1) — cuánto está revelado; un píxel se ve cuando mapa ≥ 1 − revela
+   * Se hace con un uniform inyectado en el shader (onBeforeCompile): en three r110 `alphaTest` es un #define y animarlo
+   * recompilaría el programa con cada valor. El mapa sólo decide qué se descarta: no multiplica la transparencia.
+   */
+  private revelaU: any = null;
+  private Revelar(): void {
+    const byName = this.m_Config.m_ParamsByName;
+    if (!byName || !byName["revela_mapa"]) return;
+    const t: any = this.m_Config.Texture("revela_mapa");
+    const tex = t && t._texture;
+    if (!tex) return;
+    if (!this.revelaU) {
+      this.revelaU = { value: 0 };
+      const U = this.revelaU;
+      (this.Mat as any).onBeforeCompile = (shader: any) => {
+        shader.uniforms.moRevela = U;
+        shader.fragmentShader = "uniform float moRevela;\n" + shader.fragmentShader
+          .replace("#include <alphamap_fragment>", "")
+          .replace("#include <alphatest_fragment>", "if ( texture2D( alphaMap, vUv ).g < 1.0 - moRevela ) discard;");
+      };
+    }
+    if (this.Mat.alphaMap !== tex) { this.Mat.alphaMap = tex; this.Mat.needsUpdate = true; }
+    const r = Number(this.m_Config.Eval("revela"));
+    this.revelaU.value = isNaN(r) ? 1 : Math.max(0, Math.min(1.0001, r));
   }
 
   Update( p_Event: MO.moEventList ) : void {
