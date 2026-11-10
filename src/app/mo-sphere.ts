@@ -47,6 +47,7 @@ export class moSphere {
 
   /** arriba: debajo de lo que ocupe su columna (header —que en celular se parte en dos filas— y la barra 📷 del lienzo) */
   place() {
+    moSphere.placeToolbar();
     if (this.corner[0] != "t") return;
     const vw = window.innerWidth, w = moSphere.SIZE + 14;
     const x0 = this.corner == "tl" ? 0 : vw - w, x1 = this.corner == "tl" ? w : vw;
@@ -58,6 +59,19 @@ export class moSphere {
       b = Math.max(b, r.bottom);
     });
     this.root.style.top = Math.max(14, Math.round(b + 10)) + "px";
+  }
+
+  /** B5: la barra 📷 (#moldeobuttons) es fixed a top:45px; en celular el header se parte en dos filas y la barra le
+   *  tapaba ↶ ↷ auto Versiones Persona. Se baja hasta debajo de lo que el header ocupe de verdad (medido en vivo). */
+  static placeToolbar() {
+    const tb = document.getElementById("moldeobuttons") as HTMLElement; if (!tb) return;
+    let b = 0;
+    document.querySelectorAll("header.moHeader, header.moHeader *").forEach((el: any) => {
+      const r = el.getBoundingClientRect();
+      if (!r.height || !r.width || r.top > window.innerHeight * 0.4) return;
+      b = Math.max(b, r.bottom);
+    });
+    if (b > 0) tb.style.top = Math.max(45, Math.round(b + 5)) + "px";
   }
 
   /** la palabra del botón tocado aparece y se va */
