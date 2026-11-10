@@ -17,7 +17,7 @@ Capas (de abajo hacia arriba, igual que el prototipo aprobado por FCA el 10-nov)
 Un solo paneo horizontal (`reel.paneo`) mueve las tres capas; el dibujo conserva su aspecto en cualquier ventana (`prop()`).
 """
 import json, os, re, sys
-from PIL import Image
+from PIL import Image, ImageFilter
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -75,7 +75,13 @@ def main():
     Image.open(os.path.join(kit, 'linea.png')).convert('RGBA').resize((W, ALTO), Image.LANCZOS).save(os.path.join(dst, 'linea.png'))
     o = np.array(Image.open(os.path.join(kit, 'orden.png'))).astype(np.float32) / 65535.0
     rev = np.clip(255 * (1.0 - o), 0, 255).astype(np.uint8)
-    Image.fromarray(rev, 'L').resize((W, ALTO), Image.NEAREST).save(os.path.join(dst, 'revela.png'))   # NEAREST: no mezclar órdenes
+    rev = Image.fromarray(rev, 'L').resize((W, ALTO), Image.NEAREST)          # NEAREST: no mezclar órdenes
+    # el BORDE suavizado de la tinta cae en píxeles de fondo (orden 0 ⇒ blanco ⇒ «aparece primero»): sin esto, cada trazo
+    # no revelado deja su contorno a la vista desde el comienzo. El fondo toma el orden del trazo vecino (mínimo local).
+    fondo = np.array(rev) == 255
+    vec = np.array(rev.filter(ImageFilter.MinFilter(9)))
+    rev = np.where(fondo, vec, np.array(rev)).astype(np.uint8)
+    Image.fromarray(rev, 'L').save(os.path.join(dst, 'revela.png'))
     for n, out in (('contorno.png', 'contorno.jpg'), ('real.png', 'real.jpg')):
         im = Image.open(os.path.join(kit, n)).convert('RGBA')
         fondo = Image.new('RGBA', im.size, papel + (255,)); fondo.alpha_composite(im)
