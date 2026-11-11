@@ -30,6 +30,8 @@ HOOK = dict(vel_linea=1 / 0.9, vel_contorno=1 / 0.5, vel_cierre=1 / 0.6, t_entra
             paneo_desde=0.5, paneo_hasta=0.5, escala_alto=0.42, hook_y=-(900 + 403 - H / 2) / H)
 # (escala 0,42 = 806 px de alto y hook_y = centro en y 1303 px: la palmera del clip de Canva ×1,12 pegada en y 900)
 GOLPE, T_GOLPE = 0.14, 4 / 30
+COLA = [('queremos ver\ntu dibujo!!!', 110, 1.4), ('¿si fueras un\npaisaje, cómo te\ndibujarías?\nno hace falta\nsaber dibujar', 100, 1.5), ('miércoles 2 de dic\n\n18 a 22 h\n\nMAUI Beach\ncoworking\n& Art Studio\n\nentradas en la bio', 88, 2.6)]
+VELO, VELO_RGB = 0.6, (26, 10, 90)
 
 
 def papel(P, FU, i):
@@ -136,7 +138,9 @@ def main():
         reel = setvals(reel, k, [F('%.4f' % v)], 'FUNCTION')
     t_ex0, t_ex1 = P['t_extra']
     from_b = nb * P['t_b'] + sum(t_ex0 * (t_ex1 / t_ex0) ** (j / (ne - 1)) for j in range(ne))
-    nuevos = dict(t_fundido=P.get('t_fundido', 0.4), t_cartel=P.get('t_cartel', 1.5), t_tipeo=P.get('t_tipeo', 0.7), t_b=P['t_b'], t_ex_ini=t_ex0, t_ex_fin=t_ex1, golpe=GOLPE, t_golpe=T_GOLPE,
+    # carteles de la COLA (como el prototipo: Gochi amarillo rotado 6°, sobre el vitral velado) — texto, tamaño, duración
+    cola = P.get('cola_txt', COLA) if P.get('cola', True) else []
+    nuevos = dict(**{'t_cola%d' % (j + 1): c[2] for j, c in enumerate(cola)}, t_fundido=P.get('t_fundido', 0.4), t_cartel=P.get('t_cartel', 1.5), t_tipeo=P.get('t_tipeo', 0.7), t_b=P['t_b'], t_ex_ini=t_ex0, t_ex_fin=t_ex1, golpe=GOLPE, t_golpe=T_GOLPE,
                   t_pila=max(1.0, (P['b_out'] - P['b_in']) - from_b))
     for k, v in nuevos.items():
         reel = setvals(reel, k, [F('%.4f' % v)], 'FUNCTION')
@@ -146,7 +150,8 @@ def main():
         't_bomb': 'reel.t_hook+%d*reel.t_cartel' % len(P.get('carteles_t', [])),
         'r_ex': r,
         't_extra0': 'reel.t_bomb+%d*reel.t_b' % nb,
-        'dur': 'reel.t_extra0+reel.t_ex_ini*(1-pow(reel.r_ex,%d))/(1-reel.r_ex)+reel.t_pila' % ne,
+        't_cola0': 'reel.t_extra0+reel.t_ex_ini*(1-pow(reel.r_ex,%d))/(1-reel.r_ex)+reel.t_pila' % ne,
+        'dur': 'reel.t_cola0' + ''.join('+reel.t_cola%d' % (j + 1) for j in range(len(cola))),
         'hook_on': CL('(reel.t_hook-reel.t)*1000'),
     }
     for k, v in deriv.items():
@@ -187,8 +192,26 @@ def main():
         tk = ('(reel.t_bomb+%d*reel.t_b)' % k) if k < nb else \
              ('(reel.t_extra0+reel.t_ex_ini*(1-pow(reel.r_ex,%d))/(1-reel.r_ex))' % (k - nb))
         u = CL('(reel.t-%s)/reel.t_golpe' % tk)
-        capas.append(('d%02d' % k, '', capa(tn, x, y, im.width, im.height, CL('(reel.t-%s)*1000' % tk),
+        capas.append(('d%02d' % k, '', capa(tn, x, y, im.width, im.height,
+                                            CL('(reel.t-%s)*1000' % tk) + '*' + CL('(reel.t_cola0-reel.t)*1000'),
                                             '1+reel.golpe*pow(1-%s,2)' % u)))
+    # cola: velo + un cartel por vez
+    if cola:
+        from PIL import ImageDraw, ImageFont
+        Image.new('RGB', (64, 64), VELO_RGB).save(os.path.join(dst, 'velo.png'))
+        v = capa('velo.png', 0, 0, W, H, '%.2f*' % VELO + CL('(reel.t-reel.t_cola0)*1000'))
+        capas.append(('velo', '', v))
+        for j, (txt, size, _) in enumerate(cola):
+            lay = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+            ImageDraw.Draw(lay).multiline_text((W // 2, H // 2), txt, font=ImageFont.truetype(P['gochi'], size), fill=(255, 236, 0),
+                                                anchor='mm', align='center', spacing=14)
+            lay = lay.rotate(6, resample=Image.BICUBIC)
+            bb = lay.getbbox(); n = 'cola%d' % (j + 1)
+            lay.crop(bb).save(os.path.join(dst, n + '.png'), optimize=True)
+            t0 = 'reel.t_cola0' + ''.join('+reel.t_cola%d' % (q + 1) for q in range(j))
+            a = CL('(reel.t-(%s))*1000' % t0) + '*' + CL('((%s)+reel.t_cola%d-reel.t)*1000' % (t0, j + 1))
+            capas.append((n, '', capa(n + '.png', bb[0], bb[1], bb[2] - bb[0], bb[3] - bb[1], a)))
+
     # cierre: el papel del hook tapa la pila en los últimos t_fundido s ⇒ la vuelta empieza sobre el mismo papel, sin salto
     papel_rgb = tuple(json.load(open(os.path.join(kit, 'params.json'))).get('papel', (250, 248, 242)))
     Image.new('RGB', (64, 64), papel_rgb).save(os.path.join(dst, 'cierre.png'))
@@ -208,7 +231,7 @@ def main():
     peso = sum(os.path.getsize(os.path.join(dst, f)) for f in os.listdir(dst))
     print('ok ReelLDPv9 · hook %d · %d carteles · pila %d dibujos (%d B + %d extra) · %.1f MB · dur ≈ %.1f s'
           % (hook_id, len(P.get('carteles_t', [])), len(ids), nb, ne, peso / 1e6,
-             2.0 + len(P.get('carteles_t', [])) * nuevos['t_cartel'] + from_b + nuevos['t_pila']))
+             2.0 + len(P.get('carteles_t', [])) * nuevos['t_cartel'] + from_b + nuevos['t_pila'] + sum(c[2] for c in cola)))
 
 
 if __name__ == '__main__':
