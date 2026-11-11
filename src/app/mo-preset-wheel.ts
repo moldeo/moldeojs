@@ -146,19 +146,62 @@ export class moPresetWheel extends moSphere {
 
   /** ¿la capa en foco tiene lentes propuestas sin elegir? */
   private hasProposals(fx: any): boolean {
-    return !!fx && !fx.isProject && fx.GetConfig().m_PreConfigs.some((p: any) => p.m_Proposed);
+    return !!fx && fx.GetConfig().m_PreConfigs.some((p: any) => p.m_Proposed);
   }
 
   /** ✦: si hay lentes sin elegir, se descartan; si no, se proponen 4 nuevas */
   proposeToggle() {
     const fx = this.layer();
-    if (!fx || fx.isProject) { this.flash("elegí una capa"); return; }
+    if (!fx) { this.flash("elegí una capa"); return; }
     if (this.hasProposals(fx)) this.dropProposals(); else this.propose();
   }
 
   /** genera N presets mezclando dos existentes por param (t ∈ [−0,15, 1,15] + jitter); con `seed` es reproducible */
+  /** B3d — sobre el PROYECTO no se interpola (los estados son índices de preset por capa): se RECOMBINAN dos estados del mismo
+   *  grupo capa por capa y, con probabilidad MUTA, una capa toma un preset vecino (algo que ningún estado tenía). */
+  static MUTA = 0.15;
+  private proposeProject(seed: number) {
+    const P = this.project; if (!P) return;
+    const all: any[] = P.states().filter((s: any) => !s.m_Proposed);
+    if (!all.length) return;
+    const g = (this.projGroup !== null && this.projGroup !== undefined) ? this.projGroup : P.currentGroup();
+    let base = all.filter((s: any) => P.group(s) == g);
+    if (base.length < 2) base = all;
+    const rnd = mulberry32(seed);
+    const cc = this.console.m_Config;
+    for (let k = 0; k < moPresetWheel.PROPOSALS; k++) {
+      const A = base[Math.floor(rnd() * base.length)];
+      let B = base[Math.floor(rnd() * base.length)];
+      if (base.length > 1) for (let q = 0; q < 4 && B === A; q++) B = base[Math.floor(rnd() * base.length)];
+      const pre: any = new moPreconfig();
+      pre.m_Name = "✦" + (k + 1);
+      pre.m_XmlAttributes = A.m_XmlAttributes ? Object.assign({}, A.m_XmlAttributes) : null;
+      pre.m_Proposed = true;
+      for (const pa of A.m_PreconfIndexes) {
+        const name = "" + pa.m_ParamName;
+        const pb = B.m_PreconfIndexes.find((x: any) => ("" + x.m_ParamName) == name);
+        let vi = (pb && rnd() < 0.5) ? pb.m_ValueIndex : pa.m_ValueIndex;
+        const r = rnd();
+        if (name.indexOf(".") < 0 && r < moPresetWheel.MUTA) {          /* capa entera: preset vecino */
+          const fx = P.layerByLabel(name), n = fx ? fx.GetConfig().m_PreConfigs.filter((x: any) => !x.m_Proposed).length : 0;
+          if (n > 1) vi = (vi + (rnd() < 0.5 ? n - 1 : 1)) % n;
+        }
+        const pi = new moPreconfigParamIndex();
+        pi.m_ParamName = name; pi.m_ParamIndex = pa.m_ParamIndex; pi.m_ValueIndex = vi;
+        pre.m_PreconfIndexes.push(pi);
+      }
+      cc.m_PreConfigs.push(pre);
+    }
+  }
+
   propose(seed: number = null) {
-    const fx = this.layer(); if (!fx || fx.isProject) return;
+    const fx = this.layer(); if (!fx) return;
+    if (fx.isProject) {
+      if (seed === null) seed = (Math.random() * 2147483647) | 0;
+      this.proposeProject(seed);
+      if (this.channel) this.channel.send({ verb: "propose", label: "" + fx.GetLabelName(), seed });
+      this.render(); this.flash("✦ " + moPresetWheel.PROPOSALS + " estados"); return;
+    }
     const cfg = fx.GetConfig();
     const base: any[] = cfg.m_PreConfigs.filter((p: any) => !p.m_Proposed);
     if (!base.length) return;
@@ -216,7 +259,13 @@ export class moPresetWheel extends moSphere {
     const cfg = fx.GetConfig(), pre: any = cfg.m_PreConfigs[i];
     if (!pre || !pre.m_Proposed) return;
     pre.m_Proposed = false;
-    pre.m_Name = "lente " + (cfg.m_PreConfigs.filter((p: any) => !p.m_Proposed && /^lente \d+$/.test("" + p.m_Name)).length + 1);
+    const pfx = fx.isProject ? "estado ✦" : "lente ";
+    pre.m_Name = pfx + (cfg.m_PreConfigs.filter((p: any) => !p.m_Proposed && ("" + p.m_Name).indexOf(pfx) == 0).length + 1);
+    if (fx.isProject) {
+      const cc = this.console.m_Config; if (cc && cc.SaveConfig) cc.SaveConfig();
+      if (this.channel) this.channel.send({ verb: "proposekeep", label: "" + fx.GetLabelName(), i });
+      this.render(); this.flash("elegido · " + pre.m_Name); return;
+    }
     for (const pi of pre.m_PreconfIndexes) { const v: any = cfg.m_Params[pi.m_ParamIndex] && cfg.m_Params[pi.m_ParamIndex].m_Values[pi.m_ValueIndex]; if (v) v.m_Proposed = false; }
     cfg.SaveConfig();
     if (this.channel) this.channel.send({ verb: "proposekeep", label: "" + fx.GetLabelName(), i });
@@ -227,7 +276,16 @@ export class moPresetWheel extends moSphere {
   /** descarta las lentes no elegidas; la que está sonando se queda (no se corta lo que se ve).
    *  Sus VAL siguen en memoria (deshacer depende de los índices) y ToXML no los escribe. */
   dropProposals() {
-    const fx = this.layer(); if (!fx || fx.isProject) return;
+    const fx = this.layer(); if (!fx) return;
+    if (fx.isProject) {
+      const P = this.project, cc = this.console.m_Config, ci = P.currentIndex();
+      if (ci >= 0 && P.states()[ci] && P.states()[ci].m_Proposed) this.keepProposal(ci);
+      const curSt = P.states()[ci], before = cc.m_PreConfigs.length;
+      cc.m_PreConfigs = cc.m_PreConfigs.filter((p: any) => !p.m_Proposed);
+      P.setCurrentIndex(curSt ? cc.m_PreConfigs.indexOf(curSt) : -1);
+      if (this.channel) this.channel.send({ verb: "proposedrop", label: "" + fx.GetLabelName() });
+      this.render(); this.flash("✕ " + (before - cc.m_PreConfigs.length) + " estados"); return;
+    }
     const cfg = fx.GetConfig();
     const cur = cfg.m_PreConfigs[cfg.GetCurrentPreConf()];
     if (cur && (cur as any).m_Proposed) { this.keepProposal(cfg.GetCurrentPreConf()); }

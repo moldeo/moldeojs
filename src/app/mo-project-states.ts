@@ -34,6 +34,9 @@ export class moProjectStates {
     const s = "" + name, k = s.indexOf(".");
     return k < 0 ? [s, ""] : [s.slice(0, k), s.slice(k + 1)];
   }
+  /** B3d — el estado que suena (para reindexar al descartar propuestas) */
+  currentIndex(): number { return this.cur; }
+  setCurrentIndex(i: number) { this.cur = i; }
   group(st: any): string { return (st && st.m_XmlAttributes && st.m_XmlAttributes["group"]) || ""; }
 
   layers(): any[] {
