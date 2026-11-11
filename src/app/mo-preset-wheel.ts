@@ -235,9 +235,13 @@ export class moPresetWheel extends moSphere {
           vi = cfg.CloneValue(P, ia);
           if (vi < 0) continue;
           const nv: any = P.m_Values[vi]; nv.m_Proposed = true;
+          /* B3d-2 — un param PUBLICADO (lo que el autor dejó para ajustar) no extrapola: queda dentro de lo que sus presets
+           * definen. Los rnd() se consumen igual ⇒ la semilla da las mismas lentes en el Player. */
+          const pub = ("" + (P.m_Property || "")).toLowerCase() == "published";
           nums.forEach((p: number[], j: number) => {
             const span = Math.max(Math.abs(p[1] - p[0]), Math.abs(p[0]) * 0.15, 0.05);
-            const v = p[0] + t * (p[1] - p[0]) + 0.05 * span * jit;
+            let v = p[0] + t * (p[1] - p[0]) + 0.05 * span * jit;
+            if (pub) v = Math.min(Math.max(v, Math.min(p[0], p[1])), Math.max(p[0], p[1]));
             nv.m_List[j].SetVal("" + Number(v.toFixed(4)));
           });
           fx.ResolveValue(P, vi);
