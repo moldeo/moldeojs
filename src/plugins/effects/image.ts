@@ -1,4 +1,5 @@
 import * as MO from "moldeojs";
+import * as THREE from "three";
 
 export enum moImageParamIndex {
   IMAGE_INLET=0,
@@ -67,7 +68,7 @@ export class moEffectImage extends MO.moEffect {
       this.Mat = new MO.moMaterialBasic();
     }
     if (this.Mat) {
-      this.Mat.map = this.m_Config.Texture("texture")._texture;
+      this.Mat.map = this.Video() || this.m_Config.Texture("texture")._texture;
       this.Mat.transparent = true;
       this.Mat.color = ccolor;
       this.Mat.opacity = this.m_Config.Eval("alpha");
@@ -166,6 +167,42 @@ export class moEffectImage extends MO.moEffect {
     if (this.Mat.alphaMap !== tex) { this.Mat.alphaMap = tex; this.Mat.needsUpdate = true; }
     const r = Number(this.m_Config.Eval("revela"));
     this.revelaU.value = isNaN(r) ? 1 : Math.max(0, Math.min(1.0001, r));
+  }
+
+  /**
+   * #918 B5·N5b — video como textura: params OPCIONALES del image (si no están, nada cambia).
+   *   video   (TXT)      archivo .mp4/.webm del proyecto (mismo directorio que el .mol)
+   *   video_t (FUNCTION) segundos dentro del clip que tienen que verse ahora (la expresión manda: así el reel se re-ritma igual
+   *                      que las demás capas). Si el video se aleja más de 0,15 s ⇒ seek. Con alpha ≤ 0 el video se pausa.
+   * Sin sonido (muted): es material visual; el audio del reel va aparte.
+   */
+  private vid: HTMLVideoElement = null;
+  private vtex: any = null;
+  private Video(): any {
+    const byName = this.m_Config.m_ParamsByName;
+    if (!byName || !byName["video"]) return null;
+    if (!this.vid) {
+      const name = ("" + this.m_Config.Text("video")).trim();
+      if (!name) return null;
+      let base = "";
+      try { const mol = new URLSearchParams(window.location.search).get("mol") || ""; base = mol.replace(/[^\/]*$/, ""); } catch (e) {}
+      const v = document.createElement("video");
+      v.muted = true; (v as any).playsInline = true; v.loop = false; v.preload = "auto"; v.crossOrigin = "anonymous";
+      v.setAttribute("playsinline", ""); v.src = base + name;
+      this.vid = v;
+      this.vtex = new THREE.VideoTexture(v);
+      this.vtex.minFilter = THREE.LinearFilter; this.vtex.magFilter = THREE.LinearFilter;
+    }
+    const v = this.vid;
+    const visible = Number(this.m_Config.Eval("alpha")) > 0;
+    if (!visible) { if (!v.paused) v.pause(); return this.vtex; }
+    const t = byName["video_t"] ? Number(this.m_Config.Eval("video_t")) : NaN;
+    if (!isNaN(t) && v.readyState >= 1) {
+      const tt = Math.max(0, Math.min(t, (v.duration || t) - 0.05));
+      if (Math.abs(v.currentTime - tt) > 0.15) v.currentTime = tt;
+    }
+    if (v.paused) { const pr: any = v.play(); if (pr && pr.catch) pr.catch(() => {}); }
+    return this.vtex;
   }
 
   Update( p_Event: MO.moEventList ) : void {
