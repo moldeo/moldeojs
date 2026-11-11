@@ -140,7 +140,10 @@ def main():
     from_b = nb * P['t_b'] + sum(t_ex0 * (t_ex1 / t_ex0) ** (j / (ne - 1)) for j in range(ne))
     # carteles de la COLA (como el prototipo: Gochi amarillo rotado 6°, sobre el vitral velado) — texto, tamaño, duración
     cola = P.get('cola_txt', COLA) if P.get('cola', True) else []
-    nuevos = dict(**{'t_cola%d' % (j + 1): c[2] for j, c in enumerate(cola)}, t_fundido=P.get('t_fundido', 0.4), t_cartel=P.get('t_cartel', 1.5), t_tipeo=P.get('t_tipeo', 0.7), t_b=P['t_b'], t_ex_ini=t_ex0, t_ex_fin=t_ex1, golpe=GOLPE, t_golpe=T_GOLPE,
+    if P.get('cola_video'):     # fotos + mesa + flyer: un clip de video al final (N5b); su duración real, medida
+        t_video = float(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0',
+                                        P['cola_video']], capture_output=True, text=True, check=True).stdout.strip())
+    nuevos = dict(**({'t_video': t_video} if P.get('cola_video') else {}), **{'t_cola%d' % (j + 1): c[2] for j, c in enumerate(cola)}, t_fundido=P.get('t_fundido', 0.4), t_cartel=P.get('t_cartel', 1.5), t_tipeo=P.get('t_tipeo', 0.7), t_b=P['t_b'], t_ex_ini=t_ex0, t_ex_fin=t_ex1, golpe=GOLPE, t_golpe=T_GOLPE,
                   t_pila=max(1.0, (P['b_out'] - P['b_in']) - from_b))
     for k, v in nuevos.items():
         reel = setvals(reel, k, [F('%.4f' % v)], 'FUNCTION')
@@ -151,7 +154,8 @@ def main():
         'r_ex': r,
         't_extra0': 'reel.t_bomb+%d*reel.t_b' % nb,
         't_cola0': 'reel.t_extra0+reel.t_ex_ini*(1-pow(reel.r_ex,%d))/(1-reel.r_ex)+reel.t_pila' % ne,
-        'dur': 'reel.t_cola0' + ''.join('+reel.t_cola%d' % (j + 1) for j in range(len(cola))),
+        't_cola_fin': 'reel.t_cola0' + ''.join('+reel.t_cola%d' % (j + 1) for j in range(len(cola))),
+        'dur': 'reel.t_cola_fin' + ('+reel.t_video' if P.get('cola_video') else ''),
         'hook_on': CL('(reel.t_hook-reel.t)*1000'),
     }
     for k, v in deriv.items():
@@ -212,6 +216,14 @@ def main():
             a = CL('(reel.t-(%s))*1000' % t0) + '*' + CL('((%s)+reel.t_cola%d-reel.t)*1000' % (t0, j + 1))
             capas.append((n, '', capa(n + '.png', bb[0], bb[1], bb[2] - bb[0], bb[3] - bb[1], a)))
 
+    if P.get('cola_video'):
+        import shutil
+        shutil.copyfile(P['cola_video'], os.path.join(dst, 'cola-video.mp4'))
+        cv = capa('default', 0, 0, W, H, CL('(reel.t-reel.t_cola_fin)*1000'))
+        cv = setvals(cv, 'video', [[('TXT', '', 'cola-video.mp4')]], 'TEXT')
+        cv = setvals(cv, 'video_t', [F('reel.t-reel.t_cola_fin')], 'FUNCTION')
+        capas.append(('colavid', '', cv))
+
     # cierre: el papel del hook tapa la pila en los últimos t_fundido s ⇒ la vuelta empieza sobre el mismo papel, sin salto
     papel_rgb = tuple(json.load(open(os.path.join(kit, 'params.json'))).get('papel', (250, 248, 242)))
     Image.new('RGB', (64, 64), papel_rgb).save(os.path.join(dst, 'cierre.png'))
@@ -231,7 +243,7 @@ def main():
     peso = sum(os.path.getsize(os.path.join(dst, f)) for f in os.listdir(dst))
     print('ok ReelLDPv9 · hook %d · %d carteles · pila %d dibujos (%d B + %d extra) · %.1f MB · dur ≈ %.1f s'
           % (hook_id, len(P.get('carteles_t', [])), len(ids), nb, ne, peso / 1e6,
-             2.0 + len(P.get('carteles_t', [])) * nuevos['t_cartel'] + from_b + nuevos['t_pila'] + sum(c[2] for c in cola)))
+             2.0 + len(P.get('carteles_t', [])) * nuevos['t_cartel'] + from_b + nuevos['t_pila'] + sum(c[2] for c in cola) + (t_video if P.get('cola_video') else 0)))
 
 
 if __name__ == '__main__':
