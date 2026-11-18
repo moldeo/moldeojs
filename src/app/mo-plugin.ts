@@ -117,6 +117,12 @@ PluginsDefinitions.push( new moPluginDefinition(
   moMoldeoObjectType.MO_OBJECT_EFFECT,
 moEffectParticlesSimple ) );
 
+/// Effect Particle Fractal = «semilla» / «semi» (Moldeo 2.0, FCA 18-nov) ============================================
+import { moEffectParticleFractal, moEffectSemilla, moEffectSemi } from "../plugins/effects/particlefractal";
+PluginsDefinitions.push( new moPluginDefinition( "particle_fractal", "/plugins/effects/particlefractal.ts", moMoldeoObjectType.MO_OBJECT_EFFECT, moEffectParticleFractal ) );
+PluginsDefinitions.push( new moPluginDefinition( "semilla", "/plugins/effects/particlefractal.ts", moMoldeoObjectType.MO_OBJECT_EFFECT, moEffectSemilla ) );
+PluginsDefinitions.push( new moPluginDefinition( "semi", "/plugins/effects/particlefractal.ts", moMoldeoObjectType.MO_OBJECT_EFFECT, moEffectSemi ) );
+
 /// Effect Sound ====================================================================
 import { moEffectSound } from "../plugins/effects/sound";
 PluginsDefinitions.push( new moPluginDefinition(
