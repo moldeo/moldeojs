@@ -2,7 +2,9 @@ import * as MO from "moldeojs";
 import * as THREE from "three";
 
 /**
- * particle_fractal — «semilla» / «semi» (Moldeo 2.0, FCA 18-nov-2026).
+ * semilla_cpu — borrador CPU SIN ESTADO de la «semilla» (Moldeo 2.0, FCA 18-nov-2026). Desde la Fase 1 del port de
+ * ParticlesFractal, `particle_fractal` / `semilla` / `semi` usan el motor GPU (particlesfractalgpu.ts); este queda como
+ * `semilla_cpu` (árbol explícito niveles×ramas, `crece` puede ir y volver).
  * Una MÓNADA: una sola semilla con un genoma (sus params) del que salen N nodos. Cada nodo es a la vez PARTÍCULA y NODO DE ÁRBOL:
  *   · posición en la NUBE  = dispersión alrededor de la semilla (determinista por `azar`), abierta según `multiplica`
  *   · posición en el ÁRBOL = ramificación recursiva (`ramas` hijos por nivel, `angulo`, `reduccion`, hasta `niveles`), brotada según `crece`
@@ -34,7 +36,7 @@ export class moEffectParticleFractal extends MO.moEffect {
 
   constructor() {
     super();
-    this.SetName("particle_fractal");
+    this.SetName("semilla_cpu");
   }
 
   Init(callback?: any): boolean {
@@ -174,7 +176,3 @@ export class moEffectParticleFractal extends MO.moEffect {
     return this.m_Config.GetConfigDefinition();
   }
 }
-
-/** alias: el mismo objeto con los nombres de FCA */
-export class moEffectSemilla extends moEffectParticleFractal { constructor() { super(); this.SetName("semilla"); } }
-export class moEffectSemi extends moEffectParticleFractal { constructor() { super(); this.SetName("semi"); } }

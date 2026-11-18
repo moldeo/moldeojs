@@ -117,11 +117,15 @@ PluginsDefinitions.push( new moPluginDefinition(
   moMoldeoObjectType.MO_OBJECT_EFFECT,
 moEffectParticlesSimple ) );
 
-/// Effect Particle Fractal = «semilla» / «semi» (Moldeo 2.0, FCA 18-nov) ============================================
-import { moEffectParticleFractal, moEffectSemilla, moEffectSemi } from "../plugins/effects/particlefractal";
-PluginsDefinitions.push( new moPluginDefinition( "particle_fractal", "/plugins/effects/particlefractal.ts", moMoldeoObjectType.MO_OBJECT_EFFECT, moEffectParticleFractal ) );
-PluginsDefinitions.push( new moPluginDefinition( "semilla", "/plugins/effects/particlefractal.ts", moMoldeoObjectType.MO_OBJECT_EFFECT, moEffectSemilla ) );
-PluginsDefinitions.push( new moPluginDefinition( "semi", "/plugins/effects/particlefractal.ts", moMoldeoObjectType.MO_OBJECT_EFFECT, moEffectSemi ) );
+/// Effect ParticlesFractal (port GPU del plugin de Moldeo, Fase 1) = «semilla» / «semi» (Moldeo 2.0, FCA 18-nov) ==========
+import { moEffectParticlesFractal, moEffectParticleFractalGPU, moEffectSemilla, moEffectSemi } from "../plugins/effects/particlesfractalgpu";
+PluginsDefinitions.push( new moPluginDefinition( "particlesfractal", "/plugins/effects/particlesfractalgpu.ts", moMoldeoObjectType.MO_OBJECT_EFFECT, moEffectParticlesFractal ) );
+PluginsDefinitions.push( new moPluginDefinition( "particle_fractal", "/plugins/effects/particlesfractalgpu.ts", moMoldeoObjectType.MO_OBJECT_EFFECT, moEffectParticleFractalGPU ) );
+PluginsDefinitions.push( new moPluginDefinition( "semilla", "/plugins/effects/particlesfractalgpu.ts", moMoldeoObjectType.MO_OBJECT_EFFECT, moEffectSemilla ) );
+PluginsDefinitions.push( new moPluginDefinition( "semi", "/plugins/effects/particlesfractalgpu.ts", moMoldeoObjectType.MO_OBJECT_EFFECT, moEffectSemi ) );
+/// borrador CPU sin estado (árbol explícito niveles×ramas) — queda como `semilla_cpu`
+import { moEffectParticleFractal } from "../plugins/effects/particlefractal";
+PluginsDefinitions.push( new moPluginDefinition( "semilla_cpu", "/plugins/effects/particlefractal.ts", moMoldeoObjectType.MO_OBJECT_EFFECT, moEffectParticleFractal ) );
 
 /// Effect Sound ====================================================================
 import { moEffectSound } from "../plugins/effects/sound";
