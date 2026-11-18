@@ -5,6 +5,9 @@
  *      tocar = foco (presets y parámetros la siguen) · mantener = prender / apagar
  *  - moParamsSphere  (arriba-der): los params numéricos de la capa en foco.
  *      tocar = elegir · arrastrar arriba/abajo (o rueda del mouse) en la esfera = cambiar el valor
+ *      param DISCRETO (PARAM con options="a,b,c" en el .cfg ⇒ valor entero 0..K−1): tocarlo abre el SELECTOR en anillo
+ *      (K opciones alrededor, «×» al centro = cerrar sin cambiar) · clic = elegir y cerrar · rueda = mover el resaltado,
+ *      Enter = elegir el resaltado · ESC = cerrar sin cambiar. El centro de la esfera muestra la etiqueta, no el número.
  *  - moTimeSphere    (abajo-izq): ▶ línea de tiempo del proyecto + ⇄ grupo · ● REC / ■ · ▷ reproducir la toma
  */
 import { moSphere } from "./mo-sphere";
@@ -193,7 +196,7 @@ export class moParamsSphere extends moSphere {
 
   setFocus(fx: any) {
     if (!fx || fx.isProject) return;
-    if (fx !== this.focus) { this.focus = fx; this.param = null; this.color = null; this.sub = 0; this.page = 0; }
+    if (fx !== this.focus) { this.closePicker(); this.focus = fx; this.param = null; this.color = null; this.sub = 0; this.page = 0; }
     this.render();
   }
 
@@ -219,6 +222,121 @@ export class moParamsSphere extends moSphere {
   private isColor(name: string): boolean {
     const P = this.focus && this.focus.GetConfig().m_ParamsByName[name]; if (!P) return false;
     return moParamsSphere.isColorVal(P.m_Values[Math.max(0, P.GetIndexValue())]);
+  }
+
+  /** opciones de un param discreto (atributo `options` del PARAM), o null si es continuo */
+  options(name: string): string[] {
+    const P = this.focus && this.focus.GetConfig().m_ParamsByName[name]; if (!P) return null;
+    const pd: any = P.m_ParamDefinition, xa: any = (P as any).m_XmlAttributes || {};
+    const raw = "" + ((pd && pd.m_OptionsStr) || xa["options"] || "");
+    const o = raw.split(",").map((x) => x.trim()).filter((x) => x);
+    return o.length >= 2 ? o : null;
+  }
+  /** índice actual de un param discreto (redondeado y acotado a 0..K−1) */
+  private optIndex(name: string): number {
+    const o = this.options(name); if (!o) return 0;
+    return Math.max(0, Math.min(o.length - 1, Math.round(this.value(name))));
+  }
+  /** lo que se muestra de un param: la etiqueta si es discreto, el número si no */
+  private shown(name: string): string {
+    const o = this.options(name);
+    return o ? o[this.optIndex(name)] : fmt(this.value(name, this.color ? this.sub : 0));
+  }
+
+  /* ── selector en anillo para params discretos ── */
+  private picker: HTMLDivElement = null;
+  private pickName: string = null;
+  private pickSel: number = 0;
+  private pickKey: (e: KeyboardEvent) => void = null;
+  private pickWheel: (e: WheelEvent) => void = null;
+
+  isPickerOpen(): boolean { return !!this.picker; }
+
+  openPicker(name: string) {
+    const o = this.options(name); if (!o || !this.focus) return;
+    this.closePicker();
+    moParamsSphere.ensurePickerStyle();
+    this.pickName = name; this.pickSel = this.optIndex(name);
+    const D = 300, C = D / 2, R = o.length > 6 ? 116 : 104;
+    const p = document.createElement("div");
+    p.className = "mo-sphere mw-picker"; p.id = "moParamsPicker";
+    p.setAttribute("data-html2canvas-ignore", ""); p.setAttribute("role", "listbox"); p.setAttribute("aria-label", name);
+    const mk = (txt: string, cls: string, x: number, y: number, fn: () => void, word: string) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "mw-b " + cls; b.textContent = txt; b.title = word; b.setAttribute("aria-label", word);
+      b.style.left = x + "px"; b.style.top = y + "px";
+      b.addEventListener("pointerdown", (e) => { e.preventDefault(); e.stopPropagation(); fn(); });
+      p.appendChild(b); return b;
+    };
+    const cur = this.optIndex(name);
+    o.forEach((lb, k) => {
+      const a = -Math.PI / 2 + (2 * Math.PI * k) / o.length;
+      const b = mk(lb, "mw-opt" + (k == cur ? " cur" : ""), C + R * Math.cos(a), C + R * Math.sin(a), () => this.choose(k), lb);
+      b.setAttribute("role", "option"); b.setAttribute("data-k", "" + k);
+    });
+    mk("×", "mw-center mw-x", C, C, () => this.closePicker(), "cerrar sin cambiar");
+    const t = document.createElement("div"); t.className = "mw-ptitle"; t.textContent = name; p.appendChild(t);
+    p.addEventListener("pointerdown", (e) => { e.stopPropagation(); if (e.target === p) this.closePicker(); });
+    document.body.appendChild(p);
+    this.picker = p;
+    this.pickKey = (e: KeyboardEvent) => {
+      if (e.key == "Escape") { e.preventDefault(); e.stopPropagation(); this.closePicker(); }
+      else if (e.key == "Enter") { e.preventDefault(); e.stopPropagation(); this.choose(this.pickSel); }
+      else if (e.key == "ArrowRight" || e.key == "ArrowDown") { e.preventDefault(); this.highlight(this.pickSel + 1); }
+      else if (e.key == "ArrowLeft" || e.key == "ArrowUp") { e.preventDefault(); this.highlight(this.pickSel - 1); }
+    };
+    this.pickWheel = (e: WheelEvent) => { e.preventDefault(); e.stopPropagation(); if (e.deltaY) this.highlight(this.pickSel + Math.sign(e.deltaY)); };
+    document.addEventListener("keydown", this.pickKey, true);
+    window.addEventListener("wheel", this.pickWheel, { passive: false, capture: true });
+    this.highlight(this.pickSel);
+    this.flash(name + " · " + o[cur]);
+  }
+
+  /** mueve el resaltado (rueda / flechas) sin aplicar */
+  private highlight(k: number) {
+    if (!this.picker) return;
+    const n = this.picker.querySelectorAll(".mw-opt").length; if (!n) return;
+    this.pickSel = ((k % n) + n) % n;
+    this.picker.querySelectorAll(".mw-opt").forEach((b: any) => b.classList.toggle("on", +b.getAttribute("data-k") == this.pickSel));
+  }
+
+  /** elige la opción k: mismo camino que el arrastre (historial + setNumber ⇒ fork del VAL + canal) y cierra */
+  private choose(k: number) {
+    const nm = this.pickName, o = this.options(nm);
+    this.closePicker();
+    if (!o || !this.focus || !this.touchEdit) return;
+    this.param = nm; this.sub = 0;
+    if (k != this.optIndex(nm)) {
+      if (this.history) this.history.record(this.focus, "elegir " + nm);
+      this.touchEdit.recNext = true;
+      this.touchEdit.setNumber(this.focus, nm, k, 0);
+    }
+    this.render();
+    this.flash(nm + " · " + o[k]);
+  }
+
+  closePicker() {
+    if (this.pickKey) document.removeEventListener("keydown", this.pickKey, true);
+    if (this.pickWheel) window.removeEventListener("wheel", this.pickWheel, { capture: true } as any);
+    this.pickKey = null; this.pickWheel = null;
+    if (this.picker) { this.picker.remove(); this.picker = null; }
+  }
+
+  private static ensurePickerStyle() {
+    if (document.getElementById("moParamsPickerStyle")) return;
+    const st = document.createElement("style"); st.id = "moParamsPickerStyle";
+    st.textContent = `
+.mo-sphere.mw-picker{left:50%;top:50%;width:300px;height:300px;transform:translate(-50%,-50%);z-index:2147483001;
+ animation:mwPickIn .18s ease-out}
+@keyframes mwPickIn{from{transform:translate(-50%,-50%) scale(.6);opacity:.2}to{transform:translate(-50%,-50%);opacity:1}}
+.mo-sphere.mw-picker .mw-opt{width:auto;min-width:64px;height:34px;padding:0 12px;border-radius:999px;
+ font:600 13px/1 system-ui,sans-serif;white-space:nowrap}
+.mo-sphere.mw-picker .mw-opt.cur{border-color:#ff5ed8;box-shadow:0 0 10px rgba(255,94,216,.6)}
+.mo-sphere.mw-picker .mw-x{font-size:24px}
+.mo-sphere.mw-picker .mw-ptitle{position:absolute;left:50%;top:calc(50% + 34px);transform:translateX(-50%);pointer-events:none;
+ font:600 10px/1 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:rgba(233,251,255,.7)}
+@media (prefers-reduced-motion:reduce){.mo-sphere.mw-picker{animation:none}}`;
+    document.head.appendChild(st);
   }
 
   private value(name: string, sub: number = 0): number {
@@ -257,6 +375,7 @@ export class moParamsSphere extends moSphere {
   private dragStart(e: PointerEvent) {
     if (!this.open || !this.param || (e.target as HTMLElement).closest(".mw-b")) return;
     e.preventDefault(); e.stopPropagation();
+    if (!this.color && this.options(this.param)) { this.openPicker(this.param); return; }   /* discreto: no hay valor continuo */
     if (this.history) this.history.record(this.focus, "mover " + this.label());
     if (this.touchEdit) this.touchEdit.recNext = true;
     this.drag = { id: e.pointerId, y: e.clientY, v: this.value(this.param, this.sub) };
@@ -278,6 +397,7 @@ export class moParamsSphere extends moSphere {
   private wheelMove(e: WheelEvent) {
     if (!this.open || !this.param) return;
     e.preventDefault();
+    if (!this.color && this.options(this.param)) { if (!this.picker) this.openPicker(this.param); return; }
     if (!this.wheelTimer) { if (this.history) this.history.record(this.focus, "mover " + this.label()); if (this.touchEdit) this.touchEdit.recNext = true; }
     const v = this.value(this.param, this.sub);
     this.set(v - Math.sign(e.deltaY) * this.step(v) * 10);
@@ -309,8 +429,11 @@ export class moParamsSphere extends moSphere {
     if (this.color && this.focus && this.isColor(this.color)) { this.renderColor(); return; }
     this.color = null;
     const names = this.params();
-    const v = this.param ? fmt(this.value(this.param)) : (this.focus ? moSphere.glyphOf("" + this.focus.GetLabelName()) : "∿");
-    this.centerEl = this.foldCenter(v, this.param ? this.param + " (arrastrá arriba/abajo)" : (this.focus ? "" + this.focus.GetLabelName() : "parámetros"));
+    if (this.param && !this.options(this.param)) this.closePicker();
+    const v = this.param ? this.shown(this.param) : (this.focus ? moSphere.glyphOf("" + this.focus.GetLabelName()) : "∿");
+    const disc = this.param ? this.options(this.param) : null;
+    this.centerEl = this.foldCenter(v, this.param ? this.param + (disc ? " (tocá la esfera o girá la rueda: opciones)" : " (arrastrá arriba/abajo)") : (this.focus ? "" + this.focus.GetLabelName() : "parámetros"));
+    if (disc && this.centerEl) { this.centerEl.classList.add("mw-disc"); this.centerEl.style.fontSize = v.length > 8 ? "9px" : v.length > 5 ? "11px" : ""; }
     if (!this.focus) return;
     const per = moParamsSphere.PER_PAGE, pages = Math.max(1, Math.ceil(names.length / per));
     if (this.page >= pages) this.page = 0;
@@ -332,9 +455,11 @@ export class moParamsSphere extends moSphere {
         b.title = nm + " (color) — tocar: abrir rojo · verde · azul · opacidad";
         return;
       }
+      const opts = this.options(nm);
       const b = this.btn(g, nm, nm == this.param ? "on" : "", pos[k].x, pos[k].y,
-        () => { this.param = nm; this.sub = 0; this.render(); this.flash(nm + " " + fmt(this.value(nm))); });
-      b.title = nm + " = " + fmt(this.value(nm)) + " — tocar: elegir · después arrastrá en la esfera (o rueda del mouse)";
+        () => { this.param = nm; this.sub = 0; this.render(); if (opts) this.openPicker(nm); else this.flash(nm + " " + fmt(this.value(nm))); });
+      b.title = nm + " = " + this.shown(nm) + (opts ? " — tocar: abrir las " + opts.length + " opciones" : " — tocar: elegir · después arrastrá en la esfera (o rueda del mouse)");
+      if (opts) b.setAttribute("data-discrete", "" + opts.length);
     });
   }
 }

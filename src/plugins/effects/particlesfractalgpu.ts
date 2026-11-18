@@ -33,7 +33,13 @@ import * as THREE from "three";
  *   nombres ORIGINALES: width/height (⇒ N = nextPow2(max)), incremento_madurez, left_rep_angle_min/max, right_rep_angle_min/max
  *   (radianes; como el original — rdivide = 1 — se usa el max), left_mov_angle_min/max, right_mov_angle_min/max (rad/paso),
  *   randomvelocity (avance por paso en centésimas de pantalla), randomvelocityx/y (rumbo inicial; default hacia arriba),
- *   viscosity (frenado por paso, 0..1), geometry_mode (0 puntos · 6 árbol), alpha, color, blending (1/5 aditivo).
+ *   viscosity (frenado por paso, 0..1), alpha, color, blending (1/5 aditivo).
+ *   geometry_mode — DISCRETO (FCA 18-nov): con `options="puntos,árbol (líneas),puntos + líneas"` en el PARAM el valor es el
+ *   índice 0 puntos · 1 árbol (sólo líneas hijo→padre) · 2 puntos + líneas. Sin `options` (.cfg viejo) se lee el código del
+ *   original: 0 = puntos · 6 (rsGeometryTreeLines) = árbol · otro = puntos + líneas (2/3 sprites/quads no están portados);
+ *   con `options`, un 6 suelto (fuera de rango) también se lee como árbol. Relación con `forma`: forma MUEVE las partículas (0 nube ⇄ 1 árbol) y además atenúa las líneas
+ *   (alpha·lineas·forma); geometry_mode elige QUÉ se dibuja. Con forma≈0 las líneas no se ven ⇒ en «árbol» se muestran los
+ *   puntos para que la capa no quede vacía. (Estela = no borrar el cuadro queda fuera: el render limpia el lienzo entero.)
  *   capa «semilla» (borrador de FCA, se usa si el .cfg NO trae el nombre original equivalente):
  *   niveles (⇒ N = 2^ceil(niveles/2)), angulo (grados ⇒ ambos rep_angle), largo (⇒ randomvelocity tal que el largo de rama ≈
  *   largo), balanceo (grados: asimetría izq/der), forma (0 nube de partículas ⇄ 1 árbol con líneas), dispersion (radio de la
@@ -431,6 +437,23 @@ export class moEffectParticlesFractal extends MO.moEffect {
   private readState() { return this.readTex(this.stateRT, this.cS); }
   private readMotion() { return this.readTex(this.motionRT, this.cM); }
 
+  /** geometry_mode ⇒ "puntos" | "arbol" | "ambos" (ver el comentario del archivo: índice si hay `options`, código viejo si no) */
+  public geomMode(): string {
+    if (!this.has("geometry_mode")) return "ambos";
+    const v = Math.round(this.num("geometry_mode", 2));
+    const P: any = this.m_Config.m_ParamsByName["geometry_mode"], pd: any = P && P.m_ParamDefinition;
+    const opts = "" + ((pd && pd.m_OptionsStr) || (P && P.m_XmlAttributes && P.m_XmlAttributes["options"]) || "");
+    if (opts.trim()) {
+      const o = opts.split(",").map((x) => x.trim().toLowerCase());
+      const lb = v >= 0 && v < o.length ? o[v] : (v == 6 ? "árbol" : "");
+      if (/punto/.test(lb) && /l[ií]nea|[aá]rbol/.test(lb)) return "ambos";
+      if (/punto/.test(lb)) return "puntos";
+      if (/l[ií]nea|[aá]rbol/.test(lb)) return "arbol";
+      return ["puntos", "arbol", "ambos"][Math.max(0, Math.min(2, v))];
+    }
+    return v == 0 ? "puntos" : v == 6 ? "arbol" : "ambos";   /* .cfg viejo: códigos del original */
+  }
+
   /** para el test headless: vivas, generación de la semilla, vivas por generación de nacimiento, bbox del árbol */
   public pfStats(): any {
     if (!this.N) return null;
@@ -446,6 +469,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     const r = (v: number) => +v.toFixed(4);
     return { modo: this.modo, N: this.N, K: this.K, pasos: this.pasos, genSemilla: st[0], vivas, porGen,
       bbox: vivas ? { ancho: r(x1 - x0), alto: r(y1 - y0), prof: r(z1 - z0) } : null, lineas: !!(this.lines && this.lines.visible),
+      puntos: !!(this.pts && this.pts.visible), geometry_mode: this.geomMode(),
       orbita: { activa: !!this.P.orbita, yaw: r(this.yaw), pitch: r(this.pitch), zoom: r(this.zoom), angulo_z: r((this.P.angZ || 0) * 180 / Math.PI) } };
   }
 
@@ -481,8 +505,9 @@ export class moEffectParticlesFractal extends MO.moEffect {
     U.uForma.value = forma; U.uDisp.value = this.num("dispersion", 0.25); U.uSize.value = Math.max(0.5, this.num("tamano", 4));
     U.uColor.value.setRGB(rgb.r, rgb.g, rgb.b); U.uAlpha.value = alpha;
     lU.uAlpha.value = alpha * Math.max(0, Math.min(1, this.num("lineas", 1))) * forma;
-    const gm = this.has("geometry_mode") ? Math.round(this.num("geometry_mode", 6)) : 6;
-    this.lines.visible = gm != 0 && lU.uAlpha.value > 0.001;
+    const gm = this.geomMode();
+    this.lines.visible = gm != "puntos" && lU.uAlpha.value > 0.001;
+    this.pts.visible = gm != "arbol" || !this.lines.visible;
     const add = [1, 5].indexOf(Math.round(this.num("blending", 0))) >= 0;
     for (const m of [this.pMat, this.lMat]) m.blending = add ? THREE.AdditiveBlending : THREE.NormalBlending;
 
