@@ -79,7 +79,12 @@ export class MoldeojsInterfaceComponent implements OnInit {
   /** FCA 18-nov: el grafo de cajas (.cfg) es PARÁMETRO, oculto por defecto; Edit = sólo tocar/mover. Se ve con ?grafo=1 o la tecla G en modo edición */
   /** PX (FCA 18-nov): si el proyecto trae un MOB `escena`, sus params (parallax, respira) se editan en vivo desde la barra */
   public escenaFx: any = null;
-  public escenaVals: any = { parallax: 1, respira: 1 };
+  public escenaVals: any = { parallax: 1, respira: 1, ritmo: 1 };
+  /** sólo los params que el MOB escena realmente trae (L03/L04 no tienen ritmo) */
+  public escenaKeys(): string[] {
+    const P = this.escenaFx && this.escenaFx.GetConfig().m_ParamsByName;
+    return P ? Object.keys(this.escenaVals).filter(n => !!P[n]) : [];
+  }
   public readEscena(): void {
     if (!this.escenaFx) return;
     for (const n of Object.keys(this.escenaVals)) { try { const v = Number(this.escenaFx.GetConfig().Eval(n)); if (!isNaN(v)) this.escenaVals[n] = v; } catch (x) {} }
