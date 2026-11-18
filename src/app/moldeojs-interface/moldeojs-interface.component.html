@@ -1,4 +1,4 @@
-<div #moCanvas id="moCanvas"   [class.hideme]="moEditDisplay==false" [class.showme]="moEditDisplay==true" (mouseenter)="moWheelDisplay=false;"></div>
+<div #moCanvas id="moCanvas"   [class.hideme]="moEditDisplay==false" [class.showme]="moEditDisplay==true" [style.display]="(moEditDisplay && graphView) ? '' : 'none'" (mouseenter)="moWheelDisplay=false;"></div>
 
 <div #moWheel id="moWheel" [hidden]="!moWheelDisplay">
   <div class="circle moWheelAni"></div>
@@ -24,7 +24,7 @@
   >
 </mo-control>
 
-<div id="moConfig" #moConfig (mouseenter)="moWheelDisplay=false;" [class.hideme]="moEditDisplay==false" [class.showme]="moEditDisplay==true">
+<div id="moConfig" #moConfig (mouseenter)="moWheelDisplay=false;" [class.hideme]="moEditDisplay==false" [class.showme]="moEditDisplay==true" [style.display]="(moEditDisplay && graphView) ? '' : 'none'">
 </div>
 
 
@@ -32,7 +32,7 @@
 <header class="moHeader" (mouseenter)="moToolDisplay=false;">
   <div class="moldeoicon"></div>
   <div class="moldeofile">{{moFileName}}</div>
-  <button class="moldeobutton" (click)="showmoEditView();" type="button" name="moButton" title="Moldeojs Edit View">Edit</button>
+  <button class="moldeobutton" [class.moEditing]="moEditDisplay" (click)="showmoEditView();" type="button" name="moButton" [title]="moEditDisplay ? 'Editando: tocá y mové los objetos (clic para salir)' : 'Entrar en modo edición'">{{ moEditDisplay ? 'Editando' : 'Edit' }}</button>
   <button class="moldeobutton" (click)="showmoControlView();" type="button" name="moButton" title="Moldeojs Control View">Control</button>
   <button class="moldeobutton" type="button" name="auto" title="Auto Layout" (click)="autoLayout()">auto</button>
   <button class="moldeobutton" type="button" name="undo" title="Deshacer (Ctrl+Z)" [disabled]="!history.canUndo()" (click)="doUndo()">↶</button>

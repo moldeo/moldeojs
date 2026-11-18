@@ -76,6 +76,8 @@ export class MoldeojsInterfaceComponent implements OnInit {
   /*- moConfig definitions, for save Components -*/
   @ViewChild('moConfig') moConfig: ElementRef;
   public moEditDisplay:boolean = false;
+  /** FCA 18-nov: el grafo de cajas (.cfg) es PARÁMETRO, oculto por defecto; Edit = sólo tocar/mover. Se ve con ?grafo=1 o la tecla G en modo edición */
+  public graphView: boolean = (() => { try { return new URLSearchParams(window.location.search).get("grafo") == "1"; } catch (x) { return false; } })();
   public touchEdit: moTouchEdit = null;
   public presetWheel: moPresetWheel = null;
   public objectsSphere: moObjectsSphere = null;
@@ -653,6 +655,10 @@ export class MoldeojsInterfaceComponent implements OnInit {
       this.loadPersonas();
       this.touchEdit.history = this.history;
       (window as any).moHistory = this.history;
+      window.addEventListener("keydown", (e: KeyboardEvent) => {
+        const tg: any = e.target; if (tg && (tg.tagName == "INPUT" || tg.tagName == "TEXTAREA" || tg.tagName == "SELECT")) return;
+        if (!e.ctrlKey && !e.metaKey && !e.altKey && (e.key == "g" || e.key == "G") && this.moEditDisplay) { this.graphView = !this.graphView; }
+      });
       window.addEventListener("keydown", (e: KeyboardEvent) => {
         if (!(e.ctrlKey || e.metaKey) || (e.key != "z" && e.key != "Z" && e.key != "y")) return;
         const t: any = e.target; if (t && (t.tagName == "INPUT" || t.tagName == "TEXTAREA")) return;

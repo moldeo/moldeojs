@@ -111,6 +111,12 @@ h3{
   background:#eee;
   opacity:0.95;
 }
+.moldeobutton.moEditing, .moldeobutton.moEditing:hover{
+  background:#ff8a00;
+  color:#111;
+  border-color:#b35c00;
+  box-shadow:0 0 0 2px rgba(255,138,0,0.45);
+}
 .moldeobutton:active{
   color:#eee;
   background:#222;
