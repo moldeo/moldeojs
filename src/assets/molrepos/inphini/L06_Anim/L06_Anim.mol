@@ -139,17 +139,9 @@
                 <D type="TXT">C</D>
             </VAL>
             <VAL>
-                <D type="TXT">image</D>
-                <D type="TXT">micelio_luz1</D>
-                <D type="TXT">micelio_luz1</D>
-                <D type="NUM">0</D>
-                <D type="NUM">1</D>
-                <D type="TXT">C</D>
-            </VAL>
-            <VAL>
-                <D type="TXT">image</D>
-                <D type="TXT">micelio_luz2</D>
-                <D type="TXT">micelio_luz2</D>
+                <D type="TXT">particlesfractal</D>
+                <D type="TXT">luces</D>
+                <D type="TXT">luces</D>
                 <D type="NUM">0</D>
                 <D type="NUM">1</D>
                 <D type="TXT">C</D>

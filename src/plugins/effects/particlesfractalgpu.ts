@@ -64,6 +64,25 @@ import * as THREE from "three";
  *   PRESETS de L08 (pfractal.cfg): 0 árbol · 1 nube (puntos) · 2 semilla (quieta) · 3 ciclo · 4 tela (árbol dinámico como
  *   piel + relieve 0.12) · 5 «tela que se extiende» (reposo 1, velocidad 0, relieve 0.15, escala 0.5).
  *
+ * LUCES — lugares de reposo DESDE UNA LISTA + titila (18-nov, L06_Anim «cada lucecita = una partícula»):
+ *   puntos (TEXT): archivo .json DEL PROYECTO (ruta relativa a la carpeta del .mol) con
+ *     {"size": [W, H], "semilla": [x, y], "luces": [[x, y], …]}   (px de una imagen W×H, origen arriba-izq; "puntos" = "luces")
+ *   o un array pelado [[x, y], …] en 0..1. Se eligió JSON y no una textura de posiciones: se escribe/lee a mano, se versiona
+ *   legible y lo genera cualquier detector (L06: tools de detección ⇒ luces.json). Cada punto pasa a las coordenadas de una
+ *   capa `image` que cubre el lienzo: x = px/W − ½, y = (½ − py/H)·(alto/ancho del lienzo) ⇒ con pos_x/pos_y/escala iguales a
+ *   pos_cuad_x/pos_cuad_y/anc_cuad_x de esa capa (p. ej. `micelio.pos_cuad_x`) la partícula queda sobre su punto y sigue el
+ *   parallax de la capa. Reparto POR GENEALOGÍA: las células en orden de nacimiento (generación de nacimiento, índice) toman
+ *   los puntos ordenados por distancia a `semilla` ⇒ las primeras en nacer van a los más cercanos y las luces se encienden de
+ *   la semilla hacia afuera. La célula 0 va al punto `semilla` y NO se dibuja (es la madre: las hijas nacen ahí y se deslizan
+ *   a su luz con `reposo`); las células sobrantes no se dibujan. width ≥ √(puntos+1) (L06: 18 luces ⇒ width 8 = 64 células).
+ *   Con `reposo` = 1 y randomvelocity 0 cada célula viva se asienta en su punto (resorte 12 %/paso).
+ *   titila (0..1) + titila_vel (rad/s): brillo b = 1 − titila + titila·(½ + ½·sin(fase + fase_i)), fase += dt·titila_vel
+ *   (integrada: cambiar la velocidad no salta; para que siga al proyecto, en el .cfg `titila_vel` = k·escena.ritmo);
+ *   alpha × b y tamaño × (1 − 0.35·titila + 0.35·titila·w). fase_i = frac(rango_de_nacimiento·φ)·2π ⇒ dos células que nacen
+ *   seguidas quedan desfasadas (alternado, nunca todas juntas). glow (0..1): sprite redondo de luz (núcleo blanco + halo
+ *   cuadrático) en vez del disco duro; con blending aditivo (1) se suma a lo que hay debajo. tamano_rel (> 0) = diámetro como
+ *   fracción del ancho del lienzo × escala (el `tamano` en px no sigue al lienzo). pfLuces() = medición headless.
+ *
  * MODO TELA (geometry_mode «tela» / «tela + árbol»; código viejo 3 = QUADS del original, rsGeometryQuads):
  *   la célula es partícula Y vértice de una malla. Malla indexada de triángulos (2 por celda (i,j)-(i+sx,j)-(i+sx,j+sy)-(i,j+sy));
  *   el vertex shader lee la posición de cada vértice de la MISMA textura tMotion que puntos y líneas, y la normal por
@@ -129,11 +148,15 @@ void main() {
  *  El PLANO DE DIVISIÓN gira con la generación: ψ = (gen−1)·uAngZ; el giro ±rep_angle se reparte en θ·cosψ + φ·sinψ
  *  (uAngZ = 0 ⇒ ψ = 0 ⇒ el árbol plano de Fase 1, idéntico). La primera división (gen 1) queda siempre en el plano. */
 const MOTION_FS = `
-uniform sampler2D tState; uniform sampler2D tMotion; uniform sampler2D tHead; uniform sampler2D tGene;
-uniform float uPass, uReset, uSpeed, uVisc, uTheta0, uLRep, uRRep, uLMovMin, uLMovMax, uRMovMin, uRMovMax, uSeed, uN, uAngZ, uRepo;
+uniform sampler2D tState; uniform sampler2D tMotion; uniform sampler2D tHead; uniform sampler2D tGene; uniform sampler2D tTgt;
+uniform float uList, uTgtAsp, uPass, uReset, uSpeed, uVisc, uTheta0, uLRep, uRRep, uLMovMin, uLMovMax, uRMovMin, uRMovMax, uSeed, uN, uAngZ, uRepo;
 varying vec2 vUv;
 float h(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 vec4 outp(vec3 p, float w, float th, float ph) { return uPass < 0.5 ? vec4(p, w) : vec4(th, ph, 0.0, 0.0); }
+vec3 lugar() {                                     // lugar de reposo: el punto de la lista (y × 1/aspecto) o el de grilla
+  if (uList > 0.5) { vec4 t = texture2D(tTgt, vUv); if (t.a > 0.25) return vec3(t.x, t.y * uTgtAsp, 0.0); }
+  return vec3(vUv - 0.5, 0.0);
+}
 void main() {
   vec4 s = texture2D(tState, vUv);                 // estado de ESTE paso
   if (uReset > 0.5 || s.b < 0.5) { gl_FragColor = outp(vec3(0.0), 0.0, uTheta0, 0.0); return; }
@@ -141,7 +164,7 @@ void main() {
   float psi = max(s.r - 1.0, 0.0) * uAngZ; vec2 pl = vec2(cos(psi), sin(psi));
   if (s.a > 0.5 && s.a < 1.5) {                    // recién nacida
     vec4 g = texture2D(tGene, vUv);
-    if (g.a > 0.5) { gl_FragColor = outp(vec3(0.0), 1.0, uTheta0, 0.0); return; }   // la semilla: velocidad inicial
+    if (g.a > 0.5) { gl_FragColor = outp(uList > 0.5 ? lugar() : vec3(0.0), 1.0, uTheta0, 0.0); return; }   // la semilla (con lista: en su punto)
     vec4 f = texture2D(tMotion, g.rg); vec4 fh = texture2D(tHead, g.rg);  // nace en la posición del padre, girada +left_rep_angle
     gl_FragColor = outp(f.xyz, f.w, fh.x + uLRep * pl.x, fh.y + uLRep * pl.y); return;
   }
@@ -151,41 +174,50 @@ void main() {
   hd.x += d * pl.x; hd.y += d * pl.y;
   m.w *= (1.0 - uVisc);
   m.xyz += uSpeed * m.w * vec3(cos(hd.y) * cos(hd.x), cos(hd.y) * sin(hd.x), sin(hd.y));
-  if (uRepo > 0.0) m.xyz = mix(m.xyz, vec3(vUv - 0.5, 0.0), uRepo * 0.12);   // reposo: resorte a su lugar de grilla
+  if (uRepo > 0.0) m.xyz = mix(m.xyz, lugar(), uRepo * 0.12);   // reposo: resorte a su lugar (grilla o lista «puntos»)
   gl_FragColor = outp(m.xyz, m.w, hd.x, hd.y);
 }`;
 
 const DRAW_VS = `
-uniform sampler2D tMotion; uniform sampler2D tState; uniform sampler2D tAlt;
-uniform vec2 uPos; uniform float uEsc, uForma, uDisp, uSize, uAltAmp;
-attribute vec2 aRef; attribute vec2 aCell; attribute vec2 aCloud;
+uniform sampler2D tMotion; uniform sampler2D tState; uniform sampler2D tAlt; uniform sampler2D tTgt;
+uniform vec2 uPos; uniform float uEsc, uForma, uDisp, uSize, uAltAmp, uList, uTit, uTPh;
+attribute vec2 aRef; attribute vec2 aCell; attribute vec2 aCloud; attribute float aPhase;
 #ifdef PF_CPU
 attribute vec4 aMot;
 #endif
-varying float vAlive; varying vec2 vMuv;
+varying float vAlive; varying vec2 vMuv; varying float vB;
 void main() {
   vMuv = aRef;
+  float w = 0.5 + 0.5 * sin(uTPh + aPhase);                         // titila: fase propia por célula (aPhase)
+  vB = 1.0 - uTit + uTit * w;
 #ifdef PF_CPU
   vec3 tree = aMot.xyz; float alive = aMot.w;                        // (la altitud ya viene sumada desde JS)
 #else
   vec3 tree = texture2D(tMotion, aRef).xyz + vec3(0.0, 0.0, uAltAmp * texture2D(tAlt, aRef).r);
   float alive = step(0.5, texture2D(tState, aCell).b);
+  if (uList > 0.5) alive *= step(0.75, texture2D(tTgt, aCell).a);   // lista: sólo las células con punto visible
 #endif
   vec3 p = vec3(uPos, 0.0) + mix(vec3(aCloud * uDisp, 0.0), tree, uForma) * uEsc;
   vAlive = alive;
   gl_Position = alive > 0.5 ? projectionMatrix * modelViewMatrix * vec4(p, 1.0) : vec4(2.0, 2.0, 2.0, 1.0);
-  gl_PointSize = uSize;
+  gl_PointSize = uSize * (1.0 - 0.35 * uTit + 0.35 * uTit * w);
 }`;
 
 const DRAW_FS = `
-uniform vec3 uColor; uniform float uAlpha, uMedAmt; uniform sampler2D tMed;
-varying float vAlive; varying vec2 vMuv;
+uniform vec3 uColor; uniform float uAlpha, uMedAmt, uGlow; uniform sampler2D tMed;
+varying float vAlive; varying vec2 vMuv; varying float vB;
 void main() {
-#ifdef PF_POINTS
-  vec2 c = gl_PointCoord - 0.5; if (dot(c, c) > 0.25) discard;
-#endif
   if (vAlive < 0.5) discard;
-  gl_FragColor = vec4(uColor * mix(vec3(1.0), texture2D(tMed, vMuv).rgb, uMedAmt), uAlpha);
+  vec3 col = uColor * mix(vec3(1.0), texture2D(tMed, vMuv).rgb, uMedAmt); float a = uAlpha * vB;
+#ifdef PF_POINTS
+  vec2 c = gl_PointCoord - 0.5; float r = 2.0 * length(c); if (r > 1.0) discard;
+  if (uGlow > 0.0) {                                                  // sprite de luz: núcleo blanco + halo que se apaga suave
+    float halo = (1.0 - r) * (1.0 - r), core = smoothstep(0.32, 0.0, r);
+    col = mix(col, vec3(1.0), core * 0.75 * uGlow);
+    a *= mix(1.0, min(1.0, halo * 0.85 + core * 0.6), uGlow);
+  }
+#endif
+  gl_FragColor = vec4(col, a);
 }`;
 
 /** TELA (geometry_mode QUADS del original, rsGeometryQuads): malla indexada sobre la RETÍCULA VIVA de la generación actual.
@@ -276,6 +308,10 @@ export class moEffectParticlesFractal extends MO.moEffect {
   private telaCell: Int32Array;
   private acc = 0; private lastT = 0; private lastDur = -1; private needReset = true;
   private U: any = {};
+  /** lista `puntos`: orden de nacimiento, rango por célula, fase de titila, lugar (x, y sin aspecto, 0, 1 visible · 0.5 oculto) */
+  private orden: number[] = []; private rango: Int32Array; private fase: Float32Array;
+  private tgt: Float32Array; private tgtTex: any = null; private tgtKey = ""; private lista: { pts: number[][], semilla: number[] } = null;
+  private listaUrl = ""; private listaN = 0; private tph = 0;
 
   constructor() {
     super();
@@ -336,6 +372,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     for (const rt of this.stateRT.concat(this.motionRT, this.headRT)) rt.dispose();
     this.stateRT = []; this.motionRT = []; this.headRT = [];
     if (this.geneTex) this.geneTex.dispose();
+    if (this.tgtTex) { this.tgtTex.dispose(); this.tgtTex = null; }
     for (const o of [this.pts, this.lines, this.tela]) if (o) { o.geometry.dispose(); o.material.dispose(); }
     this.pts = this.lines = this.tela = null;
   }
@@ -346,6 +383,10 @@ export class moEffectParticlesFractal extends MO.moEffect {
     this.R = R; this.N = N;
     this.gene = pfGenealogia(N); this.K = this.gene.K;
     const N2 = N * N, gene = this.gene;
+    // orden de NACIMIENTO (generación de nacimiento, después índice): rango de cada célula ⇒ fase de titila y punto de la lista
+    this.orden = Array.from({ length: N2 }, (_, k) => k).sort((p, q) => gene.gb[p] - gene.gb[q] || p - q);
+    this.rango = new Int32Array(N2); this.orden.forEach((k, r) => this.rango[k] = r);
+    this.tgt = new Float32Array(N2 * 4); this.tgtKey = "";
     const gpu = !this.forceCPU && this.floatRTOk(R);
     this.modo = gpu ? "gpu" : "cpu";
     if (!gpu && !this.forceCPU) console.warn("particlesfractal: sin texturas float renderizables ⇒ motor CPU");
@@ -369,12 +410,16 @@ export class moEffectParticlesFractal extends MO.moEffect {
         const mk = (fs: string, u: any) => new THREE.ShaderMaterial({ vertexShader: SIM_VS, fragmentShader: fs, uniforms: u, depthTest: false, depthWrite: false, blending: THREE.NoBlending });
         this.stateMat = mk(STATE_FS, { tState: { value: null }, tGene: { value: null }, uInc: { value: 0.05 }, uReset: { value: 0 } });
         const mu: any = { tState: { value: null }, tMotion: { value: null }, tHead: { value: null }, tGene: { value: null } };
-        for (const n of ["uPass", "uAngZ", "uRepo", "uReset", "uSpeed", "uVisc", "uTheta0", "uLRep", "uRRep", "uLMovMin", "uLMovMax", "uRMovMin", "uRMovMax", "uSeed", "uN"]) mu[n] = { value: 0 };
+        mu.tTgt = { value: null };
+        for (const n of ["uList", "uTgtAsp", "uPass", "uAngZ", "uRepo", "uReset", "uSpeed", "uVisc", "uTheta0", "uLRep", "uRRep", "uLMovMin", "uLMovMax", "uRMovMin", "uRMovMax", "uSeed", "uN"]) mu[n] = { value: 0 };
         this.motionMat = mk(MOTION_FS, mu);
         this.simMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), this.stateMat);
         this.simMesh.frustumCulled = false; this.simScene.add(this.simMesh);
       }
       this.stateMat.uniforms.tGene.value = this.geneTex; this.motionMat.uniforms.tGene.value = this.geneTex;
+      this.tgtTex = new THREE.DataTexture(this.tgt, N, N, THREE.RGBAFormat, THREE.FloatType);
+      this.tgtTex.minFilter = this.tgtTex.magFilter = THREE.NearestFilter;
+      this.motionMat.uniforms.tTgt.value = this.tgtTex;
     } else {
       this.cS = new Float32Array(N2 * 4); this.cS2 = new Float32Array(N2 * 4);
       this.cM = new Float32Array(N2 * 4); this.cM2 = new Float32Array(N2 * 4);
@@ -386,6 +431,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
       tMotion: { value: null }, tState: { value: null }, uPos: { value: new THREE.Vector2() }, uEsc: { value: 1 }, uForma: { value: 1 },
       uDisp: { value: 0.25 }, uSize: { value: 4 }, uColor: { value: new THREE.Color(1, 1, 1) }, uAlpha: { value: 1 },
       tAlt: { value: null }, uAltAmp: { value: 0 }, tMed: { value: null }, uMedAmt: { value: 0 },
+      tTgt: { value: gpu ? this.tgtTex : null }, uList: { value: 0 }, uTit: { value: 0 }, uTPh: { value: 0 }, uGlow: { value: 0 },
     };
     const lU = Object.assign({}, this.U, { uAlpha: { value: 1 } });
     const defs: any = gpu ? {} : { PF_CPU: 1 };
@@ -393,27 +439,33 @@ export class moEffectParticlesFractal extends MO.moEffect {
     this.lMat = new THREE.ShaderMaterial({ vertexShader: DRAW_VS, fragmentShader: DRAW_FS, uniforms: lU, defines: Object.assign({}, defs), transparent: true, depthTest: false, depthWrite: false });
 
     const pg = new THREE.BufferGeometry();
-    const pRef = new Float32Array(N2 * 2), pCl = new Float32Array(N2 * 2);
-    for (let k = 0; k < N2; k++) { const u = uv(k); pRef[k * 2] = u[0]; pRef[k * 2 + 1] = u[1]; pCl[k * 2] = cloud[k * 2]; pCl[k * 2 + 1] = cloud[k * 2 + 1]; }
+    const pRef = new Float32Array(N2 * 2), pCl = new Float32Array(N2 * 2), pPh = new Float32Array(N2);
+    // fase de titila por RANGO de nacimiento (razón áurea): dos células que nacen seguidas quedan lejos en fase ⇒ alternado
+    this.fase = new Float32Array(N2);
+    for (let k = 0; k < N2; k++) this.fase[k] = ((this.rango[k] * 0.6180339887) % 1) * Math.PI * 2;
+    for (let k = 0; k < N2; k++) { const u = uv(k); pRef[k * 2] = u[0]; pRef[k * 2 + 1] = u[1]; pCl[k * 2] = cloud[k * 2]; pCl[k * 2 + 1] = cloud[k * 2 + 1]; pPh[k] = this.fase[k]; }
     pg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(N2 * 3), 3));
     pg.setAttribute("aRef", new THREE.BufferAttribute(pRef, 2));
     pg.setAttribute("aCell", new THREE.BufferAttribute(pRef, 2));
     pg.setAttribute("aCloud", new THREE.BufferAttribute(pCl, 2));
+    pg.setAttribute("aPhase", new THREE.BufferAttribute(pPh, 1));
     if (!gpu) pg.setAttribute("aMot", new THREE.BufferAttribute(new Float32Array(N2 * 4), 4));
 
     const L = (N2 - 1) * 2;
     const lg = new THREE.BufferGeometry();
-    const lRef = new Float32Array(L * 2), lCell = new Float32Array(L * 2), lCl = new Float32Array(L * 2);
+    const lRef = new Float32Array(L * 2), lCell = new Float32Array(L * 2), lCl = new Float32Array(L * 2), lPh = new Float32Array(L);
     for (let k = 1, v = 0; k < N2; k++, v += 2) {
       const u = uv(k), f = uvF(k), fk = gene.fj[k] * N + gene.fi[k];
       lRef.set(u, v * 2); lRef.set(f, v * 2 + 2);
       lCell.set(u, v * 2); lCell.set(u, v * 2 + 2);
       lCl.set([cloud[k * 2], cloud[k * 2 + 1]], v * 2); lCl.set([cloud[fk * 2], cloud[fk * 2 + 1]], v * 2 + 2);
+      lPh[v] = lPh[v + 1] = this.fase[k];
     }
     lg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(L * 3), 3));
     lg.setAttribute("aRef", new THREE.BufferAttribute(lRef, 2));
     lg.setAttribute("aCell", new THREE.BufferAttribute(lCell, 2));
     lg.setAttribute("aCloud", new THREE.BufferAttribute(lCl, 2));
+    lg.setAttribute("aPhase", new THREE.BufferAttribute(lPh, 1));
     if (!gpu) lg.setAttribute("aMot", new THREE.BufferAttribute(new Float32Array(L * 4), 4));
 
     this.pts = new THREE.Points(pg, this.pMat); this.lines = new THREE.LineSegments(lg, this.lMat);
@@ -481,6 +533,8 @@ export class moEffectParticlesFractal extends MO.moEffect {
     P.orbita = this.num("orbita", 0) > 0.5;
     P.repo = Math.max(0, Math.min(1, this.num("reposo", 0)));
     P.altAmp = this.num("altitude_amp", 0);
+    P.tit = Math.max(0, Math.min(1, this.num("titila", 0))); P.titVel = this.num("titila_vel", 1.5);
+    P.glow = Math.max(0, Math.min(1, this.num("glow", 0)));
     P.angZ = (this.has("angulo_z") ? this.num("angulo_z", 90) : (P.orbita ? 90 : 0)) * deg;
   }
 
@@ -491,7 +545,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     su.tState.value = this.stateRT[a].texture; su.uInc.value = P.inc; su.uReset.value = reset ? 1 : 0;
     this.simMesh.material = this.stateMat; R.setRenderTarget(this.stateRT[b]); R.render(this.simScene, this.simCam);
     mu.tState.value = this.stateRT[b].texture; mu.tMotion.value = this.motionRT[a].texture; mu.tHead.value = this.headRT[a].texture;
-    mu.uAngZ.value = P.angZ; mu.uRepo.value = P.repo;
+    mu.uAngZ.value = P.angZ; mu.uRepo.value = P.repo; mu.uList.value = this.U.uList.value; mu.uTgtAsp.value = this.tgtAsp;
     mu.uReset.value = reset ? 1 : 0; mu.uSpeed.value = P.speed; mu.uVisc.value = P.visc; mu.uTheta0.value = P.theta0;
     mu.uLRep.value = P.lRep; mu.uRRep.value = P.rRep; mu.uLMovMin.value = P.lMovMin; mu.uLMovMax.value = P.lMovMax;
     mu.uRMovMin.value = P.rMovMin; mu.uRMovMax.value = P.rMovMax; mu.uSeed.value = (this.pasos % 997) * 1.618; mu.uN.value = this.N;
@@ -523,7 +577,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
       if (S1[o + 2] < 0.5) { M1.set([0, 0, 0, 0], o); H1[q] = P.theta0; H1[q + 1] = 0; continue; }
       const psi = Math.max(S1[o] - 1, 0) * P.angZ, cx = Math.cos(psi), sy = Math.sin(psi);
       if (S1[o + 3] > 0.5 && S1[o + 3] < 1.5) {
-        if (k == 0) { M1.set([0, 0, 0, 1], o); H1[q] = P.theta0; H1[q + 1] = 0; continue; }
+        if (k == 0) { const t = this.lugarCPU(0); M1.set(this.U.uList.value > 0.5 ? [t[0], t[1], t[2], 1] : [0, 0, 0, 1], o); H1[q] = P.theta0; H1[q + 1] = 0; continue; }
         const fk = g.fj[k] * N + g.fi[k], f = fk * 4;
         M1.set([Mo[f], Mo[f + 1], Mo[f + 2], Mo[f + 3]], o); H1[q] = H[fk * 2] + P.lRep * cx; H1[q + 1] = H[fk * 2 + 1] + P.lRep * sy; continue;
       }
@@ -533,12 +587,65 @@ export class moEffectParticlesFractal extends MO.moEffect {
       const th = H[q] + d * cx, ph = H[q + 1] + d * sy, w = Mo[o + 3] * (1 - P.visc), v = P.speed * w;
       M1.set([Mo[o] + v * Math.cos(ph) * Math.cos(th), Mo[o + 1] + v * Math.cos(ph) * Math.sin(th), Mo[o + 2] + v * Math.sin(ph), w], o);
       if (P.repo > 0) {                                                   // reposo: resorte a su lugar de grilla
-        const a = P.repo * 0.12, rx = ((k % N) + 0.5) / N - 0.5, ry = (Math.floor(k / N) + 0.5) / N - 0.5;
-        M1[o] += (rx - M1[o]) * a; M1[o + 1] += (ry - M1[o + 1]) * a; M1[o + 2] += (0 - M1[o + 2]) * a;
+        const a = P.repo * 0.12, t = this.lugarCPU(k);
+        M1[o] += (t[0] - M1[o]) * a; M1[o + 1] += (t[1] - M1[o + 1]) * a; M1[o + 2] += (t[2] - M1[o + 2]) * a;
       }
       H1[q] = th; H1[q + 1] = ph;
     }
     this.cS = S1; this.cS2 = S; this.cM = M1; this.cM2 = Mo; this.cH = H1; this.cH2 = H;
+  }
+
+  /** lugar de reposo de la célula k (lo mismo que lugar() del MOTION_FS): punto de la lista o lugar de grilla */
+  private lugarCPU(k: number): number[] {
+    const N = this.N, t = this.tgt;
+    if (this.U.uList.value > 0.5 && t[k * 4 + 3] > 0.25) return [t[k * 4], t[k * 4 + 1] * this.tgtAsp, 0];
+    return [((k % N) + 0.5) / N - 0.5, (Math.floor(k / N) + 0.5) / N - 0.5, 0];
+  }
+
+  // ---------------------------------------------------------------- lista `puntos` (lugares de reposo dados)
+  private tgtAsp = 1;
+  /** texto del param `puntos` (TEXT) o "" */
+  private puntosTxt(): string {
+    if (!this.has("puntos")) return "";
+    const P: any = this.m_Config.m_ParamsByName["puntos"];
+    let txt = ""; try { txt = ("" + P.m_Values[Math.max(0, P.GetIndexValue())].m_List[0].m_Text).trim(); } catch (e) {}
+    return txt == "default" ? "" : txt;
+  }
+  /** baja el .json (relativo a la carpeta del proyecto) y lo deja en this.lista; al llegar, la semilla vuelve a nacer */
+  private cargarLista(url: string) {
+    this.listaUrl = url; this.lista = null; this.tgtKey = ""; this.U.uList.value = 0;
+    if (!url) return;
+    let base = ""; try { base = "" + this.m_pResourceManager.GetDataMan().GetDataPath(); } catch (e) {}
+    const full = /^(https?:)?\/\//.test(url) || url[0] == "/" ? url : base + url;
+    fetch(full, { cache: "no-cache" }).then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }).then((j: any) => {
+      if (this.listaUrl != url) return;
+      const arr: any[] = Array.isArray(j) ? j : (j.luces || j.puntos || []);
+      const sz: number[] = !Array.isArray(j) && j.size ? j.size : [1, 1];
+      const nrm = (q: any) => [Number(q[0]) / sz[0] - 0.5, 0.5 - Number(q[1]) / sz[1]];   // px (y hacia abajo) ⇒ x∈[−½,½], y hacia arriba
+      const pts = arr.filter((q) => q && q.length >= 2 && isFinite(+q[0]) && isFinite(+q[1])).map(nrm);
+      const semilla = !Array.isArray(j) && j.semilla ? nrm(j.semilla) : null;
+      this.lista = { pts, semilla }; this.needReset = true;
+    }).catch((e) => console.warn("particlesfractal: no pude leer `puntos` " + full + ": " + e));
+  }
+  /** reparte la lista sobre las células EN ORDEN DE NACIMIENTO: la semilla (célula 0) al punto `semilla` (oculta) y las que
+   *  nacen después a los puntos ordenados por distancia a la semilla ⇒ las luces se encienden de la semilla hacia afuera.
+   *  Las células sobrantes quedan sin lugar (a = 0) y no se dibujan. */
+  private aplicarLista() {
+    const key = this.listaUrl + "|" + this.N + "|" + (this.lista ? this.lista.pts.length : -1);
+    if (!this.lista || key == this.tgtKey) return;
+    this.tgtKey = key;
+    const t = this.tgt, N2 = this.N * this.N, L = this.lista;
+    t.fill(0);
+    const s0 = L.semilla || L.pts[0] || [0, 0];
+    const pts = L.pts.slice().sort((p, q) => Math.hypot(p[0] - s0[0], p[1] - s0[1]) - Math.hypot(q[0] - s0[0], q[1] - s0[1]));
+    let r = 0;
+    if (L.semilla) { t.set([L.semilla[0], L.semilla[1], 0, 0.5], this.orden[0] * 4); r = 1; }
+    let n = 0;
+    for (const p of pts) { if (r >= N2) break; t.set([p[0], p[1], 0, 1], this.orden[r++] * 4); n++; }
+    if (n < pts.length) console.warn("particlesfractal: `puntos` trae " + pts.length + " puntos y la grilla " + N2 + " células ⇒ subí width");
+    this.listaN = n;
+    if (this.tgtTex) this.tgtTex.needsUpdate = true;
+    this.U.uList.value = 1;
   }
 
   private step(reset = false) {
@@ -644,7 +751,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     let dS = 0, dM = 0;                                                    // distancia a su lugar de grilla (reposo)
     for (let k = 0; k < N2; k++) {
       if (st[k * 4 + 2] < 0.5) continue;
-      const dx = mo[k * 4] - (((k % this.N) + 0.5) / this.N - 0.5), dy = mo[k * 4 + 1] - ((Math.floor(k / this.N) + 0.5) / this.N - 0.5), dz = mo[k * 4 + 2];
+      const t = this.lugarCPU(k), dx = mo[k * 4] - t[0], dy = mo[k * 4 + 1] - t[1], dz = mo[k * 4 + 2] - t[2];
       const d = Math.sqrt(dx * dx + dy * dy + dz * dz); dS += d; dM = Math.max(dM, d);
     }
     return { modo: this.modo, N: this.N, K: this.K, pasos: this.pasos, genSemilla: st[0], vivas, porGen,
@@ -656,6 +763,27 @@ export class moEffectParticlesFractal extends MO.moEffect {
       orbita: { activa: !!this.P.orbita, yaw: r(this.yaw), pitch: r(this.pitch), zoom: r(this.zoom), angulo_z: r((this.P.angZ || 0) * 180 / Math.PI) } };
   }
 
+  /** para el test headless (lista `puntos` + titila): cada partícula DIBUJADA con su posición en el lienzo (px CSS, origen
+   *  arriba-izq), en la imagen de la lista (px de `size`, ida y vuelta por pos_x/pos_y/escala) y su brillo actual
+   *  b = 1 − titila + titila·(½ + ½·sin(fase_acumulada + fase_i)) — la misma cuenta que DRAW_VS. */
+  public pfLuces(): any {
+    if (!this.N) return null;
+    const st = this.readState(), mo = this.readMotion(), N2 = this.N * this.N, U = this.U, lst = U.uList.value > 0.5;
+    const rs = new THREE.Vector2(); this.R.getSize(rs);
+    const asp = rs.x / rs.y, e = U.uEsc.value * U.uForma.value, px = U.uPos.value.x, py = U.uPos.value.y;
+    const items: any[] = [];
+    for (let k = 0; k < N2; k++) {
+      if (st[k * 4 + 2] < 0.5 || (lst && this.tgt[k * 4 + 3] < 0.75)) continue;
+      const x = px + mo[k * 4] * e, y = py + mo[k * 4 + 1] * e;          // mundo (ortográfica: x ∈ [−½,½], y ∈ ±½/aspecto)
+      const w = 0.5 + 0.5 * Math.sin(U.uTPh.value + this.fase[k]);
+      items.push({ k, rango: this.rango[k], x: (x + 0.5) * rs.x, y: (0.5 - y * asp) * rs.y,
+        u: mo[k * 4] + 0.5, v: 0.5 - mo[k * 4 + 1] * asp, b: 1 - U.uTit.value + U.uTit.value * w,
+        lugar: lst ? [this.tgt[k * 4] + 0.5, 0.5 - this.tgt[k * 4 + 1]] : null });
+    }
+    return { modo: this.modo, N: this.N, lista: lst ? this.listaN : 0, puntos: this.listaUrl, titila: U.uTit.value, glow: U.uGlow.value,
+      fase: U.uTPh.value, lienzo: [rs.x, rs.y], visibles: items.length, items };
+  }
+
   Draw(p_tempo: MO.moTempo, p_parentstate: MO.moEffectState = null): void {
     this.BeginDraw(p_tempo, p_parentstate);
     if (this.RM == undefined) return;
@@ -664,6 +792,10 @@ export class moEffectParticlesFractal extends MO.moEffect {
     const N = this.gridN();
     if (!this.Scene || N != this.N || (this.forceCPU && this.modo == "gpu")) this.setup(R, N);
     this.readParams();
+    { const rs0 = new THREE.Vector2(); R.getSize(rs0); this.tgtAsp = rs0.y > 0 ? rs0.y / rs0.x : 1; }   // y del lugar × 1/aspecto (como image)
+    const pu = this.puntosTxt();
+    if (pu != this.listaUrl) this.cargarLista(pu);
+    this.aplicarLista();
 
     // si el tiempo del efecto vuelve atrás (rewind / reinicio) ⇒ de nuevo a la semilla
     try { const d = Number((this as any).m_EffectState.tempo.Duration()); if (d < this.lastDur - 200) this.needReset = true; this.lastDur = d; } catch (e) {}
@@ -675,7 +807,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     if (this.needReset) { this.needReset = false; this.step(true); this.step(); this.acc = 0; }
     const now = performance.now(), dt = this.lastT ? Math.min(0.25, (now - this.lastT) / 1000) : 1 / 60;
     this.lastT = now;
-    if (tr == "play") this.acc += dt * 60 * this.P.crece;
+    if (tr == "play") { this.acc += dt * 60 * this.P.crece; this.tph += dt * this.P.titVel; }
     let n = Math.floor(this.acc); this.acc -= n; n = Math.min(n, 4);
     for (let i = 0; i < n; i++) this.step();
 
@@ -686,7 +818,11 @@ export class moEffectParticlesFractal extends MO.moEffect {
     const rgb: any = this.m_Config.EvalColor("color");
     U.uPos.value.set(this.num("pos_x", 0), this.num("pos_y", -0.25)); U.uEsc.value = this.num("escala", 1);
     U.uForma.value = forma; U.uDisp.value = this.num("dispersion", 0.25); U.uSize.value = Math.max(0.5, this.num("tamano", 4));
+    // tamano_rel > 0: diámetro como fracción del ANCHO del lienzo × escala (sigue al lienzo y a la capa, como un nodo dibujado)
+    const tRel = this.num("tamano_rel", 0);
+    if (tRel > 0) { const cw = (R.domElement && R.domElement.width) || 1280; U.uSize.value = Math.max(0.5, tRel * cw * U.uEsc.value); }
     U.uColor.value.setRGB(rgb.r, rgb.g, rgb.b); U.uAlpha.value = alpha;
+    U.uTit.value = this.P.tit; U.uTPh.value = this.tph % (Math.PI * 2000); U.uGlow.value = this.P.glow;
     const altTx = this.texParam("texture_altitude"), medTx = this.texParam("texture_medium");
     this.altTx = altTx; U.tAlt.value = altTx; U.uAltAmp.value = altTx ? this.P.altAmp : 0;
     U.tMed.value = medTx; U.uMedAmt.value = medTx ? 1 : 0;
@@ -731,7 +867,8 @@ export class moEffectParticlesFractal extends MO.moEffect {
     const N = this.N, N2 = N * N, S = this.cS, Mo = this.cM, g = this.gene;
     const pa = this.pts.geometry.attributes.aMot, la = this.lines.geometry.attributes.aMot;
     const p = pa.array as Float32Array, l = la.array as Float32Array;
-    for (let k = 0; k < N2; k++) { p.set([Mo[k * 4], Mo[k * 4 + 1], Mo[k * 4 + 2] + this.altZ(k), S[k * 4 + 2] > 0.5 ? 1 : 0], k * 4); }
+    const lst = this.U.uList.value > 0.5, tgl = this.tgt;
+    for (let k = 0; k < N2; k++) { p.set([Mo[k * 4], Mo[k * 4 + 1], Mo[k * 4 + 2] + this.altZ(k), S[k * 4 + 2] > 0.5 && (!lst || tgl[k * 4 + 3] > 0.75) ? 1 : 0], k * 4); }
     for (let k = 1, v = 0; k < N2; k++, v += 2) {
       const f = g.fj[k] * N + g.fi[k], alive = p[k * 4 + 3];
       l.set([p[k * 4], p[k * 4 + 1], p[k * 4 + 2], alive, p[f * 4], p[f * 4 + 1], p[f * 4 + 2], alive], v * 4);
@@ -860,10 +997,14 @@ export class moEffectParticlesFractal extends MO.moEffect {
       // 3D (18-nov)
       ["angulo_z", "90"], ["orbita", "0"],
       // tela (18-nov): opacidad de la malla (× alpha)
-      ["tela", "0.55"], ["altitude_amp", "0"], ["reposo", "0"]];
+      ["tela", "0.55"], ["altitude_amp", "0"], ["reposo", "0"],
+      // luces (18-nov): titila 0..1 (amplitud del prende/apaga por célula), titila_vel (rad/s), glow 0 disco · 1 sprite de luz
+      ["titila", "0"], ["titila_vel", "1.5"], ["glow", "0"], ["tamano_rel", "0"]];
     for (const [n, v] of defs) p_configdefinition.Add(n, F, idx++, new MO.moValue(v, "FUNCTION"));
     // medio (texturas del original, §2 del doc): altitud = relieve (z) de cada célula, medio = tinte
     for (const n of ["texture_altitude", "texture_medium"]) p_configdefinition.Add(n, MO.moParamType.MO_PARAM_TEXTURE, idx++, new MO.moValue("default", "TXT"));
+    // lugares de reposo desde una lista (18-nov): .json del proyecto — ver el comentario del archivo
+    p_configdefinition.Add("puntos", MO.moParamType.MO_PARAM_TEXT, idx++, new MO.moValue("", "TXT"));
     return this.m_Config.GetConfigDefinition();
   }
 }
