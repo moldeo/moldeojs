@@ -49,6 +49,20 @@ import * as THREE from "three";
  *   árbol plano de Fase 1), orbita (1 = cámara orbital propia: arrastrar con el botón izquierdo rota yaw/pitch con inercia,
  *   rueda = zoom 0.25..8, doble clic = vista inicial; no actúa en modo Edit del touchEdit ni sobre la interfaz).
  *   tela (18-nov): opacidad de la malla (× alpha, default 0.55 = semitransparente).
+ *   MEDIO (18-nov, texturas del original §2 del doc — «datos» que deforman/tiñen; acá van al RENDER, no a la simulación):
+ *   texture_altitude (TEXTURE; «más claro = más importante») ⇒ cada célula se dibuja desplazada en z
+ *   altitude_amp · rojo(textura en su uv de grilla (i+½, j+½)/N) — puntos, líneas y tela (las normales de la tela incluyen el
+ *   relieve ⇒ el sombreado lo muestra aun de frente). altitude_amp (default 0 = sin relieve) no existe en el original (allí el
+ *   relieve era `medium.z` fijo sobre la esfera). texture_medium (TEXTURE) ⇒ tiñe el color (× rgb). "default" o sin cargar =
+ *   sin efecto. Motor CPU: el relieve se suma en JS leyendo los píxeles de la imagen (canvas, una vez por imagen).
+ *   reposo (0..1, 18-nov): resorte de cada célula hacia su LUGAR DE GRILLA ((i+½)/N − ½, (j+½)/N − ½, 0) — 12 %·reposo por
+ *   paso, después de la dinámica. 0 = la dinámica del original; 1 (con randomvelocity 0) = «tela que se extiende»: la hija
+ *   nace en la posición del padre (como siempre) y se DESLIZA a su lugar; lo que avanza con las generaciones es qué celdas
+ *   están vivas ⇒ la tela crece desde la esquina de la semilla y se completa por refinamiento fractal (retícula 2×2 → 4×4
+ *   → … → N×N; área ¼ → 9⁄16 → … → 1). Intermedios = la forma del árbol tirada hacia la tela (primer resorte — ver Fase
+ *   siguiente). pfStats().reposo = {dMedio, dMax} distancia de las vivas a su lugar.
+ *   PRESETS de L08 (pfractal.cfg): 0 árbol · 1 nube (puntos) · 2 semilla (quieta) · 3 ciclo · 4 tela (árbol dinámico como
+ *   piel + relieve 0.12) · 5 «tela que se extiende» (reposo 1, velocidad 0, relieve 0.15, escala 0.5).
  *
  * MODO TELA (geometry_mode «tela» / «tela + árbol»; código viejo 3 = QUADS del original, rsGeometryQuads):
  *   la célula es partícula Y vértice de una malla. Malla indexada de triángulos (2 por celda (i,j)-(i+sx,j)-(i+sx,j+sy)-(i,j+sy));
@@ -116,7 +130,7 @@ void main() {
  *  (uAngZ = 0 ⇒ ψ = 0 ⇒ el árbol plano de Fase 1, idéntico). La primera división (gen 1) queda siempre en el plano. */
 const MOTION_FS = `
 uniform sampler2D tState; uniform sampler2D tMotion; uniform sampler2D tHead; uniform sampler2D tGene;
-uniform float uPass, uReset, uSpeed, uVisc, uTheta0, uLRep, uRRep, uLMovMin, uLMovMax, uRMovMin, uRMovMax, uSeed, uN, uAngZ;
+uniform float uPass, uReset, uSpeed, uVisc, uTheta0, uLRep, uRRep, uLMovMin, uLMovMax, uRMovMin, uRMovMax, uSeed, uN, uAngZ, uRepo;
 varying vec2 vUv;
 float h(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 vec4 outp(vec3 p, float w, float th, float ph) { return uPass < 0.5 ? vec4(p, w) : vec4(th, ph, 0.0, 0.0); }
@@ -137,22 +151,25 @@ void main() {
   hd.x += d * pl.x; hd.y += d * pl.y;
   m.w *= (1.0 - uVisc);
   m.xyz += uSpeed * m.w * vec3(cos(hd.y) * cos(hd.x), cos(hd.y) * sin(hd.x), sin(hd.y));
+  if (uRepo > 0.0) m.xyz = mix(m.xyz, vec3(vUv - 0.5, 0.0), uRepo * 0.12);   // reposo: resorte a su lugar de grilla
   gl_FragColor = outp(m.xyz, m.w, hd.x, hd.y);
 }`;
 
 const DRAW_VS = `
-uniform sampler2D tMotion; uniform sampler2D tState;
-uniform vec2 uPos; uniform float uEsc, uForma, uDisp, uSize;
+uniform sampler2D tMotion; uniform sampler2D tState; uniform sampler2D tAlt;
+uniform vec2 uPos; uniform float uEsc, uForma, uDisp, uSize, uAltAmp;
 attribute vec2 aRef; attribute vec2 aCell; attribute vec2 aCloud;
 #ifdef PF_CPU
 attribute vec4 aMot;
 #endif
-varying float vAlive;
+varying float vAlive; varying vec2 vMuv;
 void main() {
+  vMuv = aRef;
 #ifdef PF_CPU
-  vec3 tree = aMot.xyz; float alive = aMot.w;
+  vec3 tree = aMot.xyz; float alive = aMot.w;                        // (la altitud ya viene sumada desde JS)
 #else
-  vec3 tree = texture2D(tMotion, aRef).xyz; float alive = step(0.5, texture2D(tState, aCell).b);
+  vec3 tree = texture2D(tMotion, aRef).xyz + vec3(0.0, 0.0, uAltAmp * texture2D(tAlt, aRef).r);
+  float alive = step(0.5, texture2D(tState, aCell).b);
 #endif
   vec3 p = vec3(uPos, 0.0) + mix(vec3(aCloud * uDisp, 0.0), tree, uForma) * uEsc;
   vAlive = alive;
@@ -161,14 +178,14 @@ void main() {
 }`;
 
 const DRAW_FS = `
-uniform vec3 uColor; uniform float uAlpha;
-varying float vAlive;
+uniform vec3 uColor; uniform float uAlpha, uMedAmt; uniform sampler2D tMed;
+varying float vAlive; varying vec2 vMuv;
 void main() {
 #ifdef PF_POINTS
   vec2 c = gl_PointCoord - 0.5; if (dot(c, c) > 0.25) discard;
 #endif
   if (vAlive < 0.5) discard;
-  gl_FragColor = vec4(uColor, uAlpha);
+  gl_FragColor = vec4(uColor * mix(vec3(1.0), texture2D(tMed, vMuv).rgb, uMedAmt), uAlpha);
 }`;
 
 /** TELA (geometry_mode QUADS del original, rsGeometryQuads): malla indexada sobre la RETÍCULA VIVA de la generación actual.
@@ -176,15 +193,16 @@ void main() {
  *  otras colapsan a un punto fuera de pantalla (triángulos degenerados). Normal = cruz de las diferencias con los vecinos de
  *  retícula (i±sx, j±sy) leídas de la MISMA textura de posición. Un vértice no vivo ⇒ vAlive < 1 en el triángulo ⇒ discard. */
 const TELA_VS = `
-uniform sampler2D tMotion; uniform sampler2D tState;
-uniform vec2 uPos; uniform float uEsc, uForma, uDisp, uGen, uK, uN;
+uniform sampler2D tMotion; uniform sampler2D tState; uniform sampler2D tAlt;
+uniform vec2 uPos; uniform float uEsc, uForma, uDisp, uGen, uK, uN, uAltAmp;
 attribute vec2 aCell; attribute vec2 aCloud; attribute vec3 aLvl;
 #ifdef PF_CPU
 attribute vec4 aMot; attribute vec3 aNrm;
 #endif
-varying float vAlive; varying vec3 vN; varying vec3 vV;
-vec3 P(vec2 uv) { return texture2D(tMotion, uv).xyz; }
+varying float vAlive; varying vec3 vN; varying vec3 vV; varying vec2 vMuv;
+vec3 P(vec2 uv) { return texture2D(tMotion, uv).xyz + vec3(0.0, 0.0, uAltAmp * texture2D(tAlt, uv).r); }  // + relieve
 void main() {
+  vMuv = aCell;
 #ifdef PF_CPU
   float gen = uGen; vec3 tree = aMot.xyz; float alive = aMot.w; vec3 n = aNrm;
 #else
@@ -206,15 +224,16 @@ void main() {
 }`;
 
 const TELA_FS = `
-uniform vec3 uColor; uniform float uAlpha;
-varying float vAlive; varying vec3 vN; varying vec3 vV;
+uniform vec3 uColor; uniform float uAlpha, uMedAmt; uniform sampler2D tMed;
+varying float vAlive; varying vec3 vN; varying vec3 vV; varying vec2 vMuv;
 void main() {
   if (vAlive < 0.999) discard;
+  vec3 base = uColor * mix(vec3(1.0), texture2D(tMed, vMuv).rgb, uMedAmt);   // texture_medium tiñe
   vec3 n = normalize(vN), v = normalize(vV);
   if (dot(n, v) < 0.0) n = -n;                                       // doble cara: la cara que mira a la cámara
   float dif = max(dot(n, normalize(vec3(0.35, 0.55, 0.75))), 0.0);   // lambert, luz fija (espacio de vista)
   float rim = pow(1.0 - max(dot(n, v), 0.0), 2.0);
-  vec3 col = uColor * (0.3 + 0.7 * dif) + rim * 0.35 * (0.5 * uColor + 0.5);
+  vec3 col = base * (0.3 + 0.7 * dif) + rim * 0.35 * (0.5 * base + 0.5);
   gl_FragColor = vec4(col, uAlpha * (0.7 + 0.3 * rim));
 }`;
 
@@ -350,7 +369,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
         const mk = (fs: string, u: any) => new THREE.ShaderMaterial({ vertexShader: SIM_VS, fragmentShader: fs, uniforms: u, depthTest: false, depthWrite: false, blending: THREE.NoBlending });
         this.stateMat = mk(STATE_FS, { tState: { value: null }, tGene: { value: null }, uInc: { value: 0.05 }, uReset: { value: 0 } });
         const mu: any = { tState: { value: null }, tMotion: { value: null }, tHead: { value: null }, tGene: { value: null } };
-        for (const n of ["uPass", "uAngZ", "uReset", "uSpeed", "uVisc", "uTheta0", "uLRep", "uRRep", "uLMovMin", "uLMovMax", "uRMovMin", "uRMovMax", "uSeed", "uN"]) mu[n] = { value: 0 };
+        for (const n of ["uPass", "uAngZ", "uRepo", "uReset", "uSpeed", "uVisc", "uTheta0", "uLRep", "uRRep", "uLMovMin", "uLMovMax", "uRMovMin", "uRMovMax", "uSeed", "uN"]) mu[n] = { value: 0 };
         this.motionMat = mk(MOTION_FS, mu);
         this.simMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), this.stateMat);
         this.simMesh.frustumCulled = false; this.simScene.add(this.simMesh);
@@ -366,6 +385,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     this.U = {
       tMotion: { value: null }, tState: { value: null }, uPos: { value: new THREE.Vector2() }, uEsc: { value: 1 }, uForma: { value: 1 },
       uDisp: { value: 0.25 }, uSize: { value: 4 }, uColor: { value: new THREE.Color(1, 1, 1) }, uAlpha: { value: 1 },
+      tAlt: { value: null }, uAltAmp: { value: 0 }, tMed: { value: null }, uMedAmt: { value: 0 },
     };
     const lU = Object.assign({}, this.U, { uAlpha: { value: 1 } });
     const defs: any = gpu ? {} : { PF_CPU: 1 };
@@ -459,6 +479,8 @@ export class moEffectParticlesFractal extends MO.moEffect {
     P.visc = Math.max(0, Math.min(1, this.num("viscosity", 0)));
     P.crece = Math.max(0, this.num("crece", 1));
     P.orbita = this.num("orbita", 0) > 0.5;
+    P.repo = Math.max(0, Math.min(1, this.num("reposo", 0)));
+    P.altAmp = this.num("altitude_amp", 0);
     P.angZ = (this.has("angulo_z") ? this.num("angulo_z", 90) : (P.orbita ? 90 : 0)) * deg;
   }
 
@@ -469,7 +491,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     su.tState.value = this.stateRT[a].texture; su.uInc.value = P.inc; su.uReset.value = reset ? 1 : 0;
     this.simMesh.material = this.stateMat; R.setRenderTarget(this.stateRT[b]); R.render(this.simScene, this.simCam);
     mu.tState.value = this.stateRT[b].texture; mu.tMotion.value = this.motionRT[a].texture; mu.tHead.value = this.headRT[a].texture;
-    mu.uAngZ.value = P.angZ;
+    mu.uAngZ.value = P.angZ; mu.uRepo.value = P.repo;
     mu.uReset.value = reset ? 1 : 0; mu.uSpeed.value = P.speed; mu.uVisc.value = P.visc; mu.uTheta0.value = P.theta0;
     mu.uLRep.value = P.lRep; mu.uRRep.value = P.rRep; mu.uLMovMin.value = P.lMovMin; mu.uLMovMax.value = P.lMovMax;
     mu.uRMovMin.value = P.rMovMin; mu.uRMovMax.value = P.rMovMax; mu.uSeed.value = (this.pasos % 997) * 1.618; mu.uN.value = this.N;
@@ -510,6 +532,10 @@ export class moEffectParticlesFractal extends MO.moEffect {
       const d = S1[o + 2] < 1.5 ? P.lMovMin + (P.lMovMax - P.lMovMin) * r : P.rMovMin + (P.rMovMax - P.rMovMin) * r;
       const th = H[q] + d * cx, ph = H[q + 1] + d * sy, w = Mo[o + 3] * (1 - P.visc), v = P.speed * w;
       M1.set([Mo[o] + v * Math.cos(ph) * Math.cos(th), Mo[o + 1] + v * Math.cos(ph) * Math.sin(th), Mo[o + 2] + v * Math.sin(ph), w], o);
+      if (P.repo > 0) {                                                   // reposo: resorte a su lugar de grilla
+        const a = P.repo * 0.12, rx = ((k % N) + 0.5) / N - 0.5, ry = (Math.floor(k / N) + 0.5) / N - 0.5;
+        M1[o] += (rx - M1[o]) * a; M1[o + 1] += (ry - M1[o + 1]) * a; M1[o + 2] += (0 - M1[o + 2]) * a;
+      }
       H1[q] = th; H1[q + 1] = ph;
     }
     this.cS = S1; this.cS2 = S; this.cM = M1; this.cM2 = Mo; this.cH = H1; this.cH2 = H;
@@ -559,6 +585,35 @@ export class moEffectParticlesFractal extends MO.moEffect {
     return v == 0 ? "puntos" : v == 6 ? "arbol" : v == 3 ? "tela" : "ambos";
   }
 
+  /** textura de un param TEXTURE, o null si no está en el .cfg / vale "default" / la imagen no cargó */
+  private texParam(n: string): any {
+    if (!this.has(n)) return null;
+    const P: any = this.m_Config.m_ParamsByName[n];
+    let txt = ""; try { txt = ("" + P.m_Values[Math.max(0, P.GetIndexValue())].m_List[0].m_Text).trim(); } catch (e) {}
+    if (!txt || txt == "default") return null;
+    try { const t: any = this.m_Config.Texture(n), tx = t && t._texture, im = tx && tx.image; return im && (im.width || 0) > 0 ? tx : null; } catch (e) { return null; }
+  }
+  /** píxeles de una textura (para el motor CPU y las mediciones): canal rojo 0..1, con el flipY de three (v=0 abajo) */
+  private pix = new WeakMap<any, { w: number, h: number, d: Uint8ClampedArray }>();
+  private texRed(tx: any, u: number, v: number): number {
+    let c = this.pix.get(tx);
+    if (!c) {
+      try {
+        const im = tx.image, cv = document.createElement("canvas"); cv.width = im.width; cv.height = im.height;
+        const g = cv.getContext("2d"); g.drawImage(im, 0, 0); c = { w: im.width, h: im.height, d: g.getImageData(0, 0, im.width, im.height).data };
+      } catch (e) { c = { w: 1, h: 1, d: new Uint8ClampedArray(4) }; }
+      this.pix.set(tx, c);
+    }
+    const x = Math.min(c.w - 1, Math.floor(u * c.w)), y = Math.min(c.h - 1, Math.floor((tx.flipY === false ? v : 1 - v) * c.h));
+    return c.d[(y * c.w + x) * 4] / 255;
+  }
+  private altTx: any = null;
+  /** relieve (z) de la célula k: altitude_amp · rojo(texture_altitude en su uv de grilla) — lo mismo que suma el shader */
+  private altZ(k: number): number {
+    if (!this.altTx || !this.P.altAmp) return 0;
+    const N = this.N; return this.P.altAmp * this.texRed(this.altTx, ((k % N) + 0.5) / N, (Math.floor(k / N) + 0.5) / N);
+  }
+
   /** tela: generación de la retícula visible y cuántas de sus celdas tienen los 4 vértices vivos (lo que se dibuja) */
   private telaStats(st: Float32Array): { nivel: number, celdas: number, triangulos: number, reticula: string } {
     const N = this.N, gen = st[2] > 0.5 ? Math.min(Math.round(st[0]), this.K) : 0;
@@ -586,10 +641,18 @@ export class moEffectParticlesFractal extends MO.moEffect {
       x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); z0 = Math.min(z0, z); z1 = Math.max(z1, z);
     }
     const r = (v: number) => +v.toFixed(4);
+    let dS = 0, dM = 0;                                                    // distancia a su lugar de grilla (reposo)
+    for (let k = 0; k < N2; k++) {
+      if (st[k * 4 + 2] < 0.5) continue;
+      const dx = mo[k * 4] - (((k % this.N) + 0.5) / this.N - 0.5), dy = mo[k * 4 + 1] - ((Math.floor(k / this.N) + 0.5) / this.N - 0.5), dz = mo[k * 4 + 2];
+      const d = Math.sqrt(dx * dx + dy * dy + dz * dz); dS += d; dM = Math.max(dM, d);
+    }
     return { modo: this.modo, N: this.N, K: this.K, pasos: this.pasos, genSemilla: st[0], vivas, porGen,
       bbox: vivas ? { ancho: r(x1 - x0), alto: r(y1 - y0), prof: r(z1 - z0) } : null, lineas: !!(this.lines && this.lines.visible),
       puntos: !!(this.pts && this.pts.visible), geometry_mode: this.geomMode(),
       tela: Object.assign({ visible: !!(this.tela && this.tela.visible) }, this.telaStats(st)),
+      reposo: { valor: r(this.P.repo || 0), dMedio: vivas ? r(dS / vivas) : 0, dMax: r(dM), celda: r(1 / this.N) },
+      medio: { altitud: !!this.altTx, altitude_amp: r(this.P.altAmp || 0), medium: !!(this.U.tMed && this.U.tMed.value) },
       orbita: { activa: !!this.P.orbita, yaw: r(this.yaw), pitch: r(this.pitch), zoom: r(this.zoom), angulo_z: r((this.P.angZ || 0) * 180 / Math.PI) } };
   }
 
@@ -624,6 +687,9 @@ export class moEffectParticlesFractal extends MO.moEffect {
     U.uPos.value.set(this.num("pos_x", 0), this.num("pos_y", -0.25)); U.uEsc.value = this.num("escala", 1);
     U.uForma.value = forma; U.uDisp.value = this.num("dispersion", 0.25); U.uSize.value = Math.max(0.5, this.num("tamano", 4));
     U.uColor.value.setRGB(rgb.r, rgb.g, rgb.b); U.uAlpha.value = alpha;
+    const altTx = this.texParam("texture_altitude"), medTx = this.texParam("texture_medium");
+    this.altTx = altTx; U.tAlt.value = altTx; U.uAltAmp.value = altTx ? this.P.altAmp : 0;
+    U.tMed.value = medTx; U.uMedAmt.value = medTx ? 1 : 0;
     lU.uAlpha.value = alpha * Math.max(0, Math.min(1, this.num("lineas", 1))) * forma;
     const gm = this.geomMode(), esTela = gm == "tela" || gm == "tela_arbol", tU = this.tMat.uniforms;
     tU.uAlpha.value = alpha * Math.max(0, Math.min(1, this.num("tela", 0.55)));
@@ -665,7 +731,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     const N = this.N, N2 = N * N, S = this.cS, Mo = this.cM, g = this.gene;
     const pa = this.pts.geometry.attributes.aMot, la = this.lines.geometry.attributes.aMot;
     const p = pa.array as Float32Array, l = la.array as Float32Array;
-    for (let k = 0; k < N2; k++) { p.set([Mo[k * 4], Mo[k * 4 + 1], Mo[k * 4 + 2], S[k * 4 + 2] > 0.5 ? 1 : 0], k * 4); }
+    for (let k = 0; k < N2; k++) { p.set([Mo[k * 4], Mo[k * 4 + 1], Mo[k * 4 + 2] + this.altZ(k), S[k * 4 + 2] > 0.5 ? 1 : 0], k * 4); }
     for (let k = 1, v = 0; k < N2; k++, v += 2) {
       const f = g.fj[k] * N + g.fi[k], alive = p[k * 4 + 3];
       l.set([p[k * 4], p[k * 4 + 1], p[k * 4 + 2], alive, p[f * 4], p[f * 4 + 1], p[f * 4 + 2], alive], v * 4);
@@ -678,7 +744,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     this.tMat.uniforms.uGen.value = gen;
     const L = this.telaLv[gen - 1];
     if (L) {
-      const P = (k: number, c: number) => Mo[k * 4 + c];
+      const P = (k: number, c: number) => p[k * 4 + c];                  // posición + relieve (ya en los atributos de puntos)
       for (let r = 0; r < L.rows; r++) for (let q = 0; q < L.cols; q++) {
         const v = L.base + r * L.cols + q, k = cell[v];
         const kx1 = q + 1 < L.cols ? k + L.sx : k, kx0 = q > 0 ? k - L.sx : k;
@@ -794,8 +860,10 @@ export class moEffectParticlesFractal extends MO.moEffect {
       // 3D (18-nov)
       ["angulo_z", "90"], ["orbita", "0"],
       // tela (18-nov): opacidad de la malla (× alpha)
-      ["tela", "0.55"]];
+      ["tela", "0.55"], ["altitude_amp", "0"], ["reposo", "0"]];
     for (const [n, v] of defs) p_configdefinition.Add(n, F, idx++, new MO.moValue(v, "FUNCTION"));
+    // medio (texturas del original, §2 del doc): altitud = relieve (z) de cada célula, medio = tinte
+    for (const n of ["texture_altitude", "texture_medium"]) p_configdefinition.Add(n, MO.moParamType.MO_PARAM_TEXTURE, idx++, new MO.moValue("default", "TXT"));
     return this.m_Config.GetConfigDefinition();
   }
 }
