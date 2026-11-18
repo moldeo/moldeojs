@@ -35,9 +35,10 @@ import * as THREE from "three";
  *   randomvelocity (avance por paso en centésimas de pantalla), randomvelocityx/y (rumbo inicial; default hacia arriba),
  *   viscosity (frenado por paso, 0..1), alpha, color, blending (1/5 aditivo).
  *   geometry_mode — DISCRETO (FCA 18-nov): con `options="puntos,árbol (líneas),puntos + líneas"` en el PARAM el valor es el
- *   índice 0 puntos · 1 árbol (sólo líneas hijo→padre) · 2 puntos + líneas. Sin `options` (.cfg viejo) se lee el código del
- *   original: 0 = puntos · 6 (rsGeometryTreeLines) = árbol · otro = puntos + líneas (2/3 sprites/quads no están portados);
- *   con `options`, un 6 suelto (fuera de rango) también se lee como árbol. Relación con `forma`: forma MUEVE las partículas (0 nube ⇄ 1 árbol) y además atenúa las líneas
+ *   índice 0 puntos · 1 árbol (sólo líneas hijo→padre) · 2 puntos + líneas · 3 tela · 4 tela + árbol (la etiqueta manda:
+ *   «tela/malla/mesh» ⇒ tela). Sin `options` (.cfg viejo) se lee el código del original: 0 = puntos · 3 QUADS = tela ·
+ *   6 (rsGeometryTreeLines) = árbol · otro = puntos + líneas (2 sprites no está portado); con `options`, un 6 suelto
+ *   (fuera de rango) también se lee como árbol. Relación con `forma`: forma MUEVE las partículas (0 nube ⇄ 1 árbol) y además atenúa las líneas
  *   (alpha·lineas·forma); geometry_mode elige QUÉ se dibuja. Con forma≈0 las líneas no se ven ⇒ en «árbol» se muestran los
  *   puntos para que la capa no quede vacía. (Estela = no borrar el cuadro queda fuera: el render limpia el lienzo entero.)
  *   capa «semilla» (borrador de FCA, se usa si el .cfg NO trae el nombre original equivalente):
@@ -47,9 +48,27 @@ import * as THREE from "three";
  *   3D: angulo_z (grados que gira el PLANO de división en cada generación; default 90 si `orbita` está activa, si no 0 =
  *   árbol plano de Fase 1), orbita (1 = cámara orbital propia: arrastrar con el botón izquierdo rota yaw/pitch con inercia,
  *   rueda = zoom 0.25..8, doble clic = vista inicial; no actúa en modo Edit del touchEdit ni sobre la interfaz).
+ *   tela (18-nov): opacidad de la malla (× alpha, default 0.55 = semitransparente).
+ *
+ * MODO TELA (geometry_mode «tela» / «tela + árbol»; código viejo 3 = QUADS del original, rsGeometryQuads):
+ *   la célula es partícula Y vértice de una malla. Malla indexada de triángulos (2 por celda (i,j)-(i+sx,j)-(i+sx,j+sy)-(i,j+sy));
+ *   el vertex shader lee la posición de cada vértice de la MISMA textura tMotion que puntos y líneas, y la normal por
+ *   diferencias con los vecinos (i±sx, j±sy) ⇒ lambert con luz fija + ambiente + rim, doble cara, color/alpha del efecto; mezcla
+ *   NORMAL con depth test/write propio (la aditiva del efecto, en una piel plegada, quema a blanco: se usa sólo en puntos/líneas).
+ *   ORDEN DE LA GRILLA = EL DE LA GENEALOGÍA (como el original: los vecinos son vecinos de ÍNDICE, no de espacio). Pero el
+ *   original unía vecinos inmediatos (paso 1) porque en pfractalA todas las células estaban vivas (emisor esfera); acá crecen
+ *   desde una ⇒ con paso 1 la tela sólo existiría en las 2 últimas generaciones. Como todas las células dividen al mismo ritmo,
+ *   tras G divisiones las vivas forman una RETÍCULA REGULAR de la grilla (G par: paso 2^(n−G/2) en i y en j; G impar: la mitad
+ *   en i). Se arma una malla por generación y se dibuja sólo la de la generación actual de la semilla (las otras colapsan a un
+ *   punto): 1 celda en G=2, 2 en G=3, 9 en G=4 … (N−1)² al final. Las aristas de la retícula unen a cada célula con su hija de la
+ *   última división (en un eje) y con sus primas de la generación anterior (en el otro): la tela es la red de PARENTESCO y se
+ *   pliega con el árbol (con angulo_z ≠ 0 la superficie se curva en 3D). «tela + árbol» suma las líneas hijo→padre: el
+ *   esqueleto genealógico sobre la piel (se lee mejor que el wireframe de la propia malla, que a N=64 son ~8000 aristas de ruido
+ *   y repiten lo que el sombreado ya muestra). Celdas con algún vértice no vivo ⇒ discard en el fragment.
+ *   Fallback CPU: la misma malla con posición/normal por atributos (normales en JS, sólo de la retícula visible).
  *
  * NO PORTADO EN FASE 1 (queda para Fase 2/3/4, ver el doc §6.3): física 3D (gravity, attractor*, randommotion, flow_*), emisores
- * (emittertype), texturas de medio, sprites/quads (geometry_mode 2/3), color/escala por célula, genoma CellCode. El original
+ * (emittertype), texturas de medio, sprites (geometry_mode 2), color/escala por célula, genoma CellCode. El original
  * tampoco interpretaba los opcodes del genoma. `multiplica` del borrador no aplica (la multiplicación es la mitosis).
  */
 
@@ -152,6 +171,53 @@ void main() {
   gl_FragColor = vec4(uColor, uAlpha);
 }`;
 
+/** TELA (geometry_mode QUADS del original, rsGeometryQuads): malla indexada sobre la RETÍCULA VIVA de la generación actual.
+ *  aLvl = (paso u, paso v, generación G de la retícula). Sólo se dibuja la retícula G = min(generación de la semilla, K): las
+ *  otras colapsan a un punto fuera de pantalla (triángulos degenerados). Normal = cruz de las diferencias con los vecinos de
+ *  retícula (i±sx, j±sy) leídas de la MISMA textura de posición. Un vértice no vivo ⇒ vAlive < 1 en el triángulo ⇒ discard. */
+const TELA_VS = `
+uniform sampler2D tMotion; uniform sampler2D tState;
+uniform vec2 uPos; uniform float uEsc, uForma, uDisp, uGen, uK, uN;
+attribute vec2 aCell; attribute vec2 aCloud; attribute vec3 aLvl;
+#ifdef PF_CPU
+attribute vec4 aMot; attribute vec3 aNrm;
+#endif
+varying float vAlive; varying vec3 vN; varying vec3 vV;
+vec3 P(vec2 uv) { return texture2D(tMotion, uv).xyz; }
+void main() {
+#ifdef PF_CPU
+  float gen = uGen; vec3 tree = aMot.xyz; float alive = aMot.w; vec3 n = aNrm;
+#else
+  float gen = texture2D(tState, vec2(0.5 / uN)).r;                 // generación de la semilla = la de todo el árbol (síncrono)
+  vec3 tree = P(aCell); float alive = step(0.5, texture2D(tState, aCell).b);
+  vec2 du = vec2(aLvl.x, 0.0), dv = vec2(0.0, aLvl.y);
+  vec2 a = aCell + du, b = aCell - du, c = aCell + dv, d = aCell - dv;
+  vec3 px = (a.x < 1.0 ? P(a) : tree) - (b.x > 0.0 ? P(b) : tree);
+  vec3 py = (c.y < 1.0 ? P(c) : tree) - (d.y > 0.0 ? P(d) : tree);
+  vec3 n = cross(px, py);
+#endif
+  if (abs(aLvl.z - min(gen, uK)) > 0.5) { vAlive = 0.0; vN = vec3(0.0, 0.0, 1.0); vV = vN; gl_Position = vec4(2.0, 2.0, 2.0, 1.0); return; }
+  vec3 p = vec3(uPos, 0.0) + mix(vec3(aCloud * uDisp, 0.0), tree, uForma) * uEsc;
+  vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  vN = normalMatrix * (dot(n, n) > 1e-14 ? normalize(n) : vec3(0.0, 0.0, 1.0));
+  vV = projectionMatrix[3][3] > 0.5 ? vec3(0.0, 0.0, 1.0) : -mv.xyz;  // ortográfica: mira por −z
+  vAlive = alive;
+  gl_Position = projectionMatrix * mv;
+}`;
+
+const TELA_FS = `
+uniform vec3 uColor; uniform float uAlpha;
+varying float vAlive; varying vec3 vN; varying vec3 vV;
+void main() {
+  if (vAlive < 0.999) discard;
+  vec3 n = normalize(vN), v = normalize(vV);
+  if (dot(n, v) < 0.0) n = -n;                                       // doble cara: la cara que mira a la cámara
+  float dif = max(dot(n, normalize(vec3(0.35, 0.55, 0.75))), 0.0);   // lambert, luz fija (espacio de vista)
+  float rim = pow(1.0 - max(dot(n, v), 0.0), 2.0);
+  vec3 col = uColor * (0.3 + 0.7 * dif) + rim * 0.35 * (0.5 * uColor + 0.5);
+  gl_FragColor = vec4(col, uAlpha * (0.7 + 0.3 * rim));
+}`;
+
 export enum moParticlesFractalParamIndex {
   PF_INLET = 0, PF_OUTLET, PF_SCRIPT, PF_ALPHA, PF_COLOR, PF_SYNC, PF_PHASE, PF_BLENDING, PF_FIRST_CUSTOM
 };
@@ -185,6 +251,10 @@ export class moEffectParticlesFractal extends MO.moEffect {
   private cH: Float32Array; private cH2: Float32Array;
   // render
   private pts: any; private lines: any; private pMat: any; private lMat: any;
+  private tela: any; private tMat: any;
+  /** retículas de la tela: por generación G, paso (sx, sy) en celdas, primer vértice, columnas, filas; y por vértice su célula */
+  private telaLv: { G: number, sx: number, sy: number, base: number, cols: number, rows: number }[] = [];
+  private telaCell: Int32Array;
   private acc = 0; private lastT = 0; private lastDur = -1; private needReset = true;
   private U: any = {};
 
@@ -247,8 +317,8 @@ export class moEffectParticlesFractal extends MO.moEffect {
     for (const rt of this.stateRT.concat(this.motionRT, this.headRT)) rt.dispose();
     this.stateRT = []; this.motionRT = []; this.headRT = [];
     if (this.geneTex) this.geneTex.dispose();
-    for (const o of [this.pts, this.lines]) if (o) { o.geometry.dispose(); o.material.dispose(); }
-    this.pts = this.lines = null;
+    for (const o of [this.pts, this.lines, this.tela]) if (o) { o.geometry.dispose(); o.material.dispose(); }
+    this.pts = this.lines = this.tela = null;
   }
 
   /** arma (o rearma) todo para una grilla N×N */
@@ -328,9 +398,39 @@ export class moEffectParticlesFractal extends MO.moEffect {
 
     this.pts = new THREE.Points(pg, this.pMat); this.lines = new THREE.LineSegments(lg, this.lMat);
     this.pts.frustumCulled = false; this.lines.frustumCulled = false;
-    // órbita: Scene → orbG (gira alrededor del pivote) → pivG (−pivote) → líneas + puntos
+
+    // ---- TELA: una retícula por generación G (las células vivas tras G divisiones forman una retícula regular de paso
+    // sx×sy: G par = 2^(n−G/2) en ambos ejes; G impar = la mitad en i). Celda (i,j)-(i+sx,j)-(i+sx,j+sy)-(i,j+sy) = 2 triángulos.
+    const nn = Math.round(Math.log2(N)), tCell: number[] = [], tLvl: number[] = [], tIdx: number[] = [];
+    this.telaLv = [];
+    for (let G = 1; G <= this.K; G++) {
+      const m = Math.floor(G / 2), sy = Math.pow(2, nn - m), sx = G % 2 == 0 ? sy : sy / 2;
+      const cols = N / sx, rows = N / sy, base = tCell.length;
+      this.telaLv.push({ G, sx, sy, base, cols, rows });
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { tCell.push(r * sy * N + c * sx); tLvl.push(sx / N, sy / N, G); }
+      for (let r = 0; r < rows - 1; r++) for (let c = 0; c < cols - 1; c++) {
+        const a0 = base + r * cols + c, b0 = a0 + 1, d0 = a0 + cols, e0 = d0 + 1;
+        tIdx.push(a0, b0, e0, a0, e0, d0);
+      }
+    }
+    const TV = tCell.length;
+    this.telaCell = Int32Array.from(tCell);
+    const tg = new THREE.BufferGeometry(), tRef = new Float32Array(TV * 2), tCl = new Float32Array(TV * 2);
+    for (let v = 0; v < TV; v++) { const k = tCell[v], u = uv(k); tRef[v * 2] = u[0]; tRef[v * 2 + 1] = u[1]; tCl[v * 2] = cloud[k * 2]; tCl[v * 2 + 1] = cloud[k * 2 + 1]; }
+    tg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(TV * 3), 3));
+    tg.setAttribute("aCell", new THREE.BufferAttribute(tRef, 2));
+    tg.setAttribute("aCloud", new THREE.BufferAttribute(tCl, 2));
+    tg.setAttribute("aLvl", new THREE.BufferAttribute(Float32Array.from(tLvl), 3));
+    if (!gpu) { tg.setAttribute("aMot", new THREE.BufferAttribute(new Float32Array(TV * 4), 4)); tg.setAttribute("aNrm", new THREE.BufferAttribute(new Float32Array(TV * 3), 3)); }
+    tg.setIndex(new THREE.BufferAttribute(TV > 65535 ? Uint32Array.from(tIdx) : Uint16Array.from(tIdx), 1));
+    const tU = Object.assign({}, this.U, { uAlpha: { value: 0.55 }, uGen: { value: 0 }, uK: { value: this.K }, uN: { value: N } });
+    this.tMat = new THREE.ShaderMaterial({ vertexShader: TELA_VS, fragmentShader: TELA_FS, uniforms: tU, defines: Object.assign({}, defs),
+      transparent: true, depthTest: true, depthWrite: true, side: THREE.DoubleSide });
+    this.tela = new THREE.Mesh(tg, this.tMat); this.tela.frustumCulled = false;
+
+    // órbita: Scene → orbG (gira alrededor del pivote) → pivG (−pivote) → tela (con depth) + líneas + puntos (sin depth: van encima)
     this.orbG = new THREE.Group(); this.pivG = new THREE.Group();
-    this.pivG.add(this.lines); this.pivG.add(this.pts); this.orbG.add(this.pivG);
+    this.pivG.add(this.tela); this.pivG.add(this.lines); this.pivG.add(this.pts); this.orbG.add(this.pivG);
     this.Scene = new MO.moSceneNode(); this.Scene.add(this.orbG);
     this.pivOk = false;
     this.needReset = true;
@@ -345,6 +445,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     const P = this.P;
     P.inc = Math.max(0.001, Math.min(0.5, this.num("incremento_madurez", 0.05)));
     const period = Math.max(1, (1 - 2 * P.inc) / P.inc + 1);   // pasos entre divisiones
+    P.period = period;
     const deg = Math.PI / 180, bal = this.num("balanceo", 0) * deg;
     const ang = this.has("angulo") ? this.num("angulo", 28.6) * deg : 0.5;
     P.lRep = (this.has("left_rep_angle_max") || this.has("left_rep_angle_min") ? this.num("left_rep_angle_max", this.num("left_rep_angle_min", 0.5)) : ang) + bal;
@@ -437,7 +538,8 @@ export class moEffectParticlesFractal extends MO.moEffect {
   private readState() { return this.readTex(this.stateRT, this.cS); }
   private readMotion() { return this.readTex(this.motionRT, this.cM); }
 
-  /** geometry_mode ⇒ "puntos" | "arbol" | "ambos" (ver el comentario del archivo: índice si hay `options`, código viejo si no) */
+  /** geometry_mode ⇒ "puntos" | "arbol" | "ambos" | "tela" | "tela_arbol" (ver el comentario del archivo: índice si hay
+   *  `options`, código viejo del original si no) */
   public geomMode(): string {
     if (!this.has("geometry_mode")) return "ambos";
     const v = Math.round(this.num("geometry_mode", 2));
@@ -445,13 +547,30 @@ export class moEffectParticlesFractal extends MO.moEffect {
     const opts = "" + ((pd && pd.m_OptionsStr) || (P && P.m_XmlAttributes && P.m_XmlAttributes["options"]) || "");
     if (opts.trim()) {
       const o = opts.split(",").map((x) => x.trim().toLowerCase());
-      const lb = v >= 0 && v < o.length ? o[v] : (v == 6 ? "árbol" : "");
-      if (/punto/.test(lb) && /l[ií]nea|[aá]rbol/.test(lb)) return "ambos";
+      const lb = v >= 0 && v < o.length ? o[v] : (v == 6 ? "árbol" : v == 3 ? "tela" : "");
+      const lin = /l[ií]nea|[aá]rbol/.test(lb);
+      if (/tela|malla|mesh|quad/.test(lb)) return lin ? "tela_arbol" : "tela";
+      if (/punto/.test(lb) && lin) return "ambos";
       if (/punto/.test(lb)) return "puntos";
-      if (/l[ií]nea|[aá]rbol/.test(lb)) return "arbol";
-      return ["puntos", "arbol", "ambos"][Math.max(0, Math.min(2, v))];
+      if (lin) return "arbol";
+      return ["puntos", "arbol", "ambos", "tela", "tela_arbol"][Math.max(0, Math.min(4, v))];
     }
-    return v == 0 ? "puntos" : v == 6 ? "arbol" : "ambos";   /* .cfg viejo: códigos del original */
+    /* .cfg viejo: códigos del original — 0 POINTS · 3 QUADS (rsGeometryQuads = superficie) · 6 TREE · otro = puntos + líneas */
+    return v == 0 ? "puntos" : v == 6 ? "arbol" : v == 3 ? "tela" : "ambos";
+  }
+
+  /** tela: generación de la retícula visible y cuántas de sus celdas tienen los 4 vértices vivos (lo que se dibuja) */
+  private telaStats(st: Float32Array): { nivel: number, celdas: number, triangulos: number, reticula: string } {
+    const N = this.N, gen = st[2] > 0.5 ? Math.min(Math.round(st[0]), this.K) : 0;
+    const L = this.telaLv[gen - 1];
+    if (!L) return { nivel: gen, celdas: 0, triangulos: 0, reticula: "-" };
+    const al = (k: number) => st[k * 4 + 2] > 0.5;
+    let c = 0;
+    for (let r = 0; r < L.rows - 1; r++) for (let q = 0; q < L.cols - 1; q++) {
+      const k = r * L.sy * N + q * L.sx;
+      if (al(k) && al(k + L.sx) && al(k + L.sy * N) && al(k + L.sy * N + L.sx)) c++;
+    }
+    return { nivel: gen, celdas: c, triangulos: 2 * c, reticula: L.cols + "x" + L.rows };
   }
 
   /** para el test headless: vivas, generación de la semilla, vivas por generación de nacimiento, bbox del árbol */
@@ -470,6 +589,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     return { modo: this.modo, N: this.N, K: this.K, pasos: this.pasos, genSemilla: st[0], vivas, porGen,
       bbox: vivas ? { ancho: r(x1 - x0), alto: r(y1 - y0), prof: r(z1 - z0) } : null, lineas: !!(this.lines && this.lines.visible),
       puntos: !!(this.pts && this.pts.visible), geometry_mode: this.geomMode(),
+      tela: Object.assign({ visible: !!(this.tela && this.tela.visible) }, this.telaStats(st)),
       orbita: { activa: !!this.P.orbita, yaw: r(this.yaw), pitch: r(this.pitch), zoom: r(this.zoom), angulo_z: r((this.P.angZ || 0) * 180 / Math.PI) } };
   }
 
@@ -505,11 +625,18 @@ export class moEffectParticlesFractal extends MO.moEffect {
     U.uForma.value = forma; U.uDisp.value = this.num("dispersion", 0.25); U.uSize.value = Math.max(0.5, this.num("tamano", 4));
     U.uColor.value.setRGB(rgb.r, rgb.g, rgb.b); U.uAlpha.value = alpha;
     lU.uAlpha.value = alpha * Math.max(0, Math.min(1, this.num("lineas", 1))) * forma;
-    const gm = this.geomMode();
-    this.lines.visible = gm != "puntos" && lU.uAlpha.value > 0.001;
-    this.pts.visible = gm != "arbol" || !this.lines.visible;
+    const gm = this.geomMode(), esTela = gm == "tela" || gm == "tela_arbol", tU = this.tMat.uniforms;
+    tU.uAlpha.value = alpha * Math.max(0, Math.min(1, this.num("tela", 0.55)));
+    this.tela.visible = esTela && tU.uAlpha.value > 0.001;
+    this.lines.visible = gm != "puntos" && gm != "tela" && lU.uAlpha.value > 0.001;
+    // tela: antes de la 2ª división no hay celdas (retícula 2×1) ⇒ se ve la semilla como punto para que la capa no quede vacía
+    if (esTela) this.pts.visible = !this.tela.visible || this.pasos < 2 * (this.P.period || 1) + 1;
+    else this.pts.visible = gm != "arbol" || !this.lines.visible;
     const add = [1, 5].indexOf(Math.round(this.num("blending", 0))) >= 0;
     for (const m of [this.pMat, this.lMat]) m.blending = add ? THREE.AdditiveBlending : THREE.NormalBlending;
+    // la tela SIEMPRE con mezcla normal + depth: aditiva sobre una piel plegada (miles de capas casi coplanares) quema a blanco
+    // y se pierde la forma (medido en L08, blending=1); así se ve la capa de adelante sombreada y, semitransparente, lo de atrás.
+    this.tMat.blending = THREE.NormalBlending;
 
     if (this.modo == "gpu") {
       U.tMotion.value = this.motionRT[this.ic].texture; U.tState.value = this.stateRT[this.ic].texture;
@@ -519,6 +646,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     const rs: MO.moVector2 = new MO.moVector2();
     this.RM.m_Renderer.getSize(rs);
     this.drawT = now;
+    if (this.tela.visible) { try { R.clearDepth(); } catch (e) {} }   // la tela usa depth propio (ver TELA_FS): no heredar el de otras capas
     if (this.P.orbita) {
       this.bindOrbit(R);
       this.orbitFrame(rs.width, rs.height, dt);
@@ -543,6 +671,25 @@ export class moEffectParticlesFractal extends MO.moEffect {
       l.set([p[k * 4], p[k * 4 + 1], p[k * 4 + 2], alive, p[f * 4], p[f * 4 + 1], p[f * 4 + 2], alive], v * 4);
     }
     pa.needsUpdate = true; la.needsUpdate = true;
+    // tela: posición + viva por vértice, y la normal (diferencias con los vecinos de retícula) sólo en la retícula visible
+    const tg = this.tela.geometry, ta = tg.attributes.aMot, tn = tg.attributes.aNrm;
+    const tm = ta.array as Float32Array, nr = tn.array as Float32Array, cell = this.telaCell;
+    const gen = S[2] > 0.5 ? Math.min(Math.round(S[0]), this.K) : 0;
+    this.tMat.uniforms.uGen.value = gen;
+    const L = this.telaLv[gen - 1];
+    if (L) {
+      const P = (k: number, c: number) => Mo[k * 4 + c];
+      for (let r = 0; r < L.rows; r++) for (let q = 0; q < L.cols; q++) {
+        const v = L.base + r * L.cols + q, k = cell[v];
+        const kx1 = q + 1 < L.cols ? k + L.sx : k, kx0 = q > 0 ? k - L.sx : k;
+        const ky1 = r + 1 < L.rows ? k + L.sy * N : k, ky0 = r > 0 ? k - L.sy * N : k;
+        const ax = P(kx1, 0) - P(kx0, 0), ay = P(kx1, 1) - P(kx0, 1), az = P(kx1, 2) - P(kx0, 2);
+        const bx = P(ky1, 0) - P(ky0, 0), by = P(ky1, 1) - P(ky0, 1), bz = P(ky1, 2) - P(ky0, 2);
+        tm[v * 4] = P(k, 0); tm[v * 4 + 1] = P(k, 1); tm[v * 4 + 2] = P(k, 2); tm[v * 4 + 3] = S[k * 4 + 2] > 0.5 ? 1 : 0;
+        nr[v * 3] = ay * bz - az * by; nr[v * 3 + 1] = az * bx - ax * bz; nr[v * 3 + 2] = ax * by - ay * bx;
+      }
+      ta.needsUpdate = true; tn.needsUpdate = true;
+    }
   }
 
   // ---------------------------------------------------------------- órbita (param `orbita` = 1)
@@ -645,7 +792,9 @@ export class moEffectParticlesFractal extends MO.moEffect {
       ["pos_x", "0.0"], ["pos_y", "-0.25"], ["escala", "1.0"], ["forma", "1.0"], ["dispersion", "0.25"], ["crece", "1.0"],
       ["lineas", "1.0"], ["tamano", "4"], ["niveles", "8"], ["angulo", "28.6"], ["largo", "0.08"], ["balanceo", "0"],
       // 3D (18-nov)
-      ["angulo_z", "90"], ["orbita", "0"]];
+      ["angulo_z", "90"], ["orbita", "0"],
+      // tela (18-nov): opacidad de la malla (× alpha)
+      ["tela", "0.55"]];
     for (const [n, v] of defs) p_configdefinition.Add(n, F, idx++, new MO.moValue(v, "FUNCTION"));
     return this.m_Config.GetConfigDefinition();
   }
