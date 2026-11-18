@@ -138,6 +138,22 @@
                 <D type="NUM">1</D>
                 <D type="TXT">C</D>
             </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">micelio_luz1</D>
+                <D type="TXT">micelio_luz1</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">C</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">micelio_luz2</D>
+                <D type="TXT">micelio_luz2</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">C</D>
+            </VAL>
         </PARAM>
         <PARAM name="posteffect" type="MOLDEOOBJECT" />
         <PARAM name="mastereffect" type="MOLDEOOBJECT" />
