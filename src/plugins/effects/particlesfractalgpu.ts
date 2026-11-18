@@ -315,6 +315,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
   }
 
   /** vuelve a la semilla (y el BIG BANG ocurre en el mismo llamado: la semilla se ve aunque crece = 0) */
+  private held = false;
   public reset() { this.needReset = true; }
 
   private P: any = {};
@@ -435,10 +436,14 @@ export class moEffectParticlesFractal extends MO.moEffect {
     // si el tiempo del efecto vuelve atrás (rewind / reinicio) ⇒ de nuevo a la semilla
     try { const d = Number((this as any).m_EffectState.tempo.Duration()); if (d < this.lastDur - 200) this.needReset = true; this.lastDur = d; } catch (e) {}
 
+    // transporte del proyecto (círculo de tiempo): pausa ⇒ no avanza · stop ⇒ vuelve a la semilla y queda quieta · play ⇒ crece
+    const tr = (window as any).moTransport || "play";
+    if (tr == "stop" && !this.held) { this.needReset = true; this.held = true; }
+    if (tr != "stop") this.held = false;
     if (this.needReset) { this.needReset = false; this.step(true); this.step(); this.acc = 0; }
     const now = performance.now(), dt = this.lastT ? Math.min(0.25, (now - this.lastT) / 1000) : 1 / 60;
     this.lastT = now;
-    this.acc += dt * 60 * this.P.crece;
+    if (tr == "play") this.acc += dt * 60 * this.P.crece;
     let n = Math.floor(this.acc); this.acc -= n; n = Math.min(n, 4);
     for (let i = 0; i < n; i++) this.step();
 

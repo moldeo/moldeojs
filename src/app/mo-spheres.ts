@@ -420,11 +420,57 @@ export class moTimeSphere extends moSphere {
   }
 
   isPlayingTake(): boolean { return this.playingTake; }
+  /** FCA 18-nov — grabar video del lienzo (MediaRecorder sobre captureStream del canvas WebGL), se descarga al parar */
+  private vrec: any = null;
+  private toggleVideo(CON: any) {
+    if (this.vrec) { try { this.vrec.stop(); } catch (e) {} return; }
+    let cv: any = null;
+    try { cv = CON.GetResourceManager().GetRenderMan().m_Renderer.domElement; } catch (e) {}
+    if (!cv) cv = document.querySelector("canvas");
+    if (!cv || !cv.captureStream || !(window as any).MediaRecorder) { this.flash("este navegador no puede grabar el lienzo"); return; }
+    const mime = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"].find(m => (window as any).MediaRecorder.isTypeSupported(m)) || "";
+    const chunks: any[] = [];
+    const rec = new (window as any).MediaRecorder(cv.captureStream(30), mime ? { mimeType: mime, videoBitsPerSecond: 8e6 } : {});
+    rec.ondataavailable = (e: any) => { if (e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop = () => {
+      this.vrec = null; this.render();
+      const blob = new Blob(chunks, { type: "video/webm" }), a = document.createElement("a");
+      let nombre = "moldeo"; try { nombre = ((new URLSearchParams(window.location.search).get("mol") || "moldeo").split("/").pop() || "moldeo").replace(/\.mol$/, ""); } catch (e) {}
+      a.href = URL.createObjectURL(blob); a.download = nombre + "-" + new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + ".webm";
+      document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+      this.flash("video descargado · " + Math.round(blob.size / 1024) + " KB");
+    };
+    rec.start(500); this.vrec = rec; this.flash("● grabando video");
+  }
 
   protected renderOpen() {
     const S = moSphere.SIZE, C = S / 2, P = this.project, W = this.wheel;
     this.foldCenter("◷", "tiempo");
     const items: { g: string, w: string, cls: string, fn: () => void, title: string }[] = [];
+    /* FCA 18-nov: el círculo de tiempo es el transporte del proyecto — sólo ⏸/▶ y ■. Lo de antes (línea de tiempo de estados,
+       REC y tomas) queda como parámetro: ?tiempo=completo */
+    const T: any = (window as any);
+    const tr = T.moTransport || "play";
+    const CON: any = P && (P as any).console;
+    items.push({ g: tr == "play" ? "⏸" : "▶", w: tr == "play" ? "pausa" : "play", cls: tr == "play" ? "go" : "",
+      fn: () => { const nx = (T.moTransport || "play") == "play" ? "pause" : "play"; T.moTransport = nx;
+        try { if (CON) { if (nx == "pause") CON.ConsolePause(); else CON.ConsolePlay(); } } catch (e) {}
+        this.render(); this.flash(nx == "pause" ? "⏸ pausa" : "▶ play"); },
+      title: "Pausa / continúa todo el proyecto (animaciones y simulaciones)" });
+    items.push({ g: "■", w: "stop", cls: tr == "stop" ? "rec" : "",
+      fn: () => { T.moTransport = "stop"; try { if (CON) CON.ConsoleStop(); } catch (e) {}
+        this.render(); this.flash("■ stop · ▶ para empezar de nuevo"); },
+      title: "Detiene y vuelve al inicio (las simulaciones vuelven a la semilla); ▶ arranca de nuevo" });
+    const V: any = T.moView;
+    items.push({ g: this.vrec ? "■" : "●", w: this.vrec ? "parar video" : "grabar video", cls: this.vrec ? "rec" : "",
+      fn: () => { this.toggleVideo(CON); this.render(); },
+      title: "Graba el lienzo en video (.webm); al parar se descarga" });
+    items.push({ g: "📷", w: "captura", cls: "", fn: () => { try { V && V.screenshot(); this.flash("📷 captura"); } catch (e) { this.flash("no se pudo capturar"); } },
+      title: "Captura un cuadro (PNG)" });
+    items.push({ g: "⛶", w: "pantalla completa", cls: "", fn: () => { try { V && V.fullscreen(); } catch (e) {} },
+      title: "Pantalla completa (ESC para salir)" });
+    let completo = false; try { completo = new URLSearchParams(window.location.search).get("tiempo") == "completo"; } catch (e) {}
+    if (!completo) { const pos0 = this.ringPos(items.length); items.forEach((it, k) => { const b = this.btn(it.g, it.w, it.cls, pos0[k].x, pos0[k].y, it.fn); b.title = it.title; }); return; }
     const groups: string[] = (P && P.states().length) ? P.groups() : [];
     if (groups.length) {
       const sel = (W && W.projGroup !== null && groups.indexOf(W.projGroup) >= 0) ? W.projGroup : P.currentGroup();

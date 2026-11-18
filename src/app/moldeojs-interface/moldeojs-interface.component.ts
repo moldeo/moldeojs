@@ -595,6 +595,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
       }
       if (changes["moldeojsview"]) {
         console.log("moldeojsview:", changes["moldeojsview"].currentValue);
+        (window as any).moView = this.moldeojsview;   /* el círculo de tiempo usa captura y pantalla completa del visor */
         this.moldeojsview.loaded.subscribe( (evt) => {
           if (evt=="effects_loaded") {
 

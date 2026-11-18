@@ -6,7 +6,8 @@
   <span>{{overlayer}}</span>
 </div>
 
-<div id="moldeobuttons" #moldeobuttons class="btn-group moldeo_control" role="group" aria-label="..." data-html2canvas-ignore>
+<!-- FCA 18-nov: la barra vieja (captura, video, stop, play, pantalla completa) se oculta; el transporte vive en el círculo de tiempo -->
+<div id="moldeobuttons" #moldeobuttons class="btn-group moldeo_control" role="group" aria-label="..." data-html2canvas-ignore style="display:none">
   <!--button id="sample_0" type="button" class="btn btn-default" (click)="loadsample($event,0);"><span class="glyphicon glyphicon-record" style="color: red;font-size: 30px;" aria-hidden="false"></span></button>
   <button id="sample_1" type="button" class="btn btn-default" (click)="loadsample($event,1);"><span class="glyphicon glyphicon-record" style="color: green;font-size: 30px;" aria-hidden="false"></span></button>
   <button id="sample_2" type="button" class="btn btn-default" (click)="loadsample($event,2);"><span class="glyphicon glyphicon-record" style="color: blue;font-size: 30px;" aria-hidden="false"></span></button>
