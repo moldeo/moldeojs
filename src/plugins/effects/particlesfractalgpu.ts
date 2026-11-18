@@ -1,5 +1,6 @@
 import * as MO from "moldeojs";
 import * as THREE from "three";
+import { moCubrir } from "../../app/mo-cover";
 import { moCacheBust } from "../../app/mo-cache-bust";
 
 /**
@@ -150,12 +151,12 @@ void main() {
  *  (uAngZ = 0 ⇒ ψ = 0 ⇒ el árbol plano de Fase 1, idéntico). La primera división (gen 1) queda siempre en el plano. */
 const MOTION_FS = `
 uniform sampler2D tState; uniform sampler2D tMotion; uniform sampler2D tHead; uniform sampler2D tGene; uniform sampler2D tTgt;
-uniform float uList, uTgtAsp, uPass, uReset, uSpeed, uVisc, uTheta0, uLRep, uRRep, uLMovMin, uLMovMax, uRMovMin, uRMovMax, uSeed, uN, uAngZ, uRepo;
+uniform float uList, uTgtAsp, uTgtW, uTgtDX, uTgtDY, uPass, uReset, uSpeed, uVisc, uTheta0, uLRep, uRRep, uLMovMin, uLMovMax, uRMovMin, uRMovMax, uSeed, uN, uAngZ, uRepo;
 varying vec2 vUv;
 float h(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 vec4 outp(vec3 p, float w, float th, float ph) { return uPass < 0.5 ? vec4(p, w) : vec4(th, ph, 0.0, 0.0); }
 vec3 lugar() {                                     // lugar de reposo: el punto de la lista (y × 1/aspecto) o el de grilla
-  if (uList > 0.5) { vec4 t = texture2D(tTgt, vUv); if (t.a > 0.25) return vec3(t.x, t.y * uTgtAsp, 0.0); }
+  if (uList > 0.5) { vec4 t = texture2D(tTgt, vUv); if (t.a > 0.25) return vec3(t.x * uTgtW + uTgtDX, t.y * uTgtAsp + uTgtDY, 0.0); }
   return vec3(vUv - 0.5, 0.0);
 }
 void main() {
@@ -412,7 +413,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
         this.stateMat = mk(STATE_FS, { tState: { value: null }, tGene: { value: null }, uInc: { value: 0.05 }, uReset: { value: 0 } });
         const mu: any = { tState: { value: null }, tMotion: { value: null }, tHead: { value: null }, tGene: { value: null } };
         mu.tTgt = { value: null };
-        for (const n of ["uList", "uTgtAsp", "uPass", "uAngZ", "uRepo", "uReset", "uSpeed", "uVisc", "uTheta0", "uLRep", "uRRep", "uLMovMin", "uLMovMax", "uRMovMin", "uRMovMax", "uSeed", "uN"]) mu[n] = { value: 0 };
+        for (const n of ["uList", "uTgtAsp", "uTgtW", "uTgtDX", "uTgtDY", "uPass", "uAngZ", "uRepo", "uReset", "uSpeed", "uVisc", "uTheta0", "uLRep", "uRRep", "uLMovMin", "uLMovMax", "uRMovMin", "uRMovMax", "uSeed", "uN"]) mu[n] = { value: 0 };
         this.motionMat = mk(MOTION_FS, mu);
         this.simMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), this.stateMat);
         this.simMesh.frustumCulled = false; this.simScene.add(this.simMesh);
@@ -546,7 +547,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     su.tState.value = this.stateRT[a].texture; su.uInc.value = P.inc; su.uReset.value = reset ? 1 : 0;
     this.simMesh.material = this.stateMat; R.setRenderTarget(this.stateRT[b]); R.render(this.simScene, this.simCam);
     mu.tState.value = this.stateRT[b].texture; mu.tMotion.value = this.motionRT[a].texture; mu.tHead.value = this.headRT[a].texture;
-    mu.uAngZ.value = P.angZ; mu.uRepo.value = P.repo; mu.uList.value = this.U.uList.value; mu.uTgtAsp.value = this.tgtAsp;
+    mu.uAngZ.value = P.angZ; mu.uRepo.value = P.repo; mu.uList.value = this.U.uList.value; mu.uTgtAsp.value = this.tgtAsp; mu.uTgtW.value = this.tgtW; mu.uTgtDX.value = this.tgtDX; mu.uTgtDY.value = this.tgtDY;
     mu.uReset.value = reset ? 1 : 0; mu.uSpeed.value = P.speed; mu.uVisc.value = P.visc; mu.uTheta0.value = P.theta0;
     mu.uLRep.value = P.lRep; mu.uRRep.value = P.rRep; mu.uLMovMin.value = P.lMovMin; mu.uLMovMax.value = P.lMovMax;
     mu.uRMovMin.value = P.rMovMin; mu.uRMovMax.value = P.rMovMax; mu.uSeed.value = (this.pasos % 997) * 1.618; mu.uN.value = this.N;
@@ -599,12 +600,14 @@ export class moEffectParticlesFractal extends MO.moEffect {
   /** lugar de reposo de la célula k (lo mismo que lugar() del MOTION_FS): punto de la lista o lugar de grilla */
   private lugarCPU(k: number): number[] {
     const N = this.N, t = this.tgt;
-    if (this.U.uList.value > 0.5 && t[k * 4 + 3] > 0.25) return [t[k * 4], t[k * 4 + 1] * this.tgtAsp, 0];
+    if (this.U.uList.value > 0.5 && t[k * 4 + 3] > 0.25) return [t[k * 4] * this.tgtW + this.tgtDX, t[k * 4 + 1] * this.tgtAsp + this.tgtDY, 0];
     return [((k % N) + 0.5) / N - 0.5, (Math.floor(k / N) + 0.5) / N - 0.5, 0];
   }
 
   // ---------------------------------------------------------------- lista `puntos` (lugares de reposo dados)
-  private tgtAsp = 1;
+  /** lugar en el mundo = (x·tgtW + tgtDX, y·tgtAsp + tgtDY): estirar (W 1, Asp alto/ancho, sin corrimiento) o, con `ajuste` 1,
+   *  el MISMO cuadro que `image` con ajuste 1 (moCubrir con el aspecto de `size` del .json) ⇒ las luces caen sobre su capa. */
+  private tgtAsp = 1; private tgtW = 1; private tgtDX = 0; private tgtDY = 0; private listaAsp = 0;
   /** texto del param `puntos` (TEXT) o "" */
   private puntosTxt(): string {
     if (!this.has("puntos")) return "";
@@ -622,6 +625,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
       if (this.listaUrl != url) return;
       const arr: any[] = Array.isArray(j) ? j : (j.luces || j.puntos || []);
       const sz: number[] = !Array.isArray(j) && j.size ? j.size : [1, 1];
+      this.listaAsp = sz[1] > 0 ? sz[0] / sz[1] : 0;
       const nrm = (q: any) => [Number(q[0]) / sz[0] - 0.5, 0.5 - Number(q[1]) / sz[1]];   // px (y hacia abajo) ⇒ x∈[−½,½], y hacia arriba
       const pts = arr.filter((q) => q && q.length >= 2 && isFinite(+q[0]) && isFinite(+q[1])).map(nrm);
       const semilla = !Array.isArray(j) && j.semilla ? nrm(j.semilla) : null;
@@ -778,7 +782,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
       const x = px + mo[k * 4] * e, y = py + mo[k * 4 + 1] * e;          // mundo (ortográfica: x ∈ [−½,½], y ∈ ±½/aspecto)
       const w = 0.5 + 0.5 * Math.sin(U.uTPh.value + this.fase[k]);
       items.push({ k, rango: this.rango[k], x: (x + 0.5) * rs.x, y: (0.5 - y * asp) * rs.y,
-        u: mo[k * 4] + 0.5, v: 0.5 - mo[k * 4 + 1] * asp, b: 1 - U.uTit.value + U.uTit.value * w,
+        u: (mo[k * 4] - this.tgtDX) / this.tgtW + 0.5, v: 0.5 - (mo[k * 4 + 1] - this.tgtDY) / this.tgtAsp, b: 1 - U.uTit.value + U.uTit.value * w,
         lugar: lst ? [this.tgt[k * 4] + 0.5, 0.5 - this.tgt[k * 4 + 1]] : null });
     }
     return { modo: this.modo, N: this.N, lista: lst ? this.listaN : 0, puntos: this.listaUrl, titila: U.uTit.value, glow: U.uGlow.value,
@@ -793,7 +797,10 @@ export class moEffectParticlesFractal extends MO.moEffect {
     const N = this.gridN();
     if (!this.Scene || N != this.N || (this.forceCPU && this.modo == "gpu")) this.setup(R, N);
     this.readParams();
-    { const rs0 = new THREE.Vector2(); R.getSize(rs0); this.tgtAsp = rs0.y > 0 ? rs0.y / rs0.x : 1; }   // y del lugar × 1/aspecto (como image)
+    { const rs0 = new THREE.Vector2(); R.getSize(rs0); const P = rs0.y > 0 ? rs0.x / rs0.y : 1;   // como image: estira (y × 1/aspecto) o cubre
+      const cub = this.has("ajuste") && this.num("ajuste", 0) > 0.5 && this.listaAsp > 0
+        ? moCubrir(P, this.listaAsp, this.num("ancla_x", 0.5), this.num("ancla_y", 0.5)) : { w: 1, h: 1 / P, dx: 0, dy: 0 };
+      this.tgtW = cub.w; this.tgtAsp = cub.h; this.tgtDX = cub.dx; this.tgtDY = cub.dy; }
     const pu = this.puntosTxt();
     if (pu != this.listaUrl) this.cargarLista(pu);
     this.aplicarLista();
@@ -821,7 +828,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     U.uForma.value = forma; U.uDisp.value = this.num("dispersion", 0.25); U.uSize.value = Math.max(0.5, this.num("tamano", 4));
     // tamano_rel > 0: diámetro como fracción del ANCHO del lienzo × escala (sigue al lienzo y a la capa, como un nodo dibujado)
     const tRel = this.num("tamano_rel", 0);
-    if (tRel > 0) { const cw = (R.domElement && R.domElement.width) || 1280; U.uSize.value = Math.max(0.5, tRel * cw * U.uEsc.value); }
+    if (tRel > 0) { const cw = (R.domElement && R.domElement.width) || 1280; U.uSize.value = Math.max(0.5, tRel * cw * U.uEsc.value * this.tgtW); }   // × ancho del cuadro (cubrir: la capa es más ancha que el lienzo)
     U.uColor.value.setRGB(rgb.r, rgb.g, rgb.b); U.uAlpha.value = alpha;
     U.uTit.value = this.P.tit; U.uTPh.value = this.tph % (Math.PI * 2000); U.uGlow.value = this.P.glow;
     const altTx = this.texParam("texture_altitude"), medTx = this.texParam("texture_medium");

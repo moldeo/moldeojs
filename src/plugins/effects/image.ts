@@ -1,5 +1,6 @@
 import * as MO from "moldeojs";
 import { moCacheBust } from "../../app/mo-cache-bust";
+import { moCubrir } from "../../app/mo-cover";
 import * as THREE from "three";
 
 export enum moImageParamIndex {
@@ -84,6 +85,7 @@ export class moEffectImage extends MO.moEffect {
     ///MESH GEOMETRY
     if (this.Plane == undefined) {
       this.Plane = new MO.moPlaneGeometry( 1.0, 1.0/this.RM.Proportion(), 1, 1 );
+      this.planeP0 = this.RM.Proportion();
     }
 
     ///MESH MODEL
@@ -91,16 +93,14 @@ export class moEffectImage extends MO.moEffect {
       this.Model = new MO.moGLMatrixf().MakeIdentity();
 
     if (this.Model) {
-      this.Model.Scale(
-        this.m_Config.Eval("anc_cuad_x"),
-        this.m_Config.Eval("alt_cuad_y"),
-      1.0);
-      //console.log("this.m_Config.Eval(anc_cuad_x)",
-      //  this.m_Config.Eval("anc_cuad_x"),
-      //  this.m_Config.Eval("alt_cuad_y"));
+      const anc = Number(this.m_Config.Eval("anc_cuad_x")), alt = Number(this.m_Config.Eval("alt_cuad_y"));
+      const c = this.Cubrir();
+      // ajuste 0 (default) = como siempre: el plano estira la textura al lienzo. ajuste 1 = cubrir sin deformar (ver mo-cover.ts);
+      // el corrimiento del ancla se escala con anc/alt igual que en particlesfractal (mundo = escala·(cuadro) + pos).
+      this.Model.Scale(anc * (c ? c.w : 1), alt * (c ? c.h * this.planeP0 : 1), 1.0);
       this.Model.Translate(
-          this.m_Config.Eval("pos_cuad_x"),
-          this.m_Config.Eval("pos_cuad_y"),
+          Number(this.m_Config.Eval("pos_cuad_x")) + (c ? anc * c.dx : 0),
+          Number(this.m_Config.Eval("pos_cuad_y")) + (c ? alt * c.dy : 0),
           0.0);
     }
     //console.log(this.Model);
@@ -139,6 +139,23 @@ export class moEffectImage extends MO.moEffect {
 
     this.EndDraw();
 
+  }
+
+  /**
+   * L07 (FCA 18-nov) — «ajuste»: params OPCIONALES del image (si no están, nada cambia).
+   *   ajuste  (FUNCTION) 0 = estirar al lienzo (lo de siempre) · 1 = cubrir (cover) conservando el aspecto de la textura
+   *   ancla_x / ancla_y (FUNCTION 0..1, default ½) — qué parte de la imagen se conserva cuando sobra (0 = izq./arriba)
+   * Devuelve el cuadro en el mundo (moCubrir) o null si estira.
+   */
+  private planeP0 = 1;
+  private Cubrir(): { w: number, h: number, dx: number, dy: number } {
+    const byName = this.m_Config.m_ParamsByName;
+    if (!byName || !byName["ajuste"] || !(Number(this.m_Config.Eval("ajuste")) > 0.5)) return null;
+    const img: any = this.Mat && this.Mat.map && this.Mat.map.image;
+    const iw = img && (img.videoWidth || img.naturalWidth || img.width), ih = img && (img.videoHeight || img.naturalHeight || img.height);
+    if (!(iw > 0 && ih > 0)) return null;
+    const ax = byName["ancla_x"] ? Number(this.m_Config.Eval("ancla_x")) : 0.5, ay = byName["ancla_y"] ? Number(this.m_Config.Eval("ancla_y")) : 0.5;
+    return moCubrir(this.RM.Proportion(), iw / ih, ax, ay);
   }
 
   /**
