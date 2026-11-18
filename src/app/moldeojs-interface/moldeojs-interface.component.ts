@@ -77,6 +77,21 @@ export class MoldeojsInterfaceComponent implements OnInit {
   @ViewChild('moConfig') moConfig: ElementRef;
   public moEditDisplay:boolean = false;
   /** FCA 18-nov: el grafo de cajas (.cfg) es PARÁMETRO, oculto por defecto; Edit = sólo tocar/mover. Se ve con ?grafo=1 o la tecla G en modo edición */
+  /** PX (FCA 18-nov): si el proyecto trae un MOB `escena`, sus params (parallax, respira) se editan en vivo desde la barra */
+  public escenaFx: any = null;
+  public escenaVals: any = { parallax: 1, respira: 1 };
+  public readEscena(): void {
+    if (!this.escenaFx) return;
+    for (const n of Object.keys(this.escenaVals)) { try { const v = Number(this.escenaFx.GetConfig().Eval(n)); if (!isNaN(v)) this.escenaVals[n] = v; } catch (x) {} }
+    setTimeout(() => { try { this.appRef.tick(); } catch (x) {} });   /* el atajo Ctrl+Z llega por fuera de la zona de Angular */
+  }
+  public setEscena(n: string, v: any, start: boolean = false): void {
+    if (!this.escenaFx || !this.touchEdit) return;
+    const x = Number(v); if (isNaN(x)) return;
+    if (start && this.history) this.history.record(this.escenaFx, "escena " + n);
+    this.touchEdit.setNumber(this.escenaFx, n, x, 0);
+    this.escenaVals[n] = x;
+  }
   public graphView: boolean = (() => { try { return new URLSearchParams(window.location.search).get("grafo") == "1"; } catch (x) { return false; } })();
   public touchEdit: moTouchEdit = null;
   public presetWheel: moPresetWheel = null;
@@ -91,12 +106,12 @@ export class MoldeojsInterfaceComponent implements OnInit {
   public doUndo(): void {
     if (this.channel) this.channel.send({ verb: "undo" });
     const w = this.history.undo();
-    if (w) { this.undoLabel = "↶ " + w; if (this.touchEdit) this.touchEdit.log("undo", { what: w }); if (this.presetWheel) this.presetWheel.render(); if (this.paramsSphere) this.paramsSphere.render(); setTimeout(() => this.undoLabel = "", 2000); }
+    if (w) { this.undoLabel = "↶ " + w; if (this.touchEdit) this.touchEdit.log("undo", { what: w }); if (this.presetWheel) this.presetWheel.render(); if (this.paramsSphere) this.paramsSphere.render(); this.readEscena(); setTimeout(() => this.undoLabel = "", 2000); }
   }
   public doRedo(): void {
     if (this.channel) this.channel.send({ verb: "redo" });
     const w = this.history.redo();
-    if (w) { this.undoLabel = "↷ " + w; if (this.touchEdit) this.touchEdit.log("redo", { what: w }); if (this.presetWheel) this.presetWheel.render(); if (this.paramsSphere) this.paramsSphere.render(); setTimeout(() => this.undoLabel = "", 2000); }
+    if (w) { this.undoLabel = "↷ " + w; if (this.touchEdit) this.touchEdit.log("redo", { what: w }); if (this.presetWheel) this.presetWheel.render(); if (this.paramsSphere) this.paramsSphere.render(); this.readEscena(); setTimeout(() => this.undoLabel = "", 2000); }
   }
   /** #918 L2 — ?save=<ruta del Lab> ⇒ botón Guardar: manda el XML de la consola y de cada .cfg */
   public saveUrl: string = (() => { try { const v = new URLSearchParams(window.location.search).get("save");
@@ -593,6 +608,8 @@ export class MoldeojsInterfaceComponent implements OnInit {
     this.m_Console = this.moldeojsview.GetConsole();
     /* #918 P8: las capas se pueden leer desde expresiones: sol.pos_cuad_y */
     moSetObjectScope(this.m_Console.m_EffectManager.m_AllEffects);
+    this.escenaFx = this.m_Console.m_EffectManager.m_AllEffects.find((e: any) => ("" + e.GetLabelName()) == "escena") || null;
+    this.readEscena();
     /* #918 E1: tocar/arrastrar capas sobre la pantalla en modo edición */
     if (!this.touchEdit) {
       this.touchEdit = new moTouchEdit(this.m_Console, () => [this.moCanvas && this.moCanvas.nativeElement]);

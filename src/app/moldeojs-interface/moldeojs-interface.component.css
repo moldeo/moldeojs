@@ -510,3 +510,12 @@ h3{
 .moVersionRow{ display:flex; align-items:center; gap:8px; padding:6px 0; border-top:1px solid #333; }
 .moVersionNum{ font-weight:bold; min-width:34px; }
 .moVersionInfo{ flex:1; line-height:1.25; }
+.moEscena{
+  float:left;
+  margin:8px 10px 0 0;
+  color:#eee;
+  font:bold 12px monospace;
+}
+.moEscena label{ margin-right:12px; }
+.moEscena input{ width:110px; vertical-align:middle; accent-color:#ff8a00; }
+.moEscena b{ display:inline-block; width:34px; }

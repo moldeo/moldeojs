@@ -33,6 +33,11 @@
   <div class="moldeoicon"></div>
   <div class="moldeofile">{{moFileName}}</div>
   <button class="moldeobutton" [class.moEditing]="moEditDisplay" (click)="showmoEditView();" type="button" name="moButton" [title]="moEditDisplay ? 'Editando: tocá y mové los objetos (clic para salir)' : 'Entrar en modo edición'">{{ moEditDisplay ? 'Editando' : 'Edit' }}</button>
+  <span *ngIf="escenaFx" class="moEscena" title="Parámetros del proyecto (MOB escena): valen para todas las capas">
+    <label *ngFor="let n of ['parallax','respira']">{{ n }}
+      <input type="range" min="0" max="2" step="0.05" [value]="escenaVals[n]" (pointerdown)="setEscena(n, escenaVals[n], true)" (input)="setEscena(n, $event.target.value)" [attr.name]="'escena_' + n">
+      <b>{{ escenaVals[n] | number:'1.2-2' }}</b></label>
+  </span>
   <button class="moldeobutton" (click)="showmoControlView();" type="button" name="moButton" title="Moldeojs Control View">Control</button>
   <button class="moldeobutton" type="button" name="auto" title="Auto Layout" (click)="autoLayout()">auto</button>
   <button class="moldeobutton" type="button" name="undo" title="Deshacer (Ctrl+Z)" [disabled]="!history.canUndo()" (click)="doUndo()">↶</button>
