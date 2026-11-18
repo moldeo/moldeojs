@@ -5,6 +5,7 @@ import { moAbstract } from "./mo-abstract";
 import { moText, moText0, moTextArray } from "./mo-text";
 import { NULL, MOlong, MOint, MOulong, MOuint, MOfloat, MOdouble, MOubyte } from "./mo-types";
 import { moResource } from "./mo-resource";
+import { moCacheBust } from "./mo-cache-bust";
 
 export const FS : any = window["fs"];
 export const EXEDIR = (window["__dirname"]==undefined)? "" : window["__dirname"];
@@ -304,7 +305,7 @@ export class moFile extends moAbstract {
 		//console.log("Loading url with http get and subscribe:",fullget);
 		try {
 			//console.log("fullget",fullget);
-    	var request_get = this.m_FileManager.GetHttp().get(  fullget+"?rd="+(Math.random()*1000000000), {
+    	var request_get = this.m_FileManager.GetHttp().get(  moCacheBust(fullget+"?rd="+(Math.random()*1000000000)), {
 				//headers: undefined,
 				//params: undefined,
 				responseType: 'text',
@@ -716,7 +717,7 @@ export class moFileManager extends moResource {
 		//console.log("Loading url with http get and subscribe:",fullget);
 		try {
 			//console.log("fullget",fullget);
-    	this.http.get(  fullget+"?rd="+(Math.random()*1000000000), {
+    	this.http.get(  moCacheBust(fullget+"?rd="+(Math.random()*1000000000)), {
 				//headers: undefined,
 				//params: undefined,
 				responseType: 'text',

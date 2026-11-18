@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { moCacheBust } from "./mo-cache-bust";
 import Texture = THREE.Texture;
 import TextureLoader = THREE.TextureLoader;
 
@@ -76,7 +77,7 @@ export class moTexture extends moAbstract {
 
   BuildFromFile( p_fullfilename: moText, p_textureloader: TextureLoader, p_callback?:any  ): boolean {
     //console.log("moTexture.BuildFromFile >", p_fullfilename);
-    this._texture = p_textureloader.load("" + p_fullfilename, (texture) => {
+    this._texture = p_textureloader.load(moCacheBust("" + p_fullfilename), (texture) => {
       this.m_width = texture.image.width;
       this.m_height = texture.image.height;
       if (this.m_pFileMan) this.m_File = this.m_pFileMan.GetFile(p_fullfilename);

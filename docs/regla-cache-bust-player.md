@@ -25,9 +25,13 @@ Con la misma URL, el navegador muestra la versión vieja durante horas aunque el
 imagen del hero de la landing Forest (server sirviendo la nueva, FCA viendo la vieja).
 
 ## Alcance y pendiente técnico
-- El `seed`/`v` en la URL del iframe invalida `index.html`. ⚠️ Para que TAMBIÉN se renueven el `.mol`, los `.cfg` y las texturas, el
-  player tiene que propagar `seed`/`v` a sus propias descargas (agregarlos como query a cada fetch del proyecto). Hasta que eso esté,
-  además del seed en la URL, cambiar el nombre/ruta del proyecto o forzar recarga. Tarea abierta en moldeojs (ver plan Moldeo 2.0).
+- ✅ **Hecho (18-nov, RC2):** el player propaga `seed`/`v` de su URL a TODAS las descargas del proyecto desde UN solo helper,
+  `src/app/mo-cache-bust.ts` (`moCacheBust(url)`): `moFileManager.Load` (.mol/.cfg), `moTexture.BuildFromFile` (imágenes),
+  video del effect image, json de particlesfractal, `tomas.take.json`, y `loadNewMol`/`loadCFG` del editor. **Una descarga nueva del
+  proyecto tiene que pasar por `moCacheBust`.** Sin `seed`/`v` en la URL, la URL queda igual que antes.
+- ✅ **Hecho (18-nov, RC3):** el Lab arma seed/v solo — `/e/<slug>` y el hero `hero_mode = mol` de Folio: `seed` = huella de los archivos
+  del proyecto (cambia al subir zip / Guardar), `v` = versión instalada de odoo_moldeo_lab. Un seed/v puesto a mano en la URL guardada
+  se REEMPLAZA por el automático (uno a mano envejece y congela el caché).
 - Lo mismo vale para imágenes servidas con caché larga que se reemplazan en el mismo id (p. ej. `/ocapi/pub/<id>/hero` ⇒ `?v=<checksum>`).
 
 ## Dónde se aplica

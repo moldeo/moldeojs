@@ -1,4 +1,5 @@
 import * as MO from "moldeojs";
+import { moCacheBust } from "../../app/mo-cache-bust";
 import * as THREE from "three";
 
 export enum moImageParamIndex {
@@ -188,7 +189,7 @@ export class moEffectImage extends MO.moEffect {
       try { const mol = new URLSearchParams(window.location.search).get("mol") || ""; base = mol.replace(/[^\/]*$/, ""); } catch (e) {}
       const v = document.createElement("video");
       v.muted = true; (v as any).playsInline = true; v.loop = false; v.preload = "auto"; v.crossOrigin = "anonymous";
-      v.setAttribute("playsinline", ""); v.src = base + name;
+      v.setAttribute("playsinline", ""); v.src = moCacheBust(base + name);
       this.vid = v;
       this.vtex = new THREE.VideoTexture(v);
       this.vtex.minFilter = THREE.LinearFilter; this.vtex.magFilter = THREE.LinearFilter;

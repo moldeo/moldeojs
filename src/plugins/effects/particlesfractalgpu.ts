@@ -1,5 +1,6 @@
 import * as MO from "moldeojs";
 import * as THREE from "three";
+import { moCacheBust } from "../../app/mo-cache-bust";
 
 /**
  * particlesfractal — port del plugin ParticlesFractal de Moldeo (C++/OpenGL) a moldeojs (three r110, WebGL1). FASE 1.
@@ -617,7 +618,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     if (!url) return;
     let base = ""; try { base = "" + this.m_pResourceManager.GetDataMan().GetDataPath(); } catch (e) {}
     const full = /^(https?:)?\/\//.test(url) || url[0] == "/" ? url : base + url;
-    fetch(full, { cache: "no-cache" }).then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }).then((j: any) => {
+    fetch(moCacheBust(full), { cache: "no-cache" }).then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }).then((j: any) => {
       if (this.listaUrl != url) return;
       const arr: any[] = Array.isArray(j) ? j : (j.luces || j.puntos || []);
       const sz: number[] = !Array.isArray(j) && j.size ? j.size : [1, 1];
