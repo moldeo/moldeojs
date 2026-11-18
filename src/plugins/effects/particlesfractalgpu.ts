@@ -19,7 +19,8 @@ import * as THREE from "three";
  * ESTADO EN GPU (texturas float N×N, ping-pong A/B con WebGLRenderTarget a mano — orden explícito: el motionShader lee el
  * estado de ESTE paso, cosa que GPUComputationRenderer no permite):
  *   tState  = (generación [entera], madurez, rol 0 nonato · 1 nacido/izq · 2 renacido/der, evento del paso 0 · 1 nació · 2 dividió)
- *   tMotion = (x, y, rumbo θ [rad], factor de velocidad [viscosity lo frena])
+ *   tMotion = (x, y, z, factor de velocidad [viscosity lo frena])
+ *   tHead   = (rumbo θ [rad], elevación φ [rad], 0, 0) — Fase 3D (18-nov): el plano de división gira `angulo_z` por generación
  *   tGene   = (u padre, v padre, generación de nacimiento, 1 si es la semilla) — CONSTANTE, calculada UNA vez en JS
  *             (WebGL1 / GLSL ES 1.0 no tiene operadores de bits ⇒ whereIsMyFather va en JS: pfGenealogia()).
  * La condición de nacimiento del original (GenSon/2 + scale == n−1 | n, Birth.glsl:146-185) es equivalente a
@@ -37,6 +38,9 @@ import * as THREE from "three";
  *   niveles (⇒ N = 2^ceil(niveles/2)), angulo (grados ⇒ ambos rep_angle), largo (⇒ randomvelocity tal que el largo de rama ≈
  *   largo), balanceo (grados: asimetría izq/der), forma (0 nube de partículas ⇄ 1 árbol con líneas), dispersion (radio de la
  *   nube), crece (ritmo de la simulación: 0 = quieto, 1 = 60 pasos/s), lineas, tamano, pos_x, pos_y, escala.
+ *   3D: angulo_z (grados que gira el PLANO de división en cada generación; default 90 si `orbita` está activa, si no 0 =
+ *   árbol plano de Fase 1), orbita (1 = cámara orbital propia: arrastrar con el botón izquierdo rota yaw/pitch con inercia,
+ *   rueda = zoom 0.25..8, doble clic = vista inicial; no actúa en modo Edit del touchEdit ni sobre la interfaz).
  *
  * NO PORTADO EN FASE 1 (queda para Fase 2/3/4, ver el doc §6.3): física 3D (gravity, attractor*, randommotion, flow_*), emisores
  * (emittertype), texturas de medio, sprites/quads (geometry_mode 2/3), color/escala por célula, genoma CellCode. El original
@@ -81,28 +85,34 @@ void main() {
   else gl_FragColor = vec4(s.r, s.g + uInc, s.b, 0.0);                               // maduración / migración
 }`;
 
-/** Velocity.bk + Position.bk simplificados a 2D: (x, y, θ, factor de velocidad) */
+/** Velocity.bk + Position.bk en 3D. Dos pasadas del MISMO shader (uPass) leyendo el estado anterior:
+ *  pasada 0 ⇒ tMotion = (x, y, z, factor de velocidad) · pasada 1 ⇒ tHead = (rumbo θ, elevación φ, 0, 0).
+ *  El PLANO DE DIVISIÓN gira con la generación: ψ = (gen−1)·uAngZ; el giro ±rep_angle se reparte en θ·cosψ + φ·sinψ
+ *  (uAngZ = 0 ⇒ ψ = 0 ⇒ el árbol plano de Fase 1, idéntico). La primera división (gen 1) queda siempre en el plano. */
 const MOTION_FS = `
-uniform sampler2D tState; uniform sampler2D tMotion; uniform sampler2D tGene;
-uniform float uReset, uSpeed, uVisc, uTheta0, uLRep, uRRep, uLMovMin, uLMovMax, uRMovMin, uRMovMax, uSeed, uN;
+uniform sampler2D tState; uniform sampler2D tMotion; uniform sampler2D tHead; uniform sampler2D tGene;
+uniform float uPass, uReset, uSpeed, uVisc, uTheta0, uLRep, uRRep, uLMovMin, uLMovMax, uRMovMin, uRMovMax, uSeed, uN, uAngZ;
 varying vec2 vUv;
 float h(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+vec4 outp(vec3 p, float w, float th, float ph) { return uPass < 0.5 ? vec4(p, w) : vec4(th, ph, 0.0, 0.0); }
 void main() {
   vec4 s = texture2D(tState, vUv);                 // estado de ESTE paso
-  if (uReset > 0.5 || s.b < 0.5) { gl_FragColor = vec4(0.0, 0.0, uTheta0, 0.0); return; }
-  vec4 m = texture2D(tMotion, vUv);
+  if (uReset > 0.5 || s.b < 0.5) { gl_FragColor = outp(vec3(0.0), 0.0, uTheta0, 0.0); return; }
+  vec4 m = texture2D(tMotion, vUv); vec4 hd = texture2D(tHead, vUv);
+  float psi = max(s.r - 1.0, 0.0) * uAngZ; vec2 pl = vec2(cos(psi), sin(psi));
   if (s.a > 0.5 && s.a < 1.5) {                    // recién nacida
     vec4 g = texture2D(tGene, vUv);
-    if (g.a > 0.5) { gl_FragColor = vec4(0.0, 0.0, uTheta0, 1.0); return; }        // la semilla: velocidad inicial
-    vec4 f = texture2D(tMotion, g.rg);             // nace en la posición del padre, con su velocidad girada +left_rep_angle
-    gl_FragColor = vec4(f.xy, f.z + uLRep, f.w); return;
+    if (g.a > 0.5) { gl_FragColor = outp(vec3(0.0), 1.0, uTheta0, 0.0); return; }   // la semilla: velocidad inicial
+    vec4 f = texture2D(tMotion, g.rg); vec4 fh = texture2D(tHead, g.rg);  // nace en la posición del padre, girada +left_rep_angle
+    gl_FragColor = outp(f.xyz, f.w, fh.x + uLRep * pl.x, fh.y + uLRep * pl.y); return;
   }
-  if (s.a > 1.5) { gl_FragColor = vec4(m.xy, m.z - uRRep, m.w); return; }          // se dividió: gira −right_rep_angle, queda
+  if (s.a > 1.5) { gl_FragColor = outp(m.xyz, m.w, hd.x - uRRep * pl.x, hd.y - uRRep * pl.y); return; }  // se dividió: −right_rep_angle
   float r = h(vUv * uN + vec2(uSeed, uSeed * 0.37));
-  m.z += s.b < 1.5 ? mix(uLMovMin, uLMovMax, r) : mix(uRMovMin, uRMovMax, r);    // serpenteo
+  float d = s.b < 1.5 ? mix(uLMovMin, uLMovMax, r) : mix(uRMovMin, uRMovMax, r);    // serpenteo (en el plano de su división)
+  hd.x += d * pl.x; hd.y += d * pl.y;
   m.w *= (1.0 - uVisc);
-  m.xy += uSpeed * m.w * vec2(cos(m.z), sin(m.z));
-  gl_FragColor = m;
+  m.xyz += uSpeed * m.w * vec3(cos(hd.y) * cos(hd.x), cos(hd.y) * sin(hd.x), sin(hd.y));
+  gl_FragColor = outp(m.xyz, m.w, hd.x, hd.y);
 }`;
 
 const DRAW_VS = `
@@ -110,18 +120,18 @@ uniform sampler2D tMotion; uniform sampler2D tState;
 uniform vec2 uPos; uniform float uEsc, uForma, uDisp, uSize;
 attribute vec2 aRef; attribute vec2 aCell; attribute vec2 aCloud;
 #ifdef PF_CPU
-attribute vec3 aMot;
+attribute vec4 aMot;
 #endif
 varying float vAlive;
 void main() {
 #ifdef PF_CPU
-  vec2 tree = aMot.xy; float alive = aMot.z;
+  vec3 tree = aMot.xyz; float alive = aMot.w;
 #else
-  vec2 tree = texture2D(tMotion, aRef).xy; float alive = step(0.5, texture2D(tState, aCell).b);
+  vec3 tree = texture2D(tMotion, aRef).xyz; float alive = step(0.5, texture2D(tState, aCell).b);
 #endif
-  vec2 p = uPos + mix(aCloud * uDisp, tree, uForma) * uEsc;
+  vec3 p = vec3(uPos, 0.0) + mix(vec3(aCloud * uDisp, 0.0), tree, uForma) * uEsc;
   vAlive = alive;
-  gl_Position = alive > 0.5 ? projectionMatrix * modelViewMatrix * vec4(p, 0.0, 1.0) : vec4(2.0, 2.0, 2.0, 1.0);
+  gl_Position = alive > 0.5 ? projectionMatrix * modelViewMatrix * vec4(p, 1.0) : vec4(2.0, 2.0, 2.0, 1.0);
   gl_PointSize = uSize;
 }`;
 
@@ -161,11 +171,12 @@ export class moEffectParticlesFractal extends MO.moEffect {
   private gene: { fi: Int32Array, fj: Int32Array, gb: Int32Array, K: number };
   private R: any;
   // GPU
-  private stateRT: any[] = []; private motionRT: any[] = []; private ic = 0;
+  private stateRT: any[] = []; private motionRT: any[] = []; private headRT: any[] = []; private ic = 0;
   private geneTex: any; private simScene: any; private simCam: any; private simMesh: any;
   private stateMat: any; private motionMat: any;
   // CPU
   private cS: Float32Array; private cS2: Float32Array; private cM: Float32Array; private cM2: Float32Array;
+  private cH: Float32Array; private cH2: Float32Array;
   // render
   private pts: any; private lines: any; private pMat: any; private lMat: any;
   private acc = 0; private lastT = 0; private lastDur = -1; private needReset = true;
@@ -227,8 +238,8 @@ export class moEffectParticlesFractal extends MO.moEffect {
   }
 
   private dispose() {
-    for (const rt of this.stateRT.concat(this.motionRT)) rt.dispose();
-    this.stateRT = []; this.motionRT = [];
+    for (const rt of this.stateRT.concat(this.motionRT, this.headRT)) rt.dispose();
+    this.stateRT = []; this.motionRT = []; this.headRT = [];
     if (this.geneTex) this.geneTex.dispose();
     for (const o of [this.pts, this.lines]) if (o) { o.geometry.dispose(); o.material.dispose(); }
     this.pts = this.lines = null;
@@ -253,7 +264,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     for (let k = 0; k < N2; k++) { const r = Math.sqrt(rnd()), th = rnd() * Math.PI * 2; cloud[k * 2] = Math.cos(th) * r; cloud[k * 2 + 1] = Math.sin(th) * r; }
 
     if (gpu) {
-      for (let i = 0; i < 2; i++) { this.stateRT.push(this.makeRT(N)); this.motionRT.push(this.makeRT(N)); }
+      for (let i = 0; i < 2; i++) { this.stateRT.push(this.makeRT(N)); this.motionRT.push(this.makeRT(N)); this.headRT.push(this.makeRT(N)); }
       const gd = new Float32Array(N2 * 4);
       for (let k = 0; k < N2; k++) { const f = uvF(k); gd[k * 4] = f[0]; gd[k * 4 + 1] = f[1]; gd[k * 4 + 2] = gene.gb[k]; gd[k * 4 + 3] = k == 0 ? 1 : 0; }
       this.geneTex = new THREE.DataTexture(gd, N, N, THREE.RGBAFormat, THREE.FloatType);
@@ -262,8 +273,8 @@ export class moEffectParticlesFractal extends MO.moEffect {
         this.simScene = new THREE.Scene(); this.simCam = new THREE.Camera();
         const mk = (fs: string, u: any) => new THREE.ShaderMaterial({ vertexShader: SIM_VS, fragmentShader: fs, uniforms: u, depthTest: false, depthWrite: false, blending: THREE.NoBlending });
         this.stateMat = mk(STATE_FS, { tState: { value: null }, tGene: { value: null }, uInc: { value: 0.05 }, uReset: { value: 0 } });
-        const mu: any = { tState: { value: null }, tMotion: { value: null }, tGene: { value: null } };
-        for (const n of ["uReset", "uSpeed", "uVisc", "uTheta0", "uLRep", "uRRep", "uLMovMin", "uLMovMax", "uRMovMin", "uRMovMax", "uSeed", "uN"]) mu[n] = { value: 0 };
+        const mu: any = { tState: { value: null }, tMotion: { value: null }, tHead: { value: null }, tGene: { value: null } };
+        for (const n of ["uPass", "uAngZ", "uReset", "uSpeed", "uVisc", "uTheta0", "uLRep", "uRRep", "uLMovMin", "uLMovMax", "uRMovMin", "uRMovMax", "uSeed", "uN"]) mu[n] = { value: 0 };
         this.motionMat = mk(MOTION_FS, mu);
         this.simMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), this.stateMat);
         this.simMesh.frustumCulled = false; this.simScene.add(this.simMesh);
@@ -272,6 +283,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     } else {
       this.cS = new Float32Array(N2 * 4); this.cS2 = new Float32Array(N2 * 4);
       this.cM = new Float32Array(N2 * 4); this.cM2 = new Float32Array(N2 * 4);
+      this.cH = new Float32Array(N2 * 2); this.cH2 = new Float32Array(N2 * 2);
     }
 
     // ---- render: puntos (una célula = un punto) + líneas (hijo → padre, 2 vértices por célula salvo la semilla)
@@ -291,7 +303,7 @@ export class moEffectParticlesFractal extends MO.moEffect {
     pg.setAttribute("aRef", new THREE.BufferAttribute(pRef, 2));
     pg.setAttribute("aCell", new THREE.BufferAttribute(pRef, 2));
     pg.setAttribute("aCloud", new THREE.BufferAttribute(pCl, 2));
-    if (!gpu) pg.setAttribute("aMot", new THREE.BufferAttribute(new Float32Array(N2 * 3), 3));
+    if (!gpu) pg.setAttribute("aMot", new THREE.BufferAttribute(new Float32Array(N2 * 4), 4));
 
     const L = (N2 - 1) * 2;
     const lg = new THREE.BufferGeometry();
@@ -306,11 +318,15 @@ export class moEffectParticlesFractal extends MO.moEffect {
     lg.setAttribute("aRef", new THREE.BufferAttribute(lRef, 2));
     lg.setAttribute("aCell", new THREE.BufferAttribute(lCell, 2));
     lg.setAttribute("aCloud", new THREE.BufferAttribute(lCl, 2));
-    if (!gpu) lg.setAttribute("aMot", new THREE.BufferAttribute(new Float32Array(L * 3), 3));
+    if (!gpu) lg.setAttribute("aMot", new THREE.BufferAttribute(new Float32Array(L * 4), 4));
 
     this.pts = new THREE.Points(pg, this.pMat); this.lines = new THREE.LineSegments(lg, this.lMat);
     this.pts.frustumCulled = false; this.lines.frustumCulled = false;
-    this.Scene = new MO.moSceneNode(); this.Scene.add(this.lines); this.Scene.add(this.pts);
+    // órbita: Scene → orbG (gira alrededor del pivote) → pivG (−pivote) → líneas + puntos
+    this.orbG = new THREE.Group(); this.pivG = new THREE.Group();
+    this.pivG.add(this.lines); this.pivG.add(this.pts); this.orbG.add(this.pivG);
+    this.Scene = new MO.moSceneNode(); this.Scene.add(this.orbG);
+    this.pivOk = false;
     this.needReset = true;
   }
 
@@ -335,6 +351,8 @@ export class moEffectParticlesFractal extends MO.moEffect {
     P.theta0 = (vx == 0 && vy == 0) ? Math.PI / 2 : Math.atan2(vy, vx);
     P.visc = Math.max(0, Math.min(1, this.num("viscosity", 0)));
     P.crece = Math.max(0, this.num("crece", 1));
+    P.orbita = this.num("orbita", 0) > 0.5;
+    P.angZ = (this.has("angulo_z") ? this.num("angulo_z", 90) : (P.orbita ? 90 : 0)) * deg;
   }
 
   private gpuStep(reset: boolean) {
@@ -343,11 +361,14 @@ export class moEffectParticlesFractal extends MO.moEffect {
     const su = this.stateMat.uniforms, mu = this.motionMat.uniforms;
     su.tState.value = this.stateRT[a].texture; su.uInc.value = P.inc; su.uReset.value = reset ? 1 : 0;
     this.simMesh.material = this.stateMat; R.setRenderTarget(this.stateRT[b]); R.render(this.simScene, this.simCam);
-    mu.tState.value = this.stateRT[b].texture; mu.tMotion.value = this.motionRT[a].texture;
+    mu.tState.value = this.stateRT[b].texture; mu.tMotion.value = this.motionRT[a].texture; mu.tHead.value = this.headRT[a].texture;
+    mu.uAngZ.value = P.angZ;
     mu.uReset.value = reset ? 1 : 0; mu.uSpeed.value = P.speed; mu.uVisc.value = P.visc; mu.uTheta0.value = P.theta0;
     mu.uLRep.value = P.lRep; mu.uRRep.value = P.rRep; mu.uLMovMin.value = P.lMovMin; mu.uLMovMax.value = P.lMovMax;
     mu.uRMovMin.value = P.rMovMin; mu.uRMovMax.value = P.rMovMax; mu.uSeed.value = (this.pasos % 997) * 1.618; mu.uN.value = this.N;
-    this.simMesh.material = this.motionMat; R.setRenderTarget(this.motionRT[b]); R.render(this.simScene, this.simCam);
+    this.simMesh.material = this.motionMat;
+    mu.uPass.value = 0; R.setRenderTarget(this.motionRT[b]); R.render(this.simScene, this.simCam);
+    mu.uPass.value = 1; R.setRenderTarget(this.headRT[b]); R.render(this.simScene, this.simCam);
     R.setRenderTarget(prev);
     this.ic = b;
   }
@@ -355,7 +376,8 @@ export class moEffectParticlesFractal extends MO.moEffect {
   /** la MISMA máquina de estados en JS (fallback) */
   private cpuStep(reset: boolean) {
     const N = this.N, N2 = N * N, P = this.P, g = this.gene, S = this.cS, S1 = this.cS2, Mo = this.cM, M1 = this.cM2;
-    if (reset) { S.fill(0); Mo.fill(0); return; }
+    const H = this.cH, H1 = this.cH2;
+    if (reset) { S.fill(0); Mo.fill(0); for (let k = 0; k < N2; k++) { H[k * 2] = P.theta0; H[k * 2 + 1] = 0; } return; }
     const M = 1 - P.inc - 1e-4;
     for (let k = 0; k < N2; k++) {
       const o = k * 4;
@@ -368,20 +390,22 @@ export class moEffectParticlesFractal extends MO.moEffect {
       else S1.set([S[o], S[o + 1] + P.inc, S[o + 2], 0], o);
     }
     for (let k = 0; k < N2; k++) {
-      const o = k * 4;
-      if (S1[o + 2] < 0.5) { M1.set([0, 0, P.theta0, 0], o); continue; }
+      const o = k * 4, q = k * 2;
+      if (S1[o + 2] < 0.5) { M1.set([0, 0, 0, 0], o); H1[q] = P.theta0; H1[q + 1] = 0; continue; }
+      const psi = Math.max(S1[o] - 1, 0) * P.angZ, cx = Math.cos(psi), sy = Math.sin(psi);
       if (S1[o + 3] > 0.5 && S1[o + 3] < 1.5) {
-        if (k == 0) { M1.set([0, 0, P.theta0, 1], o); continue; }
-        const f = (g.fj[k] * N + g.fi[k]) * 4;
-        M1.set([Mo[f], Mo[f + 1], Mo[f + 2] + P.lRep, Mo[f + 3]], o); continue;
+        if (k == 0) { M1.set([0, 0, 0, 1], o); H1[q] = P.theta0; H1[q + 1] = 0; continue; }
+        const fk = g.fj[k] * N + g.fi[k], f = fk * 4;
+        M1.set([Mo[f], Mo[f + 1], Mo[f + 2], Mo[f + 3]], o); H1[q] = H[fk * 2] + P.lRep * cx; H1[q + 1] = H[fk * 2 + 1] + P.lRep * sy; continue;
       }
-      if (S1[o + 3] > 1.5) { M1.set([Mo[o], Mo[o + 1], Mo[o + 2] - P.rRep, Mo[o + 3]], o); continue; }
+      if (S1[o + 3] > 1.5) { M1.set([Mo[o], Mo[o + 1], Mo[o + 2], Mo[o + 3]], o); H1[q] = H[q] - P.rRep * cx; H1[q + 1] = H[q + 1] - P.rRep * sy; continue; }
       const r = Math.random();
-      const th = Mo[o + 2] + (S1[o + 2] < 1.5 ? P.lMovMin + (P.lMovMax - P.lMovMin) * r : P.rMovMin + (P.rMovMax - P.rMovMin) * r);
-      const w = Mo[o + 3] * (1 - P.visc);
-      M1.set([Mo[o] + P.speed * w * Math.cos(th), Mo[o + 1] + P.speed * w * Math.sin(th), th, w], o);
+      const d = S1[o + 2] < 1.5 ? P.lMovMin + (P.lMovMax - P.lMovMin) * r : P.rMovMin + (P.rMovMax - P.rMovMin) * r;
+      const th = H[q] + d * cx, ph = H[q + 1] + d * sy, w = Mo[o + 3] * (1 - P.visc), v = P.speed * w;
+      M1.set([Mo[o] + v * Math.cos(ph) * Math.cos(th), Mo[o + 1] + v * Math.cos(ph) * Math.sin(th), Mo[o + 2] + v * Math.sin(ph), w], o);
+      H1[q] = th; H1[q + 1] = ph;
     }
-    this.cS = S1; this.cS2 = S; this.cM = M1; this.cM2 = Mo;
+    this.cS = S1; this.cS2 = S; this.cM = M1; this.cM2 = Mo; this.cH = H1; this.cH2 = H;
   }
 
   private step(reset = false) {
@@ -412,16 +436,17 @@ export class moEffectParticlesFractal extends MO.moEffect {
     if (!this.N) return null;
     const st = this.readState(), mo = this.readMotion(), N2 = this.N * this.N;
     const porGen = new Array(this.K + 1).fill(0);
-    let vivas = 0, x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    let vivas = 0, x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, z0 = 1e9, z1 = -1e9;
     for (let k = 0; k < N2; k++) {
       if (st[k * 4 + 2] < 0.5) continue;
       vivas++; porGen[this.gene.gb[k]]++;
-      const x = mo[k * 4], y = mo[k * 4 + 1];
-      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+      const x = mo[k * 4], y = mo[k * 4 + 1], z = mo[k * 4 + 2];
+      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); z0 = Math.min(z0, z); z1 = Math.max(z1, z);
     }
     const r = (v: number) => +v.toFixed(4);
     return { modo: this.modo, N: this.N, K: this.K, pasos: this.pasos, genSemilla: st[0], vivas, porGen,
-      bbox: vivas ? { ancho: r(x1 - x0), alto: r(y1 - y0) } : null, lineas: !!(this.lines && this.lines.visible) };
+      bbox: vivas ? { ancho: r(x1 - x0), alto: r(y1 - y0), prof: r(z1 - z0) } : null, lineas: !!(this.lines && this.lines.visible),
+      orbita: { activa: !!this.P.orbita, yaw: r(this.yaw), pitch: r(this.pitch), zoom: r(this.zoom), angulo_z: r((this.P.angZ || 0) * 180 / Math.PI) } };
   }
 
   Draw(p_tempo: MO.moTempo, p_parentstate: MO.moEffectState = null): void {
@@ -468,9 +493,17 @@ export class moEffectParticlesFractal extends MO.moEffect {
     if (this.Camera == undefined) this.Camera = new MO.moCamera3D();
     const rs: MO.moVector2 = new MO.moVector2();
     this.RM.m_Renderer.getSize(rs);
-    this.GL.SetDefaultOrthographicView(rs.width, rs.height);
-    this.Camera.projectionMatrix = this.GL.GetProjectionMatrix();
-    this.RM.Render(this.Scene, this.Camera);
+    this.drawT = now;
+    if (this.P.orbita) {
+      this.bindOrbit(R);
+      this.orbitFrame(rs.width, rs.height, dt);
+      this.RM.Render(this.Scene, this.pCam);
+    } else {
+      this.orbG.rotation.set(0, 0, 0); this.orbG.position.set(0, 0, 0); this.pivG.position.set(0, 0, 0);
+      this.GL.SetDefaultOrthographicView(rs.width, rs.height);
+      this.Camera.projectionMatrix = this.GL.GetProjectionMatrix();
+      this.RM.Render(this.Scene, this.Camera);
+    }
     this.EndDraw();
   }
 
@@ -479,13 +512,95 @@ export class moEffectParticlesFractal extends MO.moEffect {
     const N = this.N, N2 = N * N, S = this.cS, Mo = this.cM, g = this.gene;
     const pa = this.pts.geometry.attributes.aMot, la = this.lines.geometry.attributes.aMot;
     const p = pa.array as Float32Array, l = la.array as Float32Array;
-    for (let k = 0; k < N2; k++) { p[k * 3] = Mo[k * 4]; p[k * 3 + 1] = Mo[k * 4 + 1]; p[k * 3 + 2] = S[k * 4 + 2] > 0.5 ? 1 : 0; }
+    for (let k = 0; k < N2; k++) { p.set([Mo[k * 4], Mo[k * 4 + 1], Mo[k * 4 + 2], S[k * 4 + 2] > 0.5 ? 1 : 0], k * 4); }
     for (let k = 1, v = 0; k < N2; k++, v += 2) {
-      const f = g.fj[k] * N + g.fi[k], alive = p[k * 3 + 2];
-      l[v * 3] = p[k * 3]; l[v * 3 + 1] = p[k * 3 + 1]; l[v * 3 + 2] = alive;
-      l[v * 3 + 3] = p[f * 3]; l[v * 3 + 4] = p[f * 3 + 1]; l[v * 3 + 5] = alive;
+      const f = g.fj[k] * N + g.fi[k], alive = p[k * 4 + 3];
+      l.set([p[k * 4], p[k * 4 + 1], p[k * 4 + 2], alive, p[f * 4], p[f * 4 + 1], p[f * 4 + 2], alive], v * 4);
     }
     pa.needsUpdate = true; la.needsUpdate = true;
+  }
+
+  // ---------------------------------------------------------------- órbita (param `orbita` = 1)
+  public yaw = 0; public pitch = 0; public zoom = 1;
+  private vYaw = 0; private vPitch = 0; private drag: { id: number, x: number, y: number, t: number } = null;
+  private orbG: any; private pivG: any; private pCam: any; private orbBound = false; private drawT = 0;
+  private piv = new THREE.Vector3(); private pivTgt = new THREE.Vector3(); private pivOk = false; private pivT = 0;
+
+  /** ¿el gesto es para la órbita? activa, dibujada hace poco, fuera de modo Edit y sobre el lienzo (no sobre la interfaz) */
+  private orbitWants(e: any): boolean {
+    if (!this.P.orbita || performance.now() - this.drawT > 500) return false;
+    const te = (window as any).moTouchEdit; if (te && te.enabled) return false;
+    const t = e.target as HTMLElement;
+    return !!t && (t === (this.R && this.R.domElement) || t.tagName == "CANVAS" || t.id == "moCanvas" || t.id == "moConnect");
+  }
+
+  private bindOrbit(R: any) {
+    if (this.orbBound) return;
+    this.orbBound = true;
+    window.addEventListener("pointerdown", (e: PointerEvent) => {
+      if (e.button !== 0 || !this.orbitWants(e)) return;
+      this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now() }; this.vYaw = this.vPitch = 0;
+    });
+    window.addEventListener("pointermove", (e: PointerEvent) => {
+      const d = this.drag; if (!d || e.pointerId !== d.id) return;
+      const now = performance.now(), dx = e.clientX - d.x, dy = e.clientY - d.y, k = 0.008;
+      this.yaw += dx * k; this.pitch = Math.max(-1.55, Math.min(1.55, this.pitch + dy * k));
+      const dts = Math.max(1, now - d.t) / 1000;
+      this.vYaw = dx * k / dts; this.vPitch = dy * k / dts;          // rad/s para la inercia
+      d.x = e.clientX; d.y = e.clientY; d.t = now;
+    });
+    const up = (e: PointerEvent) => {
+      const d = this.drag; if (!d || e.pointerId !== d.id) return;
+      if (performance.now() - d.t > 80) this.vYaw = this.vPitch = 0;   // soltó quieto ⇒ sin inercia
+      this.drag = null;
+    };
+    window.addEventListener("pointerup", up); window.addEventListener("pointercancel", up);
+    /* la rueda va sobre el canvas del renderer (en window Chrome la fuerza a pasiva y no deja frenar el scroll) */
+    const cv: HTMLElement = R.domElement || window as any;
+    cv.addEventListener("wheel", (e: WheelEvent) => {
+      if (!this.orbitWants(e)) return;
+      if (e.cancelable) e.preventDefault();
+      const dy = e.deltaMode == 1 ? e.deltaY * 16 : e.deltaY;
+      this.zoom = Math.max(0.25, Math.min(8, this.zoom * Math.exp(-dy * 0.0015)));
+    }, { passive: false });
+    window.addEventListener("dblclick", (e: MouseEvent) => {
+      if (!this.orbitWants(e)) return;
+      this.yaw = this.pitch = 0; this.zoom = 1; this.vYaw = this.vPitch = 0;
+    });
+  }
+
+  /** inercia + pivote (centro del árbol, suavizado) + cámara en perspectiva que a zoom 1 encuadra igual que la ortográfica */
+  private orbitFrame(w: number, h: number, dt: number) {
+    if (!this.drag && (this.vYaw || this.vPitch)) {
+      this.yaw += this.vYaw * dt; this.pitch = Math.max(-1.55, Math.min(1.55, this.pitch + this.vPitch * dt));
+      const f = Math.pow(0.04, dt);                                     // se apaga en ~1 s
+      this.vYaw *= f; this.vPitch *= f;
+      if (Math.abs(this.vYaw) + Math.abs(this.vPitch) < 0.01) this.vYaw = this.vPitch = 0;
+    }
+    const now = performance.now();
+    if (now - this.pivT > 500) {                                        // centro de la caja del árbol (lectura chica, 2 por s)
+      this.pivT = now;
+      const st = this.readState(), mo = this.readMotion(), N2 = this.N * this.N;
+      const lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9]; let n = 0;
+      for (let k = 0; k < N2; k++) {
+        if (st[k * 4 + 2] < 0.5) continue; n++;
+        for (let c = 0; c < 3; c++) { const v = mo[k * 4 + c]; if (v < lo[c]) lo[c] = v; if (v > hi[c]) hi[c] = v; }
+      }
+      const U = this.U, e = U.uEsc.value * U.uForma.value;
+      this.pivTgt.copy(n ? new THREE.Vector3(U.uPos.value.x + (lo[0] + hi[0]) / 2 * e, U.uPos.value.y + (lo[1] + hi[1]) / 2 * e, (lo[2] + hi[2]) / 2 * e)
+                    : new THREE.Vector3(U.uPos.value.x, U.uPos.value.y, 0));
+      if (!this.pivOk) { this.piv.copy(this.pivTgt); this.pivOk = true; }
+    }
+    this.piv.lerp(this.pivTgt, Math.min(1, dt * 2));
+    this.orbG.position.copy(this.piv); this.pivG.position.copy(this.piv).multiplyScalar(-1);
+    this.orbG.rotation.set(this.pitch, this.yaw, 0, "YXZ");
+    const aspect = w / Math.max(1, h), fov = 45;
+    if (!this.pCam) this.pCam = new THREE.PerspectiveCamera(fov, aspect, 0.001, 100);
+    this.pCam.aspect = aspect; this.pCam.updateProjectionMatrix();
+    const D = (0.5 / aspect) / Math.tan(fov / 2 * Math.PI / 180);       // altura visible = la de la vista ortográfica
+    const k = this.zoom > 1 ? 1 - 1 / this.zoom : 0;                     // al acercar, el centro va hacia el pivote
+    const tx = this.piv.x * k, ty = this.piv.y * k;
+    this.pCam.position.set(tx, ty, D / this.zoom); this.pCam.lookAt(tx, ty, 0); this.pCam.updateMatrixWorld();
   }
 
   Update(p_Event: MO.moEventList): void { super.Update(p_Event); }
@@ -503,7 +618,9 @@ export class moEffectParticlesFractal extends MO.moEffect {
       ["randomvelocity", "0.4"], ["randomvelocityx", "0"], ["randomvelocityy", "1"], ["viscosity", "0"], ["geometry_mode", "6"],
       // capa «semilla»
       ["pos_x", "0.0"], ["pos_y", "-0.25"], ["escala", "1.0"], ["forma", "1.0"], ["dispersion", "0.25"], ["crece", "1.0"],
-      ["lineas", "1.0"], ["tamano", "4"], ["niveles", "8"], ["angulo", "28.6"], ["largo", "0.08"], ["balanceo", "0"]];
+      ["lineas", "1.0"], ["tamano", "4"], ["niveles", "8"], ["angulo", "28.6"], ["largo", "0.08"], ["balanceo", "0"],
+      // 3D (18-nov)
+      ["angulo_z", "90"], ["orbita", "0"]];
     for (const [n, v] of defs) p_configdefinition.Add(n, F, idx++, new MO.moValue(v, "FUNCTION"));
     return this.m_Config.GetConfigDefinition();
   }
