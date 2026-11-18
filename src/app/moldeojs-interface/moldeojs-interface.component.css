@@ -1,17 +1,6 @@
 
 /***********START CSS FOR INTERFACE************/
 
-header{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:40px;
-  background: rgba(90, 90, 90, 0.7);
-  opacity:0.85;
-  border-bottom:4px solid #101010;
-  z-index: 101;
-}
 ul{
   margin:0;
   padding:0;
@@ -61,34 +50,6 @@ h3{
   transition-timing-function: ease-in;
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
-}
-.moldeofile{
-  float:left;
-  width:50%;
-  height:21px;
-  background:#a6aab0;
-  margin:7px 0 0 10px;
-  opacity:0.8;
-  padding:2px 0 0 2px;
-  border:1px solid #a6aab0;
-  text-overflow: clip;
-  color:#333;
-  font-family: monospace;
-  font-size:14px;
-}
-.moldeofile:hover{
-  background:#c5cfdc;
-  border:1px solid #202020;
-  color:#010101;
-}
-.moldeoicon{
-  background-image: url('../../assets/mojs-interface-data/moldeo_logo_2020_M@_512_blanco_bblanco.png');
-  background-size: 90%;
-  background-repeat:   no-repeat;
-  background-position: center center;
-  width:70px;
-  height:40px;
-  float:left;
 }
 .moldeobutton{
   position:relative;
@@ -500,22 +461,64 @@ h3{
   to {opacity:0;}
 }
 
-/* #918 H2 — panel de versiones */
-.moVersions{ position:fixed; top:96px; right:12px; z-index:1000; width:340px; max-width:calc(100vw - 24px);
-  max-height:70vh; overflow:auto; background:rgba(20,20,24,.95); color:#eee; border:1px solid #555;
-  border-radius:6px; padding:8px; font-size:13px; }
+/* UI-R (FCA 18-nov) — sin header: barra flotante abajo al centro + ficha del proyecto sobre la rueda (abajo der.).
+   Mismo lenguaje que las esferas (neón sobre tinta). Las esferas de abajo miden 176 px a 14 px del borde:
+   en pantallas angostas (< 600 px) no hay lugar entre ellas y la barra sube por encima (y la ficha, por encima de la barra). */
+.moBar{ position:fixed; left:50%; bottom:calc(14px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%);
+  z-index:2147483001; display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:999px;
+  background:radial-gradient(circle at 50% 30%,rgba(40,48,96,.80),rgba(6,7,15,.88) 75%);
+  box-shadow:0 0 0 2px rgba(94,242,255,.55),0 0 18px rgba(94,242,255,.30);
+  backdrop-filter:blur(4px); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; user-select:none; -webkit-user-select:none; }
+.moBarB{ width:38px; height:38px; padding:0; border-radius:50%; cursor:pointer;
+  border:1.5px solid rgba(94,242,255,.7); background:rgba(6,7,15,.82); color:#e9fbff; font:600 19px/1 system-ui,sans-serif;
+  transition:transform .12s ease, box-shadow .2s ease; }
+.moBarB:hover:not([disabled]){ transform:scale(1.1); box-shadow:0 0 10px #5ef2ff; }
+.moBarB:active:not([disabled]){ transform:scale(.92); }
+.moBarB[disabled]{ opacity:.35; cursor:default; border-style:dashed; }
+.moBarEdit{ height:38px; min-width:64px; padding:0 14px; border-radius:999px; cursor:pointer;
+  border:1.5px solid rgba(94,242,255,.7); background:rgba(6,7,15,.82); color:#e9fbff;
+  font:700 13px/1 system-ui,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
+.moBarEdit:hover{ box-shadow:0 0 10px #5ef2ff; }
+.moBarEdit.moEditing, .moBarEdit.moEditing:hover{ background:#ff8a00; color:#111; border-color:#fff;
+  box-shadow:0 0 0 2px rgba(255,138,0,.45),0 0 16px rgba(255,138,0,.6); }
+.moBarLabel{ position:absolute; left:50%; bottom:calc(100% + 8px); transform:translateX(-50%); pointer-events:none;
+  white-space:nowrap; max-width:80vw; overflow:hidden; text-overflow:ellipsis; color:#fff; padding:5px 12px; border-radius:999px;
+  font:700 13px/1.1 system-ui,sans-serif; letter-spacing:.04em; background:rgba(6,7,15,.78);
+  text-shadow:0 0 8px #5ef2ff; box-shadow:0 0 0 1px rgba(94,242,255,.5); }
+
+.moProyecto{ position:fixed; right:calc(14px + env(safe-area-inset-right,0px)); bottom:calc(234px + env(safe-area-inset-bottom,0px));
+  z-index:2147483001; width:280px; max-width:calc(100vw - 28px); max-height:calc(100vh - 260px); overflow:auto;
+  box-sizing:border-box; padding:10px 12px; border-radius:16px; color:#e9fbff;
+  background:radial-gradient(circle at 50% 0%,rgba(40,48,96,.85),rgba(6,7,15,.92) 80%);
+  box-shadow:0 0 0 2px rgba(94,242,255,.55),0 0 18px rgba(94,242,255,.30); backdrop-filter:blur(4px);
+  font:13px/1.3 system-ui,-apple-system,"Segoe UI",sans-serif; }
+.moProyName{ display:flex; align-items:center; gap:8px; cursor:text; padding:4px 6px; border-radius:8px; }
+.moProyName:hover{ background:rgba(94,242,255,.12); }
+.moProyNameTxt{ flex:1; font:700 15px/1.2 system-ui,sans-serif; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.moProyPen{ opacity:.7; }
+.moProyInput{ width:100%; box-sizing:border-box; padding:5px 8px; border-radius:8px; border:1.5px solid #5ef2ff;
+  background:rgba(6,7,15,.9); color:#fff; font:700 15px/1.2 system-ui,sans-serif; outline:none; }
+.moProyMsg{ margin-top:6px; opacity:.85; }
+.moProySec{ margin-top:8px; }
+.moPersona{ width:100%; padding:4px; border-radius:8px; background:rgba(6,7,15,.9); color:#e9fbff; border:1px solid rgba(94,242,255,.6); }
+.moEscena{ margin-top:8px; }
+.moEscena label{ display:flex; align-items:center; gap:8px; margin:4px 0; }
+.moEscena label span{ width:62px; }
+.moEscena input{ flex:1; min-width:0; accent-color:#ff8a00; }
+.moEscena b{ width:36px; text-align:right; font-variant-numeric:tabular-nums; }
+@media (max-width: 600px){
+  .moBar{ bottom:calc(240px + env(safe-area-inset-bottom,0px)); }
+  .moProyecto{ bottom:calc(296px + env(safe-area-inset-bottom,0px)); max-height:calc(100vh - 320px); }
+}
+
+/* #918 H2 — panel de versiones (dentro de la ficha del proyecto) */
+.moVersions{ margin-top:8px; max-height:40vh; overflow:auto; font-size:13px; }
 .moVersionsHead{ font-weight:bold; margin-bottom:6px; }
 .moVersionsClose{ float:right; cursor:pointer; padding:0 4px; }
 .moVersionsMsg{ opacity:.8; margin:4px 0; }
 .moVersionRow{ display:flex; align-items:center; gap:8px; padding:6px 0; border-top:1px solid #333; }
 .moVersionNum{ font-weight:bold; min-width:34px; }
 .moVersionInfo{ flex:1; line-height:1.25; }
-.moEscena{
-  float:left;
-  margin:8px 10px 0 0;
-  color:#eee;
-  font:bold 12px monospace;
-}
-.moEscena label{ margin-right:12px; }
-.moEscena input{ width:110px; vertical-align:middle; accent-color:#ff8a00; }
-.moEscena b{ display:inline-block; width:34px; }
+.moProyecto .moldeobutton{ float:none; position:static; margin:0; height:28px; padding:0 10px; border-radius:999px; opacity:1;
+  background:rgba(6,7,15,.82); color:#e9fbff; border:1.5px solid rgba(94,242,255,.7); cursor:pointer; }
+.moProyecto .moldeobutton:hover{ box-shadow:0 0 10px #5ef2ff; }

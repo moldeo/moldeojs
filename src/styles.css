@@ -581,4 +581,4 @@ h3{
 canvas, #moCanvas, #moConnect, mo-default { touch-action: none; }
 
 /* #918 D2: el Player no muestra interfaz */
-body.mo-player #moPresetWheel, body.mo-player .moldeo_control, body.mo-player #moldeobuttons, body.mo-player .moHeader, body.mo-player header, body.mo-player .moldeobutton { display: none !important; }
+body.mo-player #moPresetWheel, body.mo-player .moldeo_control, body.mo-player #moldeobuttons, body.mo-player .moHeader, body.mo-player header, body.mo-player .moldeobutton, body.mo-player .moBar, body.mo-player .moProyecto { display: none !important; }

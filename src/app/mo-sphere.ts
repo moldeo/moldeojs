@@ -42,36 +42,22 @@ export class moSphere {
     this.applyHelp();
     this.place();
     window.addEventListener("resize", () => this.place());
-    setTimeout(() => this.place(), 1500);   /* el header termina de armarse después (personas, versiones) */
   }
 
-  /** arriba: debajo de lo que ocupe su columna (header —que en celular se parte en dos filas— y la barra 📷 del lienzo) */
+  /** arriba: debajo de lo que ocupe su columna. UI-R (FCA 18-nov): ya no hay header; sólo queda la barra 📷 del lienzo
+   *  (#moldeobuttons, visible con ?debug) — sin ella las esferas de arriba van pegadas al borde (14 px). */
   place() {
-    moSphere.placeToolbar();
     if (this.corner[0] != "t") return;
     const vw = window.innerWidth, w = moSphere.SIZE + 14;
     const x0 = this.corner == "tl" ? 0 : vw - w, x1 = this.corner == "tl" ? w : vw;
     let b = 0;
-    document.querySelectorAll("header.moHeader, header.moHeader *, #moldeobuttons, #moldeobuttons *").forEach((el: any) => {
+    document.querySelectorAll("#moldeobuttons, #moldeobuttons *").forEach((el: any) => {
       const r = el.getBoundingClientRect();
       if (!r.height || !r.width || r.top > window.innerHeight * 0.4) return;
       if (r.right < x0 || r.left > x1) return;
       b = Math.max(b, r.bottom);
     });
     this.root.style.top = Math.max(14, Math.round(b + 10)) + "px";
-  }
-
-  /** B5: la barra 📷 (#moldeobuttons) es fixed a top:45px; en celular el header se parte en dos filas y la barra le
-   *  tapaba ↶ ↷ auto Versiones Persona. Se baja hasta debajo de lo que el header ocupe de verdad (medido en vivo). */
-  static placeToolbar() {
-    const tb = document.getElementById("moldeobuttons") as HTMLElement; if (!tb) return;
-    let b = 0;
-    document.querySelectorAll("header.moHeader, header.moHeader *").forEach((el: any) => {
-      const r = el.getBoundingClientRect();
-      if (!r.height || !r.width || r.top > window.innerHeight * 0.4) return;
-      b = Math.max(b, r.bottom);
-    });
-    if (b > 0) tb.style.top = Math.max(45, Math.round(b + 5)) + "px";
   }
 
   /** la palabra del botón tocado aparece y se va */
@@ -176,8 +162,8 @@ export class moSphere {
  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;transition:width .18s ease,height .18s ease}
 .mo-sphere-br{right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px))}
 .mo-sphere-bl{left:calc(14px + env(safe-area-inset-left,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px))}
-.mo-sphere-tl{left:calc(14px + env(safe-area-inset-left,0px));top:70px}
-.mo-sphere-tr{right:calc(14px + env(safe-area-inset-right,0px));top:70px}
+.mo-sphere-tl{left:calc(14px + env(safe-area-inset-left,0px));top:14px}
+.mo-sphere-tr{right:calc(14px + env(safe-area-inset-right,0px));top:14px}
 .mo-sphere::before{content:"";position:absolute;inset:7px;border-radius:50%;pointer-events:none;
  background:conic-gradient(from 0deg,transparent 0 70%,rgba(94,242,255,.55) 85%,transparent 100%);
  -webkit-mask:radial-gradient(circle,transparent 92%,#000 93%,#000 96%,transparent 97%);

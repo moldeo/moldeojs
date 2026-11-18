@@ -108,15 +108,81 @@ export class MoldeojsInterfaceComponent implements OnInit {
   /** #918 H1 — deshacer / rehacer */
   public history: moHistory = new moHistory();
   public undoLabel: string = "";
+  private undoTimer: any = null;
+  private showUndo(t: string): void {
+    this.undoLabel = t; clearTimeout(this.undoTimer);
+    this.undoTimer = setTimeout(() => { this.undoLabel = ""; this.tickSoon(); }, 2000);
+    this.tickSoon();
+  }
+  /** los toques de las esferas y los atajos llegan a veces por fuera de la zona de Angular */
+  private tickSoon(): void { setTimeout(() => { try { this.appRef.tick(); } catch (x) {} }); }
+
+  /* ───── UI-R (FCA 18-nov) — sin menú de arriba ─────
+   * - barra flotante abajo al centro (.moBar): ↶ · ↷ · EDIT (lo que se usa todo el tiempo)
+   * - todo lo demás del viejo header vive en la RUEDA DEL PROYECTO (moPresetWheel, cara «proyecto», mini ◈):
+   *     ✎ nombre · ◐ escena · 💾 guardar · ⟲ versiones · ☉ persona · ⌘ control · ⊞ auto · ☰ log · ? ayudas
+   *   y lo que necesita texto/deslizador/lista se abre en la FICHA (.moProyecto), encima de la rueda, con secciones
+   *   (fichaSec): "" (sólo el nombre) · escena · persona · versiones. La ficha se ve mientras la rueda muestra «proyecto».
+   * - el nombre se edita en la ficha: tocarlo ⇒ campo inline; Enter/salir = confirma, Esc = cancela.
+   *   Cambia moFileName (lo que se muestra) y marca projectRenamed ⇒ Guardar manda además `name` al Lab
+   *   (contrato: POST {files, name}); si el endpoint todavía no acepta `name`, se reintenta sin él y se avisa.
+   */
+  public proyectoView: boolean = false;
+  public fichaSec: string = "";
+  public renaming: boolean = false;
+  public renameDraft: string = "";
+  public projectRenamed: boolean = false;
+  @ViewChild('renameInput') renameInput: ElementRef;
+  public startRename(): void {
+    this.renameDraft = "" + this.moFileName; this.renaming = true; this.tickSoon();
+    setTimeout(() => { try { const el = this.renameInput && this.renameInput.nativeElement; if (el) { el.focus(); el.select(); } } catch (x) {} }, 30);
+  }
+  public confirmRename(): void {
+    if (!this.renaming) return;
+    this.renaming = false;
+    const v = ("" + (this.renameDraft || "")).trim();
+    if (v && v != this.moFileName) {
+      this.moFileName = v; this.projectRenamed = true;
+      try { document.title = v; } catch (x) {}
+      if (this.touchEdit) this.touchEdit.log("rename", { name: v });
+      if (this.presetWheel) this.presetWheel.flash("nombre · " + v);
+    }
+    this.tickSoon();
+  }
+  public cancelRename(): void { this.renaming = false; this.tickSoon(); }
+  public toggleSec(sec: string): void {
+    this.fichaSec = this.fichaSec == sec ? "" : sec;
+    if (sec == "versiones" && this.fichaSec == "versiones") { this.versionsOpen = false; this.toggleVersions(); }
+    if (sec == "escena") this.readEscena();
+    this.tickSoon();
+  }
+  /** los ítems de la cara «proyecto» de la rueda (sólo los que este proyecto/visor tiene) */
+  private projectItems(): { g: string, w: string, cls?: string, fn: () => void, title?: string }[] {
+    const it: { g: string, w: string, cls?: string, fn: () => void, title?: string }[] = [];
+    it.push({ g: "✎", w: "nombre", cls: this.renaming ? "on" : "", fn: () => this.startRename(), title: "Renombrar el proyecto (" + this.moFileName + ")" });
+    if (this.escenaFx) it.push({ g: "◐", w: "escena", cls: this.fichaSec == "escena" ? "on" : "", fn: () => this.toggleSec("escena"),
+      title: "Parámetros del proyecto (MOB escena: " + this.escenaKeys().join(", ") + ") — valen para todas las capas" });
+    if (this.saveUrl) {
+      it.push({ g: "💾", w: "guardar", cls: this.saveState == "Guardando…" ? "hot" : "", fn: () => this.saveProject(), title: "Guardar el proyecto en el MoldeoLab" });
+      it.push({ g: "⟲", w: "versiones", cls: this.fichaSec == "versiones" ? "on" : "", fn: () => this.toggleSec("versiones"), title: "Versiones guardadas del proyecto" });
+    }
+    if (this.personas.length) it.push({ g: "☉", w: "persona", cls: (this.fichaSec == "persona" ? "on" : "") + (this.personaId ? " go" : ""),
+      fn: () => this.toggleSec("persona"), title: "La carta de una persona mueve el sol y la luna" });
+    it.push({ g: "⌘", w: "control", cls: this.moControlDisplay ? "on" : "", fn: () => { this.showmoControlView(); this.tickSoon(); }, title: "Moldeojs Control View" });
+    it.push({ g: "⊞", w: "auto layout", fn: () => this.autoLayout(), title: "Auto layout: ordena las cajas del grafo (se ve en Edit con la tecla G o ?grafo=1)" });
+    const logOn = !!(this.touchEdit && this.touchEdit.logOn);
+    it.push({ g: "☰", w: logOn ? "log ●" : "log", cls: logOn ? "rec" : "", fn: () => { if (this.touchEdit) this.touchEdit.toggleLog(); }, title: "Registrar los toques (para depurar)" });
+    return it;
+  }
   public doUndo(): void {
     if (this.channel) this.channel.send({ verb: "undo" });
     const w = this.history.undo();
-    if (w) { this.undoLabel = "↶ " + w; if (this.touchEdit) this.touchEdit.log("undo", { what: w }); if (this.presetWheel) this.presetWheel.render(); if (this.paramsSphere) this.paramsSphere.render(); this.readEscena(); setTimeout(() => this.undoLabel = "", 2000); }
+    if (w) { this.showUndo("↶ " + w); if (this.touchEdit) this.touchEdit.log("undo", { what: w }); if (this.presetWheel) this.presetWheel.render(); if (this.paramsSphere) this.paramsSphere.render(); this.readEscena(); }
   }
   public doRedo(): void {
     if (this.channel) this.channel.send({ verb: "redo" });
     const w = this.history.redo();
-    if (w) { this.undoLabel = "↷ " + w; if (this.touchEdit) this.touchEdit.log("redo", { what: w }); if (this.presetWheel) this.presetWheel.render(); if (this.paramsSphere) this.paramsSphere.render(); this.readEscena(); setTimeout(() => this.undoLabel = "", 2000); }
+    if (w) { this.showUndo("↷ " + w); if (this.touchEdit) this.touchEdit.log("redo", { what: w }); if (this.presetWheel) this.presetWheel.render(); if (this.paramsSphere) this.paramsSphere.render(); this.readEscena(); }
   }
   /** #918 L2 — ?save=<ruta del Lab> ⇒ botón Guardar: manda el XML de la consola y de cada .cfg */
   public saveUrl: string = (() => { try { const v = new URLSearchParams(window.location.search).get("save");
@@ -140,19 +206,30 @@ export class MoldeojsInterfaceComponent implements OnInit {
     // B3c — la toma (REC) viaja con el proyecto
     const tj = this.timeSphere ? this.timeSphere.takeJSON() : null;
     if (tj) files[moTimeSphere.TAKE_FILE] = tj;
-    this.saveState = "Guardando…";
-    fetch(this.saveUrl, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
-      body: JSON.stringify({ jsonrpc: "2.0", method: "call", params: { files } }) })
-      .then((r) => r.json())
+    this.saveState = "Guardando…"; this.tickSoon();
+    const post = (params: any) => fetch(this.saveUrl, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin",
+      body: JSON.stringify({ jsonrpc: "2.0", method: "call", params }) }).then((r) => r.json());
+    /* UI-R: si se renombró, va también `name`; un Lab que todavía no lo acepta responde error ⇒ se guarda sin renombrar */
+    const withName = this.projectRenamed ? Object.assign({ name: "" + this.moFileName }, { files }) : { files };
+    let nameRejected = false;
+    post(withName)
+      .then((j) => {
+        if (this.projectRenamed && j && j.error) { nameRejected = true; return post({ files }); }
+        return j;
+      })
       .then((j) => {
         const ok = j && j.result && j.result.ok;
         const v = ok && j.result.version != null ? " v" + j.result.version : "";
-        this.saveState = ok ? "Guardado ✓" + v : ("No se guardó: " + ((j && j.result && j.result.error) || (j && j.error && j.error.message) || "error"));
+        this.saveState = ok ? "Guardado ✓" + v + (nameRejected ? " (el Lab no renombra todavía)" : "")
+          : ("No se guardó: " + ((j && j.result && j.result.error) || (j && j.error && j.error.message) || "error"));
+        if (ok && !nameRejected) this.projectRenamed = false;
         if (ok && tj && this.timeSphere) this.timeSphere.markSaved();
         if (this.touchEdit) this.touchEdit.log("save", { ok: !!ok, n: Object.keys(files).length });
-        setTimeout(() => { this.saveState = ""; }, 4000);
+        if (this.presetWheel) { this.presetWheel.flash(ok ? "guardado ✓" + v : "no se guardó"); this.presetWheel.render(); }
+        this.tickSoon();
+        setTimeout(() => { this.saveState = ""; this.tickSoon(); }, 4000);
       })
-      .catch((e) => { this.saveState = "No se guardó (sin conexión)"; });
+      .catch((e) => { this.saveState = "No se guardó (sin conexión)"; this.tickSoon(); });
   }
   /** #918 H2 — versiones: mismo contrato en el Lab (/e/<slug>/mol-versions) y en el Director (/proj-versions) */
   public versionsOpen: boolean = false;
@@ -195,7 +272,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
   public personaMsg: string = "";
   private loadPersonas(): void {
     if (!this.personaUrl || (this.channel && this.channel.isPlayer())) return;
-    this.rpc(this.personaUrl, {}).then((r) => { this.personas = (r.ok && r.personas) || []; }).catch(() => {});
+    this.rpc(this.personaUrl, {}).then((r) => { this.personas = (r.ok && r.personas) || []; if (this.presetWheel) this.presetWheel.render(); this.tickSoon(); }).catch(() => {});
   }
   public choosePersona(id: string): void {
     this.personaId = id;
@@ -343,6 +420,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
     console.log("showmoEditView");
     this.moEditDisplay = !this.moEditDisplay;
     if (this.touchEdit) this.touchEdit.enabled = this.moEditDisplay;
+    this.tickSoon();
     /*if (this.moCanvas && this.moCanvas.nativeElement.getAttribute("class")=="hideme" ) {
       this.moCanvas.nativeElement.setAttribute("class","showme");
       this.moConfig.nativeElement.setAttribute("class","showme");
@@ -632,6 +710,10 @@ export class MoldeojsInterfaceComponent implements OnInit {
       this.presetWheel.onCapture = (fx, i) => this.touchEdit && this.touchEdit.log("capture", { fx: "" + fx.GetLabelName(), i, name: "" + fx.GetConfig().m_PreConfigs[i].m_Name });
       (window as any).moPresetWheel = this.presetWheel;
       this.presetWheel.history = this.history;
+      /* UI-R: la rueda es también la del proyecto (ver arriba, proyectoView) */
+      this.presetWheel.projectItems = () => this.projectItems();
+      this.presetWheel.onView = (v) => { this.proyectoView = v == "proyecto"; if (!this.proyectoView) { this.renaming = false; } this.tickSoon(); };
+      this.presetWheel.render();
       /* #918 D2: canal Control → Player */
       const ch = new moChannel();
       this.channel = ch;
@@ -691,7 +773,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
     }
     let cName : any = this.m_Console.GetConfigName();
     let cFile : moFile = new moFile(cName);
-    this.moFileName = cFile.GetFileName();
+    if (!this.projectRenamed) this.moFileName = cFile.GetFileName();
     this.loadMobNodes();
 
     //activate mob by type to show on interface other views to same objects

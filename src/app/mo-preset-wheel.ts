@@ -6,6 +6,17 @@
  *  - ✦ Proponer (nivel 1): 4 lentes nuevas mezclando presets existentes (barato: no renderiza, interpola).
  *    Lente punteada: tocar = llamarla · mantener = quedársela · ✦ otra vez = descartar las no elegidas.
  *  - si en modo Edit se toca una capa en la pantalla, la esfera la toma (setLayer)
+ *
+ * UI-R (FCA 18-nov) — es también la RUEDA DEL PROYECTO: el menú de arriba desapareció y sus funciones viven acá.
+ *  - mini ◈ (abajo der.) alterna dos caras de la misma rueda:
+ *      · «presets» (la de siempre: capa en foco + sus presets)
+ *      · «proyecto»: el anillo trae lo que antes estaba en el header, en este orden (empezando arriba, horario):
+ *          ✎ nombre · ◐ escena · 💾 guardar · ⟲ versiones · ☉ persona · ⌘ control · ⊞ auto · ☰ log · ? ayudas
+ *        (escena/guardar/versiones/persona sólo si el proyecto/visor los tiene). El centro ◎ vuelve a presets.
+ *  - lo que necesita texto, deslizador o lista (nombre, escena, persona, versiones) se abre en la FICHA del proyecto,
+ *    un panel encima de la rueda que arma el componente (moldeojs-interface: .moProyecto). La rueda sólo pide la cara.
+ *  - los ítems los da el componente (projectItems): la rueda no conoce el Lab, ni la escena, ni las personas.
+ *  - undo / redo / EDIT NO están acá: son la barra flotante abajo al centro (se usan todo el tiempo).
  */
 import { moSphere } from "./mo-sphere";
 import { moPreconfig, moPreconfigParamIndex } from "./mo-pre-config";
@@ -41,6 +52,20 @@ export class moPresetWheel extends moSphere {
   private static MODES: { [m: string]: number } = { proyecto: null, corte: 0, lento: 3 };
   onMode: (mode: string) => void = null;
   onLayer: (layer: any) => void = null;   /** F15: las otras esferas siguen a la capa en foco */
+
+  /** UI-R — cara de la rueda: "presets" | "proyecto" */
+  view: string = "presets";
+  /** UI-R — los ítems de la cara «proyecto» (los arma el componente; se piden en cada render) */
+  projectItems: () => { g: string, w: string, cls?: string, fn: () => void, title?: string }[] = null;
+  onView: (view: string) => void = null;
+  setView(v: string) {
+    this.view = v == "proyecto" ? "proyecto" : "presets";
+    this.render();
+    this.flash(this.view);
+    if (this.onView) this.onView(this.view);
+  }
+  /** un ítem de la cara proyecto se tocó: se redibuja (estados on/off) y se nombra */
+  private projTap(it: { w: string, fn: () => void }) { it.fn(); this.render(); this.flash(it.w); }
 
   project: any = null;            /** #918 P7: moProjectStates (estados del paisaje + línea de tiempo) */
   channel: any = null;            /** #918 D2: moChannel (Control → Player) */
@@ -306,7 +331,31 @@ export class moPresetWheel extends moSphere {
   private static GROUP_LABEL: { [g: string]: string } = { dia: "día", estacion: "estaciones", "": "estados" };
   groupLabel(g: string): string { return moPresetWheel.GROUP_LABEL[g] || g; }
 
+  /** UI-R — mini ◈ (abajo der.): alterna presets ⇄ proyecto */
+  private viewToggle() {
+    const S = moSphere.SIZE, onP = this.view == "proyecto";
+    const b = this.btn("◈", onP ? "volver a presets" : "proyecto", "mw-mini mw-proj" + (onP ? " on" : ""), S - 14, S - 14,
+      () => this.setView(onP ? "presets" : "proyecto"));
+    b.title = onP ? "Volver a los presets" : "Proyecto: nombre, escena, guardar, versiones, persona, control, log, ayudas";
+  }
+
+  private renderProject() {
+    const S = moSphere.SIZE, C = S / 2;
+    const c = this.btn("◎", "presets", "mw-center", C, C, () => this.setView("presets"));
+    c.title = "Proyecto — tocar el centro: volver a los presets";
+    this.viewToggle();
+    const items = (this.projectItems ? this.projectItems() : []).concat([
+      { g: "?", w: "ayudas", cls: this.help ? "on" : "", fn: () => this.toggleHelp(), title: "Mostrar / ocultar los nombres dentro de las esferas" }]);
+    const pos = this.ringPos(items.length, items.length > 8 ? 62 : 58);
+    items.forEach((it, k) => {
+      const b = this.btn(it.g, it.w, it.cls || "", pos[k].x, pos[k].y, () => this.projTap(it));
+      b.setAttribute("data-proj", it.w);
+      b.title = it.title || it.w;
+    });
+  }
+
   protected renderOpen() {
+    if (this.view == "proyecto") { this.renderProject(); return; }
     const fx = this.layer(), S = moSphere.SIZE, C = S / 2;
     /* centro: la capa (sigla) */
     const lname = fx ? (fx.isProject ? "proyecto" : "" + fx.GetLabelName()) : "sin presets";
@@ -321,9 +370,8 @@ export class moPresetWheel extends moSphere {
     const pb = this.btn(hasP ? "✕" : "✦", hasP ? "descartar lentes" : "proponer", "mw-mini" + (hasP ? " hot" : ""), S - 14, 14, () => this.proposeToggle());
     pb.title = hasP ? "Descartar las lentes no elegidas (la que suena se queda)"
                     : "Proponer 4 presets nuevos mezclando los que hay — tocar una lente la llama, mantenerla la guarda";
-    /* ayudas (abajo der.) */
-    const hb = this.btn("?", "ayudas", "mw-mini" + (this.help ? " on" : ""), S - 14, S - 14, () => this.toggleHelp());
-    hb.title = "Mostrar / ocultar los nombres dentro de las esferas";
+    /* UI-R: abajo der. = ◈ cara del proyecto (las ayudas «?» pasaron a esa cara) */
+    this.viewToggle();
     if (!fx) return;
     /* anillo: los presets, empezando arriba y en sentido horario */
     const cfg = fx.GetConfig(), cur = cfg.GetCurrentPreConf();

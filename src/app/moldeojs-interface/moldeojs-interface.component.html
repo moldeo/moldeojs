@@ -29,35 +29,46 @@
 
 
 
-<header class="moHeader" (mouseenter)="moToolDisplay=false;">
-  <div class="moldeoicon"></div>
-  <div class="moldeofile">{{moFileName}}</div>
-  <button class="moldeobutton" [class.moEditing]="moEditDisplay" (click)="showmoEditView();" type="button" name="moButton" [title]="moEditDisplay ? 'Editando: tocá y mové los objetos (clic para salir)' : 'Entrar en modo edición'">{{ moEditDisplay ? 'Editando' : 'Edit' }}</button>
-  <span *ngIf="escenaFx" class="moEscena" title="Parámetros del proyecto (MOB escena): valen para todas las capas">
-    <label *ngFor="let n of escenaKeys()">{{ n }}
+<!-- UI-R (FCA 18-nov): el menú de arriba se fue. Barra flotante abajo al centro = deshacer · rehacer · EDIT;
+     el resto (nombre, escena, guardar, versiones, persona, control, auto, log) vive en la rueda del proyecto (abajo der., ◈)
+     y en su FICHA (.moProyecto), que se ve mientras la rueda muestra la cara «proyecto». -->
+<div class="moBar" data-html2canvas-ignore role="toolbar" aria-label="Deshacer, rehacer y modo edición">
+  <span *ngIf="undoLabel" class="moBarLabel" aria-live="polite">{{ undoLabel }}</span>
+  <button class="moBarB" type="button" name="undo" title="Deshacer (Ctrl+Z)" aria-label="Deshacer" [disabled]="!history.canUndo()" (click)="doUndo()">↶</button>
+  <button class="moBarB" type="button" name="redo" title="Rehacer (Ctrl+Shift+Z)" aria-label="Rehacer" [disabled]="!history.canRedo()" (click)="doRedo()">↷</button>
+  <button class="moBarEdit" [class.moEditing]="moEditDisplay" type="button" name="moButton" (click)="showmoEditView();" [title]="moEditDisplay ? 'Editando: tocá y mové los objetos (clic para salir)' : 'Entrar en modo edición'">{{ moEditDisplay ? 'Editando' : 'EDIT' }}</button>
+</div>
+
+<div *ngIf="proyectoView" class="moProyecto" data-html2canvas-ignore>
+  <div class="moProyName" *ngIf="!renaming" (click)="startRename()" title="Tocar para renombrar el proyecto">
+    <span class="moProyNameTxt">{{ moFileName }}</span><span class="moProyPen">✎</span>
+  </div>
+  <input *ngIf="renaming" #renameInput class="moProyInput" name="projectName" type="text" [value]="renameDraft"
+    (input)="renameDraft = $event.target.value" (keydown.enter)="confirmRename()" (keydown.escape)="cancelRename()" (blur)="confirmRename()"
+    aria-label="Nombre del proyecto">
+  <div *ngIf="saveState" class="moProyMsg">{{ saveState }}</div>
+  <div *ngIf="personaMsg" class="moProyMsg">{{ personaMsg }}</div>
+
+  <div *ngIf="fichaSec == 'escena' && escenaFx" class="moEscena" title="Parámetros del proyecto (MOB escena): valen para todas las capas">
+    <label *ngFor="let n of escenaKeys()"><span>{{ n }}</span>
       <input type="range" min="0" max="2" step="0.05" [value]="escenaVals[n]" (pointerdown)="setEscena(n, escenaVals[n], true)" (input)="setEscena(n, $event.target.value)" [attr.name]="'escena_' + n">
       <b>{{ escenaVals[n] | number:'1.2-2' }}</b></label>
-  </span>
-  <button class="moldeobutton" (click)="showmoControlView();" type="button" name="moButton" title="Moldeojs Control View">Control</button>
-  <button class="moldeobutton" type="button" name="auto" title="Auto Layout" (click)="autoLayout()">auto</button>
-  <button class="moldeobutton" type="button" name="undo" title="Deshacer (Ctrl+Z)" [disabled]="!history.canUndo()" (click)="doUndo()">↶</button>
-  <button class="moldeobutton" type="button" name="redo" title="Rehacer (Ctrl+Shift+Z)" [disabled]="!history.canRedo()" (click)="doRedo()">↷</button>
-  <span *ngIf="undoLabel" class="moldeobutton" style="pointer-events:none">{{ undoLabel }}</span>
-  <button *ngIf="saveUrl" class="moldeobutton" type="button" name="save" title="Guardar el proyecto en el MoldeoLab" (click)="saveProject()">{{ saveState || 'Guardar' }}</button>
-  <button *ngIf="saveUrl" class="moldeobutton" type="button" name="versions" title="Versiones guardadas del proyecto" (click)="toggleVersions()">Versiones</button>
-  <select *ngIf="personas.length" class="moldeobutton moPersona" name="persona" title="La carta de una persona mueve el sol y la luna" [value]="personaId" (change)="choosePersona($event.target.value)">
-    <option value="">Persona…</option>
-    <option *ngFor="let p of personas" [value]="p.id">{{ p.alias }} · {{ p.id }}</option>
-  </select>
-  <span *ngIf="personaMsg" class="moPersonaMsg">{{ personaMsg }}</span>
-  <button class="moldeobutton" type="button" name="log" title="Registrar los toques (para depurar)" (click)="touchEdit && touchEdit.toggleLog()">{{ touchEdit && touchEdit.logOn ? 'Log ●' : 'Log' }}</button>
-</header>
-<div *ngIf="versionsOpen" class="moVersions">
-  <div class="moVersionsHead">Versiones <span class="moVersionsClose" (click)="versionsOpen=false">✕</span></div>
-  <div *ngIf="versionsMsg" class="moVersionsMsg">{{ versionsMsg }}</div>
-  <div *ngFor="let v of versions" class="moVersionRow">
-    <span class="moVersionNum">v{{ v.number }}</span>
-    <span class="moVersionInfo">{{ versionDate(v.date) }} · {{ v.user }}<br/><i>{{ v.note }}</i></span>
-    <button class="moldeobutton" type="button" (click)="restoreVersion(v)">Restaurar</button>
+  </div>
+
+  <div *ngIf="fichaSec == 'persona' && personas.length" class="moProySec">
+    <select class="moPersona" name="persona" title="La carta de una persona mueve el sol y la luna" [value]="personaId" (change)="choosePersona($event.target.value)">
+      <option value="">Persona…</option>
+      <option *ngFor="let p of personas" [value]="p.id">{{ p.alias }} · {{ p.id }}</option>
+    </select>
+  </div>
+
+  <div *ngIf="fichaSec == 'versiones'" class="moVersions">
+    <div class="moVersionsHead">Versiones <span class="moVersionsClose" (click)="toggleSec('versiones')">✕</span></div>
+    <div *ngIf="versionsMsg" class="moVersionsMsg">{{ versionsMsg }}</div>
+    <div *ngFor="let v of versions" class="moVersionRow">
+      <span class="moVersionNum">v{{ v.number }}</span>
+      <span class="moVersionInfo">{{ versionDate(v.date) }} · {{ v.user }}<br/><i>{{ v.note }}</i></span>
+      <button class="moldeobutton" type="button" (click)="restoreVersion(v)">Restaurar</button>
+    </div>
   </div>
 </div>

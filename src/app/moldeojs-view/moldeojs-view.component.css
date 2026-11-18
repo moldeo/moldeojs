@@ -124,7 +124,7 @@
   position: fixed;
   display: block;
   right: 15px;
-  top: 45px;
+  top: 10px;   /* UI-R: sin header arriba */
   z-index: 10000;
   background-color: rgba(0,0,0,0.22);
   padding: 0px;
