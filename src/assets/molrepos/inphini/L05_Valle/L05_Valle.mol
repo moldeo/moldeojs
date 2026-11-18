@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<MOCONFIG majorversion="0" minorversion="0">
+    <DEFINITION name="__console__" class="moConsole" />
+    <UPDATE />
+    <CONFIGPARAMS>
+        <PARAM name="inlet" type="INLET">
+            <VAL>
+                <D type="TXT">VARIABLE1</D>
+                <D type="TXT">NUMERIC</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="outlet" type="OUTLET" />
+        <PARAM name="script" type="SCRIPT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="devices" type="MOLDEOOBJECT" />
+        <PARAM name="preeffect" type="MOLDEOOBJECT">
+            <VAL>
+                <D type="TXT">erase</D>
+                <D type="TXT">erase</D>
+                <D type="TXT">erase</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="effect" type="MOLDEOOBJECT">
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">escena</D>
+                <D type="TXT">escena</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">Z</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e000_fondo</D>
+                <D type="TXT">e000_fondo</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">A</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e001_molino_1_e014</D>
+                <D type="TXT">e001_molino_1_e014</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">B</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e002_molino_2_e015</D>
+                <D type="TXT">e002_molino_2_e015</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">C</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e003_puente_e017</D>
+                <D type="TXT">e003_puente_e017</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">D</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e004_edificio_2_e019</D>
+                <D type="TXT">e004_edificio_2_e019</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">E</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e005_edificio_1_e018</D>
+                <D type="TXT">e005_edificio_1_e018</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">F</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e006_nube_izquierda_e022</D>
+                <D type="TXT">e006_nube_izquierda_e022</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">G</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e007_sol_e013</D>
+                <D type="TXT">e007_sol_e013</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">H</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e008_panel_solar_e016</D>
+                <D type="TXT">e008_panel_solar_e016</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">I</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e009_nube_derecha_e023</D>
+                <D type="TXT">e009_nube_derecha_e023</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">J</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e010_hoja_4_e012</D>
+                <D type="TXT">e010_hoja_4_e012</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">K</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e011_flores_violetas_e020</D>
+                <D type="TXT">e011_flores_violetas_e020</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">L</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e012_flores_rosas_e021</D>
+                <D type="TXT">e012_flores_rosas_e021</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">M</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e013_hoja_3_e011</D>
+                <D type="TXT">e013_hoja_3_e011</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">N</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e014_hoja_2_e010</D>
+                <D type="TXT">e014_hoja_2_e010</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">O</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e015_arbol_derecho_e008</D>
+                <D type="TXT">e015_arbol_derecho_e008</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">P</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e016_hoja_1_e009</D>
+                <D type="TXT">e016_hoja_1_e009</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">Q</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e017_arbol_izquierdo_e007</D>
+                <D type="TXT">e017_arbol_izquierdo_e007</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">R</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e018_tronco_grande_e006</D>
+                <D type="TXT">e018_tronco_grande_e006</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">S</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e019_raices_e004</D>
+                <D type="TXT">e019_raices_e004</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">T</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e020_micelio_e000</D>
+                <D type="TXT">e020_micelio_e000</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">U</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e021_copa_grande_e005</D>
+                <D type="TXT">e021_copa_grande_e005</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">V</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e022_semilla_e001</D>
+                <D type="TXT">e022_semilla_e001</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">W</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e023_hongos_e002</D>
+                <D type="TXT">e023_hongos_e002</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">X</D>
+            </VAL>
+            <VAL>
+                <D type="TXT">image</D>
+                <D type="TXT">e024_hojas_del_compost_e003</D>
+                <D type="TXT">e024_hojas_del_compost_e003</D>
+                <D type="NUM">0</D>
+                <D type="NUM">1</D>
+                <D type="TXT">Y</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="posteffect" type="MOLDEOOBJECT" />
+        <PARAM name="mastereffect" type="MOLDEOOBJECT" />
+        <PARAM name="resources" type="MOLDEOOBJECT" />
+        <PARAM name="mastereffects_on" type="NUM" options="off,on">
+            <VAL>
+                <D type="NUM">0</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="fulldebug" type="NUM">
+            <VAL>
+                <D type="NUM">0</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="outputmode" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="outputresolution" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="rendermode" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="renderresolution" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="clip1" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="clip2" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="clip3" type="TEXT">
+            <VAL>
+                <D type="TXT"></D>
+            </VAL>
+        </PARAM>
+        <PARAM name="screenshots" type="NUM">
+            <VAL>
+                <D type="NUM">0</D>
+            </VAL>
+        </PARAM>
+        <PARAM name="videoshots" type="NUM">
+            <VAL>
+                <D type="NUM">0</D>
+            </VAL>
+        </PARAM>
+    </CONFIGPARAMS>
+    <PRECONFIGS />
+</MOCONFIG>
