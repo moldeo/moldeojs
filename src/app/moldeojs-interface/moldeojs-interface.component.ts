@@ -1,4 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { moCacheBust } from "../mo-cache-bust";
 import {
   Component,
   OnInit,
@@ -519,7 +520,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
 
     let moFile = new XMLHttpRequest();
     //moFile.open("GET", path+"/"+projectName+".mol", true);
-    moFile.open("GET", path, true);
+    moFile.open("GET", moCacheBust(path), true);
     moFile.onreadystatechange = function (){
       if(moFile.readyState === 4){
         if(moFile.status === 200 || moFile.status == 0){
@@ -551,7 +552,7 @@ export class MoldeojsInterfaceComponent implements OnInit {
     let this_ = this;
 
     let cfgFile = new XMLHttpRequest();
-    cfgFile.open("GET", path+"/"+cfg_name+".cfg", true);
+    cfgFile.open("GET", moCacheBust(path+"/"+cfg_name+".cfg"), true);
     cfgFile.onreadystatechange = function (){
       if(cfgFile.readyState === 4){
         if(cfgFile.status === 200 || cfgFile.status == 0){

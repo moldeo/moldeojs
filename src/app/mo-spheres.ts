@@ -8,6 +8,7 @@
  *  - moTimeSphere    (abajo-izq): ▶ línea de tiempo del proyecto + ⇄ grupo · ● REC / ■ · ▷ reproducir la toma
  */
 import { moSphere } from "./mo-sphere";
+import { moCacheBust } from "./mo-cache-bust";
 
 const NUMERIC = ["NUM", "CHAR", "INT", "LONG", "FLOAT", "DOUBLE"];
 const NUMRE = /^\s*-?(\d+\.?\d*|\.\d+)(e-?\d+)?\s*$/i;
@@ -389,7 +390,7 @@ export class moTimeSphere extends moSphere {
 
   /** al abrir: la última toma guardada queda lista para ▷ (404 o archivo inválido = sin tomas) */
   loadTakes(url: string): Promise<number> {
-    return fetch(url, { credentials: "same-origin", cache: "no-store" })
+    return fetch(moCacheBust(url), { credentials: "same-origin", cache: "no-store" })
       .then((r) => r.ok ? r.json() : null)
       .then((j) => {
         if (!j || j.v !== 1 || !Array.isArray(j.tomas) || !j.tomas.length) return 0;
